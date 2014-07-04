@@ -149,7 +149,8 @@ Similarly, you can use an :math:`\ell_1` penalty and minimise
     lasso_estimator.fit(X, y)
     print "Estimated beta error =", np.linalg.norm(lasso_estimator.beta - beta)
 
-**Elastic net regression (L1 + L2 penalties)**
+Elastic net regression (L1 + L2 penalties)
+------------------------------------------
 
 You can combine :math:`\ell_1` and :math:`\ell_2` penalties with coefficients :math:`\alpha=0.1` (global penalty) and :math:`l=0.1` (:math:`\ell_1` ratio) and minimise
 
