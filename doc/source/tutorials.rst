@@ -99,7 +99,7 @@ Linear regression
 =================
 
 Knowing :math:`X` and :math:`y`, we want to find :math:`\beta` by
-minimizing the OLS loss function. Note that the defaulyt option is to minimize the mean square error and not the sum square error.
+minimizing the OLS loss function. Note that the defaulyt option is to minimize the mean squared error and not the sum squared error.
 
 .. math::
 
