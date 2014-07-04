@@ -1,0 +1,10 @@
+*.pyc
+*~
+.nfs*
+~$*
+*.Rhistory
+*.aux
+*.bbl
+*.blg
+*.log
+*.pdf
