@@ -99,11 +99,11 @@ Linear regression
 =================
 
 Knowing :math:`X` and :math:`y`, we want to find :math:`\beta` by
-minimizing the OLS loss function
+minimizing the OLS loss function. Note that the defaulyt option is to minimize the mean square error and not the sum square error.
 
 .. math::
 
-   \min \|y - X\beta\|^2_2
+   \min \frac{1}{n}\|y - X\beta\|^2_2
 
 using default algorithm (CONESTA).
 
@@ -122,7 +122,7 @@ We add an :math:`\ell_2` constraint with ridge regression coefficient
 
 .. math::
 
-   \min\left(\frac{1}{2}\|y - X\beta\|_2^2 + \frac{l_2}{2}\|\beta\|_2^2\right)
+   \min\left(\frac{1}{2 n}\|y - X\beta\|_2^2 + \frac{l_2}{2}\|\beta\|_2^2\right)
 
 .. code-block:: python
 
@@ -139,7 +139,7 @@ Similarly, you can use an :math:`\ell_1` penalty and minimise
 
 .. math::
 
-   \min\left(\frac{1}{2}\|y - X\beta\|_2^2 + l_1\|\beta\|_1\right).
+   \min\left(\frac{1}{2 n}\|y - X\beta\|_2^2 + l_1\|\beta\|_1\right).
 
 .. code-block:: python
 
@@ -156,7 +156,7 @@ You can combine :math:`\ell_1` and :math:`\ell_2` penalties with coefficients :m
 
 .. math::
 
-   \min\left(\frac{1}{2}\|y - X\beta\|_2^2 + \alpha (\frac{(1 - l)}{2}\|\beta\|_2^2 + l\cdot \|\beta\|_1))\right).
+   \min\left(\frac{1}{2 n}\|y - X\beta\|_2^2 + \alpha (\frac{(1 - l)}{2}\|\beta\|_2^2 + l\cdot \|\beta\|_1))\right).
 
 .. code-block:: python
 
@@ -174,7 +174,7 @@ You can combine :math:`\ell_1`, :math:`\ell_2` and TV penalties with coefficient
 
 .. math::
 
-   \min\left(\frac{1}{2}\|y - X\beta\|_2^2 + l_2\cdot \|\beta\|_2^2 + l_1\cdot \|\beta\|_1 + l_{TV}\cdot TV(\beta)\right).
+   \min\left(\frac{1}{2 n}\|y - X\beta\|_2^2 + l_2\cdot \|\beta\|_2^2 + l_1\cdot \|\beta\|_1 + l_{TV}\cdot TV(\beta)\right).
 
 .. code-block:: python
 
@@ -196,7 +196,7 @@ constraint, :math:`\mathrm{GL}`, and instead minimise
 
 .. math::
 
-   \min\left(\frac{1}{2}\|y - X\beta\|_2^2 + \frac{k}{2}\|\beta\|_2^2 + l\|\beta\|_1 + g\cdot GL(\beta)\right).
+   \min\left(\frac{1}{2 n}\|y - X\beta\|_2^2 + \frac{k}{2}\|\beta\|_2^2 + l\|\beta\|_1 + g\cdot GL(\beta)\right).
 
 .. code-block:: python
 
