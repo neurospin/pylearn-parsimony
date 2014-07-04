@@ -95,8 +95,8 @@ Or in the discrimination case:
 In later sessions, we want to discover :math:`\beta` using different loss
 functions.
 
-Linear regression + L1 + L2 + TV or + GL
-========================================
+Linear regression
+=================
 
 Knowing :math:`X` and :math:`y`, we want to find :math:`\beta` by
 minimizing the OLS loss function
@@ -105,76 +105,90 @@ minimizing the OLS loss function
 
    \min \|y - X\beta\|^2_2
 
-using FISTA.
+using default algorithm (CONESTA).
 
 .. code-block:: python
 
     import parsimony.estimators as estimators
-    import parsimony.algorithms.explicit as algorithms
-    import parsimony.functions.nesterov.tv as tv
-    k = 0.0  # l2 ridge regression coefficient
-    l = 0.0  # l1 lasso coefficient
-    g = 0.0  # Nesterov function coefficient
-    A, n_compacts = tv.A_from_shape(shape)  # Memory allocation for TV
-    ols_estimator = estimators.LinearRegressionL1L2TV(
-                                          k, l, g, A=A,
-                                          algorithm=algorithms.FISTA(),
-                                          algorithm_params=dict(max_iter=1000))
-    res = ols_estimator.fit(X, y)
+    ols_estimator = estimators.LinearRegression()
+    ols_estimator.fit(X, y)
     print "Estimated beta error =", np.linalg.norm(ols_estimator.beta - beta)
 
+Ridge regression (L2 penalty)
+-----------------------------
+
 We add an :math:`\ell_2` constraint with ridge regression coefficient
-:math:`k=0.1` and minimise
+:math:`l_2=0.1` and minimise
 
 .. math::
 
-   \min\left(\frac{1}{2}\|y - X\beta\|_2^2 + \frac{k}{2}\|\beta\|_2^2\right)
-
-where the :math:`q`-norm is defined as
-
-.. math::
-
-   \|v\|_q = \left(\sum_{i=1}^p |v_i|^q\right)^{\frac{1}{q}}
+   \min\left(\frac{1}{2}\|y - X\beta\|_2^2 + \frac{l_2}{2}\|\beta\|_2^2\right)
 
 .. code-block:: python
 
     import parsimony.estimators as estimators
-    import parsimony.algorithms.explicit as algorithms
-    import parsimony.functions.nesterov.tv as tv
-    k = 0.1  # l2 ridge regression coefficient
-    l = 0.0  # l1 lasso coefficient
-    g = 0.0  # Nesterov function coefficient
-    A, n_compacts = tv.A_from_shape(shape)
-    ridge_estimator = estimators.LinearRegressionL1L2TV(
-                                          k, l, g, A=A,
-                                          algorithm=algorithms.FISTA(),
-                                          algorithm_params=dict(max_iter=1000))
-    res = ridge_estimator.fit(X, y)
+    l2 = 0.1  # l2 ridge regression coefficient
+    ridge_estimator = estimators.RidgeRegression(l2)
+    ridge_estimator.fit(X, y)
     print "Estimated beta error =", np.linalg.norm(ridge_estimator.beta - beta)
 
-Similarly, you can add an :math:`\ell_1` constraint and a :math:`\mathrm{TV}`
-constraint with coefficients :math:`l=0.1` and :math:`g=0.1` and instead
-minimise
+Lasso regression (L1 penalty)
+-----------------------------
+
+Similarly, you can use an :math:`\ell_1` penalty and minimise
 
 .. math::
 
-   \min\left(\frac{1}{2}\|y - X\beta\|_2^2 + \frac{k}{2}\|\beta\|_2^2 + l\|\beta\|_1 + g\cdot TV(\beta)\right).
+   \min\left(\frac{1}{2}\|y - X\beta\|_2^2 + l_1\|\beta\|_1\right).
 
 .. code-block:: python
 
     import parsimony.estimators as estimators
-    import parsimony.algorithms.explicit as algorithms
-    import parsimony.functions.nesterov.tv as tv
-    k = 0.0  # l2 ridge regression coefficient
-    l = 0.1  # l1 lasso coefficient
-    g = 0.1  # tv coefficient
-    A, n_compacts = tv.A_from_shape(shape)
-    estimator = estimators.LinearRegressionL1L2TV(
-                                          k, l, g, A=A,
-                                          algorithm=algorithms.FISTA(),
-                                          algorithm_params=dict(max_iter=1000))
-    res = estimator.fit(X, y)
-    print "Estimated beta error =", np.linalg.norm(estimator.beta - beta)
+    l1 = 0.1  # l1 lasso coefficient
+    lasso_estimator = estimators.Lasso(l1)
+    lasso_estimator.fit(X, y)
+    print "Estimated beta error =", np.linalg.norm(lasso_estimator.beta - beta)
+
+**Elastic net regression (L1 + L2 penalties)**
+
+You can combine :math:`\ell_1` and :math:`\ell_2` penalties with coefficients :math:`\alpha=0.1` (global penalty) and :math:`l=0.1` (:math:`\ell_1` ratio) and minimise
+
+.. math::
+
+   \min\left(\frac{1}{2}\|y - X\beta\|_2^2 + \alpha (\frac{(1 - l)}{2}\|\beta\|_2^2 + l\cdot \|\beta\|_1))\right).
+
+.. code-block:: python
+
+    import parsimony.estimators as estimators
+    alpha = 0.1  # global penalty
+    l = 0.1  # l1 ratio (lasso)
+    enet_estimator = estimators.ElasticNet(l=l, alpha=alpha)
+    enet_estimator.fit(X, y)
+    print "Estimated beta error =", np.linalg.norm(enet_estimator.beta - beta)
+
+Elastic net regression + TV (L1 + L2 + TV penalties)
+----------------------------------------------------
+
+You can combine :math:`\ell_1`, :math:`\ell_2` and TV penalties with coefficients :math:`l_1=0.1`, :math:`l_2=0.1` and  :math:`l_{TV}=0.1` and minimise
+
+.. math::
+
+   \min\left(\frac{1}{2}\|y - X\beta\|_2^2 + l_2\cdot \|\beta\|_2^2 + l_1\cdot \|\beta\|_1 + l_{TV}\cdot TV(\beta)\right).
+
+.. code-block:: python
+
+    import parsimony.estimators as estimators
+    import parsimony.functions.nesterov.tv as tv_helper
+    l1 = 0.1  # l1 penalty
+    l2 = 0.1  # l2 penalty
+    tv = 0.1  # tv penalty
+    A, n_compacts = tv_helper.A_from_shape(shape)  # Memory allocation for TV
+    tvenet_estimator = estimators.LinearRegressionL1L2TV(l1=l1, l2=l2, tv=tv, A=A)
+    tvenet_estimator.fit(X, y)
+    print "Estimated beta error =", np.linalg.norm(tvenet_estimator.beta - beta)
+
+Elastic net regression + Group Lasso (L1 + L2 + GL penalties)
+-------------------------------------------------------------
 
 We change the :math:`\mathrm{TV}` constraint to an overlapping group lasso
 constraint, :math:`\mathrm{GL}`, and instead minimise
@@ -200,8 +214,11 @@ constraint, :math:`\mathrm{GL}`, and instead minimise
     res = estimator.fit(X, y)
     print "Estimated beta error =", np.linalg.norm(estimator.beta - beta)
 
+Logistic regression
+===================
+
 Logistic regression + L1 + L2 + TV or + GL
-==========================================
+------------------------------------------
 
 Knowing :math:`X` and :math:`y`, we want to find the weight vector
 :math:`\beta` by minimizing the logistic regression loss function

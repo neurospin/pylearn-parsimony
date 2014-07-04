@@ -14,7 +14,7 @@ Build pages
 We assume that your parsimony repository is located in "~/pylearn-parsimony". Goto the directory which contains the doc source, and then build the doc.
 
 ```
-$ PARSIMONYDIR=~/pylearn-parsimony
+$ PARSIMONYDIR=~/git/pylearn-parsimony
 $ cd $PARSIMONYDIR/doc/source
 $ make html
 $ mkdir -p ./_build/html/epydoc_api
