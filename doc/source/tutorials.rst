@@ -158,7 +158,7 @@ You can combine :math:`\ell_1`, :math:`\ell_2` and TV penalties with coefficient
 
 .. math::
 
-   \min\left(\frac{1}{2 n}\|y - X\beta\|_2^2 + l_2\cdot \|\beta\|_2^2 + l_1\cdot \|\beta\|_1 + l_{TV}\cdot TV(\beta)\right).
+   \min\left(\frac{1}{2 n}\|y - X\beta\|_2^2 + \frac{l_2}{2} \|\beta\|_2^2 + l_1 \|\beta\|_1 + l_{TV} TV(\beta)\right).
 
 .. code-block:: python
 
@@ -244,7 +244,7 @@ minimise
 
 .. math::
 
-   \min\left(\frac{1}{n}\sum_{i=1}^n\log(1 + e^{-y_i(\beta^Tx_i)}) + \frac{k}{2}\|\beta\|_2^2\right).
+   \min\left(\frac{1}{n}\sum_{i=1}^n\log(1 + e^{-y_i(\beta^Tx_i)}) + \frac{l_2}{2}\|\beta\|_2^2\right).
 
 Note that there is not specfific estimator, but you can use the generic 
 LogisticRegressionL1L2TV estimator with null :math:`l_1, tv` coefficient
@@ -255,8 +255,8 @@ LogisticRegressionL1L2TV estimator with null :math:`l_1, tv` coefficient
     import parsimony.functions.nesterov.tv as tv_helper
     l2 = 0.1  # l2 ridge regression coefficient
     A, n_compacts = tv_helper.A_from_shape(shape)
-    ridge_lr_estimator = LogisticRegressionL1L2TV(l1=0, l2=l2, tv=0, A=A)
-    ridge_lr_estimator.fit(Xtr, ytr)
+    ridge_lr_estimator = estimators.LogisticRegressionL1L2TV(l1=0, l2=l2, tv=0, A=A)
+    ridge_lr_estimator.fit(X, y)
     print "Estimated prediction rate =", ridge_lr_estimator.score(X, y)
 
 Ridge + Lasso logistic regression (L1 + L2 penalties)
@@ -268,7 +268,7 @@ minimise:
 
 .. math::
 
-   \min\left(\frac{1}{n}\sum_{i=1}^n\log(1 + e^{-y_i(\beta^Tx_i)}) + \frac{k}{2}\|\beta\|_2^2 + l\|\beta\|_1 \right).
+   \min\left(\frac{1}{n}\sum_{i=1}^n\log(1 + e^{-y_i(\beta^Tx_i)}) + \frac{l_2}{2}\|\beta\|_2^2 + l_1\|\beta\|_1 \right).
 
 .. code-block:: python
 
@@ -277,8 +277,8 @@ minimise:
     l1 = 0.1  # l1 lasso coefficient
     l2 = 0.1  # l2 ridge regression coefficient
     A, n_compacts = tv_helper.A_from_shape(shape)
-    enet_lr_estimator = LogisticRegressionL1L2TV(l1=l1, l2=l2, tv=0, A=A)
-    enet_lr_estimator.fit(Xtr, ytr)
+    enet_lr_estimator = estimators.LogisticRegressionL1L2TV(l1=l1, l2=l2, tv=0, A=A)
+    enet_lr_estimator.fit(X, y)
     print "Estimated prediction rate =", enet_lr_estimator.score(X, y)
 
 Logistic regression with L1 + L2 and TV penalties
@@ -298,8 +298,8 @@ Finally, you can add a :math:`\mathrm{TV}` penalty minimise:
     l2 = 0.1  # l2 ridge regression coefficient
     tv = 0.1  # l2 ridge regression coefficient
     A, n_compacts = tv_helper.A_from_shape(shape)
-    enettv_lr_estimator = LogisticRegressionL1L2TV(l1=l1, l2=l2, tv=tv, A=A)
-    enettv_lr_estimator.fit(Xtr, ytr)
+    enettv_lr_estimator = estimators.LogisticRegressionL1L2TV(l1=l1, l2=l2, tv=tv, A=A)
+    enettv_lr_estimator.fit(X, y)
     print "Estimated prediction rate =", enettv_lr_estimator.score(X, y)
 
 Logistic regression with L1 + L2 and GL penalties
