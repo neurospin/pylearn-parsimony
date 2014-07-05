@@ -1,10 +1,7 @@
 .. _installing:
 
-Installing Parsimony
-====================
-
 Getting the dependencies
-------------------------
+========================
 
 The reference environment for pylearn-parsimony is Ubuntu 12.04 LTS with
 Python 2.7.3, Numpy 1.6.1 and Scipy 0.9.0. More recent versions likely w
@@ -33,7 +30,7 @@ In order to show plots, you may need to install Matplotlib:
 
 
 Installing from github
-----------------------
+======================
 
 You can check out the latest sources with the command:
 
@@ -44,4 +41,4 @@ You can check out the latest sources with the command:
     git clone https://github.com/neurospin/pylearn-parsimony.git
 
 
-Then add pylearn-parsimony in your $PYTHONPATH
+Then add ``pylearn-parsimony`` directory in your ``$PYTHONPATH``
