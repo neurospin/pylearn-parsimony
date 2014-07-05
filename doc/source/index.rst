@@ -21,6 +21,14 @@ Parsimony currently contains:
     - COntinuation of NESTsterov’s smoothing Algorithm (CONESTA)
     - Excessive Gap Method
 
+Installing Parsimony
+====================
+
+.. toctree::
+
+   installing.rst
+
+
 Tutorials
 =========
 
