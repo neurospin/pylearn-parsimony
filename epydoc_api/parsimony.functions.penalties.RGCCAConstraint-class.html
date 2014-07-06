@@ -1,0 +1,606 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>parsimony.functions.penalties.RGCCAConstraint</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="parsimony-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="parsimony-module.html">Package&nbsp;parsimony</a> ::
+        <a href="parsimony.functions-module.html" onclick="show_private();">Package&nbsp;functions</a> ::
+        <a href="parsimony.functions.penalties-module.html">Module&nbsp;penalties</a> ::
+        Class&nbsp;RGCCAConstraint
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="parsimony.functions.penalties.RGCCAConstraint-class.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class RGCCAConstraint</h1><p class="nomargin-top"><span class="codelink"><a href="parsimony.functions.penalties-pysrc.html#RGCCAConstraint">source&nbsp;code</a></span></p>
+<pre class="base-tree">
+           object --+            
+                    |            
+  <a href="parsimony.functions.properties.Function-class.html">properties.Function</a> --+        
+                        |        
+<a href="parsimony.functions.properties.AtomicFunction-class.html">properties.AtomicFunction</a> --+    
+                            |    
+               object --+   |    
+                        |   |    
+      <a href="parsimony.functions.properties.Gradient-class.html">properties.Gradient</a> --+    
+                            |    
+               object --+   |    
+                        |   |    
+       <a href="parsimony.functions.properties.Penalty-class.html">properties.Penalty</a> --+    
+                            |    
+               object --+   |    
+                        |   |    
+    <a href="parsimony.functions.properties.Constraint-class.html">properties.Constraint</a> --+    
+                            |    
+          <a href="parsimony.functions.penalties.QuadraticConstraint-class.html">QuadraticConstraint</a> --+
+                                |
+                   object --+   |
+                            |   |
+<a href="parsimony.functions.properties.ProjectionOperator-class.html">properties.ProjectionOperator</a> --+
+                                |
+                               <strong class="uidshort">RGCCAConstraint</strong>
+</pre>
+
+<hr />
+<pre class="literalblock">
+The proximal operator of the quadratic function
+
+    f(x) = l * (x'(tau * I + ((1 - tau) / n) * X'X)x - c),
+
+where tau is a given regularisation constant. The constrained version has
+the form
+
+    x'(tau * I + ((1 - tau) / n) * X'X)x &lt;= c.
+
+Parameters
+----------
+l : Non-negative float. The Lagrange multiplier, or regularisation
+        constant, of the function.
+
+c : Float. The limit of the constraint. The function is feasible if
+        x'(tau * I + ((1 - tau) / n) * X'X)x &lt;= c. The default value is
+        c=0, i.e. the default is a regularisation formulation.
+
+tau : Non-negative float. The regularisation constant.
+
+unbiased : Boolean. Whether the sample variance should be unbiased or not.
+        Default is unbiased.
+
+penalty_start : Non-negative integer. The number of columns, variables
+        etc., to be exempt from penalisation. Equivalently, the first index
+        to be penalised. Default is 0, all columns are included.
+
+</pre>
+
+<!-- ==================== INSTANCE METHODS ==================== -->
+<a name="section-InstanceMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.penalties.RGCCAConstraint-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">l</span>=<span class="summary-sig-default">1.0</span>,
+        <span class="summary-sig-arg">c</span>=<span class="summary-sig-default">0.0</span>,
+        <span class="summary-sig-arg">tau</span>=<span class="summary-sig-default">1.0</span>,
+        <span class="summary-sig-arg">X</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">unbiased</span>=<span class="summary-sig-default">True</span>,
+        <span class="summary-sig-arg">penalty_start</span>=<span class="summary-sig-default">0</span>)</span><br />
+      x.__init__(...) initializes x; see help(type(x)) for signature</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.penalties-pysrc.html#RGCCAConstraint.__init__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.penalties.RGCCAConstraint-class.html#reset" class="summary-sig-name">reset</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Free any cached computations from previous use of this Function.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.penalties-pysrc.html#RGCCAConstraint.reset">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.penalties.RGCCAConstraint-class.html#f" class="summary-sig-name">f</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">beta</span>)</span><br />
+      Function value.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.penalties-pysrc.html#RGCCAConstraint.f">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.penalties.RGCCAConstraint-class.html#grad" class="summary-sig-name">grad</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">beta</span>)</span><br />
+      Gradient of the function.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.penalties-pysrc.html#RGCCAConstraint.grad">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.penalties.RGCCAConstraint-class.html#feasible" class="summary-sig-name">feasible</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">beta</span>)</span><br />
+      Feasibility of the constraint.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.penalties-pysrc.html#RGCCAConstraint.feasible">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.penalties.RGCCAConstraint-class.html#proj" class="summary-sig-name">proj</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">beta</span>)</span><br />
+      The projection operator corresponding to the function.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.penalties-pysrc.html#RGCCAConstraint.proj">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.penalties.RGCCAConstraint-class.html#_compute_value" class="summary-sig-name" onclick="show_private();">_compute_value</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">beta</span>)</span><br />
+      Helper function to compute the function value.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.penalties-pysrc.html#RGCCAConstraint._compute_value">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.Function-class.html">properties.Function</a></code></b>:
+      <code><a href="parsimony.functions.properties.Function-class.html#get_params">get_params</a></code>,
+      <code><a href="parsimony.functions.properties.Function-class.html#set_params">set_params</a></code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.Gradient-class.html">properties.Gradient</a></code></b>:
+      <code><a href="parsimony.functions.properties.Gradient-class.html#approx_grad">approx_grad</a></code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__delattr__</code>,
+      <code>__format__</code>,
+      <code>__getattribute__</code>,
+      <code>__hash__</code>,
+      <code>__new__</code>,
+      <code>__reduce__</code>,
+      <code>__reduce_ex__</code>,
+      <code>__repr__</code>,
+      <code>__setattr__</code>,
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS VARIABLES ==================== -->
+<a name="section-ClassVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.penalties.QuadraticConstraint-class.html">QuadraticConstraint</a></code></b>:
+      <code><a href="parsimony.functions.penalties.QuadraticConstraint-class.html#__abstractmethods__">__abstractmethods__</a></code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.AtomicFunction-class.html">properties.AtomicFunction</a></code></b>:
+      <code><a href="parsimony.functions.properties.AtomicFunction-class.html#__metaclass__">__metaclass__</a></code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.Function-class.html">properties.Function</a></code></b> (private):
+      <code><a href="parsimony.functions.properties.Function-class.html#_abc_cache" onclick="show_private();">_abc_cache</a></code>,
+      <code><a href="parsimony.functions.properties.Function-class.html#_abc_negative_cache" onclick="show_private();">_abc_negative_cache</a></code>,
+      <code><a href="parsimony.functions.properties.Function-class.html#_abc_negative_cache_version" onclick="show_private();">_abc_negative_cache_version</a></code>,
+      <code><a href="parsimony.functions.properties.Function-class.html#_abc_registry" onclick="show_private();">_abc_registry</a></code>
+      </p></div>
+    </td>
+  </tr>
+</table>
+<!-- ==================== PROPERTIES ==================== -->
+<a name="section-Properties"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Properties</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Properties"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__class__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-MethodDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="__init__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">l</span>=<span class="sig-default">1.0</span>,
+        <span class="sig-arg">c</span>=<span class="sig-default">0.0</span>,
+        <span class="sig-arg">tau</span>=<span class="sig-default">1.0</span>,
+        <span class="sig-arg">X</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">unbiased</span>=<span class="sig-default">True</span>,
+        <span class="sig-arg">penalty_start</span>=<span class="sig-default">0</span>)</span>
+    <br /><em class="fname">(Constructor)</em>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.penalties-pysrc.html#RGCCAConstraint.__init__">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>x.__init__(...) initializes x; see help(type(x)) for signature</p>
+  <dl class="fields">
+    <dt>Overrides:
+        object.__init__
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="reset"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">reset</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.penalties-pysrc.html#RGCCAConstraint.reset">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Free any cached computations from previous use of this Function.</p>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="parsimony.functions.properties.Function-class.html#reset">properties.Function.reset</a>
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="f"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">f</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">beta</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.penalties-pysrc.html#RGCCAConstraint.f">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Function value.</p>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="parsimony.functions.properties.Function-class.html#f">properties.Function.f</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="grad"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">grad</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">beta</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.penalties-pysrc.html#RGCCAConstraint.grad">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Gradient of the function.</p>
+  <p>From the interface &quot;Gradient&quot;.</p>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="parsimony.functions.properties.Gradient-class.html#grad">properties.Gradient.grad</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="feasible"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">feasible</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">beta</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.penalties-pysrc.html#RGCCAConstraint.feasible">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Feasibility of the constraint.</p>
+  <p>From the interface &quot;Constraint&quot;.</p>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="parsimony.functions.properties.Constraint-class.html#feasible">properties.Constraint.feasible</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="proj"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">proj</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">beta</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.penalties-pysrc.html#RGCCAConstraint.proj">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+The projection operator corresponding to the function.
+
+From the interface &quot;ProjectionOperator&quot;.
+
+Examples
+--------
+&gt;&gt;&gt; import parsimony.functions.penalties as penalties
+&gt;&gt;&gt; import numpy as np
+&gt;&gt;&gt; np.random.seed(42)
+&gt;&gt;&gt;
+&gt;&gt;&gt; X = np.random.randn(10, 10)
+&gt;&gt;&gt; x = np.random.randn(10, 1)
+&gt;&gt;&gt; L2 = penalties.RGCCAConstraint(c=1.0, tau=1.0, X=X, unbiased=True)
+&gt;&gt;&gt; L2.f(x)
+5.7906381220390024
+&gt;&gt;&gt; y = L2.proj(x)
+&gt;&gt;&gt; L2.f(y)
+-2.2204460492503131e-16
+&gt;&gt;&gt; np.linalg.norm(y)
+0.99999999999999989
+
+</pre>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="parsimony.functions.properties.ProjectionOperator-class.html#proj">properties.ProjectionOperator.proj</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="_compute_value"></a>
+<div class="private">
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">_compute_value</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">beta</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.penalties-pysrc.html#RGCCAConstraint._compute_value">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Helper function to compute the function value.</p>
+  <p>Note that beta must already be sliced!</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="parsimony-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sun Jul  6 11:32:52 2014
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

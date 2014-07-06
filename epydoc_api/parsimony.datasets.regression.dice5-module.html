@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>parsimony.datasets.regression.dice5</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="parsimony-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="parsimony-module.html">Package&nbsp;parsimony</a> ::
+        <a href="parsimony.datasets-module.html">Package&nbsp;datasets</a> ::
+        <a href="parsimony.datasets.regression-module.html">Package&nbsp;regression</a> ::
+        Module&nbsp;dice5
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="parsimony.datasets.regression.dice5-module.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== MODULE DESCRIPTION ==================== -->
+<h1 class="epydoc">Module dice5</h1><p class="nomargin-top"><span class="codelink"><a href="parsimony.datasets.regression.dice5-pysrc.html">source&nbsp;code</a></span></p>
+<p>Created on Tue Mar 18 10:57:39 2014</p>
+  <p>Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights 
+  reserved.</p>
+
+<hr />
+<div class="fields">      <p><strong>Author:</strong>
+        Edouard Duchesnay
+      </p>
+      <p><strong>License:</strong>
+        BSD 3-clause.
+      </p>
+</div><!-- ==================== FUNCTIONS ==================== -->
+<a name="section-Functions"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Functions</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Functions"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.datasets.regression.dice5-module.html#load" class="summary-sig-name">load</a>(<span class="summary-sig-arg">n_samples</span>=<span class="summary-sig-default">100</span>,
+        <span class="summary-sig-arg">shape</span>=<span class="summary-sig-default"><code class="variable-group">(</code>30<code class="variable-op">, </code>30<code class="variable-op">, </code>1<code class="variable-group">)</code></span>,
+        <span class="summary-sig-arg">r2</span>=<span class="summary-sig-default">0.75</span>,
+        <span class="summary-sig-arg">sigma_spatial_smoothing</span>=<span class="summary-sig-default">1</span>,
+        <span class="summary-sig-arg">object_pixel_ratio</span>=<span class="summary-sig-default">0.5</span>,
+        <span class="summary-sig-arg">objects</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">random_seed</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Generates regression samples (images + target variable) and beta.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.datasets.regression.dice5-pysrc.html#load">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.datasets.regression.dice5-module.html#dice_five_with_union_of_pairs" class="summary-sig-name">dice_five_with_union_of_pairs</a>(<span class="summary-sig-arg">shape</span>,
+        <span class="summary-sig-arg">std</span>,
+        <span class="summary-sig-arg">beta</span>)</span><br />
+      Seven objects, five dot + union1 = dots 1 + 2 and union2 = dots 4 + 5
+1, 3 and 4 have beta == beta
+2, 5  have beta = -beta/2
+union1 and union2 have beta = 0</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.datasets.regression.dice5-pysrc.html#dice_five_with_union_of_pairs">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+</table>
+<!-- ==================== VARIABLES ==================== -->
+<a name="section-Variables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Variables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="'parsimony.datasets.regression'"><code class="variable-quote">'</code><code class="variable-string">parsimony.datasets.regression</code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
+</table>
+<!-- ==================== FUNCTION DETAILS ==================== -->
+<a name="section-FunctionDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Function Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-FunctionDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="load"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">load</span>(<span class="sig-arg">n_samples</span>=<span class="sig-default">100</span>,
+        <span class="sig-arg">shape</span>=<span class="sig-default"><code class="variable-group">(</code>30<code class="variable-op">, </code>30<code class="variable-op">, </code>1<code class="variable-group">)</code></span>,
+        <span class="sig-arg">r2</span>=<span class="sig-default">0.75</span>,
+        <span class="sig-arg">sigma_spatial_smoothing</span>=<span class="sig-default">1</span>,
+        <span class="sig-arg">object_pixel_ratio</span>=<span class="sig-default">0.5</span>,
+        <span class="sig-arg">objects</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">random_seed</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.datasets.regression.dice5-pysrc.html#load">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+Generates regression samples (images + target variable) and beta.
+
+Input features (X) covariance structure is controled both at a pixel
+level (spatial smoothing) and object level. Objects are component
+of pixels sharing a covariance that stem from a latent variable.
+beta is non null within objects (default is five dots).
+Then y is obtained with y = X * beta + noise, where beta is scalled such
+that r_square(y, X * beta) = r2 and noise is sampled according to N(0, 1).
+
+Parameters
+----------
+n_samples: Integer. Number of samples. Default is 100.
+
+# TODO: This is wrong. Shape should be Z, Y, X.
+shape: Tuple or list with three integers. Order x, y, z shape each samples
+        Default is (30, 30, 1).
+
+r2: Float. The desire R-squared (explained variance) ie.:
+        r_square(y, X * beta) = r2 (Default is .75)
+
+sigma_spatial_smoothing: Float. Standard deviation for Gaussian kernel
+        (default is 1). High value promotes spatial correlation pixels.
+
+object_pixel_ratio: Float. Controls the ratio between object-level signal
+        and pixel-level signal for pixels within objects. If
+        object_pixel_ratio == 1 then 100% of the signal of pixels within
+        the same object is shared (ie.: no pixel level) signal. If
+        object_pixel_ratio == 0 then all the signal is pixel specific.
+        High object_pixel_ratio promotes spatial correlation between
+        pixels of the same object.
+
+objects: List of objects. Objects carying information to be drawn in the
+        image. If not provide a dice with five points (object) will be
+        drawn. Point 1, 3, 4 are carying predictive information while
+        point 2 is a suppressor of point 1 and point 5 is a suppressor of
+        point 3. Object should implement &quot;get_mask()&quot; method, a have
+        &quot;is_suppressor&quot; (bool) and &quot;r&quot; (ref to suppressor object,
+        possibely None) attributes.
+
+random_seed: None or integer. See numpy.random.seed(). If not None, it can
+        be used to obtain reproducable samples.
+
+Returns
+-------
+X3d: Numpy array of shape [n_sample, shape]. The input features.
+
+y: Numpy array of shape [n_sample, 1]. The target variable.
+
+beta3d: Numpy array of shape [shape,]. It is the beta such that
+        y = X * beta + noise.
+
+Details
+-------
+The general procedure is:
+    1) For each pixel i, Generate independant variables Xi ~ N(0, 1)
+    2) Add object level structure corresponding to the five dots:
+       - Sample five latent variables ~ N(0, 1): l1, l12, l3, l4, l45.
+       - Pixel i of dots X1, X2, X3, X4, X5 are sampled as:
+         X1i = l1 + l12 + Xi
+         X2i = l12 + Xi
+         X3i = 2 * l3 + Xi
+         X4i = l4 + l45 + Xi
+         X5i = l45 + Xi
+         Note that:
+         Pixels of dot X1 share a common variance that stem from l1 + l12.
+         Pixels of dot X2 share a common variance that stem from l12.
+         Pixels of dot X1 and pixel of dot X2 share a common variance that
+         stem from l12.
+         etc.
+    4) Spatial Smoothing.
+    5) Model: y = X beta + noise
+    - Betas are null outside dots, and 1 or -1 depending on the dot:
+        X1: 1, X2: -1, X3: 1, X4: 1, X5: -1.
+    - Sample noise ~ N(0, 1)
+    - Compute X beta then scale beta such that: r_squared(y, X beta) = r2
+    Return X, y, beta
+
+    Note that negative coeficients for X2 and X5 combined with the shared
+    latent variable l12 and l45 make X2 and X5 suppressor regions ie.:
+    regions are not correlated with y but
+        y = X1 - X2 + X3 + X4 -X5 + noise
+        y = l1 + l3 + l4 + noise
+        So pixels of X2 and X5 are not correlated with the target y so they
+        will not be detected by univariate analysis. However, they
+        are usefull since they are suppressing unwilling variance that stem
+        from latents l12 and l45.
+
+Examples
+--------
+&gt;&gt;&gt; import numpy as np
+&gt;&gt;&gt; import matplotlib.pyplot as plot
+&gt;&gt;&gt; from  parsimony import datasets
+&gt;&gt;&gt; n_samples = 100
+&gt;&gt;&gt; shape = (11, 11, 1)
+&gt;&gt;&gt; X3d, y, beta3d = datasets.regression.dice5.load(n_samples=n_samples,
+...     shape=shape, r2=.5, random_seed=1)
+
+</pre>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="dice_five_with_union_of_pairs"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">dice_five_with_union_of_pairs</span>(<span class="sig-arg">shape</span>,
+        <span class="sig-arg">std</span>,
+        <span class="sig-arg">beta</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.datasets.regression.dice5-pysrc.html#dice_five_with_union_of_pairs">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+Seven objects, five dot + union1 = dots 1 + 2 and union2 = dots 4 + 5
+1, 3 and 4 have beta == beta
+2, 5  have beta = -beta/2
+union1 and union2 have beta = 0
+
+Examples
+--------
+#shape = (5, 5, 1)
+beta = 1
+std = 1
+noise = np.zeros(shape)
+info = np.zeros(shape)
+for o in dice_five_with_union_of_pairs(shape, beta, std):
+   noise[o.get_mask()] += o.std
+   info[o.get_mask()] += o.beta
+   print o.std, o.beta
+plot = plt.subplot(121)
+import matplotlib.pyplot as plt
+cax = plot.matshow(noise.squeeze())
+plt.colorbar(cax)
+plt.title(&quot;Noise sum coeficients&quot;)
+plot = plt.subplot(122)
+cax = plot.matshow(info.squeeze())
+plt.colorbar(cax)
+plt.title(&quot;Informative sum coeficients&quot;)
+plt.show()
+
+</pre>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="parsimony-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sun Jul  6 11:32:50 2014
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

@@ -1,1 +1,202 @@
-Github pages for pylearn-parsimony.
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Welcome to the documentation of Parsimony! &mdash; Parsimony 0.1.9 documentation</title>
+    
+    <link rel="stylesheet" href="static/default.css" type="text/css" />
+    <link rel="stylesheet" href="static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1.9',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <script type="text/javascript" src="static/underscore.js"></script>
+    <script type="text/javascript" src="static/doctools.js"></script>
+    <link rel="top" title="Parsimony 0.1.9 documentation" href="#" />
+    <link rel="next" title="Getting the dependencies" href="installing.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="installing.html" title="Getting the dependencies"
+             accesskey="N">next</a> |</li>
+        <li><a href="#">Parsimony 0.1.9 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="welcome-to-the-documentation-of-parsimony">
+<span id="index"></span><h1>Welcome to the documentation of Parsimony!<a class="headerlink" href="#welcome-to-the-documentation-of-parsimony" title="Permalink to this headline">¶</a></h1>
+<p>Parsimony provides structured and sparse modelling in machine learning.
+Parsimony currently contains:</p>
+<ul>
+<li><dl class="first docutils">
+<dt>Loss functions:</dt>
+<dd><ul class="first last simple">
+<li>Linear regression</li>
+<li>Logistic regression</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Penalties:</dt>
+<dd><ul class="first last simple">
+<li>L1 (Lasso)</li>
+<li>L2 (Ridge)</li>
+<li>Total variation (TV)</li>
+<li>Overlapping group lasso (GL)</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Algorithms:</dt>
+<dd><ul class="first last simple">
+<li>Iterative Soft-Thresholding Algorithm (ISTA)</li>
+<li>Fast Iterative Soft-Thresholding Algorithm (FISTA)</li>
+<li>COntinuation of NESTsterov’s smoothing Algorithm (CONESTA)</li>
+<li>Excessive Gap Method</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<div class="section" id="installing-parsimony">
+<h2>Installing Parsimony<a class="headerlink" href="#installing-parsimony" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installing.html">Getting the dependencies</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installing.html#installing-from-github">Installing from github</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="tutorials">
+<h2>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">General framework</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html#estimators">Estimators</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#simulated-dataset-for-regression">Simulated dataset for regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#linear-regression">Linear regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#ridge-regression-l2-penalty">Ridge regression (L2 penalty)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#lasso-regression-l1-penalty">Lasso regression (L1 penalty)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#elastic-net-regression-l1-l2-penalties">Elastic net regression (L1 + L2 penalties)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#elastic-net-regression-tv-l1-l2-tv-penalties">Elastic net regression + TV (L1 + L2 + TV penalties)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#elastic-net-regression-group-lasso-l1-l2-gl-penalties">Elastic net regression + Group Lasso (L1 + L2 + GL penalties)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#simulated-dataset-for-classication">Simulated dataset for classication</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#logistic-regression">Logistic regression</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#ridge-logistic-regression-l2-penalty">Ridge logistic regression (L2 penalty)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#ridge-lasso-logistic-regression-l1-l2-penalties">Ridge + Lasso logistic regression (L1 + L2 penalties)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#logistic-regression-with-l1-l2-and-tv-penalties">Logistic regression with L1 + L2 and TV penalties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#logistic-regression-with-l1-l2-and-gl-penalties">Logistic regression with L1 + L2 and GL penalties</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html#algorithms">Algorithms</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#fista">FISTA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#conesta">CONESTA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html#excessive-gap-method">Excessive gap method</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html#references">References</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="api">
+<h2>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="./epydoc_api/index.html">API</a></p>
+</div>
+<div class="section" id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to the documentation of Parsimony!</a><ul>
+<li><a class="reference internal" href="#installing-parsimony">Installing Parsimony</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#tutorials">Tutorials</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#api">API</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="installing.html"
+                        title="next chapter">Getting the dependencies</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="installing.html" title="Getting the dependencies"
+             >next</a> |</li>
+        <li><a href="#">Parsimony 0.1.9 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Tommy Löfstedt et al..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

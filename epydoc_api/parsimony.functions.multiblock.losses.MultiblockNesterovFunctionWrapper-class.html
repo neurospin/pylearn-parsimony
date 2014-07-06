@@ -1,0 +1,1057 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="parsimony-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="parsimony-module.html">Package&nbsp;parsimony</a> ::
+        <a href="parsimony.functions-module.html" onclick="show_private();">Package&nbsp;functions</a> ::
+        <a href="parsimony.functions.multiblock-module.html" onclick="show_private();">Package&nbsp;multiblock</a> ::
+        <a href="parsimony.functions.multiblock.losses-module.html">Module&nbsp;losses</a> ::
+        Class&nbsp;MultiblockNesterovFunctionWrapper
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class MultiblockNesterovFunctionWrapper</h1><p class="nomargin-top"><span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper">source&nbsp;code</a></span></p>
+<pre class="base-tree">
+                  object --+            
+                           |            
+         <a href="parsimony.functions.properties.Function-class.html">properties.Function</a> --+        
+                               |        
+    <a href="parsimony.functions.properties.CompositeFunction-class.html">properties.CompositeFunction</a> --+    
+                                   |    
+                      object --+   |    
+                               |   |    
+             <a href="parsimony.functions.properties.Gradient-class.html">properties.Gradient</a> --+    
+                                   |    
+                      object --+   |    
+                               |   |    
+             <a href="parsimony.functions.properties.StepSize-class.html">properties.StepSize</a> --+    
+                                   |    
+                      object --+   |    
+                               |   |    
+     <a href="parsimony.functions.properties.ProximalOperator-class.html">properties.ProximalOperator</a> --+    
+                                   |    
+           <a href="parsimony.functions.multiblock.losses.MultiblockFunctionWrapper-class.html">MultiblockFunctionWrapper</a> --+
+                                       |
+                          object --+   |
+                                   |   |
+<a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html">nesterov.properties.NesterovFunction</a> --+
+                                       |
+                          object --+   |
+                                   |   |
+             <a href="parsimony.functions.properties.Continuation-class.html">properties.Continuation</a> --+
+                                       |
+                                      <strong class="uidshort">MultiblockNesterovFunctionWrapper</strong>
+</pre>
+
+<hr />
+<!-- ==================== INSTANCE METHODS ==================== -->
+<a name="section-InstanceMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">function</span>,
+        <span class="summary-sig-arg">w</span>,
+        <span class="summary-sig-arg">index</span>)</span><br />
+      x.__init__(...) initializes x; see help(type(x)) for signature</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.__init__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html#get_params" class="summary-sig-name">get_params</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">*args</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.get_params">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html#fmu" class="summary-sig-name">fmu</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">beta</span>,
+        <span class="summary-sig-arg">mu</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Returns the smoothed function value.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.fmu">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html#phi" class="summary-sig-name">phi</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">alpha</span>,
+        <span class="summary-sig-arg">beta</span>)</span><br />
+      Function value with known alpha.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.phi">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html#get_mu" class="summary-sig-name">get_mu</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Returns the regularisation constant for the smoothing.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.get_mu">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html#set_mu" class="summary-sig-name">set_mu</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">mu</span>)</span><br />
+      Sets the regularisation constant for the smoothing.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.set_mu">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html#alpha" class="summary-sig-name">alpha</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">beta</span>)</span><br />
+      Dual variable of the Nesterov function.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.alpha">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html#A" class="summary-sig-name">A</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Linear operator of the Nesterov function.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.A">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html#Aa" class="summary-sig-name">Aa</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">alpha</span>)</span><br />
+      Compute A'*alpha.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.Aa">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html#project" class="summary-sig-name">project</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">alpha</span>)</span><br />
+      Projection onto the compact space of the Nesterov function.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.project">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html#M" class="summary-sig-name">M</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      The maximum value of the regularisation of the dual variable.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.M">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html#estimate_mu" class="summary-sig-name">estimate_mu</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">beta</span>)</span><br />
+      Compute a &quot;good&quot; value of mu with respect to the given beta.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.estimate_mu">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html#mu_opt" class="summary-sig-name">mu_opt</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">eps</span>)</span><br />
+      The optimal value of mu given epsilon.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.mu_opt">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html#eps_opt" class="summary-sig-name">eps_opt</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">mu</span>)</span><br />
+      The optimal value of epsilon given mu.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.eps_opt">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html#eps_max" class="summary-sig-name">eps_max</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">mu</span>)</span><br />
+      The maximum value of epsilon.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.eps_max">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html#mu_max" class="summary-sig-name">mu_max</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">eps</span>)</span><br />
+      The maximum value of mu.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.mu_max">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.multiblock.losses.MultiblockFunctionWrapper-class.html">MultiblockFunctionWrapper</a></code></b>:
+      <code><a href="parsimony.functions.multiblock.losses.MultiblockFunctionWrapper-class.html#f">f</a></code>,
+      <code><a href="parsimony.functions.multiblock.losses.MultiblockFunctionWrapper-class.html#grad">grad</a></code>,
+      <code><a href="parsimony.functions.multiblock.losses.MultiblockFunctionWrapper-class.html#prox">prox</a></code>,
+      <code><a href="parsimony.functions.multiblock.losses.MultiblockFunctionWrapper-class.html#step">step</a></code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.Function-class.html">properties.Function</a></code></b>:
+      <code><a href="parsimony.functions.properties.Function-class.html#reset">reset</a></code>,
+      <code><a href="parsimony.functions.properties.Function-class.html#set_params">set_params</a></code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.Gradient-class.html">properties.Gradient</a></code></b>:
+      <code><a href="parsimony.functions.properties.Gradient-class.html#approx_grad">approx_grad</a></code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__delattr__</code>,
+      <code>__format__</code>,
+      <code>__getattribute__</code>,
+      <code>__hash__</code>,
+      <code>__new__</code>,
+      <code>__reduce__</code>,
+      <code>__reduce_ex__</code>,
+      <code>__repr__</code>,
+      <code>__setattr__</code>,
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS VARIABLES ==================== -->
+<a name="section-ClassVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.multiblock.losses.MultiblockFunctionWrapper-class.html">MultiblockFunctionWrapper</a></code></b>:
+      <code><a href="parsimony.functions.multiblock.losses.MultiblockFunctionWrapper-class.html#__abstractmethods__">__abstractmethods__</a></code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.multiblock.losses.MultiblockFunctionWrapper-class.html">MultiblockFunctionWrapper</a></code></b> (private):
+      <code><a href="parsimony.functions.multiblock.losses.MultiblockFunctionWrapper-class.html#_abc_negative_cache_version" onclick="show_private();">_abc_negative_cache_version</a></code>
+      </p></div>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.CompositeFunction-class.html">properties.CompositeFunction</a></code></b>:
+      <code><a href="parsimony.functions.properties.CompositeFunction-class.html#__metaclass__">__metaclass__</a></code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.Function-class.html">properties.Function</a></code></b> (private):
+      <code><a href="parsimony.functions.properties.Function-class.html#_abc_cache" onclick="show_private();">_abc_cache</a></code>,
+      <code><a href="parsimony.functions.properties.Function-class.html#_abc_negative_cache" onclick="show_private();">_abc_negative_cache</a></code>,
+      <code><a href="parsimony.functions.properties.Function-class.html#_abc_registry" onclick="show_private();">_abc_registry</a></code>
+      </p></div>
+    </td>
+  </tr>
+</table>
+<!-- ==================== PROPERTIES ==================== -->
+<a name="section-Properties"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Properties</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Properties"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__class__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-MethodDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="__init__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">function</span>,
+        <span class="sig-arg">w</span>,
+        <span class="sig-arg">index</span>)</span>
+    <br /><em class="fname">(Constructor)</em>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.__init__">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>x.__init__(...) initializes x; see help(type(x)) for signature</p>
+  <dl class="fields">
+    <dt>Overrides:
+        object.__init__
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="get_params"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_params</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">*args</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.get_params">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="parsimony.functions.properties.Function-class.html#get_params">properties.Function.get_params</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="fmu"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">fmu</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">beta</span>,
+        <span class="sig-arg">mu</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.fmu">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+Returns the smoothed function value.
+
+From the interface &quot;NesterovFunction&quot;.
+
+Parameters
+----------
+beta : Numpy array. A weight vector.
+
+mu : Non-negative float. The regularisation constant for the smoothing.
+
+</pre>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#fmu">nesterov.properties.NesterovFunction.fmu</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="phi"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">phi</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">alpha</span>,
+        <span class="sig-arg">beta</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.phi">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Function value with known alpha.</p>
+  <p>From the interface &quot;NesterovFunction&quot;.</p>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#phi">nesterov.properties.NesterovFunction.phi</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="get_mu"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">get_mu</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.get_mu">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Returns the regularisation constant for the smoothing.</p>
+  <p>From the interface &quot;NesterovFunction&quot;.</p>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#get_mu">nesterov.properties.NesterovFunction.get_mu</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="set_mu"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">set_mu</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">mu</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.set_mu">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+Sets the regularisation constant for the smoothing.
+
+From the interface &quot;NesterovFunction&quot;.
+
+Parameters
+----------
+mu : Non-negative float. The regularisation constant for the smoothing
+        to use from now on.
+
+Returns
+-------
+old_mu : Non-negative float. The old regularisation constant for the
+        smoothing that was overwritten and no longer is used.
+
+</pre>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#set_mu">nesterov.properties.NesterovFunction.set_mu</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="alpha"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">alpha</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">beta</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.alpha">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+Dual variable of the Nesterov function.
+
+From the interface &quot;NesterovFunction&quot;.
+
+Parameters
+----------
+beta : Numpy array (p-by-1). The variable for which to compute the dual
+        variable alpha.
+
+</pre>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#alpha">nesterov.properties.NesterovFunction.alpha</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="A"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">A</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.A">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Linear operator of the Nesterov function.</p>
+  <p>From the interface &quot;NesterovFunction&quot;.</p>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#A">nesterov.properties.NesterovFunction.A</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="Aa"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">Aa</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">alpha</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.Aa">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+Compute A'*alpha.
+
+From the interface &quot;NesterovFunction&quot;.
+
+Parameters
+----------
+alpha : Numpy array (x-by-1). The dual variable alpha.
+
+</pre>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#Aa">nesterov.properties.NesterovFunction.Aa</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="project"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">project</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">alpha</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.project">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+Projection onto the compact space of the Nesterov function.
+
+From the interface &quot;NesterovFunction&quot;.
+
+Parameters
+----------
+alpha : Numpy array (x-by-1). The not-yet-projected dual variable
+        alpha.
+
+</pre>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#project">nesterov.properties.NesterovFunction.project</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="M"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">M</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.M">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+The maximum value of the regularisation of the dual variable. We
+have
+
+    M = max_{alpha in K} 0.5*|alpha|&#178;_2.
+
+From the interface &quot;NesterovFunction&quot;.
+
+</pre>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#M">nesterov.properties.NesterovFunction.M</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="estimate_mu"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">estimate_mu</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">beta</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.estimate_mu">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+Compute a &quot;good&quot; value of mu with respect to the given beta.
+
+From the interface &quot;NesterovFunction&quot;.
+
+Parameters
+----------
+beta : Numpy array (p-by-1). The primal variable at which to compute a
+        feasible value of mu.
+
+</pre>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#estimate_mu">nesterov.properties.NesterovFunction.estimate_mu</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="mu_opt"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">mu_opt</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">eps</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.mu_opt">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+The optimal value of mu given epsilon.
+
+Parameters
+----------
+eps : Positive float. The desired precision.
+
+Returns
+-------
+mu : Positive float. The optimal regularisation parameter.
+
+From the interface &quot;Continuation&quot;.
+
+</pre>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="parsimony.functions.properties.Continuation-class.html#mu_opt">properties.Continuation.mu_opt</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="eps_opt"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">eps_opt</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">mu</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.eps_opt">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+The optimal value of epsilon given mu.
+
+Parameters
+----------
+mu : Positive float. The regularisation constant of the smoothing.
+
+Returns
+-------
+eps : Positive float. The optimal precision.
+
+From the interface &quot;Continuation&quot;.
+
+</pre>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="parsimony.functions.properties.Continuation-class.html#eps_opt">properties.Continuation.eps_opt</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="eps_max"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">eps_max</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">mu</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.eps_max">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+The maximum value of epsilon.
+
+From the interface &quot;Continuation&quot;.
+
+Parameters
+----------
+mu : Positive float. The regularisation constant of the smoothing.
+
+Returns
+-------
+eps : Positive float. The upper limit, the maximum, precision.
+
+</pre>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="parsimony.functions.properties.Continuation-class.html#eps_max">properties.Continuation.eps_max</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="mu_max"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">mu_max</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">eps</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#MultiblockNesterovFunctionWrapper.mu_max">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+The maximum value of mu.
+
+From the interface &quot;Continuation&quot;.
+
+Parameters
+----------
+eps : Positive float. The maximum precision of the smoothing.
+
+Returns
+-------
+mu : Positive float. The upper limit, the maximum, of the
+        regularisation constant of the smoothing.
+
+</pre>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="parsimony.functions.properties.Continuation-class.html#mu_max">properties.Continuation.mu_max</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="parsimony-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sun Jul  6 11:32:52 2014
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

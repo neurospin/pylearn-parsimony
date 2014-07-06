@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>parsimony.algorithms.bases.InformationAlgorithm</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="parsimony-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="parsimony-module.html">Package&nbsp;parsimony</a> ::
+        <a href="parsimony.algorithms-module.html">Package&nbsp;algorithms</a> ::
+        <a href="parsimony.algorithms.bases-module.html">Module&nbsp;bases</a> ::
+        Class&nbsp;InformationAlgorithm
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="parsimony.algorithms.bases.InformationAlgorithm-class.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class InformationAlgorithm</h1><p class="nomargin-top"><span class="codelink"><a href="parsimony.algorithms.bases-pysrc.html#InformationAlgorithm">source&nbsp;code</a></span></p>
+<pre class="base-tree">
+object --+
+         |
+        <strong class="uidshort">InformationAlgorithm</strong>
+</pre>
+
+<dl><dt>Known Subclasses:</dt>
+<dd>
+      <ul class="subclass-list">
+<li><a href="parsimony.algorithms.gradient.GradientDescent-class.html">gradient.GradientDescent</a></li><li class="private">, <a href="parsimony.algorithms.multiblock.MultiblockCONESTA-class.html" onclick="show_private();">multiblock.MultiblockCONESTA</a></li><li>, <a href="parsimony.algorithms.multiblock.MultiblockFISTA-class.html">multiblock.MultiblockFISTA</a></li><li>, <a href="parsimony.algorithms.primaldual.CONESTA-class.html">primaldual.CONESTA</a></li><li>, <a href="parsimony.algorithms.primaldual.ExcessiveGapMethod-class.html">primaldual.ExcessiveGapMethod</a></li><li>, <a href="parsimony.algorithms.primaldual.NaiveCONESTA-class.html">primaldual.NaiveCONESTA</a></li><li>, <a href="parsimony.algorithms.proximal.FISTA-class.html">proximal.FISTA</a></li><li>, <a href="parsimony.algorithms.proximal.ISTA-class.html">proximal.ISTA</a></li><li>, <a href="parsimony.algorithms.utils.Bisection-class.html">utils.Bisection</a></li><li>, <a href="parsimony.algorithms.utils.NewtonRaphson-class.html">utils.NewtonRaphson</a></li>  </ul>
+</dd></dl>
+
+<hr />
+<pre class="literalblock">
+Algorithms that produce information about their run.
+
+Implementing classes should update the INFO_PROVIDED class variable with
+the information provided by the algorithm. Defauls to an empty list.
+
+ALL algorithms that inherit from InformationAlgorithm MUST add force_reset
+as a decorator to the run method.
+
+Fields
+------
+info_ret : Dictionary. The algorithm outputs are collected in this
+        dictionary.
+
+info : List of utils.Info. The identifiers for the requested information
+        outputs. The algorithms will store the requested outputs in
+        self.info.
+
+INFO_PROVIDED : List of utils.Info. The allowed output identifiers. The
+        implementing class should update this list with the
+        provided/allowed outputs.
+
+Examples
+--------
+&gt;&gt;&gt; import parsimony.algorithms as algorithms
+&gt;&gt;&gt; from parsimony.algorithms.utils import Info
+&gt;&gt;&gt; from parsimony.functions.losses import LinearRegression
+&gt;&gt;&gt; import numpy as np
+&gt;&gt;&gt; np.random.seed(42)
+&gt;&gt;&gt; gd = algorithms.gradient.GradientDescent(info=[Info.fvalue])
+&gt;&gt;&gt; gd.info_copy()
+['fvalue']
+&gt;&gt;&gt; lr = LinearRegression(X=np.random.rand(10,15), y=np.random.rand(10,1))
+&gt;&gt;&gt; beta = gd.run(lr, np.random.rand(15, 1))
+&gt;&gt;&gt; gd.info_get(Info.fvalue)  # doctest:+ELLIPSIS
+[0.068510926021035312, ... 1.8856122733915382e-12]
+
+</pre>
+
+<!-- ==================== INSTANCE METHODS ==================== -->
+<a name="section-InstanceMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.algorithms.bases.InformationAlgorithm-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">info</span>=<span class="summary-sig-default"><code class="variable-group">[</code><code class="variable-group">]</code></span>,
+        <span class="summary-sig-arg">**kwargs</span>)</span><br />
+      Parameters
+----------
+info : List or tuple of utils.Info.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.algorithms.bases-pysrc.html#InformationAlgorithm.__init__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.algorithms.bases.InformationAlgorithm-class.html#info_get" class="summary-sig-name">info_get</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">nfo</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Returns the computed information about the algorithm run.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.algorithms.bases-pysrc.html#InformationAlgorithm.info_get">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.algorithms.bases.InformationAlgorithm-class.html#info_set" class="summary-sig-name">info_set</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">nfo</span>,
+        <span class="summary-sig-arg">value</span>)</span><br />
+      Sets the computed information about the algorithm run identified by
+nfo.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.algorithms.bases-pysrc.html#InformationAlgorithm.info_set">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="info_provided"></a><span class="summary-sig-name">info_provided</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">nfo</span>)</span><br />
+      Returns true if the current algorithm provides the given information,
+      and False otherwise.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.algorithms.bases-pysrc.html#InformationAlgorithm.info_provided">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="info_requested"></a><span class="summary-sig-name">info_requested</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">nfo</span>)</span><br />
+      Returns true if the the given information was requested, and False 
+      otherwise.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.algorithms.bases-pysrc.html#InformationAlgorithm.info_requested">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.algorithms.bases.InformationAlgorithm-class.html#info_reset" class="summary-sig-name">info_reset</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Resets the information saved in the previous run.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.algorithms.bases-pysrc.html#InformationAlgorithm.info_reset">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="info_copy"></a><span class="summary-sig-name">info_copy</span>(<span class="summary-sig-arg">self</span>)</span><br />
+      Returns a shallow copy of the requested information.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.algorithms.bases-pysrc.html#InformationAlgorithm.info_copy">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.algorithms.bases.InformationAlgorithm-class.html#check_info_compatibility" class="summary-sig-name">check_info_compatibility</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">info</span>)</span><br />
+      Check if the requested information is provided.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.algorithms.bases-pysrc.html#InformationAlgorithm.check_info_compatibility">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__delattr__</code>,
+      <code>__format__</code>,
+      <code>__getattribute__</code>,
+      <code>__hash__</code>,
+      <code>__new__</code>,
+      <code>__reduce__</code>,
+      <code>__reduce_ex__</code>,
+      <code>__repr__</code>,
+      <code>__setattr__</code>,
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS VARIABLES ==================== -->
+<a name="section-ClassVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="INFO_PROVIDED"></a><span class="summary-name">INFO_PROVIDED</span> = <code title="[]"><code class="variable-group">[</code><code class="variable-group">]</code></code>
+    </td>
+  </tr>
+</table>
+<!-- ==================== PROPERTIES ==================== -->
+<a name="section-Properties"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Properties</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Properties"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__class__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-MethodDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="__init__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">info</span>=<span class="sig-default"><code class="variable-group">[</code><code class="variable-group">]</code></span>,
+        <span class="sig-arg">**kwargs</span>)</span>
+    <br /><em class="fname">(Constructor)</em>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.algorithms.bases-pysrc.html#InformationAlgorithm.__init__">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+
+Parameters
+----------
+info : List or tuple of utils.Info. The identifiers for the run
+        information to return.
+
+</pre>
+  <dl class="fields">
+    <dt>Overrides:
+        object.__init__
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="info_get"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">info_get</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">nfo</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.algorithms.bases-pysrc.html#InformationAlgorithm.info_get">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+Returns the computed information about the algorithm run.
+
+Parameters
+----------
+nfo : utils.Info. The identifier to return information about. If nfo is
+        None, all information is returned in a dictionary.
+
+</pre>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="info_set"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">info_set</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">nfo</span>,
+        <span class="sig-arg">value</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.algorithms.bases-pysrc.html#InformationAlgorithm.info_set">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+Sets the computed information about the algorithm run identified by
+nfo.
+
+Parameters
+----------
+nfo : utils.Info. The identifier to for the computed information about.
+
+value : object. The value to associate with nfo.
+
+</pre>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="info_reset"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">info_reset</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.algorithms.bases-pysrc.html#InformationAlgorithm.info_reset">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Resets the information saved in the previous run. The info_ret field, 
+  a dictionary, is cleared.</p>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="check_info_compatibility"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">check_info_compatibility</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">info</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.algorithms.bases-pysrc.html#InformationAlgorithm.check_info_compatibility">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+Check if the requested information is provided.
+
+Parameters
+----------
+info : A list of utils.Info. The identifiers for information that
+        should be computed.
+
+</pre>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="parsimony-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sun Jul  6 11:32:51 2014
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>parsimony.utils</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="parsimony-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="parsimony-module.html">Package&nbsp;parsimony</a> ::
+        Package&nbsp;utils
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="parsimony.utils-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="parsimony.utils-module.html" onclick="show_private();">Package parsimony.utils</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno"> 1</tt>  <tt class="py-line"><tt class="py-comment"># -*- coding: utf-8 -*-</tt> </tt>
+<a name="L2"></a><tt class="py-lineno"> 2</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L3"></a><tt class="py-lineno"> 3</tt>  <tt class="py-line"><tt class="py-docstring">Created on Thu Feb 8 09:22:00 2013</tt> </tt>
+<a name="L4"></a><tt class="py-lineno"> 4</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L5"></a><tt class="py-lineno"> 5</tt>  <tt class="py-line"><tt class="py-docstring">Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.</tt> </tt>
+<a name="L6"></a><tt class="py-lineno"> 6</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L7"></a><tt class="py-lineno"> 7</tt>  <tt class="py-line"><tt class="py-docstring">@author:  Tommy L&#246;fstedt and Edouard Duchesnay</tt> </tt>
+<a name="L8"></a><tt class="py-lineno"> 8</tt>  <tt class="py-line"><tt class="py-docstring">@email:   lofstedt.tommy@gmail.com, edouard.duchesnay@cea.fr</tt> </tt>
+<a name="L9"></a><tt class="py-lineno"> 9</tt>  <tt class="py-line"><tt class="py-docstring">@license: BSD 3-clause.</tt> </tt>
+<a name="L10"></a><tt class="py-lineno">10</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L11"></a><tt class="py-lineno">11</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt id="link-0" class="py-name" targets="Module parsimony.utils.maths=parsimony.utils.maths-module.html"><a title="parsimony.utils.maths" class="py-name" href="#" onclick="return doclink('link-0', 'maths', 'link-0');">maths</a></tt> </tt>
+<a name="L12"></a><tt class="py-lineno">12</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt id="link-1" class="py-name" targets="Module parsimony.utils.consts=parsimony.utils.consts-module.html"><a title="parsimony.utils.consts" class="py-name" href="#" onclick="return doclink('link-1', 'consts', 'link-1');">consts</a></tt> </tt>
+<a name="L13"></a><tt class="py-lineno">13</tt>  <tt class="py-line"> </tt>
+<a name="L14"></a><tt class="py-lineno">14</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-op">.</tt><tt id="link-2" class="py-name" targets="Module parsimony.algorithms.utils=parsimony.algorithms.utils-module.html,Module parsimony.datasets.simulate.utils=parsimony.datasets.simulate.utils-module.html,Module parsimony.datasets.utils=parsimony.datasets.utils-module.html,Package parsimony.utils=parsimony.utils-module.html,Module parsimony.utils.utils=parsimony.utils.utils-module.html"><a title="parsimony.algorithms.utils
+parsimony.datasets.simulate.utils
+parsimony.datasets.utils
+parsimony.utils
+parsimony.utils.utils" class="py-name" href="#" onclick="return doclink('link-2', 'utils', 'link-2');">utils</a></tt> <tt class="py-keyword">import</tt> <tt id="link-3" class="py-name" targets="Function parsimony.utils.utils.time_cpu()=parsimony.utils.utils-module.html#time_cpu"><a title="parsimony.utils.utils.time_cpu" class="py-name" href="#" onclick="return doclink('link-3', 'time_cpu', 'link-3');">time_cpu</a></tt><tt class="py-op">,</tt> <tt id="link-4" class="py-name" targets="Function parsimony.utils.time_wall()=parsimony.utils-module.html#time_wall"><a title="parsimony.utils.time_wall" class="py-name" href="#" onclick="return doclink('link-4', 'time_wall', 'link-4');">time_wall</a></tt><tt class="py-op">,</tt> <tt id="link-5" class="py-name" targets="Function parsimony.utils.utils.deprecated()=parsimony.utils.utils-module.html#deprecated"><a title="parsimony.utils.utils.deprecated" class="py-name" href="#" onclick="return doclink('link-5', 'deprecated', 'link-5');">deprecated</a></tt> </tt>
+<a name="L15"></a><tt class="py-lineno">15</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-op">.</tt><tt id="link-6" class="py-name"><a title="parsimony.algorithms.utils
+parsimony.datasets.simulate.utils
+parsimony.datasets.utils
+parsimony.utils
+parsimony.utils.utils" class="py-name" href="#" onclick="return doclink('link-6', 'utils', 'link-2');">utils</a></tt> <tt class="py-keyword">import</tt> <tt id="link-7" class="py-name" targets="Function parsimony.utils.utils.optimal_shrinkage()=parsimony.utils.utils-module.html#optimal_shrinkage"><a title="parsimony.utils.utils.optimal_shrinkage" class="py-name" href="#" onclick="return doclink('link-7', 'optimal_shrinkage', 'link-7');">optimal_shrinkage</a></tt><tt class="py-op">,</tt> <tt id="link-8" class="py-name" targets="Class parsimony.utils.utils.AnonymousClass=parsimony.utils.utils.AnonymousClass-class.html"><a title="parsimony.utils.utils.AnonymousClass" class="py-name" href="#" onclick="return doclink('link-8', 'AnonymousClass', 'link-8');">AnonymousClass</a></tt> </tt>
+<a name="L16"></a><tt class="py-lineno">16</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-op">.</tt><tt id="link-9" class="py-name" targets="Function parsimony.utils.check_arrays()=parsimony.utils-module.html#check_arrays"><a title="parsimony.utils.check_arrays" class="py-name" href="#" onclick="return doclink('link-9', 'check_arrays', 'link-9');">check_arrays</a></tt> <tt class="py-keyword">import</tt> <tt id="link-10" class="py-name"><a title="parsimony.utils.check_arrays" class="py-name" href="#" onclick="return doclink('link-10', 'check_arrays', 'link-9');">check_arrays</a></tt> </tt>
+<a name="L17"></a><tt class="py-lineno">17</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-op">.</tt><tt id="link-11" class="py-name" targets="Module parsimony.utils.plot=parsimony.utils.plot-module.html"><a title="parsimony.utils.plot" class="py-name" href="#" onclick="return doclink('link-11', 'plot', 'link-11');">plot</a></tt> <tt class="py-keyword">import</tt> <tt id="link-12" class="py-name" targets="Function parsimony.utils.plot.plot_map2d()=parsimony.utils.plot-module.html#plot_map2d"><a title="parsimony.utils.plot.plot_map2d" class="py-name" href="#" onclick="return doclink('link-12', 'plot_map2d', 'link-12');">plot_map2d</a></tt> </tt>
+<a name="L18"></a><tt class="py-lineno">18</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-op">.</tt><tt id="link-13" class="py-name" targets="Module parsimony.utils.classif_label=parsimony.utils.classif_label-module.html"><a title="parsimony.utils.classif_label" class="py-name" href="#" onclick="return doclink('link-13', 'classif_label', 'link-13');">classif_label</a></tt> <tt class="py-keyword">import</tt> <tt id="link-14" class="py-name" targets="Function parsimony.utils.classif_label.class_weight_to_sample_weight()=parsimony.utils.classif_label-module.html#class_weight_to_sample_weight"><a title="parsimony.utils.classif_label.class_weight_to_sample_weight" class="py-name" href="#" onclick="return doclink('link-14', 'class_weight_to_sample_weight', 'link-14');">class_weight_to_sample_weight</a></tt><tt class="py-op">,</tt> <tt id="link-15" class="py-name" targets="Function parsimony.utils.classif_label.check_labels()=parsimony.utils.classif_label-module.html#check_labels"><a title="parsimony.utils.classif_label.check_labels" class="py-name" href="#" onclick="return doclink('link-15', 'check_labels', 'link-15');">check_labels</a></tt> </tt>
+<a name="L19"></a><tt class="py-lineno">19</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-op">.</tt> <tt class="py-keyword">import</tt> <tt id="link-16" class="py-name" targets="Module parsimony.utils.start_vectors=parsimony.utils.start_vectors-module.html"><a title="parsimony.utils.start_vectors" class="py-name" href="#" onclick="return doclink('link-16', 'start_vectors', 'link-16');">start_vectors</a></tt> </tt>
+<a name="L20"></a><tt class="py-lineno">20</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-op">.</tt> <tt class="py-keyword">import</tt> <tt id="link-17" class="py-name" targets="Module parsimony.utils.resampling=parsimony.utils.resampling-module.html"><a title="parsimony.utils.resampling" class="py-name" href="#" onclick="return doclink('link-17', 'resampling', 'link-17');">resampling</a></tt> </tt>
+<a name="L21"></a><tt class="py-lineno">21</tt>  <tt class="py-line"> </tt>
+<a name="L22"></a><tt class="py-lineno">22</tt>  <tt class="py-line"> </tt>
+<a name="L23"></a><tt class="py-lineno">23</tt>  <tt class="py-line"><tt class="py-name">__all__</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">"maths"</tt><tt class="py-op">,</tt> <tt class="py-string">"consts"</tt><tt class="py-op">,</tt> </tt>
+<a name="L24"></a><tt class="py-lineno">24</tt>  <tt class="py-line">           <tt class="py-string">"time_cpu"</tt><tt class="py-op">,</tt> <tt class="py-string">"time_wall"</tt><tt class="py-op">,</tt> <tt class="py-string">"deprecated"</tt><tt class="py-op">,</tt> </tt>
+<a name="L25"></a><tt class="py-lineno">25</tt>  <tt class="py-line">           <tt class="py-string">"check_arrays"</tt><tt class="py-op">,</tt> </tt>
+<a name="L26"></a><tt class="py-lineno">26</tt>  <tt class="py-line">           <tt class="py-string">"optimal_shrinkage"</tt><tt class="py-op">,</tt> <tt class="py-string">"AnonymousClass"</tt><tt class="py-op">,</tt> </tt>
+<a name="L27"></a><tt class="py-lineno">27</tt>  <tt class="py-line">           <tt class="py-string">"plot_map2d"</tt><tt class="py-op">,</tt> </tt>
+<a name="L28"></a><tt class="py-lineno">28</tt>  <tt class="py-line">           <tt class="py-string">"class_weight_to_sample_weight"</tt><tt class="py-op">,</tt> <tt class="py-string">"check_labels"</tt><tt class="py-op">,</tt> </tt>
+<a name="L29"></a><tt class="py-lineno">29</tt>  <tt class="py-line">           <tt class="py-string">"start_vectors"</tt><tt class="py-op">,</tt> <tt class="py-string">"resampling"</tt><tt class="py-op">]</tt> </tt>
+<a name="L30"></a><tt class="py-lineno">30</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="parsimony-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sun Jul  6 11:32:53 2014
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

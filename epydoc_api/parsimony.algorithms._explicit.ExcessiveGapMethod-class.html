@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>parsimony.algorithms._explicit.ExcessiveGapMethod</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="parsimony-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="parsimony-module.html">Package&nbsp;parsimony</a> ::
+        <a href="parsimony.algorithms-module.html">Package&nbsp;algorithms</a> ::
+        <a href="parsimony.algorithms._explicit-module.html">Module&nbsp;_explicit</a> ::
+        Class&nbsp;ExcessiveGapMethod
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="parsimony.algorithms._explicit.ExcessiveGapMethod-class.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class ExcessiveGapMethod</h1><p class="nomargin-top"><span class="codelink"><a href="parsimony.algorithms._explicit-pysrc.html#ExcessiveGapMethod">source&nbsp;code</a></span></p>
+<pre class="base-tree">
+            object --+        
+                     |        
+   <a href="parsimony.algorithms.bases.BaseAlgorithm-class.html">bases.BaseAlgorithm</a> --+    
+                         |    
+   <a href="parsimony.algorithms.bases.ExplicitAlgorithm-class.html">bases.ExplicitAlgorithm</a> --+
+                             |
+                object --+   |
+                         |   |
+  <a href="parsimony.algorithms.bases.IterativeAlgorithm-class.html">bases.IterativeAlgorithm</a> --+
+                             |
+                object --+   |
+                         |   |
+<a href="parsimony.algorithms.bases.InformationAlgorithm-class.html">bases.InformationAlgorithm</a> --+
+                             |
+                            <strong class="uidshort">ExcessiveGapMethod</strong>
+</pre>
+
+<hr />
+<p>Nesterov's excessive gap method for strongly convex functions.</p>
+
+<!-- ==================== INSTANCE METHODS ==================== -->
+<a name="section-InstanceMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.algorithms._explicit.ExcessiveGapMethod-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">eps</span>=<span class="summary-sig-default">consts.TOLERANCE</span>,
+        <span class="summary-sig-arg">info</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">max_iter</span>=<span class="summary-sig-default">10000</span>,
+        <span class="summary-sig-arg">min_iter</span>=<span class="summary-sig-default">1</span>)</span><br />
+      Parameters
+----------
+output : Boolean.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.algorithms._explicit-pysrc.html#ExcessiveGapMethod.__init__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.algorithms._explicit.ExcessiveGapMethod-class.html#run" class="summary-sig-name">run</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">function</span>,
+        <span class="summary-sig-arg">beta</span>=<span class="summary-sig-default">None</span>)</span><br />
+      The excessive gap method for strongly convex functions.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.algorithms._explicit-pysrc.html#ExcessiveGapMethod.run">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html">bases.BaseAlgorithm</a></code></b>:
+      <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#get_params">get_params</a></code>,
+      <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#set_params">set_params</a></code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.algorithms.bases.IterativeAlgorithm-class.html">bases.IterativeAlgorithm</a></code></b>:
+      <code><a href="parsimony.algorithms.bases.IterativeAlgorithm-class.html#iter_reset">iter_reset</a></code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.algorithms.bases.InformationAlgorithm-class.html">bases.InformationAlgorithm</a></code></b>:
+      <code><a href="parsimony.algorithms.bases.InformationAlgorithm-class.html#check_info_compatibility">check_info_compatibility</a></code>,
+      <code><a href="parsimony.algorithms.bases.InformationAlgorithm-class.html#info_copy">info_copy</a></code>,
+      <code><a href="parsimony.algorithms.bases.InformationAlgorithm-class.html#info_get">info_get</a></code>,
+      <code><a href="parsimony.algorithms.bases.InformationAlgorithm-class.html#info_provided">info_provided</a></code>,
+      <code><a href="parsimony.algorithms.bases.InformationAlgorithm-class.html#info_requested">info_requested</a></code>,
+      <code><a href="parsimony.algorithms.bases.InformationAlgorithm-class.html#info_reset">info_reset</a></code>,
+      <code><a href="parsimony.algorithms.bases.InformationAlgorithm-class.html#info_set">info_set</a></code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__delattr__</code>,
+      <code>__format__</code>,
+      <code>__getattribute__</code>,
+      <code>__hash__</code>,
+      <code>__new__</code>,
+      <code>__reduce__</code>,
+      <code>__reduce_ex__</code>,
+      <code>__repr__</code>,
+      <code>__setattr__</code>,
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== STATIC METHODS ==================== -->
+<a name="section-StaticMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Static Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-StaticMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html">bases.BaseAlgorithm</a></code></b>:
+      <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#check_compatibility">check_compatibility</a></code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS VARIABLES ==================== -->
+<a name="section-ClassVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="parsimony.algorithms._explicit.ExcessiveGapMethod-class.html#INTERFACES" class="summary-name">INTERFACES</a> = <code title="[nesterov_interfaces.NesterovFunction, interfaces.LipschitzContinuousG\
+radient, interfaces.GradientMap, interfaces.DualFunction, interfaces.S\
+tronglyConvex]">[nesterov_interfaces.NesterovFunction, interfaces<code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a href="parsimony.algorithms._explicit.ExcessiveGapMethod-class.html#PROVIDED_INFO" class="summary-name">PROVIDED_INFO</a> = <code title="[Info.ok, Info.num_iter, Info.t, Info.f, Info.bound, Info.converged]">[Info.ok, Info.num_iter, Info.t, Info.f, Info.<code class="variable-ellipsis">...</code></code>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.algorithms.bases.ExplicitAlgorithm-class.html">bases.ExplicitAlgorithm</a></code></b>:
+      <code><a href="parsimony.algorithms.bases.ExplicitAlgorithm-class.html#__abstractmethods__">__abstractmethods__</a></code>,
+      <code><a href="parsimony.algorithms.bases.ExplicitAlgorithm-class.html#__metaclass__">__metaclass__</a></code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html">bases.BaseAlgorithm</a></code></b> (private):
+      <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_cache" onclick="show_private();">_abc_cache</a></code>,
+      <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_negative_cache" onclick="show_private();">_abc_negative_cache</a></code>,
+      <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_negative_cache_version" onclick="show_private();">_abc_negative_cache_version</a></code>,
+      <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_registry" onclick="show_private();">_abc_registry</a></code>
+      </p></div>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.algorithms.bases.InformationAlgorithm-class.html">bases.InformationAlgorithm</a></code></b>:
+      <code><a href="parsimony.algorithms.bases.InformationAlgorithm-class.html#INFO_PROVIDED">INFO_PROVIDED</a></code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== PROPERTIES ==================== -->
+<a name="section-Properties"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Properties</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Properties"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__class__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-MethodDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="__init__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">eps</span>=<span class="sig-default">consts.TOLERANCE</span>,
+        <span class="sig-arg">info</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">max_iter</span>=<span class="sig-default">10000</span>,
+        <span class="sig-arg">min_iter</span>=<span class="sig-default">1</span>)</span>
+    <br /><em class="fname">(Constructor)</em>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.algorithms._explicit-pysrc.html#ExcessiveGapMethod.__init__">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+
+Parameters
+----------
+output : Boolean. Whether or not to return extra output information.
+        If output is True, running the algorithm will return a tuple
+        with two elements. The first element is the found regression
+        vector, and the second is the extra output information.
+
+eps : Positive float. Tolerance for the stopping criterion.
+
+info : Information. If, and if so what, extra run information should be
+        returned. Default is None, which is replaced by Information(),
+        which means that no run information is computed nor returned.
+
+max_iter : Positive integer. Maximum allowed number of iterations.
+
+min_iter : Positive integer. Minimum allowed number of iterations.
+
+</pre>
+  <dl class="fields">
+    <dt>Overrides:
+        object.__init__
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="run"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">run</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">function</span>,
+        <span class="sig-arg">beta</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.algorithms._explicit-pysrc.html#ExcessiveGapMethod.run">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+The excessive gap method for strongly convex functions.
+
+Parameters
+----------
+function : The function to minimise. It contains two parts, function.g
+        is the strongly convex part and function.h is the smoothed part
+        of the function.
+
+beta : Numpy array. A start vector. This is normally not given, but
+        left None, since the start vector is computed by the algorithm.
+
+</pre>
+  <dl class="fields">
+    <dt>Decorators:</dt>
+    <dd><ul class="nomargin-top">
+        <li><code>@bases.check_compatibility</code></li>
+    </ul></dd>
+    <dt>Overrides:
+        <a href="parsimony.algorithms.bases.ExplicitAlgorithm-class.html#run">bases.ExplicitAlgorithm.run</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== CLASS VARIABLE DETAILS ==================== -->
+<a name="section-ClassVariableDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variable Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariableDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="INTERFACES"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">INTERFACES</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+[nesterov_interfaces.NesterovFunction, interfaces.LipschitzContinuousG<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+radient, interfaces.GradientMap, interfaces.DualFunction, interfaces.S<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
+tronglyConvex]
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="PROVIDED_INFO"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">PROVIDED_INFO</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+[Info.ok, Info.num_iter, Info.t, Info.f, Info.bound, Info.converged]
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="parsimony-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sun Jul  6 11:32:51 2014
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

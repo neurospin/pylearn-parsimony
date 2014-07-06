@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>parsimony.datasets.simulate.correlation_matrices</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="parsimony-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="parsimony-module.html">Package&nbsp;parsimony</a> ::
+        <a href="parsimony.datasets-module.html">Package&nbsp;datasets</a> ::
+        <a href="parsimony.datasets.simulate-module.html">Package&nbsp;simulate</a> ::
+        Module&nbsp;correlation_matrices
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="parsimony.datasets.simulate.correlation_matrices-module.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== MODULE DESCRIPTION ==================== -->
+<h1 class="epydoc">Module correlation_matrices</h1><p class="nomargin-top"><span class="codelink"><a href="parsimony.datasets.simulate.correlation_matrices-pysrc.html">source&nbsp;code</a></span></p>
+<pre class="literalblock">
+
+Generates correlation matrices using two of the approaches described in:
+
+    Hardin &amp; Garcia (2013). A method for generating realistic correlation
+    matrices.
+
+Created on Wed Jun 19 13:56:24 2013
+
+Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+
+@author:  Tommy L&#246;fstedt
+@email:   tommy.loefstedt@cea.fr
+@license: BSD 3-clause.
+
+</pre>
+
+<!-- ==================== FUNCTIONS ==================== -->
+<a name="section-Functions"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Functions</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Functions"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.datasets.simulate.correlation_matrices-module.html#ConstantCorrelation" class="summary-sig-name">ConstantCorrelation</a>(<span class="summary-sig-arg">p</span>=<span class="summary-sig-default"><code class="variable-group">[</code>100<code class="variable-group">]</code></span>,
+        <span class="summary-sig-arg">rho</span>=<span class="summary-sig-default"><code class="variable-group">[</code>0.05<code class="variable-group">]</code></span>,
+        <span class="summary-sig-arg">delta</span>=<span class="summary-sig-default">0.1</span>,
+        <span class="summary-sig-arg">eps</span>=<span class="summary-sig-default">0.5</span>)</span><br />
+      Returns a positive definite matrix, S, corresponding to a block
+covariance matrix.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.datasets.simulate.correlation_matrices-pysrc.html#ConstantCorrelation">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.datasets.simulate.correlation_matrices-module.html#ToeplitzCorrelation" class="summary-sig-name">ToeplitzCorrelation</a>(<span class="summary-sig-arg">p</span>=<span class="summary-sig-default"><code class="variable-group">[</code>100<code class="variable-group">]</code></span>,
+        <span class="summary-sig-arg">rho</span>=<span class="summary-sig-default"><code class="variable-group">[</code>0.05<code class="variable-group">]</code></span>,
+        <span class="summary-sig-arg">eps</span>=<span class="summary-sig-default">0.5</span>)</span><br />
+      Returns a positive definite matrix, S, corresponding to a block
+covariance matrix.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.datasets.simulate.correlation_matrices-pysrc.html#ToeplitzCorrelation">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+</table>
+<!-- ==================== VARIABLES ==================== -->
+<a name="section-Variables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Variables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="__package__"></a><span class="summary-name">__package__</span> = <code title="'parsimony.datasets.simulate'"><code class="variable-quote">'</code><code class="variable-string">parsimony.datasets.simulate</code><code class="variable-quote">'</code></code>
+    </td>
+  </tr>
+</table>
+<!-- ==================== FUNCTION DETAILS ==================== -->
+<a name="section-FunctionDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Function Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-FunctionDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="ConstantCorrelation"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">ConstantCorrelation</span>(<span class="sig-arg">p</span>=<span class="sig-default"><code class="variable-group">[</code>100<code class="variable-group">]</code></span>,
+        <span class="sig-arg">rho</span>=<span class="sig-default"><code class="variable-group">[</code>0.05<code class="variable-group">]</code></span>,
+        <span class="sig-arg">delta</span>=<span class="sig-default">0.1</span>,
+        <span class="sig-arg">eps</span>=<span class="sig-default">0.5</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.datasets.simulate.correlation_matrices-pysrc.html#ConstantCorrelation">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+Returns a positive definite matrix, S, corresponding to a block
+covariance matrix. Each block has the structure:
+
+          [1, ..., rho_k]
+    S_k = [...,  1,  ...],
+          [rho_k, ..., 1]
+
+i.e. 1 on the diagonal and rho_k (on average) outside the diagonal. S then
+has the structure:
+
+        [S_1, delta, delta]
+    S = [delta, S_i, delta],
+        [delta, delta, S_N]
+
+i.e. with the groups-correlation matrices on the diagonal and delta (on
+average) outside.
+
+Parameters
+----------
+p    : A scalar or a list of scalars with the numbers of variables for each
+       group.
+
+rho  : A scalar or a list of the average correlation between off-diagonal
+       elements of S.
+
+delta: Baseline noise between groups. Only used if the number of groups is
+       greater than one. The baseline noise is computed as
+
+           delta * rho_min,
+
+       and you must provide a delta such that 0 &lt;= delta &lt; 1.
+
+eps  : Entry-wise random noise. This parameter determines the distribution
+       of the noise. The noise is approximately normally distributed with
+       mean
+
+           delta * min(rho)
+
+       and variance
+
+           (eps * (1 - max(rho))) ** 2.0 / 10.
+
+       You can thus control the noise by this parameter, but note that you
+       must have
+
+           0 &lt;= eps &lt; 1 - max(rho).
+
+Returns
+-------
+S    : The correlation matrix.
+
+</pre>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="ToeplitzCorrelation"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">ToeplitzCorrelation</span>(<span class="sig-arg">p</span>=<span class="sig-default"><code class="variable-group">[</code>100<code class="variable-group">]</code></span>,
+        <span class="sig-arg">rho</span>=<span class="sig-default"><code class="variable-group">[</code>0.05<code class="variable-group">]</code></span>,
+        <span class="sig-arg">eps</span>=<span class="sig-default">0.5</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.datasets.simulate.correlation_matrices-pysrc.html#ToeplitzCorrelation">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+Returns a positive definite matrix, S, corresponding to a block
+covariance matrix. Each block has the structure:
+
+          [            1,       rho_k^1, rho_k^2,     ..., rho_k^{p_k-1}]
+          [      rho_k^1,             1, rho_k^1,     ..., rho_k^{p_k-2}]
+    S_k = [      rho_k^2,       rho_k^1,       1,     ...,           ...]
+          [          ...,           ...,     ...,       1,       rho_k^1]
+          [rho_k^{p_k-1}, rho_k^{p_k-2},     ..., rho_k^1,             1]
+
+i.e. 1 on the diagonal and exponentially decreasing correlations outside
+the diagonal. S then has the structure:
+
+        [S_1,     0,     0]
+    S = [  0,   S_i,     0],
+        [  0,     0,   S_N]
+
+i.e. with the group-correlation matrices on the diagonal and zero (on
+average) outside.
+
+Parameters
+----------
+p    : A scalar or a list of scalars with the numbers of variables for each
+       group.
+
+rho  : A scalar or a list of the average correlation between off-diagonal
+       elements of S.
+
+eps  : Maximum entry-wise random noise. This parameter determines the
+       distribution of the noise. The noise is approximately normally
+       distributed with zero mean and variance
+
+           (eps * (1.0 - max(rho)) / (1.0 + max(rho))) ** 2.0 / 10.
+
+       You can thus control the noise by this parameter, but note that you
+       must have
+
+           0 &lt;= eps &lt; 1.
+
+Returns
+-------
+S    : The correlation matrix.
+
+</pre>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="parsimony-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sun Jul  6 11:32:50 2014
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

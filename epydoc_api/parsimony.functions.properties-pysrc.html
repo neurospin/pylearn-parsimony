@@ -1,0 +1,1099 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>parsimony.functions.properties</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="parsimony-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="parsimony-module.html">Package&nbsp;parsimony</a> ::
+        <a href="parsimony.functions-module.html" onclick="show_private();">Package&nbsp;functions</a> ::
+        Module&nbsp;properties
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="parsimony.functions.properties-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="parsimony.functions.properties-module.html">Module parsimony.functions.properties</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-comment"># -*- coding: utf-8 -*-</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-docstring">The :mod:`parsimony.functions.properties` module contains base classes that are</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-docstring">used  to assign properties, i.e. functionality of the functions.</tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-docstring">Try to keep the inheritance tree loop-free unless absolutely impossible.</tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-docstring">Created on Mon Apr 22 10:54:29 2013</tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"><tt class="py-docstring">Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.</tt> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"><tt class="py-docstring">@author:  Tommy L&#246;fstedt, Vincent Guillemot, Edouard Duchesnay and</tt> </tt>
+<a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"><tt class="py-docstring">          Fouad Hadj-Selem</tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"><tt class="py-docstring">@email:   lofstedt.tommy@gmail.com, edouard.duchesnay@cea.fr</tt> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line"><tt class="py-docstring">@license: BSD 3-clause.</tt> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">abc</tt> </tt>
+<a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line"> </tt>
+<a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">numpy</tt> <tt class="py-keyword">as</tt> <tt class="py-name">np</tt> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt>  <tt class="py-line"> </tt>
+<a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt id="link-0" class="py-name" targets="Package parsimony=parsimony-module.html"><a title="parsimony" class="py-name" href="#" onclick="return doclink('link-0', 'parsimony', 'link-0');">parsimony</a></tt><tt class="py-op">.</tt><tt id="link-1" class="py-name" targets="Module parsimony.algorithms.utils=parsimony.algorithms.utils-module.html,Module parsimony.datasets.simulate.utils=parsimony.datasets.simulate.utils-module.html,Module parsimony.datasets.utils=parsimony.datasets.utils-module.html,Package parsimony.utils=parsimony.utils-module.html,Module parsimony.utils.utils=parsimony.utils.utils-module.html"><a title="parsimony.algorithms.utils
+parsimony.datasets.simulate.utils
+parsimony.datasets.utils
+parsimony.utils
+parsimony.utils.utils" class="py-name" href="#" onclick="return doclink('link-1', 'utils', 'link-1');">utils</a></tt><tt class="py-op">.</tt><tt id="link-2" class="py-name" targets="Module parsimony.utils.maths=parsimony.utils.maths-module.html"><a title="parsimony.utils.maths" class="py-name" href="#" onclick="return doclink('link-2', 'maths', 'link-2');">maths</a></tt> <tt class="py-keyword">as</tt> <tt id="link-3" class="py-name"><a title="parsimony.utils.maths" class="py-name" href="#" onclick="return doclink('link-3', 'maths', 'link-2');">maths</a></tt> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt id="link-4" class="py-name"><a title="parsimony" class="py-name" href="#" onclick="return doclink('link-4', 'parsimony', 'link-0');">parsimony</a></tt><tt class="py-op">.</tt><tt id="link-5" class="py-name"><a title="parsimony.algorithms.utils
+parsimony.datasets.simulate.utils
+parsimony.datasets.utils
+parsimony.utils
+parsimony.utils.utils" class="py-name" href="#" onclick="return doclink('link-5', 'utils', 'link-1');">utils</a></tt><tt class="py-op">.</tt><tt id="link-6" class="py-name" targets="Module parsimony.utils.consts=parsimony.utils.consts-module.html"><a title="parsimony.utils.consts" class="py-name" href="#" onclick="return doclink('link-6', 'consts', 'link-6');">consts</a></tt> <tt class="py-keyword">as</tt> <tt id="link-7" class="py-name"><a title="parsimony.utils.consts" class="py-name" href="#" onclick="return doclink('link-7', 'consts', 'link-6');">consts</a></tt> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line"> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line"><tt class="py-name">__all__</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">"Function"</tt><tt class="py-op">,</tt> <tt class="py-string">"AtomicFunction"</tt><tt class="py-op">,</tt> <tt class="py-string">"CompositeFunction"</tt><tt class="py-op">,</tt> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line">           <tt class="py-string">"Penalty"</tt><tt class="py-op">,</tt> <tt class="py-string">"Constraint"</tt><tt class="py-op">,</tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line">           <tt class="py-string">"ProximalOperator"</tt><tt class="py-op">,</tt> <tt class="py-string">"ProjectionOperator"</tt><tt class="py-op">,</tt> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line">           <tt class="py-string">"CombinedProjectionOperator"</tt><tt class="py-op">,</tt> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line">           <tt class="py-string">"Continuation"</tt><tt class="py-op">,</tt> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line">           <tt class="py-string">"Gradient"</tt><tt class="py-op">,</tt> <tt class="py-string">"Hessian"</tt><tt class="py-op">,</tt> <tt class="py-string">"LipschitzContinuousGradient"</tt><tt class="py-op">,</tt> <tt class="py-string">"StepSize"</tt><tt class="py-op">,</tt> </tt>
+<a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line">           <tt class="py-string">"GradientMap"</tt><tt class="py-op">,</tt> <tt class="py-string">"DualFunction"</tt><tt class="py-op">,</tt> <tt class="py-string">"Eigenvalues"</tt><tt class="py-op">,</tt> <tt class="py-string">"StronglyConvex"</tt><tt class="py-op">,</tt> </tt>
+<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line">           <tt class="py-string">"OR"</tt><tt class="py-op">]</tt> </tt>
+<a name="Function"></a><div id="Function-def"><a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line"> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line"> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt> <a class="py-toggle" href="#" id="Function-toggle" onclick="return toggle('Function');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.functions.properties.Function-class.html">Function</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Function-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Function-expanded"><a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line"> </tt>
+<a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line">    <tt id="link-8" class="py-name" targets="Variable parsimony.algorithms.bases.ExplicitAlgorithm.__metaclass__=parsimony.algorithms.bases.ExplicitAlgorithm-class.html#__metaclass__,Variable parsimony.algorithms.bases.ImplicitAlgorithm.__metaclass__=parsimony.algorithms.bases.ImplicitAlgorithm-class.html#__metaclass__,Variable parsimony.datasets.simulate.grad.NesterovFunction.__metaclass__=parsimony.datasets.simulate.grad.NesterovFunction-class.html#__metaclass__,Variable parsimony.estimators.LogisticRegressionEstimator.__metaclass__=parsimony.estimators.LogisticRegressionEstimator-class.html#__metaclass__,Variable parsimony.estimators.RegressionEstimator.__metaclass__=parsimony.estimators.RegressionEstimator-class.html#__metaclass__,Variable parsimony.functions.multiblock.properties.MultiblockFunction.__metaclass__=parsimony.functions.multiblock.properties.MultiblockFunction-class.html#__metaclass__,Variable parsimony.functions.properties.AtomicFunction.__metaclass__=parsimony.functions.properties.AtomicFunction-class.html#__metaclass__,Variable parsimony.functions.properties.CompositeFunction.__metaclass__=parsimony.functions.properties.CompositeFunction-class.html#__metaclass__"><a title="parsimony.algorithms.bases.ExplicitAlgorithm.__metaclass__
+parsimony.algorithms.bases.ImplicitAlgorithm.__metaclass__
+parsimony.datasets.simulate.grad.NesterovFunction.__metaclass__
+parsimony.estimators.LogisticRegressionEstimator.__metaclass__
+parsimony.estimators.RegressionEstimator.__metaclass__
+parsimony.functions.multiblock.properties.MultiblockFunction.__metaclass__
+parsimony.functions.properties.AtomicFunction.__metaclass__
+parsimony.functions.properties.CompositeFunction.__metaclass__" class="py-name" href="#" onclick="return doclink('link-8', '__metaclass__', 'link-8');">__metaclass__</a></tt> <tt class="py-op">=</tt> <tt class="py-name">abc</tt><tt class="py-op">.</tt><tt id="link-9" class="py-name" targets="Class abc.ABCMeta=abc.ABCMeta-class.html"><a title="abc.ABCMeta" class="py-name" href="#" onclick="return doclink('link-9', 'ABCMeta', 'link-9');">ABCMeta</a></tt> </tt>
+<a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line"> </tt>
+<a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">abc</tt><tt class="py-op">.</tt><tt class="py-name">abstractmethod</tt> </tt>
+<a name="Function.f"></a><div id="Function.f-def"><a name="L39"></a><tt class="py-lineno"> 39</tt> <a class="py-toggle" href="#" id="Function.f-toggle" onclick="return toggle('Function.f');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.Function-class.html#f">f</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">args</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kwargs</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Function.f-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Function.f-expanded"><a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line">        <tt class="py-docstring">"""Function value.</tt> </tt>
+<a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">'Abstract method "f" must be '</tt> </tt>
+<a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line">                                  <tt class="py-string">'specialised!'</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line"> </tt>
+<a name="Function.reset"></a><div id="Function.reset-def"><a name="L45"></a><tt class="py-lineno"> 45</tt> <a class="py-toggle" href="#" id="Function.reset-toggle" onclick="return toggle('Function.reset');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.Function-class.html#reset">reset</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Function.reset-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Function.reset-expanded"><a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line">        <tt class="py-docstring">"""Free any cached computations from previous use of this Function.</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line">        <tt class="py-keyword">pass</tt> </tt>
+</div><a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line"> </tt>
+<a name="Function.get_params"></a><div id="Function.get_params-def"><a name="L50"></a><tt class="py-lineno"> 50</tt> <a class="py-toggle" href="#" id="Function.get_params-toggle" onclick="return toggle('Function.get_params');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.Function-class.html#get_params">get_params</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">args</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Function.get_params-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Function.get_params-expanded"><a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line"> </tt>
+<a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line">        <tt class="py-name">ret</tt> <tt class="py-op">=</tt> <tt class="py-name">dict</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">k</tt> <tt class="py-keyword">in</tt> <tt class="py-name">args</tt><tt class="py-op">:</tt> </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line">            <tt class="py-name">ret</tt><tt class="py-op">[</tt><tt class="py-name">k</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">getattr</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-name">k</tt><tt class="py-op">)</tt> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line"> </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">ret</tt> </tt>
+</div><a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line"> </tt>
+<a name="Function.set_params"></a><div id="Function.set_params-def"><a name="L58"></a><tt class="py-lineno"> 58</tt> <a class="py-toggle" href="#" id="Function.set_params-toggle" onclick="return toggle('Function.set_params');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.Function-class.html#set_params">set_params</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kwargs</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Function.set_params-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Function.set_params-expanded"><a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line"> </tt>
+<a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">k</tt> <tt class="py-keyword">in</tt> <tt class="py-name">kwargs</tt><tt class="py-op">:</tt> </tt>
+<a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line">            <tt class="py-name">setattr</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-name">k</tt><tt class="py-op">,</tt> <tt class="py-name">kwargs</tt><tt class="py-op">[</tt><tt class="py-name">k</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line"> </tt>
+<a name="AtomicFunction"></a><div id="AtomicFunction-def"><a name="L63"></a><tt class="py-lineno"> 63</tt>  <tt class="py-line"> </tt>
+<a name="L64"></a><tt class="py-lineno"> 64</tt> <a class="py-toggle" href="#" id="AtomicFunction-toggle" onclick="return toggle('AtomicFunction');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.functions.properties.AtomicFunction-class.html">AtomicFunction</a><tt class="py-op">(</tt><tt class="py-base-class">Function</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="AtomicFunction-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="AtomicFunction-expanded"><a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line">    <tt class="py-docstring">""" This is a function that is not in general supposed to be minimised by</tt> </tt>
+<a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line"><tt class="py-docstring">    itself. Instead it should be combined with other atomic functions and</tt> </tt>
+<a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line"><tt class="py-docstring">    composite functions into composite functions.</tt> </tt>
+<a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line">    <tt id="link-10" class="py-name"><a title="parsimony.algorithms.bases.ExplicitAlgorithm.__metaclass__
+parsimony.algorithms.bases.ImplicitAlgorithm.__metaclass__
+parsimony.datasets.simulate.grad.NesterovFunction.__metaclass__
+parsimony.estimators.LogisticRegressionEstimator.__metaclass__
+parsimony.estimators.RegressionEstimator.__metaclass__
+parsimony.functions.multiblock.properties.MultiblockFunction.__metaclass__
+parsimony.functions.properties.AtomicFunction.__metaclass__
+parsimony.functions.properties.CompositeFunction.__metaclass__" class="py-name" href="#" onclick="return doclink('link-10', '__metaclass__', 'link-8');">__metaclass__</a></tt> <tt class="py-op">=</tt> <tt class="py-name">abc</tt><tt class="py-op">.</tt><tt id="link-11" class="py-name"><a title="abc.ABCMeta" class="py-name" href="#" onclick="return doclink('link-11', 'ABCMeta', 'link-9');">ABCMeta</a></tt> </tt>
+</div><a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line"> </tt>
+<a name="CompositeFunction"></a><div id="CompositeFunction-def"><a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line"> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt> <a class="py-toggle" href="#" id="CompositeFunction-toggle" onclick="return toggle('CompositeFunction');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.functions.properties.CompositeFunction-class.html">CompositeFunction</a><tt class="py-op">(</tt><tt class="py-base-class">Function</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CompositeFunction-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="CompositeFunction-expanded"><a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line">    <tt class="py-docstring">""" This is a function that is the combination (e.g. sum) of other</tt> </tt>
+<a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line"><tt class="py-docstring">    composite or atomic functions. It may also be a constrained function.</tt> </tt>
+<a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line">    <tt id="link-12" class="py-name"><a title="parsimony.algorithms.bases.ExplicitAlgorithm.__metaclass__
+parsimony.algorithms.bases.ImplicitAlgorithm.__metaclass__
+parsimony.datasets.simulate.grad.NesterovFunction.__metaclass__
+parsimony.estimators.LogisticRegressionEstimator.__metaclass__
+parsimony.estimators.RegressionEstimator.__metaclass__
+parsimony.functions.multiblock.properties.MultiblockFunction.__metaclass__
+parsimony.functions.properties.AtomicFunction.__metaclass__
+parsimony.functions.properties.CompositeFunction.__metaclass__" class="py-name" href="#" onclick="return doclink('link-12', '__metaclass__', 'link-8');">__metaclass__</a></tt> <tt class="py-op">=</tt> <tt class="py-name">abc</tt><tt class="py-op">.</tt><tt id="link-13" class="py-name"><a title="abc.ABCMeta" class="py-name" href="#" onclick="return doclink('link-13', 'ABCMeta', 'link-9');">ABCMeta</a></tt> </tt>
+</div><a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line"> </tt>
+<a name="Penalty"></a><div id="Penalty-def"><a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line"><tt class="py-comment">#    constraints = list()</tt> </tt>
+<a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line"><tt class="py-comment">#    def add_constraint(self, function):</tt> </tt>
+<a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line"><tt class="py-comment">#        """Add a constraint to this function.</tt> </tt>
+<a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line"><tt class="py-comment">#        """</tt> </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line"><tt class="py-comment">#        self.constraints.append(function)</tt> </tt>
+<a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line"><tt class="py-comment">#    def get_constraints(self):</tt> </tt>
+<a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line"><tt class="py-comment">#        """Returns the constraint functions for this function. Returns an</tt> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line"><tt class="py-comment">#        empty list if no constraint functions exist.</tt> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line"><tt class="py-comment">#        """</tt> </tt>
+<a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line"><tt class="py-comment">#        return self.constraints</tt> </tt>
+<a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line"> </tt>
+<a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line"> </tt>
+<a name="L92"></a><tt class="py-lineno"> 92</tt> <a class="py-toggle" href="#" id="Penalty-toggle" onclick="return toggle('Penalty');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.functions.properties.Penalty-class.html">Penalty</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Penalty-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Penalty-expanded"><a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line">    <tt class="py-docstring">"""Represents the penalisation of a function.</tt> </tt>
+<a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line"><tt class="py-docstring">    Penalties must take a parameter penalty_start, with default value 0.</tt> </tt>
+<a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line"><tt class="py-docstring">    Columns, variables or corresponding entities with indices smaller than</tt> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line"><tt class="py-docstring">    penalty_start must not be penalised.</tt> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line"><tt class="py-docstring">    Parameters</tt> </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line"><tt class="py-docstring">    ----------</tt> </tt>
+<a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line"><tt class="py-docstring">    penalty_start : Non-negative integer. The number of columns, variables</tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line"><tt class="py-docstring">            etc., to except from penalisation. Equivalently, the first index</tt> </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line"><tt class="py-docstring">            to be penalised. Default is 0, all columns are included.</tt> </tt>
+<a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line">    <tt id="link-14" class="py-name"><a title="parsimony.algorithms.bases.ExplicitAlgorithm.__metaclass__
+parsimony.algorithms.bases.ImplicitAlgorithm.__metaclass__
+parsimony.datasets.simulate.grad.NesterovFunction.__metaclass__
+parsimony.estimators.LogisticRegressionEstimator.__metaclass__
+parsimony.estimators.RegressionEstimator.__metaclass__
+parsimony.functions.multiblock.properties.MultiblockFunction.__metaclass__
+parsimony.functions.properties.AtomicFunction.__metaclass__
+parsimony.functions.properties.CompositeFunction.__metaclass__" class="py-name" href="#" onclick="return doclink('link-14', '__metaclass__', 'link-8');">__metaclass__</a></tt> <tt class="py-op">=</tt> <tt class="py-name">abc</tt><tt class="py-op">.</tt><tt id="link-15" class="py-name"><a title="abc.ABCMeta" class="py-name" href="#" onclick="return doclink('link-15', 'ABCMeta', 'link-9');">ABCMeta</a></tt> </tt>
+</div><a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line"> </tt>
+<a name="Constraint"></a><div id="Constraint-def"><a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line"> </tt>
+<a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line"><tt class="py-comment"># TODO: Should all constraints have the projection operator?</tt> </tt>
+<a name="L109"></a><tt class="py-lineno">109</tt> <a class="py-toggle" href="#" id="Constraint-toggle" onclick="return toggle('Constraint');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.functions.properties.Constraint-class.html">Constraint</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Constraint-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Constraint-expanded"><a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line">    <tt class="py-docstring">"""Represents a constraint of a function.</tt> </tt>
+<a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line"><tt class="py-docstring">    Constraints must take a parameter penalty_start, with default value 0.</tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line"><tt class="py-docstring">    Columns, variables or corresponding entities with indices smaller than</tt> </tt>
+<a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line"><tt class="py-docstring">    penalty_start must not be penalised.</tt> </tt>
+<a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line"><tt class="py-docstring">    Parameters</tt> </tt>
+<a name="L117"></a><tt class="py-lineno">117</tt>  <tt class="py-line"><tt class="py-docstring">    ----------</tt> </tt>
+<a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line"><tt class="py-docstring">    penalty_start : The number of columns, variables etc., to except from</tt> </tt>
+<a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line"><tt class="py-docstring">            penalisation. Equivalently, the first index to be penalised.</tt> </tt>
+<a name="L120"></a><tt class="py-lineno">120</tt>  <tt class="py-line"><tt class="py-docstring">            Default is 0, all columns are included.</tt> </tt>
+<a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L122"></a><tt class="py-lineno">122</tt>  <tt class="py-line">    <tt id="link-16" class="py-name"><a title="parsimony.algorithms.bases.ExplicitAlgorithm.__metaclass__
+parsimony.algorithms.bases.ImplicitAlgorithm.__metaclass__
+parsimony.datasets.simulate.grad.NesterovFunction.__metaclass__
+parsimony.estimators.LogisticRegressionEstimator.__metaclass__
+parsimony.estimators.RegressionEstimator.__metaclass__
+parsimony.functions.multiblock.properties.MultiblockFunction.__metaclass__
+parsimony.functions.properties.AtomicFunction.__metaclass__
+parsimony.functions.properties.CompositeFunction.__metaclass__" class="py-name" href="#" onclick="return doclink('link-16', '__metaclass__', 'link-8');">__metaclass__</a></tt> <tt class="py-op">=</tt> <tt class="py-name">abc</tt><tt class="py-op">.</tt><tt id="link-17" class="py-name"><a title="abc.ABCMeta" class="py-name" href="#" onclick="return doclink('link-17', 'ABCMeta', 'link-9');">ABCMeta</a></tt> </tt>
+<a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line"> </tt>
+<a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">abc</tt><tt class="py-op">.</tt><tt class="py-name">abstractmethod</tt> </tt>
+<a name="Constraint.feasible"></a><div id="Constraint.feasible-def"><a name="L125"></a><tt class="py-lineno">125</tt> <a class="py-toggle" href="#" id="Constraint.feasible-toggle" onclick="return toggle('Constraint.feasible');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.Constraint-class.html#feasible">feasible</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">x</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Constraint.feasible-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Constraint.feasible-expanded"><a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line">        <tt class="py-docstring">"""Feasibility of the constraint at point x.</tt> </tt>
+<a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L128"></a><tt class="py-lineno">128</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">'Abstract method "feasible" must be '</tt> </tt>
+<a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line">                                  <tt class="py-string">'specialised!'</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L130"></a><tt class="py-lineno">130</tt>  <tt class="py-line"> </tt>
+<a name="ProximalOperator"></a><div id="ProximalOperator-def"><a name="L131"></a><tt class="py-lineno">131</tt>  <tt class="py-line"> </tt>
+<a name="L132"></a><tt class="py-lineno">132</tt> <a class="py-toggle" href="#" id="ProximalOperator-toggle" onclick="return toggle('ProximalOperator');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.functions.properties.ProximalOperator-class.html">ProximalOperator</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ProximalOperator-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="ProximalOperator-expanded"><a name="L133"></a><tt class="py-lineno">133</tt>  <tt class="py-line"> </tt>
+<a name="L134"></a><tt class="py-lineno">134</tt>  <tt class="py-line">    <tt id="link-18" class="py-name"><a title="parsimony.algorithms.bases.ExplicitAlgorithm.__metaclass__
+parsimony.algorithms.bases.ImplicitAlgorithm.__metaclass__
+parsimony.datasets.simulate.grad.NesterovFunction.__metaclass__
+parsimony.estimators.LogisticRegressionEstimator.__metaclass__
+parsimony.estimators.RegressionEstimator.__metaclass__
+parsimony.functions.multiblock.properties.MultiblockFunction.__metaclass__
+parsimony.functions.properties.AtomicFunction.__metaclass__
+parsimony.functions.properties.CompositeFunction.__metaclass__" class="py-name" href="#" onclick="return doclink('link-18', '__metaclass__', 'link-8');">__metaclass__</a></tt> <tt class="py-op">=</tt> <tt class="py-name">abc</tt><tt class="py-op">.</tt><tt id="link-19" class="py-name"><a title="abc.ABCMeta" class="py-name" href="#" onclick="return doclink('link-19', 'ABCMeta', 'link-9');">ABCMeta</a></tt> </tt>
+<a name="L135"></a><tt class="py-lineno">135</tt>  <tt class="py-line"> </tt>
+<a name="L136"></a><tt class="py-lineno">136</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">abc</tt><tt class="py-op">.</tt><tt class="py-name">abstractmethod</tt> </tt>
+<a name="ProximalOperator.prox"></a><div id="ProximalOperator.prox-def"><a name="L137"></a><tt class="py-lineno">137</tt> <a class="py-toggle" href="#" id="ProximalOperator.prox-toggle" onclick="return toggle('ProximalOperator.prox');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.ProximalOperator-class.html#prox">prox</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">beta</tt><tt class="py-op">,</tt> <tt class="py-param">factor</tt><tt class="py-op">=</tt><tt class="py-number">1.0</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ProximalOperator.prox-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="ProximalOperator.prox-expanded"><a name="L138"></a><tt class="py-lineno">138</tt>  <tt class="py-line">        <tt class="py-docstring">"""The proximal operator corresponding to the function.</tt> </tt>
+<a name="L139"></a><tt class="py-lineno">139</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L140"></a><tt class="py-lineno">140</tt>  <tt class="py-line"><tt class="py-docstring">        Parameters</tt> </tt>
+<a name="L141"></a><tt class="py-lineno">141</tt>  <tt class="py-line"><tt class="py-docstring">        ----------</tt> </tt>
+<a name="L142"></a><tt class="py-lineno">142</tt>  <tt class="py-line"><tt class="py-docstring">        beta : Numpy array (p-by-1). The point at which to apply the proximal</tt> </tt>
+<a name="L143"></a><tt class="py-lineno">143</tt>  <tt class="py-line"><tt class="py-docstring">                operator.</tt> </tt>
+<a name="L144"></a><tt class="py-lineno">144</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L145"></a><tt class="py-lineno">145</tt>  <tt class="py-line"><tt class="py-docstring">        factor : Positive float. A factor by which the Lagrange multiplier is</tt> </tt>
+<a name="L146"></a><tt class="py-lineno">146</tt>  <tt class="py-line"><tt class="py-docstring">                scaled. This is usually the step size.</tt> </tt>
+<a name="L147"></a><tt class="py-lineno">147</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L148"></a><tt class="py-lineno">148</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">'Abstract method "prox" must be '</tt> </tt>
+<a name="L149"></a><tt class="py-lineno">149</tt>  <tt class="py-line">                                  <tt class="py-string">'specialised!'</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L150"></a><tt class="py-lineno">150</tt>  <tt class="py-line"> </tt>
+<a name="ProjectionOperator"></a><div id="ProjectionOperator-def"><a name="L151"></a><tt class="py-lineno">151</tt>  <tt class="py-line"> </tt>
+<a name="L152"></a><tt class="py-lineno">152</tt> <a class="py-toggle" href="#" id="ProjectionOperator-toggle" onclick="return toggle('ProjectionOperator');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.functions.properties.ProjectionOperator-class.html">ProjectionOperator</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ProjectionOperator-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="ProjectionOperator-expanded"><a name="L153"></a><tt class="py-lineno">153</tt>  <tt class="py-line"> </tt>
+<a name="L154"></a><tt class="py-lineno">154</tt>  <tt class="py-line">    <tt id="link-20" class="py-name"><a title="parsimony.algorithms.bases.ExplicitAlgorithm.__metaclass__
+parsimony.algorithms.bases.ImplicitAlgorithm.__metaclass__
+parsimony.datasets.simulate.grad.NesterovFunction.__metaclass__
+parsimony.estimators.LogisticRegressionEstimator.__metaclass__
+parsimony.estimators.RegressionEstimator.__metaclass__
+parsimony.functions.multiblock.properties.MultiblockFunction.__metaclass__
+parsimony.functions.properties.AtomicFunction.__metaclass__
+parsimony.functions.properties.CompositeFunction.__metaclass__" class="py-name" href="#" onclick="return doclink('link-20', '__metaclass__', 'link-8');">__metaclass__</a></tt> <tt class="py-op">=</tt> <tt class="py-name">abc</tt><tt class="py-op">.</tt><tt id="link-21" class="py-name"><a title="abc.ABCMeta" class="py-name" href="#" onclick="return doclink('link-21', 'ABCMeta', 'link-9');">ABCMeta</a></tt> </tt>
+<a name="L155"></a><tt class="py-lineno">155</tt>  <tt class="py-line"> </tt>
+<a name="L156"></a><tt class="py-lineno">156</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">abc</tt><tt class="py-op">.</tt><tt class="py-name">abstractmethod</tt> </tt>
+<a name="ProjectionOperator.proj"></a><div id="ProjectionOperator.proj-def"><a name="L157"></a><tt class="py-lineno">157</tt> <a class="py-toggle" href="#" id="ProjectionOperator.proj-toggle" onclick="return toggle('ProjectionOperator.proj');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.ProjectionOperator-class.html#proj">proj</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">beta</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ProjectionOperator.proj-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="ProjectionOperator.proj-expanded"><a name="L158"></a><tt class="py-lineno">158</tt>  <tt class="py-line">        <tt class="py-docstring">"""The projection operator corresponding to the function.</tt> </tt>
+<a name="L159"></a><tt class="py-lineno">159</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L160"></a><tt class="py-lineno">160</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">'Abstract method "proj" must be '</tt> </tt>
+<a name="L161"></a><tt class="py-lineno">161</tt>  <tt class="py-line">                                  <tt class="py-string">'specialised!'</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L162"></a><tt class="py-lineno">162</tt>  <tt class="py-line"> </tt>
+<a name="CombinedProjectionOperator"></a><div id="CombinedProjectionOperator-def"><a name="L163"></a><tt class="py-lineno">163</tt>  <tt class="py-line"> </tt>
+<a name="L164"></a><tt class="py-lineno">164</tt> <a class="py-toggle" href="#" id="CombinedProjectionOperator-toggle" onclick="return toggle('CombinedProjectionOperator');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.functions.properties.CombinedProjectionOperator-class.html">CombinedProjectionOperator</a><tt class="py-op">(</tt><tt class="py-base-class">Function</tt><tt class="py-op">,</tt> <tt class="py-base-class">ProjectionOperator</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CombinedProjectionOperator-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="CombinedProjectionOperator-expanded"><a name="L165"></a><tt class="py-lineno">165</tt>  <tt class="py-line"> </tt>
+<a name="CombinedProjectionOperator.__init__"></a><div id="CombinedProjectionOperator.__init__-def"><a name="L166"></a><tt class="py-lineno">166</tt> <a class="py-toggle" href="#" id="CombinedProjectionOperator.__init__-toggle" onclick="return toggle('CombinedProjectionOperator.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.CombinedProjectionOperator-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">functions</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CombinedProjectionOperator.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CombinedProjectionOperator.__init__-expanded"><a name="L167"></a><tt class="py-lineno">167</tt>  <tt class="py-line">        <tt class="py-docstring">"""Functions must currently be a tuple or list with two projection</tt> </tt>
+<a name="L168"></a><tt class="py-lineno">168</tt>  <tt class="py-line"><tt class="py-docstring">        operators.</tt> </tt>
+<a name="L169"></a><tt class="py-lineno">169</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L170"></a><tt class="py-lineno">170</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-22" class="py-name" targets="Package parsimony.functions=parsimony.functions-module.html"><a title="parsimony.functions" class="py-name" href="#" onclick="return doclink('link-22', 'functions', 'link-22');">functions</a></tt> <tt class="py-op">=</tt> <tt id="link-23" class="py-name"><a title="parsimony.functions" class="py-name" href="#" onclick="return doclink('link-23', 'functions', 'link-22');">functions</a></tt> </tt>
+<a name="L171"></a><tt class="py-lineno">171</tt>  <tt class="py-line"> </tt>
+<a name="L172"></a><tt class="py-lineno">172</tt>  <tt class="py-line"><tt class="py-comment">#        from algorithms import ProjectionADMM</tt> </tt>
+<a name="L173"></a><tt class="py-lineno">173</tt>  <tt class="py-line"><tt class="py-comment">#        self.proj_op = ProjectionADMM()</tt> </tt>
+<a name="L174"></a><tt class="py-lineno">174</tt>  <tt class="py-line">        <tt class="py-keyword">from</tt> <tt id="link-24" class="py-name"><a title="parsimony" class="py-name" href="#" onclick="return doclink('link-24', 'parsimony', 'link-0');">parsimony</a></tt><tt class="py-op">.</tt><tt id="link-25" class="py-name" targets="Package parsimony.algorithms=parsimony.algorithms-module.html"><a title="parsimony.algorithms" class="py-name" href="#" onclick="return doclink('link-25', 'algorithms', 'link-25');">algorithms</a></tt><tt class="py-op">.</tt><tt class="py-name">explicit</tt> <tt class="py-keyword">import</tt> <tt id="link-26" class="py-name" targets="Class parsimony.algorithms._explicit.DykstrasProjectionAlgorithm=parsimony.algorithms._explicit.DykstrasProjectionAlgorithm-class.html,Class parsimony.algorithms.proximal.DykstrasProjectionAlgorithm=parsimony.algorithms.proximal.DykstrasProjectionAlgorithm-class.html"><a title="parsimony.algorithms._explicit.DykstrasProjectionAlgorithm
+parsimony.algorithms.proximal.DykstrasProjectionAlgorithm" class="py-name" href="#" onclick="return doclink('link-26', 'DykstrasProjectionAlgorithm', 'link-26');">DykstrasProjectionAlgorithm</a></tt> </tt>
+<a name="L175"></a><tt class="py-lineno">175</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">proj_op</tt> <tt class="py-op">=</tt> <tt id="link-27" class="py-name"><a title="parsimony.algorithms._explicit.DykstrasProjectionAlgorithm
+parsimony.algorithms.proximal.DykstrasProjectionAlgorithm" class="py-name" href="#" onclick="return doclink('link-27', 'DykstrasProjectionAlgorithm', 'link-26');">DykstrasProjectionAlgorithm</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L176"></a><tt class="py-lineno">176</tt>  <tt class="py-line"> </tt>
+<a name="CombinedProjectionOperator.f"></a><div id="CombinedProjectionOperator.f-def"><a name="L177"></a><tt class="py-lineno">177</tt> <a class="py-toggle" href="#" id="CombinedProjectionOperator.f-toggle" onclick="return toggle('CombinedProjectionOperator.f');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.CombinedProjectionOperator-class.html#f">f</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">x</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CombinedProjectionOperator.f-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CombinedProjectionOperator.f-expanded"><a name="L178"></a><tt class="py-lineno">178</tt>  <tt class="py-line"> </tt>
+<a name="L179"></a><tt class="py-lineno">179</tt>  <tt class="py-line">        <tt class="py-name">val</tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+<a name="L180"></a><tt class="py-lineno">180</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">func</tt> <tt class="py-keyword">in</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-28" class="py-name"><a title="parsimony.functions" class="py-name" href="#" onclick="return doclink('link-28', 'functions', 'link-22');">functions</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L181"></a><tt class="py-lineno">181</tt>  <tt class="py-line">            <tt class="py-name">val</tt> <tt class="py-op">+=</tt> <tt class="py-name">func</tt><tt class="py-op">.</tt><tt id="link-29" class="py-name" targets="Method parsimony.functions.combinedfunctions.CombinedFunction.f()=parsimony.functions.combinedfunctions.CombinedFunction-class.html#f,Method parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.f()=parsimony.functions.combinedfunctions.LinearRegressionL1L2GL-class.html#f,Method parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.f()=parsimony.functions.combinedfunctions.LinearRegressionL1L2TV-class.html#f,Method parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.f()=parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV-class.html#f,Method parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.f()=parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV-class.html#f,Method parsimony.functions.losses.LatentVariableVariance.f()=parsimony.functions.losses.LatentVariableVariance-class.html#f,Method parsimony.functions.losses.LinearFunction.f()=parsimony.functions.losses.LinearFunction-class.html#f,Method parsimony.functions.losses.LinearRegression.f()=parsimony.functions.losses.LinearRegression-class.html#f,Method parsimony.functions.losses.LogisticRegression.f()=parsimony.functions.losses.LogisticRegression-class.html#f,Method parsimony.functions.losses.RidgeLogisticRegression.f()=parsimony.functions.losses.RidgeLogisticRegression-class.html#f,Method parsimony.functions.losses.RidgeRegression.f()=parsimony.functions.losses.RidgeRegression-class.html#f,Method parsimony.functions.multiblock.losses.CombinedMultiblockFunction.f()=parsimony.functions.multiblock.losses.CombinedMultiblockFunction-class.html#f,Method parsimony.functions.multiblock.losses.GeneralisedMultiblock.f()=parsimony.functions.multiblock.losses.GeneralisedMultiblock-class.html#f,Method parsimony.functions.multiblock.losses.LatentVariableCovariance.f()=parsimony.functions.multiblock.losses.LatentVariableCovariance-class.html#f,Method parsimony.functions.multiblock.losses.MultiblockFunctionWrapper.f()=parsimony.functions.multiblock.losses.MultiblockFunctionWrapper-class.html#f,Method parsimony.functions.nesterov.gl.GroupLassoOverlap.f()=parsimony.functions.nesterov.gl.GroupLassoOverlap-class.html#f,Method parsimony.functions.nesterov.grouptv.GroupTotalVariation.f()=parsimony.functions.nesterov.grouptv.GroupTotalVariation-class.html#f,Method parsimony.functions.nesterov.l1.L1.f()=parsimony.functions.nesterov.l1.L1-class.html#f,Method parsimony.functions.nesterov.l1tv.L1TV.f()=parsimony.functions.nesterov.l1tv.L1TV-class.html#f,Method parsimony.functions.nesterov.tv.TotalVariation.f()=parsimony.functions.nesterov.tv.TotalVariation-class.html#f,Method parsimony.functions.penalties.L0.f()=parsimony.functions.penalties.L0-class.html#f,Method parsimony.functions.penalties.L1.f()=parsimony.functions.penalties.L1-class.html#f,Method parsimony.functions.penalties.L1L2Squared.f()=parsimony.functions.penalties.L1L2Squared-class.html#f,Method parsimony.functions.penalties.L2.f()=parsimony.functions.penalties.L2-class.html#f,Method parsimony.functions.penalties.L2Squared.f()=parsimony.functions.penalties.L2Squared-class.html#f,Method parsimony.functions.penalties.LInf.f()=parsimony.functions.penalties.LInf-class.html#f,Method parsimony.functions.penalties.QuadraticConstraint.f()=parsimony.functions.penalties.QuadraticConstraint-class.html#f,Method parsimony.functions.penalties.RGCCAConstraint.f()=parsimony.functions.penalties.RGCCAConstraint-class.html#f,Method parsimony.functions.penalties.SufficientDescentCondition.f()=parsimony.functions.penalties.SufficientDescentCondition-class.html#f,Method parsimony.functions.penalties.ZeroFunction.f()=parsimony.functions.penalties.ZeroFunction-class.html#f,Method parsimony.functions.properties.CombinedProjectionOperator.f()=parsimony.functions.properties.CombinedProjectionOperator-class.html#f,Method parsimony.functions.properties.Function.f()=parsimony.functions.properties.Function-class.html#f"><a title="parsimony.functions.combinedfunctions.CombinedFunction.f
+parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.f
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.f
+parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.f
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.f
+parsimony.functions.losses.LatentVariableVariance.f
+parsimony.functions.losses.LinearFunction.f
+parsimony.functions.losses.LinearRegression.f
+parsimony.functions.losses.LogisticRegression.f
+parsimony.functions.losses.RidgeLogisticRegression.f
+parsimony.functions.losses.RidgeRegression.f
+parsimony.functions.multiblock.losses.CombinedMultiblockFunction.f
+parsimony.functions.multiblock.losses.GeneralisedMultiblock.f
+parsimony.functions.multiblock.losses.LatentVariableCovariance.f
+parsimony.functions.multiblock.losses.MultiblockFunctionWrapper.f
+parsimony.functions.nesterov.gl.GroupLassoOverlap.f
+parsimony.functions.nesterov.grouptv.GroupTotalVariation.f
+parsimony.functions.nesterov.l1.L1.f
+parsimony.functions.nesterov.l1tv.L1TV.f
+parsimony.functions.nesterov.tv.TotalVariation.f
+parsimony.functions.penalties.L0.f
+parsimony.functions.penalties.L1.f
+parsimony.functions.penalties.L1L2Squared.f
+parsimony.functions.penalties.L2.f
+parsimony.functions.penalties.L2Squared.f
+parsimony.functions.penalties.LInf.f
+parsimony.functions.penalties.QuadraticConstraint.f
+parsimony.functions.penalties.RGCCAConstraint.f
+parsimony.functions.penalties.SufficientDescentCondition.f
+parsimony.functions.penalties.ZeroFunction.f
+parsimony.functions.properties.CombinedProjectionOperator.f
+parsimony.functions.properties.Function.f" class="py-name" href="#" onclick="return doclink('link-29', 'f', 'link-29');">f</a></tt><tt class="py-op">(</tt><tt class="py-name">x</tt><tt class="py-op">)</tt> </tt>
+<a name="L182"></a><tt class="py-lineno">182</tt>  <tt class="py-line"> </tt>
+<a name="L183"></a><tt class="py-lineno">183</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">val</tt> </tt>
+</div><a name="L184"></a><tt class="py-lineno">184</tt>  <tt class="py-line"> </tt>
+<a name="CombinedProjectionOperator.proj"></a><div id="CombinedProjectionOperator.proj-def"><a name="L185"></a><tt class="py-lineno">185</tt> <a class="py-toggle" href="#" id="CombinedProjectionOperator.proj-toggle" onclick="return toggle('CombinedProjectionOperator.proj');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.CombinedProjectionOperator-class.html#proj">proj</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">x</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="CombinedProjectionOperator.proj-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="CombinedProjectionOperator.proj-expanded"><a name="L186"></a><tt class="py-lineno">186</tt>  <tt class="py-line">        <tt class="py-docstring">"""The projection operator corresponding to the function.</tt> </tt>
+<a name="L187"></a><tt class="py-lineno">187</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L188"></a><tt class="py-lineno">188</tt>  <tt class="py-line"><tt class="py-docstring">        From the interface "ProjectionOperator".</tt> </tt>
+<a name="L189"></a><tt class="py-lineno">189</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L190"></a><tt class="py-lineno">190</tt>  <tt class="py-line">        <tt id="link-30" class="py-name" targets="Method parsimony.functions.combinedfunctions.CombinedFunction.proj()=parsimony.functions.combinedfunctions.CombinedFunction-class.html#proj,Method parsimony.functions.multiblock.losses.CombinedMultiblockFunction.proj()=parsimony.functions.multiblock.losses.CombinedMultiblockFunction-class.html#proj,Method parsimony.functions.multiblock.losses.GeneralisedMultiblock.proj()=parsimony.functions.multiblock.losses.GeneralisedMultiblock-class.html#proj,Method parsimony.functions.multiblock.properties.MultiblockProjectionOperator.proj()=parsimony.functions.multiblock.properties.MultiblockProjectionOperator-class.html#proj,Method parsimony.functions.penalties.L0.proj()=parsimony.functions.penalties.L0-class.html#proj,Method parsimony.functions.penalties.L1.proj()=parsimony.functions.penalties.L1-class.html#proj,Method parsimony.functions.penalties.L2.proj()=parsimony.functions.penalties.L2-class.html#proj,Method parsimony.functions.penalties.L2Squared.proj()=parsimony.functions.penalties.L2Squared-class.html#proj,Method parsimony.functions.penalties.LInf.proj()=parsimony.functions.penalties.LInf-class.html#proj,Method parsimony.functions.penalties.RGCCAConstraint.proj()=parsimony.functions.penalties.RGCCAConstraint-class.html#proj,Method parsimony.functions.penalties.ZeroFunction.proj()=parsimony.functions.penalties.ZeroFunction-class.html#proj,Method parsimony.functions.properties.CombinedProjectionOperator.proj()=parsimony.functions.properties.CombinedProjectionOperator-class.html#proj,Method parsimony.functions.properties.ProjectionOperator.proj()=parsimony.functions.properties.ProjectionOperator-class.html#proj"><a title="parsimony.functions.combinedfunctions.CombinedFunction.proj
+parsimony.functions.multiblock.losses.CombinedMultiblockFunction.proj
+parsimony.functions.multiblock.losses.GeneralisedMultiblock.proj
+parsimony.functions.multiblock.properties.MultiblockProjectionOperator.proj
+parsimony.functions.penalties.L0.proj
+parsimony.functions.penalties.L1.proj
+parsimony.functions.penalties.L2.proj
+parsimony.functions.penalties.L2Squared.proj
+parsimony.functions.penalties.LInf.proj
+parsimony.functions.penalties.RGCCAConstraint.proj
+parsimony.functions.penalties.ZeroFunction.proj
+parsimony.functions.properties.CombinedProjectionOperator.proj
+parsimony.functions.properties.ProjectionOperator.proj" class="py-name" href="#" onclick="return doclink('link-30', 'proj', 'link-30');">proj</a></tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">proj_op</tt><tt class="py-op">.</tt><tt id="link-31" class="py-name" targets="Method parsimony.algorithms._explicit.BacktrackingLineSearch.run()=parsimony.algorithms._explicit.BacktrackingLineSearch-class.html#run,Method parsimony.algorithms._explicit.Bisection.run()=parsimony.algorithms._explicit.Bisection-class.html#run,Method parsimony.algorithms._explicit.CONESTA.run()=parsimony.algorithms._explicit.CONESTA-class.html#run,Method parsimony.algorithms._explicit.DykstrasProjectionAlgorithm.run()=parsimony.algorithms._explicit.DykstrasProjectionAlgorithm-class.html#run,Method parsimony.algorithms._explicit.ExcessiveGapMethod.run()=parsimony.algorithms._explicit.ExcessiveGapMethod-class.html#run,Method parsimony.algorithms._explicit.FISTA.run()=parsimony.algorithms._explicit.FISTA-class.html#run,Method parsimony.algorithms._explicit.GradientDescent.run()=parsimony.algorithms._explicit.GradientDescent-class.html#run,Method parsimony.algorithms._explicit.ISTA.run()=parsimony.algorithms._explicit.ISTA-class.html#run,Method parsimony.algorithms._explicit.NaiveCONESTA.run()=parsimony.algorithms._explicit.NaiveCONESTA-class.html#run,Method parsimony.algorithms._explicit.NewtonRaphson.run()=parsimony.algorithms._explicit.NewtonRaphson-class.html#run,Method parsimony.algorithms._explicit.ParallelDykstrasProjectionAlgorithm.run()=parsimony.algorithms._explicit.ParallelDykstrasProjectionAlgorithm-class.html#run,Method parsimony.algorithms._explicit.ParallelDykstrasProximalAlgorithm.run()=parsimony.algorithms._explicit.ParallelDykstrasProximalAlgorithm-class.html#run,Method parsimony.algorithms._implicit.FastSVD.run()=parsimony.algorithms._implicit.FastSVD-class.html#run,Method parsimony.algorithms._implicit.FastSVDProduct.run()=parsimony.algorithms._implicit.FastSVDProduct-class.html#run,Method parsimony.algorithms._implicit.FastSparseSVD.run()=parsimony.algorithms._implicit.FastSparseSVD-class.html#run,Method parsimony.algorithms.bases.ExplicitAlgorithm.run()=parsimony.algorithms.bases.ExplicitAlgorithm-class.html#run,Method parsimony.algorithms.bases.ImplicitAlgorithm.run()=parsimony.algorithms.bases.ImplicitAlgorithm-class.html#run,Method parsimony.algorithms.gradient.GradientDescent.run()=parsimony.algorithms.gradient.GradientDescent-class.html#run,Method parsimony.algorithms.multiblock.MultiblockCONESTA.run()=parsimony.algorithms.multiblock.MultiblockCONESTA-class.html#run,Method parsimony.algorithms.multiblock.MultiblockFISTA.run()=parsimony.algorithms.multiblock.MultiblockFISTA-class.html#run,Method parsimony.algorithms.nipals.FastSVD.run()=parsimony.algorithms.nipals.FastSVD-class.html#run,Method parsimony.algorithms.nipals.FastSVDProduct.run()=parsimony.algorithms.nipals.FastSVDProduct-class.html#run,Method parsimony.algorithms.nipals.FastSparseSVD.run()=parsimony.algorithms.nipals.FastSparseSVD-class.html#run,Method parsimony.algorithms.nipals.PLSR.run()=parsimony.algorithms.nipals.PLSR-class.html#run,Method parsimony.algorithms.nipals.SparsePLSR.run()=parsimony.algorithms.nipals.SparsePLSR-class.html#run,Method parsimony.algorithms.primaldual.CONESTA.run()=parsimony.algorithms.primaldual.CONESTA-class.html#run,Method parsimony.algorithms.primaldual.ExcessiveGapMethod.run()=parsimony.algorithms.primaldual.ExcessiveGapMethod-class.html#run,Method parsimony.algorithms.primaldual.NaiveCONESTA.run()=parsimony.algorithms.primaldual.NaiveCONESTA-class.html#run,Method parsimony.algorithms.proximal.DykstrasProjectionAlgorithm.run()=parsimony.algorithms.proximal.DykstrasProjectionAlgorithm-class.html#run,Method parsimony.algorithms.proximal.DykstrasProximalAlgorithm.run()=parsimony.algorithms.proximal.DykstrasProximalAlgorithm-class.html#run,Method parsimony.algorithms.proximal.FISTA.run()=parsimony.algorithms.proximal.FISTA-class.html#run,Method parsimony.algorithms.proximal.ISTA.run()=parsimony.algorithms.proximal.ISTA-class.html#run,Method parsimony.algorithms.proximal.ParallelDykstrasProjectionAlgorithm.run()=parsimony.algorithms.proximal.ParallelDykstrasProjectionAlgorithm-class.html#run,Method parsimony.algorithms.proximal.ParallelDykstrasProximalAlgorithm.run()=parsimony.algorithms.proximal.ParallelDykstrasProximalAlgorithm-class.html#run,Method parsimony.algorithms.utils.BacktrackingLineSearch.run()=parsimony.algorithms.utils.BacktrackingLineSearch-class.html#run,Method parsimony.algorithms.utils.Bisection.run()=parsimony.algorithms.utils.Bisection-class.html#run,Method parsimony.algorithms.utils.NewtonRaphson.run()=parsimony.algorithms.utils.NewtonRaphson-class.html#run"><a title="parsimony.algorithms._explicit.BacktrackingLineSearch.run
+parsimony.algorithms._explicit.Bisection.run
+parsimony.algorithms._explicit.CONESTA.run
+parsimony.algorithms._explicit.DykstrasProjectionAlgorithm.run
+parsimony.algorithms._explicit.ExcessiveGapMethod.run
+parsimony.algorithms._explicit.FISTA.run
+parsimony.algorithms._explicit.GradientDescent.run
+parsimony.algorithms._explicit.ISTA.run
+parsimony.algorithms._explicit.NaiveCONESTA.run
+parsimony.algorithms._explicit.NewtonRaphson.run
+parsimony.algorithms._explicit.ParallelDykstrasProjectionAlgorithm.run
+parsimony.algorithms._explicit.ParallelDykstrasProximalAlgorithm.run
+parsimony.algorithms._implicit.FastSVD.run
+parsimony.algorithms._implicit.FastSVDProduct.run
+parsimony.algorithms._implicit.FastSparseSVD.run
+parsimony.algorithms.bases.ExplicitAlgorithm.run
+parsimony.algorithms.bases.ImplicitAlgorithm.run
+parsimony.algorithms.gradient.GradientDescent.run
+parsimony.algorithms.multiblock.MultiblockCONESTA.run
+parsimony.algorithms.multiblock.MultiblockFISTA.run
+parsimony.algorithms.nipals.FastSVD.run
+parsimony.algorithms.nipals.FastSVDProduct.run
+parsimony.algorithms.nipals.FastSparseSVD.run
+parsimony.algorithms.nipals.PLSR.run
+parsimony.algorithms.nipals.SparsePLSR.run
+parsimony.algorithms.primaldual.CONESTA.run
+parsimony.algorithms.primaldual.ExcessiveGapMethod.run
+parsimony.algorithms.primaldual.NaiveCONESTA.run
+parsimony.algorithms.proximal.DykstrasProjectionAlgorithm.run
+parsimony.algorithms.proximal.DykstrasProximalAlgorithm.run
+parsimony.algorithms.proximal.FISTA.run
+parsimony.algorithms.proximal.ISTA.run
+parsimony.algorithms.proximal.ParallelDykstrasProjectionAlgorithm.run
+parsimony.algorithms.proximal.ParallelDykstrasProximalAlgorithm.run
+parsimony.algorithms.utils.BacktrackingLineSearch.run
+parsimony.algorithms.utils.Bisection.run
+parsimony.algorithms.utils.NewtonRaphson.run" class="py-name" href="#" onclick="return doclink('link-31', 'run', 'link-31');">run</a></tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-32" class="py-name"><a title="parsimony.functions" class="py-name" href="#" onclick="return doclink('link-32', 'functions', 'link-22');">functions</a></tt><tt class="py-op">,</tt> <tt class="py-name">x</tt><tt class="py-op">)</tt> </tt>
+<a name="L191"></a><tt class="py-lineno">191</tt>  <tt class="py-line"> </tt>
+<a name="L192"></a><tt class="py-lineno">192</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-33" class="py-name"><a title="parsimony.functions.combinedfunctions.CombinedFunction.proj
+parsimony.functions.multiblock.losses.CombinedMultiblockFunction.proj
+parsimony.functions.multiblock.losses.GeneralisedMultiblock.proj
+parsimony.functions.multiblock.properties.MultiblockProjectionOperator.proj
+parsimony.functions.penalties.L0.proj
+parsimony.functions.penalties.L1.proj
+parsimony.functions.penalties.L2.proj
+parsimony.functions.penalties.L2Squared.proj
+parsimony.functions.penalties.LInf.proj
+parsimony.functions.penalties.RGCCAConstraint.proj
+parsimony.functions.penalties.ZeroFunction.proj
+parsimony.functions.properties.CombinedProjectionOperator.proj
+parsimony.functions.properties.ProjectionOperator.proj" class="py-name" href="#" onclick="return doclink('link-33', 'proj', 'link-30');">proj</a></tt> </tt>
+</div></div><a name="L193"></a><tt class="py-lineno">193</tt>  <tt class="py-line"> </tt>
+<a name="Continuation"></a><div id="Continuation-def"><a name="L194"></a><tt class="py-lineno">194</tt>  <tt class="py-line"> </tt>
+<a name="L195"></a><tt class="py-lineno">195</tt> <a class="py-toggle" href="#" id="Continuation-toggle" onclick="return toggle('Continuation');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.functions.properties.Continuation-class.html">Continuation</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Continuation-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Continuation-expanded"><a name="L196"></a><tt class="py-lineno">196</tt>  <tt class="py-line"> </tt>
+<a name="L197"></a><tt class="py-lineno">197</tt>  <tt class="py-line">    <tt id="link-34" class="py-name"><a title="parsimony.algorithms.bases.ExplicitAlgorithm.__metaclass__
+parsimony.algorithms.bases.ImplicitAlgorithm.__metaclass__
+parsimony.datasets.simulate.grad.NesterovFunction.__metaclass__
+parsimony.estimators.LogisticRegressionEstimator.__metaclass__
+parsimony.estimators.RegressionEstimator.__metaclass__
+parsimony.functions.multiblock.properties.MultiblockFunction.__metaclass__
+parsimony.functions.properties.AtomicFunction.__metaclass__
+parsimony.functions.properties.CompositeFunction.__metaclass__" class="py-name" href="#" onclick="return doclink('link-34', '__metaclass__', 'link-8');">__metaclass__</a></tt> <tt class="py-op">=</tt> <tt class="py-name">abc</tt><tt class="py-op">.</tt><tt id="link-35" class="py-name"><a title="abc.ABCMeta" class="py-name" href="#" onclick="return doclink('link-35', 'ABCMeta', 'link-9');">ABCMeta</a></tt> </tt>
+<a name="L198"></a><tt class="py-lineno">198</tt>  <tt class="py-line"> </tt>
+<a name="L199"></a><tt class="py-lineno">199</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">abc</tt><tt class="py-op">.</tt><tt class="py-name">abstractmethod</tt> </tt>
+<a name="Continuation.mu_opt"></a><div id="Continuation.mu_opt-def"><a name="L200"></a><tt class="py-lineno">200</tt> <a class="py-toggle" href="#" id="Continuation.mu_opt-toggle" onclick="return toggle('Continuation.mu_opt');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.Continuation-class.html#mu_opt">mu_opt</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">eps</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Continuation.mu_opt-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Continuation.mu_opt-expanded"><a name="L201"></a><tt class="py-lineno">201</tt>  <tt class="py-line">        <tt class="py-docstring">"""The optimal value of mu given epsilon.</tt> </tt>
+<a name="L202"></a><tt class="py-lineno">202</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L203"></a><tt class="py-lineno">203</tt>  <tt class="py-line"><tt class="py-docstring">        Parameters</tt> </tt>
+<a name="L204"></a><tt class="py-lineno">204</tt>  <tt class="py-line"><tt class="py-docstring">        ----------</tt> </tt>
+<a name="L205"></a><tt class="py-lineno">205</tt>  <tt class="py-line"><tt class="py-docstring">        eps : Positive float. The desired precision.</tt> </tt>
+<a name="L206"></a><tt class="py-lineno">206</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L207"></a><tt class="py-lineno">207</tt>  <tt class="py-line"><tt class="py-docstring">        Returns</tt> </tt>
+<a name="L208"></a><tt class="py-lineno">208</tt>  <tt class="py-line"><tt class="py-docstring">        -------</tt> </tt>
+<a name="L209"></a><tt class="py-lineno">209</tt>  <tt class="py-line"><tt class="py-docstring">        mu : Positive float. The optimal regularisation parameter.</tt> </tt>
+<a name="L210"></a><tt class="py-lineno">210</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L211"></a><tt class="py-lineno">211</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">'Abstract method "mu_opt" must be '</tt> </tt>
+<a name="L212"></a><tt class="py-lineno">212</tt>  <tt class="py-line">                                  <tt class="py-string">'specialised!'</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L213"></a><tt class="py-lineno">213</tt>  <tt class="py-line"> </tt>
+<a name="L214"></a><tt class="py-lineno">214</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">abc</tt><tt class="py-op">.</tt><tt class="py-name">abstractmethod</tt> </tt>
+<a name="Continuation.eps_opt"></a><div id="Continuation.eps_opt-def"><a name="L215"></a><tt class="py-lineno">215</tt> <a class="py-toggle" href="#" id="Continuation.eps_opt-toggle" onclick="return toggle('Continuation.eps_opt');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.Continuation-class.html#eps_opt">eps_opt</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">mu</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Continuation.eps_opt-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Continuation.eps_opt-expanded"><a name="L216"></a><tt class="py-lineno">216</tt>  <tt class="py-line">        <tt class="py-docstring">"""The optimal value of epsilon given mu.</tt> </tt>
+<a name="L217"></a><tt class="py-lineno">217</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L218"></a><tt class="py-lineno">218</tt>  <tt class="py-line"><tt class="py-docstring">        Parameters</tt> </tt>
+<a name="L219"></a><tt class="py-lineno">219</tt>  <tt class="py-line"><tt class="py-docstring">        ----------</tt> </tt>
+<a name="L220"></a><tt class="py-lineno">220</tt>  <tt class="py-line"><tt class="py-docstring">        mu : Positive float. The regularisation constant of the smoothing.</tt> </tt>
+<a name="L221"></a><tt class="py-lineno">221</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L222"></a><tt class="py-lineno">222</tt>  <tt class="py-line"><tt class="py-docstring">        Returns</tt> </tt>
+<a name="L223"></a><tt class="py-lineno">223</tt>  <tt class="py-line"><tt class="py-docstring">        -------</tt> </tt>
+<a name="L224"></a><tt class="py-lineno">224</tt>  <tt class="py-line"><tt class="py-docstring">        eps : Positive float. The optimal precision.</tt> </tt>
+<a name="L225"></a><tt class="py-lineno">225</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L226"></a><tt class="py-lineno">226</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">'Abstract method "eps_opt" must be '</tt> </tt>
+<a name="L227"></a><tt class="py-lineno">227</tt>  <tt class="py-line">                                  <tt class="py-string">'specialised!'</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L228"></a><tt class="py-lineno">228</tt>  <tt class="py-line"> </tt>
+<a name="L229"></a><tt class="py-lineno">229</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">abc</tt><tt class="py-op">.</tt><tt class="py-name">abstractmethod</tt> </tt>
+<a name="Continuation.eps_max"></a><div id="Continuation.eps_max-def"><a name="L230"></a><tt class="py-lineno">230</tt> <a class="py-toggle" href="#" id="Continuation.eps_max-toggle" onclick="return toggle('Continuation.eps_max');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.Continuation-class.html#eps_max">eps_max</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">mu</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Continuation.eps_max-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Continuation.eps_max-expanded"><a name="L231"></a><tt class="py-lineno">231</tt>  <tt class="py-line">        <tt class="py-docstring">"""The maximum value of epsilon.</tt> </tt>
+<a name="L232"></a><tt class="py-lineno">232</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L233"></a><tt class="py-lineno">233</tt>  <tt class="py-line"><tt class="py-docstring">        Parameters</tt> </tt>
+<a name="L234"></a><tt class="py-lineno">234</tt>  <tt class="py-line"><tt class="py-docstring">        ----------</tt> </tt>
+<a name="L235"></a><tt class="py-lineno">235</tt>  <tt class="py-line"><tt class="py-docstring">        mu : Positive float. The regularisation constant of the smoothing.</tt> </tt>
+<a name="L236"></a><tt class="py-lineno">236</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L237"></a><tt class="py-lineno">237</tt>  <tt class="py-line"><tt class="py-docstring">        Returns</tt> </tt>
+<a name="L238"></a><tt class="py-lineno">238</tt>  <tt class="py-line"><tt class="py-docstring">        -------</tt> </tt>
+<a name="L239"></a><tt class="py-lineno">239</tt>  <tt class="py-line"><tt class="py-docstring">        eps : Positive float. The upper limit, the maximum, precision.</tt> </tt>
+<a name="L240"></a><tt class="py-lineno">240</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L241"></a><tt class="py-lineno">241</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">'Abstract method "eps_max" must be '</tt> </tt>
+<a name="L242"></a><tt class="py-lineno">242</tt>  <tt class="py-line">                                  <tt class="py-string">'specialised!'</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L243"></a><tt class="py-lineno">243</tt>  <tt class="py-line"> </tt>
+<a name="L244"></a><tt class="py-lineno">244</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">abc</tt><tt class="py-op">.</tt><tt class="py-name">abstractmethod</tt> </tt>
+<a name="Continuation.mu_max"></a><div id="Continuation.mu_max-def"><a name="L245"></a><tt class="py-lineno">245</tt> <a class="py-toggle" href="#" id="Continuation.mu_max-toggle" onclick="return toggle('Continuation.mu_max');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.Continuation-class.html#mu_max">mu_max</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">eps</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Continuation.mu_max-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Continuation.mu_max-expanded"><a name="L246"></a><tt class="py-lineno">246</tt>  <tt class="py-line">        <tt class="py-docstring">"""The maximum value of mu.</tt> </tt>
+<a name="L247"></a><tt class="py-lineno">247</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L248"></a><tt class="py-lineno">248</tt>  <tt class="py-line"><tt class="py-docstring">        Parameters</tt> </tt>
+<a name="L249"></a><tt class="py-lineno">249</tt>  <tt class="py-line"><tt class="py-docstring">        ----------</tt> </tt>
+<a name="L250"></a><tt class="py-lineno">250</tt>  <tt class="py-line"><tt class="py-docstring">        eps : Positive float. The maximum precision of the smoothing.</tt> </tt>
+<a name="L251"></a><tt class="py-lineno">251</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L252"></a><tt class="py-lineno">252</tt>  <tt class="py-line"><tt class="py-docstring">        Returns</tt> </tt>
+<a name="L253"></a><tt class="py-lineno">253</tt>  <tt class="py-line"><tt class="py-docstring">        -------</tt> </tt>
+<a name="L254"></a><tt class="py-lineno">254</tt>  <tt class="py-line"><tt class="py-docstring">        mu : Positive float. The upper limit, the maximum, of the</tt> </tt>
+<a name="L255"></a><tt class="py-lineno">255</tt>  <tt class="py-line"><tt class="py-docstring">                regularisation constant of the smoothing.</tt> </tt>
+<a name="L256"></a><tt class="py-lineno">256</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L257"></a><tt class="py-lineno">257</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">'Abstract method "mu_max" must be '</tt> </tt>
+<a name="L258"></a><tt class="py-lineno">258</tt>  <tt class="py-line">                                  <tt class="py-string">'specialised!'</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L259"></a><tt class="py-lineno">259</tt>  <tt class="py-line"> </tt>
+<a name="Gradient"></a><div id="Gradient-def"><a name="L260"></a><tt class="py-lineno">260</tt>  <tt class="py-line"> </tt>
+<a name="L261"></a><tt class="py-lineno">261</tt> <a class="py-toggle" href="#" id="Gradient-toggle" onclick="return toggle('Gradient');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.functions.properties.Gradient-class.html">Gradient</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Gradient-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Gradient-expanded"><a name="L262"></a><tt class="py-lineno">262</tt>  <tt class="py-line"> </tt>
+<a name="L263"></a><tt class="py-lineno">263</tt>  <tt class="py-line">    <tt id="link-36" class="py-name"><a title="parsimony.algorithms.bases.ExplicitAlgorithm.__metaclass__
+parsimony.algorithms.bases.ImplicitAlgorithm.__metaclass__
+parsimony.datasets.simulate.grad.NesterovFunction.__metaclass__
+parsimony.estimators.LogisticRegressionEstimator.__metaclass__
+parsimony.estimators.RegressionEstimator.__metaclass__
+parsimony.functions.multiblock.properties.MultiblockFunction.__metaclass__
+parsimony.functions.properties.AtomicFunction.__metaclass__
+parsimony.functions.properties.CompositeFunction.__metaclass__" class="py-name" href="#" onclick="return doclink('link-36', '__metaclass__', 'link-8');">__metaclass__</a></tt> <tt class="py-op">=</tt> <tt class="py-name">abc</tt><tt class="py-op">.</tt><tt id="link-37" class="py-name"><a title="abc.ABCMeta" class="py-name" href="#" onclick="return doclink('link-37', 'ABCMeta', 'link-9');">ABCMeta</a></tt> </tt>
+<a name="L264"></a><tt class="py-lineno">264</tt>  <tt class="py-line"> </tt>
+<a name="L265"></a><tt class="py-lineno">265</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">abc</tt><tt class="py-op">.</tt><tt class="py-name">abstractmethod</tt> </tt>
+<a name="Gradient.grad"></a><div id="Gradient.grad-def"><a name="L266"></a><tt class="py-lineno">266</tt> <a class="py-toggle" href="#" id="Gradient.grad-toggle" onclick="return toggle('Gradient.grad');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.Gradient-class.html#grad">grad</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">beta</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Gradient.grad-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Gradient.grad-expanded"><a name="L267"></a><tt class="py-lineno">267</tt>  <tt class="py-line">        <tt class="py-docstring">"""Gradient of the function.</tt> </tt>
+<a name="L268"></a><tt class="py-lineno">268</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L269"></a><tt class="py-lineno">269</tt>  <tt class="py-line"><tt class="py-docstring">        Parameters</tt> </tt>
+<a name="L270"></a><tt class="py-lineno">270</tt>  <tt class="py-line"><tt class="py-docstring">        ----------</tt> </tt>
+<a name="L271"></a><tt class="py-lineno">271</tt>  <tt class="py-line"><tt class="py-docstring">        beta : Numpy array (p-by-1). The point at which to evaluate the</tt> </tt>
+<a name="L272"></a><tt class="py-lineno">272</tt>  <tt class="py-line"><tt class="py-docstring">                gradient.</tt> </tt>
+<a name="L273"></a><tt class="py-lineno">273</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L274"></a><tt class="py-lineno">274</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">'Abstract method "grad" must be '</tt> </tt>
+<a name="L275"></a><tt class="py-lineno">275</tt>  <tt class="py-line">                                  <tt class="py-string">'specialised!'</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L276"></a><tt class="py-lineno">276</tt>  <tt class="py-line"> </tt>
+<a name="Gradient.approx_grad"></a><div id="Gradient.approx_grad-def"><a name="L277"></a><tt class="py-lineno">277</tt> <a class="py-toggle" href="#" id="Gradient.approx_grad-toggle" onclick="return toggle('Gradient.approx_grad');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.Gradient-class.html#approx_grad">approx_grad</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">x</tt><tt class="py-op">,</tt> <tt class="py-param">eps</tt><tt class="py-op">=</tt><tt class="py-number">1e-4</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Gradient.approx_grad-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Gradient.approx_grad-expanded"><a name="L278"></a><tt class="py-lineno">278</tt>  <tt class="py-line">        <tt class="py-docstring">"""Numerical approximation of the gradient.</tt> </tt>
+<a name="L279"></a><tt class="py-lineno">279</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L280"></a><tt class="py-lineno">280</tt>  <tt class="py-line"><tt class="py-docstring">        Parameters</tt> </tt>
+<a name="L281"></a><tt class="py-lineno">281</tt>  <tt class="py-line"><tt class="py-docstring">        ----------</tt> </tt>
+<a name="L282"></a><tt class="py-lineno">282</tt>  <tt class="py-line"><tt class="py-docstring">        beta : Numpy array (p-by-1). The point at which to evaluate the</tt> </tt>
+<a name="L283"></a><tt class="py-lineno">283</tt>  <tt class="py-line"><tt class="py-docstring">                gradient.</tt> </tt>
+<a name="L284"></a><tt class="py-lineno">284</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L285"></a><tt class="py-lineno">285</tt>  <tt class="py-line"><tt class="py-docstring">        eps : Positive integer. The precision of the numerical solution.</tt> </tt>
+<a name="L286"></a><tt class="py-lineno">286</tt>  <tt class="py-line"><tt class="py-docstring">                Smaller is better, but too small may result in floating point</tt> </tt>
+<a name="L287"></a><tt class="py-lineno">287</tt>  <tt class="py-line"><tt class="py-docstring">                precision errors.</tt> </tt>
+<a name="L288"></a><tt class="py-lineno">288</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L289"></a><tt class="py-lineno">289</tt>  <tt class="py-line">        <tt class="py-name">p</tt> <tt class="py-op">=</tt> <tt class="py-name">x</tt><tt class="py-op">.</tt><tt class="py-name">shape</tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt> </tt>
+<a name="L290"></a><tt class="py-lineno">290</tt>  <tt class="py-line">        <tt id="link-38" class="py-name" targets="Module parsimony.datasets.simulate.grad=parsimony.datasets.simulate.grad-module.html,Method parsimony.datasets.simulate.grad.Function.grad()=parsimony.datasets.simulate.grad.Function-class.html#grad,Method parsimony.datasets.simulate.grad.L1.grad()=parsimony.datasets.simulate.grad.L1-class.html#grad,Method parsimony.datasets.simulate.grad.L2.grad()=parsimony.datasets.simulate.grad.L2-class.html#grad,Method parsimony.datasets.simulate.grad.L2Squared.grad()=parsimony.datasets.simulate.grad.L2Squared-class.html#grad,Method parsimony.datasets.simulate.grad.NesterovFunction.grad()=parsimony.datasets.simulate.grad.NesterovFunction-class.html#grad,Method parsimony.datasets.simulate.grad.SmoothedGroupLasso.grad()=parsimony.datasets.simulate.grad.SmoothedGroupLasso-class.html#grad,Method parsimony.datasets.simulate.grad.SmoothedGroupTotalVariation.grad()=parsimony.datasets.simulate.grad.SmoothedGroupTotalVariation-class.html#grad,Method parsimony.datasets.simulate.grad.SmoothedL1.grad()=parsimony.datasets.simulate.grad.SmoothedL1-class.html#grad,Method parsimony.datasets.simulate.grad.SmoothedTotalVariation.grad()=parsimony.datasets.simulate.grad.SmoothedTotalVariation-class.html#grad,Method parsimony.datasets.simulate.grad.TotalVariation.grad()=parsimony.datasets.simulate.grad.TotalVariation-class.html#grad,Method parsimony.functions.combinedfunctions.CombinedFunction.grad()=parsimony.functions.combinedfunctions.CombinedFunction-class.html#grad,Method parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.grad()=parsimony.functions.combinedfunctions.LinearRegressionL1L2GL-class.html#grad,Method parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.grad()=parsimony.functions.combinedfunctions.LinearRegressionL1L2TV-class.html#grad,Method parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.grad()=parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV-class.html#grad,Method parsimony.functions.losses.LatentVariableVariance.grad()=parsimony.functions.losses.LatentVariableVariance-class.html#grad,Method parsimony.functions.losses.LinearFunction.grad()=parsimony.functions.losses.LinearFunction-class.html#grad,Method parsimony.functions.losses.LinearRegression.grad()=parsimony.functions.losses.LinearRegression-class.html#grad,Method parsimony.functions.losses.LogisticRegression.grad()=parsimony.functions.losses.LogisticRegression-class.html#grad,Method parsimony.functions.losses.RidgeLogisticRegression.grad()=parsimony.functions.losses.RidgeLogisticRegression-class.html#grad,Method parsimony.functions.losses.RidgeRegression.grad()=parsimony.functions.losses.RidgeRegression-class.html#grad,Method parsimony.functions.multiblock.losses.CombinedMultiblockFunction.grad()=parsimony.functions.multiblock.losses.CombinedMultiblockFunction-class.html#grad,Method parsimony.functions.multiblock.losses.GeneralisedMultiblock.grad()=parsimony.functions.multiblock.losses.GeneralisedMultiblock-class.html#grad,Method parsimony.functions.multiblock.losses.LatentVariableCovariance.grad()=parsimony.functions.multiblock.losses.LatentVariableCovariance-class.html#grad,Method parsimony.functions.multiblock.losses.MultiblockFunctionWrapper.grad()=parsimony.functions.multiblock.losses.MultiblockFunctionWrapper-class.html#grad,Method parsimony.functions.multiblock.properties.MultiblockGradient.grad()=parsimony.functions.multiblock.properties.MultiblockGradient-class.html#grad,Method parsimony.functions.nesterov.l1.L1.grad()=parsimony.functions.nesterov.l1.L1-class.html#grad,Method parsimony.functions.nesterov.properties.NesterovFunction.grad()=parsimony.functions.nesterov.properties.NesterovFunction-class.html#grad,Method parsimony.functions.penalties.L2Squared.grad()=parsimony.functions.penalties.L2Squared-class.html#grad,Method parsimony.functions.penalties.QuadraticConstraint.grad()=parsimony.functions.penalties.QuadraticConstraint-class.html#grad,Method parsimony.functions.penalties.RGCCAConstraint.grad()=parsimony.functions.penalties.RGCCAConstraint-class.html#grad,Method parsimony.functions.penalties.ZeroFunction.grad()=parsimony.functions.penalties.ZeroFunction-class.html#grad,Method parsimony.functions.properties.Gradient.grad()=parsimony.functions.properties.Gradient-class.html#grad"><a title="parsimony.datasets.simulate.grad
+parsimony.datasets.simulate.grad.Function.grad
+parsimony.datasets.simulate.grad.L1.grad
+parsimony.datasets.simulate.grad.L2.grad
+parsimony.datasets.simulate.grad.L2Squared.grad
+parsimony.datasets.simulate.grad.NesterovFunction.grad
+parsimony.datasets.simulate.grad.SmoothedGroupLasso.grad
+parsimony.datasets.simulate.grad.SmoothedGroupTotalVariation.grad
+parsimony.datasets.simulate.grad.SmoothedL1.grad
+parsimony.datasets.simulate.grad.SmoothedTotalVariation.grad
+parsimony.datasets.simulate.grad.TotalVariation.grad
+parsimony.functions.combinedfunctions.CombinedFunction.grad
+parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.grad
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.grad
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.grad
+parsimony.functions.losses.LatentVariableVariance.grad
+parsimony.functions.losses.LinearFunction.grad
+parsimony.functions.losses.LinearRegression.grad
+parsimony.functions.losses.LogisticRegression.grad
+parsimony.functions.losses.RidgeLogisticRegression.grad
+parsimony.functions.losses.RidgeRegression.grad
+parsimony.functions.multiblock.losses.CombinedMultiblockFunction.grad
+parsimony.functions.multiblock.losses.GeneralisedMultiblock.grad
+parsimony.functions.multiblock.losses.LatentVariableCovariance.grad
+parsimony.functions.multiblock.losses.MultiblockFunctionWrapper.grad
+parsimony.functions.multiblock.properties.MultiblockGradient.grad
+parsimony.functions.nesterov.l1.L1.grad
+parsimony.functions.nesterov.properties.NesterovFunction.grad
+parsimony.functions.penalties.L2Squared.grad
+parsimony.functions.penalties.QuadraticConstraint.grad
+parsimony.functions.penalties.RGCCAConstraint.grad
+parsimony.functions.penalties.ZeroFunction.grad
+parsimony.functions.properties.Gradient.grad" class="py-name" href="#" onclick="return doclink('link-38', 'grad', 'link-38');">grad</a></tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">zeros</tt><tt class="py-op">(</tt><tt class="py-name">x</tt><tt class="py-op">.</tt><tt class="py-name">shape</tt><tt class="py-op">)</tt> </tt>
+<a name="L291"></a><tt class="py-lineno">291</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">,</tt> <tt class="py-op">(</tt><tt id="link-39" class="py-name" targets="Class parsimony.functions.properties.Penalty=parsimony.functions.properties.Penalty-class.html"><a title="parsimony.functions.properties.Penalty" class="py-name" href="#" onclick="return doclink('link-39', 'Penalty', 'link-39');">Penalty</a></tt><tt class="py-op">,</tt> <tt id="link-40" class="py-name" targets="Class parsimony.functions.properties.Constraint=parsimony.functions.properties.Constraint-class.html"><a title="parsimony.functions.properties.Constraint" class="py-name" href="#" onclick="return doclink('link-40', 'Constraint', 'link-40');">Constraint</a></tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L292"></a><tt class="py-lineno">292</tt>  <tt class="py-line">            <tt class="py-name">start</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">penalty_start</tt> </tt>
+<a name="L293"></a><tt class="py-lineno">293</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L294"></a><tt class="py-lineno">294</tt>  <tt class="py-line">            <tt class="py-name">start</tt> <tt class="py-op">=</tt> <tt class="py-number">0</tt> </tt>
+<a name="L295"></a><tt class="py-lineno">295</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">i</tt> <tt class="py-keyword">in</tt> <tt class="py-name">xrange</tt><tt class="py-op">(</tt><tt class="py-name">start</tt><tt class="py-op">,</tt> <tt class="py-name">p</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L296"></a><tt class="py-lineno">296</tt>  <tt class="py-line">            <tt class="py-name">x</tt><tt class="py-op">[</tt><tt class="py-name">i</tt><tt class="py-op">,</tt> <tt class="py-number">0</tt><tt class="py-op">]</tt> <tt class="py-op">-=</tt> <tt class="py-name">eps</tt> </tt>
+<a name="L297"></a><tt class="py-lineno">297</tt>  <tt class="py-line">            <tt class="py-name">loss1</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-41" class="py-name"><a title="parsimony.functions.combinedfunctions.CombinedFunction.f
+parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.f
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.f
+parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.f
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.f
+parsimony.functions.losses.LatentVariableVariance.f
+parsimony.functions.losses.LinearFunction.f
+parsimony.functions.losses.LinearRegression.f
+parsimony.functions.losses.LogisticRegression.f
+parsimony.functions.losses.RidgeLogisticRegression.f
+parsimony.functions.losses.RidgeRegression.f
+parsimony.functions.multiblock.losses.CombinedMultiblockFunction.f
+parsimony.functions.multiblock.losses.GeneralisedMultiblock.f
+parsimony.functions.multiblock.losses.LatentVariableCovariance.f
+parsimony.functions.multiblock.losses.MultiblockFunctionWrapper.f
+parsimony.functions.nesterov.gl.GroupLassoOverlap.f
+parsimony.functions.nesterov.grouptv.GroupTotalVariation.f
+parsimony.functions.nesterov.l1.L1.f
+parsimony.functions.nesterov.l1tv.L1TV.f
+parsimony.functions.nesterov.tv.TotalVariation.f
+parsimony.functions.penalties.L0.f
+parsimony.functions.penalties.L1.f
+parsimony.functions.penalties.L1L2Squared.f
+parsimony.functions.penalties.L2.f
+parsimony.functions.penalties.L2Squared.f
+parsimony.functions.penalties.LInf.f
+parsimony.functions.penalties.QuadraticConstraint.f
+parsimony.functions.penalties.RGCCAConstraint.f
+parsimony.functions.penalties.SufficientDescentCondition.f
+parsimony.functions.penalties.ZeroFunction.f
+parsimony.functions.properties.CombinedProjectionOperator.f
+parsimony.functions.properties.Function.f" class="py-name" href="#" onclick="return doclink('link-41', 'f', 'link-29');">f</a></tt><tt class="py-op">(</tt><tt class="py-name">x</tt><tt class="py-op">)</tt> </tt>
+<a name="L298"></a><tt class="py-lineno">298</tt>  <tt class="py-line">            <tt class="py-name">x</tt><tt class="py-op">[</tt><tt class="py-name">i</tt><tt class="py-op">,</tt> <tt class="py-number">0</tt><tt class="py-op">]</tt> <tt class="py-op">+=</tt> <tt class="py-number">2.0</tt> <tt class="py-op">*</tt> <tt class="py-name">eps</tt> </tt>
+<a name="L299"></a><tt class="py-lineno">299</tt>  <tt class="py-line">            <tt class="py-name">loss2</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-42" class="py-name"><a title="parsimony.functions.combinedfunctions.CombinedFunction.f
+parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.f
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.f
+parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.f
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.f
+parsimony.functions.losses.LatentVariableVariance.f
+parsimony.functions.losses.LinearFunction.f
+parsimony.functions.losses.LinearRegression.f
+parsimony.functions.losses.LogisticRegression.f
+parsimony.functions.losses.RidgeLogisticRegression.f
+parsimony.functions.losses.RidgeRegression.f
+parsimony.functions.multiblock.losses.CombinedMultiblockFunction.f
+parsimony.functions.multiblock.losses.GeneralisedMultiblock.f
+parsimony.functions.multiblock.losses.LatentVariableCovariance.f
+parsimony.functions.multiblock.losses.MultiblockFunctionWrapper.f
+parsimony.functions.nesterov.gl.GroupLassoOverlap.f
+parsimony.functions.nesterov.grouptv.GroupTotalVariation.f
+parsimony.functions.nesterov.l1.L1.f
+parsimony.functions.nesterov.l1tv.L1TV.f
+parsimony.functions.nesterov.tv.TotalVariation.f
+parsimony.functions.penalties.L0.f
+parsimony.functions.penalties.L1.f
+parsimony.functions.penalties.L1L2Squared.f
+parsimony.functions.penalties.L2.f
+parsimony.functions.penalties.L2Squared.f
+parsimony.functions.penalties.LInf.f
+parsimony.functions.penalties.QuadraticConstraint.f
+parsimony.functions.penalties.RGCCAConstraint.f
+parsimony.functions.penalties.SufficientDescentCondition.f
+parsimony.functions.penalties.ZeroFunction.f
+parsimony.functions.properties.CombinedProjectionOperator.f
+parsimony.functions.properties.Function.f" class="py-name" href="#" onclick="return doclink('link-42', 'f', 'link-29');">f</a></tt><tt class="py-op">(</tt><tt class="py-name">x</tt><tt class="py-op">)</tt> </tt>
+<a name="L300"></a><tt class="py-lineno">300</tt>  <tt class="py-line">            <tt class="py-name">x</tt><tt class="py-op">[</tt><tt class="py-name">i</tt><tt class="py-op">,</tt> <tt class="py-number">0</tt><tt class="py-op">]</tt> <tt class="py-op">-=</tt> <tt class="py-name">eps</tt> </tt>
+<a name="L301"></a><tt class="py-lineno">301</tt>  <tt class="py-line">            <tt id="link-43" class="py-name"><a title="parsimony.datasets.simulate.grad
+parsimony.datasets.simulate.grad.Function.grad
+parsimony.datasets.simulate.grad.L1.grad
+parsimony.datasets.simulate.grad.L2.grad
+parsimony.datasets.simulate.grad.L2Squared.grad
+parsimony.datasets.simulate.grad.NesterovFunction.grad
+parsimony.datasets.simulate.grad.SmoothedGroupLasso.grad
+parsimony.datasets.simulate.grad.SmoothedGroupTotalVariation.grad
+parsimony.datasets.simulate.grad.SmoothedL1.grad
+parsimony.datasets.simulate.grad.SmoothedTotalVariation.grad
+parsimony.datasets.simulate.grad.TotalVariation.grad
+parsimony.functions.combinedfunctions.CombinedFunction.grad
+parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.grad
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.grad
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.grad
+parsimony.functions.losses.LatentVariableVariance.grad
+parsimony.functions.losses.LinearFunction.grad
+parsimony.functions.losses.LinearRegression.grad
+parsimony.functions.losses.LogisticRegression.grad
+parsimony.functions.losses.RidgeLogisticRegression.grad
+parsimony.functions.losses.RidgeRegression.grad
+parsimony.functions.multiblock.losses.CombinedMultiblockFunction.grad
+parsimony.functions.multiblock.losses.GeneralisedMultiblock.grad
+parsimony.functions.multiblock.losses.LatentVariableCovariance.grad
+parsimony.functions.multiblock.losses.MultiblockFunctionWrapper.grad
+parsimony.functions.multiblock.properties.MultiblockGradient.grad
+parsimony.functions.nesterov.l1.L1.grad
+parsimony.functions.nesterov.properties.NesterovFunction.grad
+parsimony.functions.penalties.L2Squared.grad
+parsimony.functions.penalties.QuadraticConstraint.grad
+parsimony.functions.penalties.RGCCAConstraint.grad
+parsimony.functions.penalties.ZeroFunction.grad
+parsimony.functions.properties.Gradient.grad" class="py-name" href="#" onclick="return doclink('link-43', 'grad', 'link-38');">grad</a></tt><tt class="py-op">[</tt><tt class="py-name">i</tt><tt class="py-op">,</tt> <tt class="py-number">0</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-name">loss2</tt> <tt class="py-op">-</tt> <tt class="py-name">loss1</tt><tt class="py-op">)</tt> <tt class="py-op">/</tt> <tt class="py-op">(</tt><tt class="py-number">2.0</tt> <tt class="py-op">*</tt> <tt class="py-name">eps</tt><tt class="py-op">)</tt> </tt>
+<a name="L302"></a><tt class="py-lineno">302</tt>  <tt class="py-line"> </tt>
+<a name="L303"></a><tt class="py-lineno">303</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-44" class="py-name"><a title="parsimony.datasets.simulate.grad
+parsimony.datasets.simulate.grad.Function.grad
+parsimony.datasets.simulate.grad.L1.grad
+parsimony.datasets.simulate.grad.L2.grad
+parsimony.datasets.simulate.grad.L2Squared.grad
+parsimony.datasets.simulate.grad.NesterovFunction.grad
+parsimony.datasets.simulate.grad.SmoothedGroupLasso.grad
+parsimony.datasets.simulate.grad.SmoothedGroupTotalVariation.grad
+parsimony.datasets.simulate.grad.SmoothedL1.grad
+parsimony.datasets.simulate.grad.SmoothedTotalVariation.grad
+parsimony.datasets.simulate.grad.TotalVariation.grad
+parsimony.functions.combinedfunctions.CombinedFunction.grad
+parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.grad
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.grad
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.grad
+parsimony.functions.losses.LatentVariableVariance.grad
+parsimony.functions.losses.LinearFunction.grad
+parsimony.functions.losses.LinearRegression.grad
+parsimony.functions.losses.LogisticRegression.grad
+parsimony.functions.losses.RidgeLogisticRegression.grad
+parsimony.functions.losses.RidgeRegression.grad
+parsimony.functions.multiblock.losses.CombinedMultiblockFunction.grad
+parsimony.functions.multiblock.losses.GeneralisedMultiblock.grad
+parsimony.functions.multiblock.losses.LatentVariableCovariance.grad
+parsimony.functions.multiblock.losses.MultiblockFunctionWrapper.grad
+parsimony.functions.multiblock.properties.MultiblockGradient.grad
+parsimony.functions.nesterov.l1.L1.grad
+parsimony.functions.nesterov.properties.NesterovFunction.grad
+parsimony.functions.penalties.L2Squared.grad
+parsimony.functions.penalties.QuadraticConstraint.grad
+parsimony.functions.penalties.RGCCAConstraint.grad
+parsimony.functions.penalties.ZeroFunction.grad
+parsimony.functions.properties.Gradient.grad" class="py-name" href="#" onclick="return doclink('link-44', 'grad', 'link-38');">grad</a></tt> </tt>
+</div></div><a name="L304"></a><tt class="py-lineno">304</tt>  <tt class="py-line"> </tt>
+<a name="Hessian"></a><div id="Hessian-def"><a name="L305"></a><tt class="py-lineno">305</tt>  <tt class="py-line"> </tt>
+<a name="L306"></a><tt class="py-lineno">306</tt> <a class="py-toggle" href="#" id="Hessian-toggle" onclick="return toggle('Hessian');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.functions.properties.Hessian-class.html">Hessian</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Hessian-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Hessian-expanded"><a name="L307"></a><tt class="py-lineno">307</tt>  <tt class="py-line"> </tt>
+<a name="L308"></a><tt class="py-lineno">308</tt>  <tt class="py-line">    <tt id="link-45" class="py-name"><a title="parsimony.algorithms.bases.ExplicitAlgorithm.__metaclass__
+parsimony.algorithms.bases.ImplicitAlgorithm.__metaclass__
+parsimony.datasets.simulate.grad.NesterovFunction.__metaclass__
+parsimony.estimators.LogisticRegressionEstimator.__metaclass__
+parsimony.estimators.RegressionEstimator.__metaclass__
+parsimony.functions.multiblock.properties.MultiblockFunction.__metaclass__
+parsimony.functions.properties.AtomicFunction.__metaclass__
+parsimony.functions.properties.CompositeFunction.__metaclass__" class="py-name" href="#" onclick="return doclink('link-45', '__metaclass__', 'link-8');">__metaclass__</a></tt> <tt class="py-op">=</tt> <tt class="py-name">abc</tt><tt class="py-op">.</tt><tt id="link-46" class="py-name"><a title="abc.ABCMeta" class="py-name" href="#" onclick="return doclink('link-46', 'ABCMeta', 'link-9');">ABCMeta</a></tt> </tt>
+<a name="L309"></a><tt class="py-lineno">309</tt>  <tt class="py-line"> </tt>
+<a name="L310"></a><tt class="py-lineno">310</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">abc</tt><tt class="py-op">.</tt><tt class="py-name">abstractmethod</tt> </tt>
+<a name="Hessian.hessian"></a><div id="Hessian.hessian-def"><a name="L311"></a><tt class="py-lineno">311</tt> <a class="py-toggle" href="#" id="Hessian.hessian-toggle" onclick="return toggle('Hessian.hessian');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.Hessian-class.html#hessian">hessian</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">beta</tt><tt class="py-op">,</tt> <tt class="py-param">vector</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Hessian.hessian-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Hessian.hessian-expanded"><a name="L312"></a><tt class="py-lineno">312</tt>  <tt class="py-line">        <tt class="py-docstring">"""The Hessian of the function.</tt> </tt>
+<a name="L313"></a><tt class="py-lineno">313</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L314"></a><tt class="py-lineno">314</tt>  <tt class="py-line"><tt class="py-docstring">        Parameters</tt> </tt>
+<a name="L315"></a><tt class="py-lineno">315</tt>  <tt class="py-line"><tt class="py-docstring">        ----------</tt> </tt>
+<a name="L316"></a><tt class="py-lineno">316</tt>  <tt class="py-line"><tt class="py-docstring">        beta : The point at which to evaluate the Hessian.</tt> </tt>
+<a name="L317"></a><tt class="py-lineno">317</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L318"></a><tt class="py-lineno">318</tt>  <tt class="py-line"><tt class="py-docstring">        vector : If not None, it is multiplied with the Hessian from the right.</tt> </tt>
+<a name="L319"></a><tt class="py-lineno">319</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L320"></a><tt class="py-lineno">320</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">'Abstract method "hessian" must be '</tt> </tt>
+<a name="L321"></a><tt class="py-lineno">321</tt>  <tt class="py-line">                                  <tt class="py-string">'specialised!'</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L322"></a><tt class="py-lineno">322</tt>  <tt class="py-line"> </tt>
+<a name="L323"></a><tt class="py-lineno">323</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">abc</tt><tt class="py-op">.</tt><tt class="py-name">abstractmethod</tt> </tt>
+<a name="Hessian.hessian_inverse"></a><div id="Hessian.hessian_inverse-def"><a name="L324"></a><tt class="py-lineno">324</tt> <a class="py-toggle" href="#" id="Hessian.hessian_inverse-toggle" onclick="return toggle('Hessian.hessian_inverse');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.Hessian-class.html#hessian_inverse">hessian_inverse</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">beta</tt><tt class="py-op">,</tt> <tt class="py-param">vector</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Hessian.hessian_inverse-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Hessian.hessian_inverse-expanded"><a name="L325"></a><tt class="py-lineno">325</tt>  <tt class="py-line">        <tt class="py-docstring">"""Inverse of the Hessian (second derivative) of the function.</tt> </tt>
+<a name="L326"></a><tt class="py-lineno">326</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L327"></a><tt class="py-lineno">327</tt>  <tt class="py-line"><tt class="py-docstring">        Sometimes this can be done efficiently if we know the structure of the</tt> </tt>
+<a name="L328"></a><tt class="py-lineno">328</tt>  <tt class="py-line"><tt class="py-docstring">        Hessian. Also, if we multiply the Hessian by a vector, it is often</tt> </tt>
+<a name="L329"></a><tt class="py-lineno">329</tt>  <tt class="py-line"><tt class="py-docstring">        possible to do efficiently.</tt> </tt>
+<a name="L330"></a><tt class="py-lineno">330</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L331"></a><tt class="py-lineno">331</tt>  <tt class="py-line"><tt class="py-docstring">        Parameters</tt> </tt>
+<a name="L332"></a><tt class="py-lineno">332</tt>  <tt class="py-line"><tt class="py-docstring">        ----------</tt> </tt>
+<a name="L333"></a><tt class="py-lineno">333</tt>  <tt class="py-line"><tt class="py-docstring">        beta : The point at which to evaluate the Hessian.</tt> </tt>
+<a name="L334"></a><tt class="py-lineno">334</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L335"></a><tt class="py-lineno">335</tt>  <tt class="py-line"><tt class="py-docstring">        vector : If not None, it is multiplied with the inverse of the Hessian</tt> </tt>
+<a name="L336"></a><tt class="py-lineno">336</tt>  <tt class="py-line"><tt class="py-docstring">                from the right.</tt> </tt>
+<a name="L337"></a><tt class="py-lineno">337</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L338"></a><tt class="py-lineno">338</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">'Abstract method "hessian_inverse" must be '</tt> </tt>
+<a name="L339"></a><tt class="py-lineno">339</tt>  <tt class="py-line">                                  <tt class="py-string">'specialised!'</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L340"></a><tt class="py-lineno">340</tt>  <tt class="py-line"> </tt>
+<a name="LipschitzContinuousGradient"></a><div id="LipschitzContinuousGradient-def"><a name="L341"></a><tt class="py-lineno">341</tt>  <tt class="py-line"> </tt>
+<a name="L342"></a><tt class="py-lineno">342</tt> <a class="py-toggle" href="#" id="LipschitzContinuousGradient-toggle" onclick="return toggle('LipschitzContinuousGradient');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.functions.properties.LipschitzContinuousGradient-class.html">LipschitzContinuousGradient</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="LipschitzContinuousGradient-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="LipschitzContinuousGradient-expanded"><a name="L343"></a><tt class="py-lineno">343</tt>  <tt class="py-line"> </tt>
+<a name="L344"></a><tt class="py-lineno">344</tt>  <tt class="py-line">    <tt id="link-47" class="py-name"><a title="parsimony.algorithms.bases.ExplicitAlgorithm.__metaclass__
+parsimony.algorithms.bases.ImplicitAlgorithm.__metaclass__
+parsimony.datasets.simulate.grad.NesterovFunction.__metaclass__
+parsimony.estimators.LogisticRegressionEstimator.__metaclass__
+parsimony.estimators.RegressionEstimator.__metaclass__
+parsimony.functions.multiblock.properties.MultiblockFunction.__metaclass__
+parsimony.functions.properties.AtomicFunction.__metaclass__
+parsimony.functions.properties.CompositeFunction.__metaclass__" class="py-name" href="#" onclick="return doclink('link-47', '__metaclass__', 'link-8');">__metaclass__</a></tt> <tt class="py-op">=</tt> <tt class="py-name">abc</tt><tt class="py-op">.</tt><tt id="link-48" class="py-name"><a title="abc.ABCMeta" class="py-name" href="#" onclick="return doclink('link-48', 'ABCMeta', 'link-9');">ABCMeta</a></tt> </tt>
+<a name="L345"></a><tt class="py-lineno">345</tt>  <tt class="py-line"> </tt>
+<a name="L346"></a><tt class="py-lineno">346</tt>  <tt class="py-line">    <tt class="py-comment"># TODO: Should L by default take a weight vector as argument?</tt> </tt>
+<a name="L347"></a><tt class="py-lineno">347</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">abc</tt><tt class="py-op">.</tt><tt class="py-name">abstractmethod</tt> </tt>
+<a name="LipschitzContinuousGradient.L"></a><div id="LipschitzContinuousGradient.L-def"><a name="L348"></a><tt class="py-lineno">348</tt> <a class="py-toggle" href="#" id="LipschitzContinuousGradient.L-toggle" onclick="return toggle('LipschitzContinuousGradient.L');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.LipschitzContinuousGradient-class.html#L">L</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="LipschitzContinuousGradient.L-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="LipschitzContinuousGradient.L-expanded"><a name="L349"></a><tt class="py-lineno">349</tt>  <tt class="py-line">        <tt class="py-docstring">"""Lipschitz constant of the gradient.</tt> </tt>
+<a name="L350"></a><tt class="py-lineno">350</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L351"></a><tt class="py-lineno">351</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">'Abstract method "L" must be '</tt> </tt>
+<a name="L352"></a><tt class="py-lineno">352</tt>  <tt class="py-line">                                  <tt class="py-string">'specialised!'</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L353"></a><tt class="py-lineno">353</tt>  <tt class="py-line"> </tt>
+<a name="LipschitzContinuousGradient.approx_L"></a><div id="LipschitzContinuousGradient.approx_L-def"><a name="L354"></a><tt class="py-lineno">354</tt> <a class="py-toggle" href="#" id="LipschitzContinuousGradient.approx_L-toggle" onclick="return toggle('LipschitzContinuousGradient.approx_L');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.LipschitzContinuousGradient-class.html#approx_L">approx_L</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">shape</tt><tt class="py-op">,</tt> <tt class="py-param">max_iter</tt><tt class="py-op">=</tt><tt class="py-number">10000</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="LipschitzContinuousGradient.approx_L-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="LipschitzContinuousGradient.approx_L-expanded"><a name="L355"></a><tt class="py-lineno">355</tt>  <tt class="py-line">        <tt class="py-docstring">"""Monte Carlo approximation of the Lipschitz constant.</tt> </tt>
+<a name="L356"></a><tt class="py-lineno">356</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L357"></a><tt class="py-lineno">357</tt>  <tt class="py-line"><tt class="py-docstring">        Warning: This will not yield a good approximation within reasonable</tt> </tt>
+<a name="L358"></a><tt class="py-lineno">358</tt>  <tt class="py-line"><tt class="py-docstring">        time for very large data sets. Use only if you know what you are doing.</tt> </tt>
+<a name="L359"></a><tt class="py-lineno">359</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L360"></a><tt class="py-lineno">360</tt>  <tt class="py-line"><tt class="py-docstring">        Parameters</tt> </tt>
+<a name="L361"></a><tt class="py-lineno">361</tt>  <tt class="py-line"><tt class="py-docstring">        ----------</tt> </tt>
+<a name="L362"></a><tt class="py-lineno">362</tt>  <tt class="py-line"><tt class="py-docstring">        shape : List or tuple. Usually has the form (p, 1). The shape of the</tt> </tt>
+<a name="L363"></a><tt class="py-lineno">363</tt>  <tt class="py-line"><tt class="py-docstring">                points which we draw randomly.</tt> </tt>
+<a name="L364"></a><tt class="py-lineno">364</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L365"></a><tt class="py-lineno">365</tt>  <tt class="py-line">        <tt id="link-49" class="py-name" targets="Method parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.L()=parsimony.functions.combinedfunctions.LinearRegressionL1L2GL-class.html#L,Method parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.L()=parsimony.functions.combinedfunctions.LinearRegressionL1L2TV-class.html#L,Method parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.L()=parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV-class.html#L,Method parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.L()=parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV-class.html#L,Method parsimony.functions.losses.LatentVariableVariance.L()=parsimony.functions.losses.LatentVariableVariance-class.html#L,Method parsimony.functions.losses.LinearFunction.L()=parsimony.functions.losses.LinearFunction-class.html#L,Method parsimony.functions.losses.LinearRegression.L()=parsimony.functions.losses.LinearRegression-class.html#L,Method parsimony.functions.losses.LogisticRegression.L()=parsimony.functions.losses.LogisticRegression-class.html#L,Method parsimony.functions.losses.RidgeLogisticRegression.L()=parsimony.functions.losses.RidgeLogisticRegression-class.html#L,Method parsimony.functions.losses.RidgeRegression.L()=parsimony.functions.losses.RidgeRegression-class.html#L,Method parsimony.functions.multiblock.losses.LatentVariableCovariance.L()=parsimony.functions.multiblock.losses.LatentVariableCovariance-class.html#L,Method parsimony.functions.multiblock.properties.MultiblockLipschitzContinuousGradient.L()=parsimony.functions.multiblock.properties.MultiblockLipschitzContinuousGradient-class.html#L,Method parsimony.functions.nesterov.gl.GroupLassoOverlap.L()=parsimony.functions.nesterov.gl.GroupLassoOverlap-class.html#L,Method parsimony.functions.nesterov.grouptv.GroupTotalVariation.L()=parsimony.functions.nesterov.grouptv.GroupTotalVariation-class.html#L,Method parsimony.functions.nesterov.l1.L1.L()=parsimony.functions.nesterov.l1.L1-class.html#L,Method parsimony.functions.nesterov.tv.TotalVariation.L()=parsimony.functions.nesterov.tv.TotalVariation-class.html#L,Method parsimony.functions.penalties.L2Squared.L()=parsimony.functions.penalties.L2Squared-class.html#L,Method parsimony.functions.properties.LipschitzContinuousGradient.L()=parsimony.functions.properties.LipschitzContinuousGradient-class.html#L"><a title="parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.L
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.L
+parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.L
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.L
+parsimony.functions.losses.LatentVariableVariance.L
+parsimony.functions.losses.LinearFunction.L
+parsimony.functions.losses.LinearRegression.L
+parsimony.functions.losses.LogisticRegression.L
+parsimony.functions.losses.RidgeLogisticRegression.L
+parsimony.functions.losses.RidgeRegression.L
+parsimony.functions.multiblock.losses.LatentVariableCovariance.L
+parsimony.functions.multiblock.properties.MultiblockLipschitzContinuousGradient.L
+parsimony.functions.nesterov.gl.GroupLassoOverlap.L
+parsimony.functions.nesterov.grouptv.GroupTotalVariation.L
+parsimony.functions.nesterov.l1.L1.L
+parsimony.functions.nesterov.tv.TotalVariation.L
+parsimony.functions.penalties.L2Squared.L
+parsimony.functions.properties.LipschitzContinuousGradient.L" class="py-name" href="#" onclick="return doclink('link-49', 'L', 'link-49');">L</a></tt> <tt class="py-op">=</tt> <tt class="py-op">-</tt><tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-string">"inf"</tt><tt class="py-op">)</tt> </tt>
+<a name="L366"></a><tt class="py-lineno">366</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">i</tt> <tt class="py-keyword">in</tt> <tt class="py-name">xrange</tt><tt class="py-op">(</tt><tt class="py-name">max_iter</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L367"></a><tt class="py-lineno">367</tt>  <tt class="py-line">            <tt class="py-name">a</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt id="link-50" class="py-name" targets="Function parsimony.datasets.simulate.beta.random()=parsimony.datasets.simulate.beta-module.html#random"><a title="parsimony.datasets.simulate.beta.random" class="py-name" href="#" onclick="return doclink('link-50', 'random', 'link-50');">random</a></tt><tt class="py-op">.</tt><tt id="link-51" class="py-name" targets="Method parsimony.datasets.simulate.utils.RandomUniform.rand()=parsimony.datasets.simulate.utils.RandomUniform-class.html#rand"><a title="parsimony.datasets.simulate.utils.RandomUniform.rand" class="py-name" href="#" onclick="return doclink('link-51', 'rand', 'link-51');">rand</a></tt><tt class="py-op">(</tt><tt class="py-op">*</tt><tt class="py-name">shape</tt><tt class="py-op">)</tt> <tt class="py-op">*</tt> <tt class="py-number">2.0</tt> <tt class="py-op">-</tt> <tt class="py-number">1.0</tt> </tt>
+<a name="L368"></a><tt class="py-lineno">368</tt>  <tt class="py-line">            <tt class="py-name">b</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt id="link-52" class="py-name"><a title="parsimony.datasets.simulate.beta.random" class="py-name" href="#" onclick="return doclink('link-52', 'random', 'link-50');">random</a></tt><tt class="py-op">.</tt><tt id="link-53" class="py-name"><a title="parsimony.datasets.simulate.utils.RandomUniform.rand" class="py-name" href="#" onclick="return doclink('link-53', 'rand', 'link-51');">rand</a></tt><tt class="py-op">(</tt><tt class="py-op">*</tt><tt class="py-name">shape</tt><tt class="py-op">)</tt> <tt class="py-op">*</tt> <tt class="py-number">2.0</tt> <tt class="py-op">-</tt> <tt class="py-number">1.0</tt> </tt>
+<a name="L369"></a><tt class="py-lineno">369</tt>  <tt class="py-line">            <tt class="py-name">grad_a</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-54" class="py-name"><a title="parsimony.datasets.simulate.grad
+parsimony.datasets.simulate.grad.Function.grad
+parsimony.datasets.simulate.grad.L1.grad
+parsimony.datasets.simulate.grad.L2.grad
+parsimony.datasets.simulate.grad.L2Squared.grad
+parsimony.datasets.simulate.grad.NesterovFunction.grad
+parsimony.datasets.simulate.grad.SmoothedGroupLasso.grad
+parsimony.datasets.simulate.grad.SmoothedGroupTotalVariation.grad
+parsimony.datasets.simulate.grad.SmoothedL1.grad
+parsimony.datasets.simulate.grad.SmoothedTotalVariation.grad
+parsimony.datasets.simulate.grad.TotalVariation.grad
+parsimony.functions.combinedfunctions.CombinedFunction.grad
+parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.grad
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.grad
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.grad
+parsimony.functions.losses.LatentVariableVariance.grad
+parsimony.functions.losses.LinearFunction.grad
+parsimony.functions.losses.LinearRegression.grad
+parsimony.functions.losses.LogisticRegression.grad
+parsimony.functions.losses.RidgeLogisticRegression.grad
+parsimony.functions.losses.RidgeRegression.grad
+parsimony.functions.multiblock.losses.CombinedMultiblockFunction.grad
+parsimony.functions.multiblock.losses.GeneralisedMultiblock.grad
+parsimony.functions.multiblock.losses.LatentVariableCovariance.grad
+parsimony.functions.multiblock.losses.MultiblockFunctionWrapper.grad
+parsimony.functions.multiblock.properties.MultiblockGradient.grad
+parsimony.functions.nesterov.l1.L1.grad
+parsimony.functions.nesterov.properties.NesterovFunction.grad
+parsimony.functions.penalties.L2Squared.grad
+parsimony.functions.penalties.QuadraticConstraint.grad
+parsimony.functions.penalties.RGCCAConstraint.grad
+parsimony.functions.penalties.ZeroFunction.grad
+parsimony.functions.properties.Gradient.grad" class="py-name" href="#" onclick="return doclink('link-54', 'grad', 'link-38');">grad</a></tt><tt class="py-op">(</tt><tt class="py-name">a</tt><tt class="py-op">)</tt> </tt>
+<a name="L370"></a><tt class="py-lineno">370</tt>  <tt class="py-line">            <tt class="py-name">grad_b</tt> <tt class="py-op">=</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt id="link-55" class="py-name"><a title="parsimony.datasets.simulate.grad
+parsimony.datasets.simulate.grad.Function.grad
+parsimony.datasets.simulate.grad.L1.grad
+parsimony.datasets.simulate.grad.L2.grad
+parsimony.datasets.simulate.grad.L2Squared.grad
+parsimony.datasets.simulate.grad.NesterovFunction.grad
+parsimony.datasets.simulate.grad.SmoothedGroupLasso.grad
+parsimony.datasets.simulate.grad.SmoothedGroupTotalVariation.grad
+parsimony.datasets.simulate.grad.SmoothedL1.grad
+parsimony.datasets.simulate.grad.SmoothedTotalVariation.grad
+parsimony.datasets.simulate.grad.TotalVariation.grad
+parsimony.functions.combinedfunctions.CombinedFunction.grad
+parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.grad
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.grad
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.grad
+parsimony.functions.losses.LatentVariableVariance.grad
+parsimony.functions.losses.LinearFunction.grad
+parsimony.functions.losses.LinearRegression.grad
+parsimony.functions.losses.LogisticRegression.grad
+parsimony.functions.losses.RidgeLogisticRegression.grad
+parsimony.functions.losses.RidgeRegression.grad
+parsimony.functions.multiblock.losses.CombinedMultiblockFunction.grad
+parsimony.functions.multiblock.losses.GeneralisedMultiblock.grad
+parsimony.functions.multiblock.losses.LatentVariableCovariance.grad
+parsimony.functions.multiblock.losses.MultiblockFunctionWrapper.grad
+parsimony.functions.multiblock.properties.MultiblockGradient.grad
+parsimony.functions.nesterov.l1.L1.grad
+parsimony.functions.nesterov.properties.NesterovFunction.grad
+parsimony.functions.penalties.L2Squared.grad
+parsimony.functions.penalties.QuadraticConstraint.grad
+parsimony.functions.penalties.RGCCAConstraint.grad
+parsimony.functions.penalties.ZeroFunction.grad
+parsimony.functions.properties.Gradient.grad" class="py-name" href="#" onclick="return doclink('link-55', 'grad', 'link-38');">grad</a></tt><tt class="py-op">(</tt><tt class="py-name">b</tt><tt class="py-op">)</tt> </tt>
+<a name="L371"></a><tt class="py-lineno">371</tt>  <tt class="py-line">            <tt class="py-name">L_</tt> <tt class="py-op">=</tt> <tt id="link-56" class="py-name"><a title="parsimony.utils.maths" class="py-name" href="#" onclick="return doclink('link-56', 'maths', 'link-2');">maths</a></tt><tt class="py-op">.</tt><tt id="link-57" class="py-name" targets="Function parsimony.utils.maths.norm()=parsimony.utils.maths-module.html#norm"><a title="parsimony.utils.maths.norm" class="py-name" href="#" onclick="return doclink('link-57', 'norm', 'link-57');">norm</a></tt><tt class="py-op">(</tt><tt class="py-name">grad_a</tt> <tt class="py-op">-</tt> <tt class="py-name">grad_b</tt><tt class="py-op">)</tt> <tt class="py-op">/</tt> <tt id="link-58" class="py-name"><a title="parsimony.utils.maths" class="py-name" href="#" onclick="return doclink('link-58', 'maths', 'link-2');">maths</a></tt><tt class="py-op">.</tt><tt id="link-59" class="py-name"><a title="parsimony.utils.maths.norm" class="py-name" href="#" onclick="return doclink('link-59', 'norm', 'link-57');">norm</a></tt><tt class="py-op">(</tt><tt class="py-name">a</tt> <tt class="py-op">-</tt> <tt class="py-name">b</tt><tt class="py-op">)</tt> </tt>
+<a name="L372"></a><tt class="py-lineno">372</tt>  <tt class="py-line">            <tt id="link-60" class="py-name"><a title="parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.L
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.L
+parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.L
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.L
+parsimony.functions.losses.LatentVariableVariance.L
+parsimony.functions.losses.LinearFunction.L
+parsimony.functions.losses.LinearRegression.L
+parsimony.functions.losses.LogisticRegression.L
+parsimony.functions.losses.RidgeLogisticRegression.L
+parsimony.functions.losses.RidgeRegression.L
+parsimony.functions.multiblock.losses.LatentVariableCovariance.L
+parsimony.functions.multiblock.properties.MultiblockLipschitzContinuousGradient.L
+parsimony.functions.nesterov.gl.GroupLassoOverlap.L
+parsimony.functions.nesterov.grouptv.GroupTotalVariation.L
+parsimony.functions.nesterov.l1.L1.L
+parsimony.functions.nesterov.tv.TotalVariation.L
+parsimony.functions.penalties.L2Squared.L
+parsimony.functions.properties.LipschitzContinuousGradient.L" class="py-name" href="#" onclick="return doclink('link-60', 'L', 'link-49');">L</a></tt> <tt class="py-op">=</tt> <tt class="py-name">max</tt><tt class="py-op">(</tt><tt id="link-61" class="py-name"><a title="parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.L
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.L
+parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.L
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.L
+parsimony.functions.losses.LatentVariableVariance.L
+parsimony.functions.losses.LinearFunction.L
+parsimony.functions.losses.LinearRegression.L
+parsimony.functions.losses.LogisticRegression.L
+parsimony.functions.losses.RidgeLogisticRegression.L
+parsimony.functions.losses.RidgeRegression.L
+parsimony.functions.multiblock.losses.LatentVariableCovariance.L
+parsimony.functions.multiblock.properties.MultiblockLipschitzContinuousGradient.L
+parsimony.functions.nesterov.gl.GroupLassoOverlap.L
+parsimony.functions.nesterov.grouptv.GroupTotalVariation.L
+parsimony.functions.nesterov.l1.L1.L
+parsimony.functions.nesterov.tv.TotalVariation.L
+parsimony.functions.penalties.L2Squared.L
+parsimony.functions.properties.LipschitzContinuousGradient.L" class="py-name" href="#" onclick="return doclink('link-61', 'L', 'link-49');">L</a></tt><tt class="py-op">,</tt> <tt class="py-name">L_</tt><tt class="py-op">)</tt> </tt>
+<a name="L373"></a><tt class="py-lineno">373</tt>  <tt class="py-line"> </tt>
+<a name="L374"></a><tt class="py-lineno">374</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt id="link-62" class="py-name"><a title="parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.L
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.L
+parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.L
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.L
+parsimony.functions.losses.LatentVariableVariance.L
+parsimony.functions.losses.LinearFunction.L
+parsimony.functions.losses.LinearRegression.L
+parsimony.functions.losses.LogisticRegression.L
+parsimony.functions.losses.RidgeLogisticRegression.L
+parsimony.functions.losses.RidgeRegression.L
+parsimony.functions.multiblock.losses.LatentVariableCovariance.L
+parsimony.functions.multiblock.properties.MultiblockLipschitzContinuousGradient.L
+parsimony.functions.nesterov.gl.GroupLassoOverlap.L
+parsimony.functions.nesterov.grouptv.GroupTotalVariation.L
+parsimony.functions.nesterov.l1.L1.L
+parsimony.functions.nesterov.tv.TotalVariation.L
+parsimony.functions.penalties.L2Squared.L
+parsimony.functions.properties.LipschitzContinuousGradient.L" class="py-name" href="#" onclick="return doclink('link-62', 'L', 'link-49');">L</a></tt> </tt>
+</div></div><a name="L375"></a><tt class="py-lineno">375</tt>  <tt class="py-line"> </tt>
+<a name="StepSize"></a><div id="StepSize-def"><a name="L376"></a><tt class="py-lineno">376</tt>  <tt class="py-line"> </tt>
+<a name="L377"></a><tt class="py-lineno">377</tt> <a class="py-toggle" href="#" id="StepSize-toggle" onclick="return toggle('StepSize');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.functions.properties.StepSize-class.html">StepSize</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="StepSize-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="StepSize-expanded"><a name="L378"></a><tt class="py-lineno">378</tt>  <tt class="py-line"> </tt>
+<a name="L379"></a><tt class="py-lineno">379</tt>  <tt class="py-line">    <tt id="link-63" class="py-name"><a title="parsimony.algorithms.bases.ExplicitAlgorithm.__metaclass__
+parsimony.algorithms.bases.ImplicitAlgorithm.__metaclass__
+parsimony.datasets.simulate.grad.NesterovFunction.__metaclass__
+parsimony.estimators.LogisticRegressionEstimator.__metaclass__
+parsimony.estimators.RegressionEstimator.__metaclass__
+parsimony.functions.multiblock.properties.MultiblockFunction.__metaclass__
+parsimony.functions.properties.AtomicFunction.__metaclass__
+parsimony.functions.properties.CompositeFunction.__metaclass__" class="py-name" href="#" onclick="return doclink('link-63', '__metaclass__', 'link-8');">__metaclass__</a></tt> <tt class="py-op">=</tt> <tt class="py-name">abc</tt><tt class="py-op">.</tt><tt id="link-64" class="py-name"><a title="abc.ABCMeta" class="py-name" href="#" onclick="return doclink('link-64', 'ABCMeta', 'link-9');">ABCMeta</a></tt> </tt>
+<a name="L380"></a><tt class="py-lineno">380</tt>  <tt class="py-line"> </tt>
+<a name="L381"></a><tt class="py-lineno">381</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">abc</tt><tt class="py-op">.</tt><tt class="py-name">abstractmethod</tt> </tt>
+<a name="StepSize.step"></a><div id="StepSize.step-def"><a name="L382"></a><tt class="py-lineno">382</tt> <a class="py-toggle" href="#" id="StepSize.step-toggle" onclick="return toggle('StepSize.step');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.StepSize-class.html#step">step</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">beta</tt><tt class="py-op">,</tt> <tt class="py-param">index</tt><tt class="py-op">=</tt><tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="StepSize.step-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="StepSize.step-expanded"><a name="L383"></a><tt class="py-lineno">383</tt>  <tt class="py-line">        <tt class="py-docstring">"""The step size to use in descent methods.</tt> </tt>
+<a name="L384"></a><tt class="py-lineno">384</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L385"></a><tt class="py-lineno">385</tt>  <tt class="py-line"><tt class="py-docstring">        Parameters</tt> </tt>
+<a name="L386"></a><tt class="py-lineno">386</tt>  <tt class="py-line"><tt class="py-docstring">        ----------</tt> </tt>
+<a name="L387"></a><tt class="py-lineno">387</tt>  <tt class="py-line"><tt class="py-docstring">        beta : Numpy array. The point at which to determine the step size.</tt> </tt>
+<a name="L388"></a><tt class="py-lineno">388</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L389"></a><tt class="py-lineno">389</tt>  <tt class="py-line"><tt class="py-docstring">        index : Non-negative integer. For multiblock functions, to know which</tt> </tt>
+<a name="L390"></a><tt class="py-lineno">390</tt>  <tt class="py-line"><tt class="py-docstring">                variable the step is for.</tt> </tt>
+<a name="L391"></a><tt class="py-lineno">391</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L392"></a><tt class="py-lineno">392</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">'Abstract method "step" must be '</tt> </tt>
+<a name="L393"></a><tt class="py-lineno">393</tt>  <tt class="py-line">                                  <tt class="py-string">'specialised!'</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L394"></a><tt class="py-lineno">394</tt>  <tt class="py-line"> </tt>
+<a name="GradientMap"></a><div id="GradientMap-def"><a name="L395"></a><tt class="py-lineno">395</tt>  <tt class="py-line"> </tt>
+<a name="L396"></a><tt class="py-lineno">396</tt> <a class="py-toggle" href="#" id="GradientMap-toggle" onclick="return toggle('GradientMap');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.functions.properties.GradientMap-class.html">GradientMap</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="GradientMap-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="GradientMap-expanded"><a name="L397"></a><tt class="py-lineno">397</tt>  <tt class="py-line"> </tt>
+<a name="L398"></a><tt class="py-lineno">398</tt>  <tt class="py-line">    <tt id="link-65" class="py-name"><a title="parsimony.algorithms.bases.ExplicitAlgorithm.__metaclass__
+parsimony.algorithms.bases.ImplicitAlgorithm.__metaclass__
+parsimony.datasets.simulate.grad.NesterovFunction.__metaclass__
+parsimony.estimators.LogisticRegressionEstimator.__metaclass__
+parsimony.estimators.RegressionEstimator.__metaclass__
+parsimony.functions.multiblock.properties.MultiblockFunction.__metaclass__
+parsimony.functions.properties.AtomicFunction.__metaclass__
+parsimony.functions.properties.CompositeFunction.__metaclass__" class="py-name" href="#" onclick="return doclink('link-65', '__metaclass__', 'link-8');">__metaclass__</a></tt> <tt class="py-op">=</tt> <tt class="py-name">abc</tt><tt class="py-op">.</tt><tt id="link-66" class="py-name"><a title="abc.ABCMeta" class="py-name" href="#" onclick="return doclink('link-66', 'ABCMeta', 'link-9');">ABCMeta</a></tt> </tt>
+<a name="L399"></a><tt class="py-lineno">399</tt>  <tt class="py-line"> </tt>
+<a name="L400"></a><tt class="py-lineno">400</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">abc</tt><tt class="py-op">.</tt><tt class="py-name">abstractmethod</tt> </tt>
+<a name="GradientMap.V"></a><div id="GradientMap.V-def"><a name="L401"></a><tt class="py-lineno">401</tt> <a class="py-toggle" href="#" id="GradientMap.V-toggle" onclick="return toggle('GradientMap.V');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.GradientMap-class.html#V">V</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">alpha</tt><tt class="py-op">,</tt> <tt class="py-param">beta</tt><tt class="py-op">,</tt> <tt class="py-param">L</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="GradientMap.V-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="GradientMap.V-expanded"><a name="L402"></a><tt class="py-lineno">402</tt>  <tt class="py-line">        <tt class="py-docstring">"""The gradient map associated to the function.</tt> </tt>
+<a name="L403"></a><tt class="py-lineno">403</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L404"></a><tt class="py-lineno">404</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">'Abstract method "V" must be '</tt> </tt>
+<a name="L405"></a><tt class="py-lineno">405</tt>  <tt class="py-line">                                  <tt class="py-string">'specialised!'</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L406"></a><tt class="py-lineno">406</tt>  <tt class="py-line"> </tt>
+<a name="DualFunction"></a><div id="DualFunction-def"><a name="L407"></a><tt class="py-lineno">407</tt>  <tt class="py-line"> </tt>
+<a name="L408"></a><tt class="py-lineno">408</tt> <a class="py-toggle" href="#" id="DualFunction-toggle" onclick="return toggle('DualFunction');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.functions.properties.DualFunction-class.html">DualFunction</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="DualFunction-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="DualFunction-expanded"><a name="L409"></a><tt class="py-lineno">409</tt>  <tt class="py-line"> </tt>
+<a name="L410"></a><tt class="py-lineno">410</tt>  <tt class="py-line">    <tt id="link-67" class="py-name"><a title="parsimony.algorithms.bases.ExplicitAlgorithm.__metaclass__
+parsimony.algorithms.bases.ImplicitAlgorithm.__metaclass__
+parsimony.datasets.simulate.grad.NesterovFunction.__metaclass__
+parsimony.estimators.LogisticRegressionEstimator.__metaclass__
+parsimony.estimators.RegressionEstimator.__metaclass__
+parsimony.functions.multiblock.properties.MultiblockFunction.__metaclass__
+parsimony.functions.properties.AtomicFunction.__metaclass__
+parsimony.functions.properties.CompositeFunction.__metaclass__" class="py-name" href="#" onclick="return doclink('link-67', '__metaclass__', 'link-8');">__metaclass__</a></tt> <tt class="py-op">=</tt> <tt class="py-name">abc</tt><tt class="py-op">.</tt><tt id="link-68" class="py-name"><a title="abc.ABCMeta" class="py-name" href="#" onclick="return doclink('link-68', 'ABCMeta', 'link-9');">ABCMeta</a></tt> </tt>
+<a name="L411"></a><tt class="py-lineno">411</tt>  <tt class="py-line"> </tt>
+<a name="L412"></a><tt class="py-lineno">412</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">abc</tt><tt class="py-op">.</tt><tt class="py-name">abstractmethod</tt> </tt>
+<a name="DualFunction.gap"></a><div id="DualFunction.gap-def"><a name="L413"></a><tt class="py-lineno">413</tt> <a class="py-toggle" href="#" id="DualFunction.gap-toggle" onclick="return toggle('DualFunction.gap');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.DualFunction-class.html#gap">gap</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">beta</tt><tt class="py-op">,</tt> <tt class="py-param">beta_hat</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-param">eps</tt><tt class="py-op">=</tt><tt id="link-69" class="py-name"><a title="parsimony.utils.consts" class="py-name" href="#" onclick="return doclink('link-69', 'consts', 'link-6');">consts</a></tt><tt class="py-op">.</tt><tt id="link-70" class="py-name" targets="Variable parsimony.datasets.simulate.utils.TOLERANCE=parsimony.datasets.simulate.utils-module.html#TOLERANCE,Variable parsimony.utils.consts.TOLERANCE=parsimony.utils.consts-module.html#TOLERANCE"><a title="parsimony.datasets.simulate.utils.TOLERANCE
+parsimony.utils.consts.TOLERANCE" class="py-name" href="#" onclick="return doclink('link-70', 'TOLERANCE', 'link-70');">TOLERANCE</a></tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="DualFunction.gap-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="DualFunction.gap-expanded"><a name="L414"></a><tt class="py-lineno">414</tt>  <tt class="py-line">        <tt class="py-docstring">"""Compute the duality gap.</tt> </tt>
+<a name="L415"></a><tt class="py-lineno">415</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L416"></a><tt class="py-lineno">416</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">'Abstract method "gap" must be '</tt> </tt>
+<a name="L417"></a><tt class="py-lineno">417</tt>  <tt class="py-line">                                  <tt class="py-string">'specialised!'</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L418"></a><tt class="py-lineno">418</tt>  <tt class="py-line"> </tt>
+<a name="L419"></a><tt class="py-lineno">419</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">abc</tt><tt class="py-op">.</tt><tt class="py-name">abstractmethod</tt> </tt>
+<a name="DualFunction.betahat"></a><div id="DualFunction.betahat-def"><a name="L420"></a><tt class="py-lineno">420</tt> <a class="py-toggle" href="#" id="DualFunction.betahat-toggle" onclick="return toggle('DualFunction.betahat');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.DualFunction-class.html#betahat">betahat</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">alpha</tt><tt class="py-op">,</tt> <tt class="py-param">beta</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">,</tt> <tt class="py-param">eps</tt><tt class="py-op">=</tt><tt id="link-71" class="py-name"><a title="parsimony.utils.consts" class="py-name" href="#" onclick="return doclink('link-71', 'consts', 'link-6');">consts</a></tt><tt class="py-op">.</tt><tt id="link-72" class="py-name"><a title="parsimony.datasets.simulate.utils.TOLERANCE
+parsimony.utils.consts.TOLERANCE" class="py-name" href="#" onclick="return doclink('link-72', 'TOLERANCE', 'link-70');">TOLERANCE</a></tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="DualFunction.betahat-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="DualFunction.betahat-expanded"><a name="L421"></a><tt class="py-lineno">421</tt>  <tt class="py-line">        <tt class="py-docstring">"""Return the beta that minimises the dual function.</tt> </tt>
+<a name="L422"></a><tt class="py-lineno">422</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L423"></a><tt class="py-lineno">423</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">'Abstract method "betahat" must be '</tt> </tt>
+<a name="L424"></a><tt class="py-lineno">424</tt>  <tt class="py-line">                                  <tt class="py-string">'specialised!'</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L425"></a><tt class="py-lineno">425</tt>  <tt class="py-line"> </tt>
+<a name="Eigenvalues"></a><div id="Eigenvalues-def"><a name="L426"></a><tt class="py-lineno">426</tt>  <tt class="py-line"> </tt>
+<a name="L427"></a><tt class="py-lineno">427</tt> <a class="py-toggle" href="#" id="Eigenvalues-toggle" onclick="return toggle('Eigenvalues');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.functions.properties.Eigenvalues-class.html">Eigenvalues</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Eigenvalues-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="Eigenvalues-expanded"><a name="L428"></a><tt class="py-lineno">428</tt>  <tt class="py-line"> </tt>
+<a name="L429"></a><tt class="py-lineno">429</tt>  <tt class="py-line">    <tt id="link-73" class="py-name"><a title="parsimony.algorithms.bases.ExplicitAlgorithm.__metaclass__
+parsimony.algorithms.bases.ImplicitAlgorithm.__metaclass__
+parsimony.datasets.simulate.grad.NesterovFunction.__metaclass__
+parsimony.estimators.LogisticRegressionEstimator.__metaclass__
+parsimony.estimators.RegressionEstimator.__metaclass__
+parsimony.functions.multiblock.properties.MultiblockFunction.__metaclass__
+parsimony.functions.properties.AtomicFunction.__metaclass__
+parsimony.functions.properties.CompositeFunction.__metaclass__" class="py-name" href="#" onclick="return doclink('link-73', '__metaclass__', 'link-8');">__metaclass__</a></tt> <tt class="py-op">=</tt> <tt class="py-name">abc</tt><tt class="py-op">.</tt><tt id="link-74" class="py-name"><a title="abc.ABCMeta" class="py-name" href="#" onclick="return doclink('link-74', 'ABCMeta', 'link-9');">ABCMeta</a></tt> </tt>
+<a name="L430"></a><tt class="py-lineno">430</tt>  <tt class="py-line"> </tt>
+<a name="L431"></a><tt class="py-lineno">431</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">abc</tt><tt class="py-op">.</tt><tt class="py-name">abstractmethod</tt> </tt>
+<a name="Eigenvalues.lambda_max"></a><div id="Eigenvalues.lambda_max-def"><a name="L432"></a><tt class="py-lineno">432</tt> <a class="py-toggle" href="#" id="Eigenvalues.lambda_max-toggle" onclick="return toggle('Eigenvalues.lambda_max');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.Eigenvalues-class.html#lambda_max">lambda_max</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Eigenvalues.lambda_max-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Eigenvalues.lambda_max-expanded"><a name="L433"></a><tt class="py-lineno">433</tt>  <tt class="py-line">        <tt class="py-docstring">"""Largest eigenvalue of the corresponding covariance matrix.</tt> </tt>
+<a name="L434"></a><tt class="py-lineno">434</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L435"></a><tt class="py-lineno">435</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">'Abstract method "lambda_max" must be '</tt> </tt>
+<a name="L436"></a><tt class="py-lineno">436</tt>  <tt class="py-line">                                  <tt class="py-string">'specialised!'</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L437"></a><tt class="py-lineno">437</tt>  <tt class="py-line"> </tt>
+<a name="Eigenvalues.lambda_min"></a><div id="Eigenvalues.lambda_min-def"><a name="L438"></a><tt class="py-lineno">438</tt> <a class="py-toggle" href="#" id="Eigenvalues.lambda_min-toggle" onclick="return toggle('Eigenvalues.lambda_min');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.Eigenvalues-class.html#lambda_min">lambda_min</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Eigenvalues.lambda_min-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="Eigenvalues.lambda_min-expanded"><a name="L439"></a><tt class="py-lineno">439</tt>  <tt class="py-line">        <tt class="py-docstring">"""Smallest eigenvalue of the corresponding covariance matrix.</tt> </tt>
+<a name="L440"></a><tt class="py-lineno">440</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L441"></a><tt class="py-lineno">441</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">'Abstract method "lambda_min" is not '</tt> </tt>
+<a name="L442"></a><tt class="py-lineno">442</tt>  <tt class="py-line">                                  <tt class="py-string">'implemented!'</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L443"></a><tt class="py-lineno">443</tt>  <tt class="py-line"> </tt>
+<a name="StronglyConvex"></a><div id="StronglyConvex-def"><a name="L444"></a><tt class="py-lineno">444</tt>  <tt class="py-line"> </tt>
+<a name="L445"></a><tt class="py-lineno">445</tt> <a class="py-toggle" href="#" id="StronglyConvex-toggle" onclick="return toggle('StronglyConvex');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.functions.properties.StronglyConvex-class.html">StronglyConvex</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="StronglyConvex-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="StronglyConvex-expanded"><a name="L446"></a><tt class="py-lineno">446</tt>  <tt class="py-line">    <tt class="py-docstring">"""Represents strongly convex functions.</tt> </tt>
+<a name="L447"></a><tt class="py-lineno">447</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L448"></a><tt class="py-lineno">448</tt>  <tt class="py-line"><tt class="py-docstring">    A function is strongly convex with parameter m if</tt> </tt>
+<a name="L449"></a><tt class="py-lineno">449</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L450"></a><tt class="py-lineno">450</tt>  <tt class="py-line"><tt class="py-docstring">        (grad(f(x) - grad(f(y))'(x - y) &gt;= m.||x - y||&#178;_2,</tt> </tt>
+<a name="L451"></a><tt class="py-lineno">451</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L452"></a><tt class="py-lineno">452</tt>  <tt class="py-line"><tt class="py-docstring">    or equivalently if</tt> </tt>
+<a name="L453"></a><tt class="py-lineno">453</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L454"></a><tt class="py-lineno">454</tt>  <tt class="py-line"><tt class="py-docstring">        H(f(x)) &gt;= mI,</tt> </tt>
+<a name="L455"></a><tt class="py-lineno">455</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L456"></a><tt class="py-lineno">456</tt>  <tt class="py-line"><tt class="py-docstring">    where H is the Hessian, I is the identity matrix. The second "&gt;=" means</tt> </tt>
+<a name="L457"></a><tt class="py-lineno">457</tt>  <tt class="py-line"><tt class="py-docstring">    that H(f(x)) - mI is positive semi-definite.</tt> </tt>
+<a name="L458"></a><tt class="py-lineno">458</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L459"></a><tt class="py-lineno">459</tt>  <tt class="py-line">    <tt id="link-75" class="py-name"><a title="parsimony.algorithms.bases.ExplicitAlgorithm.__metaclass__
+parsimony.algorithms.bases.ImplicitAlgorithm.__metaclass__
+parsimony.datasets.simulate.grad.NesterovFunction.__metaclass__
+parsimony.estimators.LogisticRegressionEstimator.__metaclass__
+parsimony.estimators.RegressionEstimator.__metaclass__
+parsimony.functions.multiblock.properties.MultiblockFunction.__metaclass__
+parsimony.functions.properties.AtomicFunction.__metaclass__
+parsimony.functions.properties.CompositeFunction.__metaclass__" class="py-name" href="#" onclick="return doclink('link-75', '__metaclass__', 'link-8');">__metaclass__</a></tt> <tt class="py-op">=</tt> <tt class="py-name">abc</tt><tt class="py-op">.</tt><tt id="link-76" class="py-name"><a title="abc.ABCMeta" class="py-name" href="#" onclick="return doclink('link-76', 'ABCMeta', 'link-9');">ABCMeta</a></tt> </tt>
+<a name="L460"></a><tt class="py-lineno">460</tt>  <tt class="py-line"> </tt>
+<a name="L461"></a><tt class="py-lineno">461</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">abc</tt><tt class="py-op">.</tt><tt class="py-name">abstractmethod</tt> </tt>
+<a name="StronglyConvex.parameter"></a><div id="StronglyConvex.parameter-def"><a name="L462"></a><tt class="py-lineno">462</tt> <a class="py-toggle" href="#" id="StronglyConvex.parameter-toggle" onclick="return toggle('StronglyConvex.parameter');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.StronglyConvex-class.html#parameter">parameter</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="StronglyConvex.parameter-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="StronglyConvex.parameter-expanded"><a name="L463"></a><tt class="py-lineno">463</tt>  <tt class="py-line">        <tt class="py-docstring">"""Returns the strongly convex parameter for the function.</tt> </tt>
+<a name="L464"></a><tt class="py-lineno">464</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L465"></a><tt class="py-lineno">465</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">'Abstract method "parameter" is not '</tt> </tt>
+<a name="L466"></a><tt class="py-lineno">466</tt>  <tt class="py-line">                                  <tt class="py-string">'implemented!'</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L467"></a><tt class="py-lineno">467</tt>  <tt class="py-line"> </tt>
+<a name="OR"></a><div id="OR-def"><a name="L468"></a><tt class="py-lineno">468</tt>  <tt class="py-line"> </tt>
+<a name="L469"></a><tt class="py-lineno">469</tt> <a class="py-toggle" href="#" id="OR-toggle" onclick="return toggle('OR');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.functions.properties.OR-class.html">OR</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="OR-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="OR-expanded"><a name="OR.__init__"></a><div id="OR.__init__-def"><a name="L470"></a><tt class="py-lineno">470</tt> <a class="py-toggle" href="#" id="OR.__init__-toggle" onclick="return toggle('OR.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.OR-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">classes</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="OR.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="OR.__init__-expanded"><a name="L471"></a><tt class="py-lineno">471</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">classes</tt> <tt class="py-op">=</tt> <tt class="py-name">classes</tt> </tt>
+</div><a name="L472"></a><tt class="py-lineno">472</tt>  <tt class="py-line"> </tt>
+<a name="OR.evaluate"></a><div id="OR.evaluate-def"><a name="L473"></a><tt class="py-lineno">473</tt> <a class="py-toggle" href="#" id="OR.evaluate-toggle" onclick="return toggle('OR.evaluate');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.OR-class.html#evaluate">evaluate</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">function</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="OR.evaluate-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="OR.evaluate-expanded"><a name="L474"></a><tt class="py-lineno">474</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">c</tt> <tt class="py-keyword">in</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">classes</tt><tt class="py-op">:</tt> </tt>
+<a name="L475"></a><tt class="py-lineno">475</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt class="py-name">function</tt><tt class="py-op">,</tt> <tt class="py-name">c</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L476"></a><tt class="py-lineno">476</tt>  <tt class="py-line">                <tt class="py-keyword">return</tt> <tt class="py-name">True</tt> </tt>
+<a name="L477"></a><tt class="py-lineno">477</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">False</tt> </tt>
+</div><a name="L478"></a><tt class="py-lineno">478</tt>  <tt class="py-line"> </tt>
+<a name="OR.__str__"></a><div id="OR.__str__-def"><a name="L479"></a><tt class="py-lineno">479</tt> <a class="py-toggle" href="#" id="OR.__str__-toggle" onclick="return toggle('OR.__str__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.functions.properties.OR-class.html#__str__">__str__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="OR.__str__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="OR.__str__-expanded"><a name="L480"></a><tt class="py-lineno">480</tt>  <tt class="py-line">        <tt class="py-name">string</tt> <tt class="py-op">=</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">classes</tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L481"></a><tt class="py-lineno">481</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">i</tt> <tt class="py-keyword">in</tt> <tt class="py-name">xrange</tt><tt class="py-op">(</tt><tt class="py-number">1</tt><tt class="py-op">,</tt> <tt class="py-name">len</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">classes</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L482"></a><tt class="py-lineno">482</tt>  <tt class="py-line">            <tt class="py-name">string</tt> <tt class="py-op">=</tt> <tt class="py-name">string</tt> <tt class="py-op">+</tt> <tt class="py-string">" OR "</tt> <tt class="py-op">+</tt> <tt class="py-name">str</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">classes</tt><tt class="py-op">[</tt><tt class="py-name">i</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L483"></a><tt class="py-lineno">483</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="parsimony-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sun Jul  6 11:32:54 2014
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

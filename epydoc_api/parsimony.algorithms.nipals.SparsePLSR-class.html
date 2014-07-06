@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>parsimony.algorithms.nipals.SparsePLSR</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="parsimony-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="parsimony-module.html">Package&nbsp;parsimony</a> ::
+        <a href="parsimony.algorithms-module.html">Package&nbsp;algorithms</a> ::
+        <a href="parsimony.algorithms.nipals-module.html">Module&nbsp;nipals</a> ::
+        Class&nbsp;SparsePLSR
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="parsimony.algorithms.nipals.SparsePLSR-class.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS DESCRIPTION ==================== -->
+<h1 class="epydoc">Class SparsePLSR</h1><p class="nomargin-top"><span class="codelink"><a href="parsimony.algorithms.nipals-pysrc.html#SparsePLSR">source&nbsp;code</a></span></p>
+<pre class="base-tree">
+          object --+        
+                   |        
+ <a href="parsimony.algorithms.bases.BaseAlgorithm-class.html">bases.BaseAlgorithm</a> --+    
+                       |    
+ <a href="parsimony.algorithms.bases.ImplicitAlgorithm-class.html">bases.ImplicitAlgorithm</a> --+
+                           |
+              object --+   |
+                       |   |
+<a href="parsimony.algorithms.bases.IterativeAlgorithm-class.html">bases.IterativeAlgorithm</a> --+
+                           |
+                          <strong class="uidshort">SparsePLSR</strong>
+</pre>
+
+<hr />
+<pre class="literalblock">
+A NIPALS implementation for Sparse PLS regresison.
+
+Parameters
+----------
+l : List or tuple of two non-negative floats. The Lagrange multipliers, or
+        regularisation constants, for the X and Y blocks, respectively.
+
+penalise_y : Bool. Whether or not to penalise the Y block as well.
+
+max_iter : Non-negative integer. Maximum allowed number of iterations.
+        Default is 200.
+
+eps : Positive float. The tolerance used in the stopping criterion.
+
+Examples
+--------
+&gt;&gt;&gt; from parsimony.algorithms.nipals import SparsePLSR
+&gt;&gt;&gt; import numpy as np
+&gt;&gt;&gt; np.random.seed(42)
+&gt;&gt;&gt;
+&gt;&gt;&gt; X = np.random.rand(10, 10)
+&gt;&gt;&gt; Y = np.random.rand(10, 5)
+&gt;&gt;&gt; w = np.random.rand(10, 1)
+&gt;&gt;&gt; c = np.random.rand(5, 1)
+&gt;&gt;&gt; plsr = SparsePLSR(l=[4.0, 5.0])
+&gt;&gt;&gt; w, c = plsr.run([X, Y], [w, c])
+&gt;&gt;&gt; w
+array([[ 0.32012726],
+       [ 0.31873833],
+       [ 0.15539258],
+       [ 0.64271827],
+       [ 0.23337738],
+       [ 0.54819589],
+       [ 0.        ],
+       [ 0.06088551],
+       [ 0.        ],
+       [ 0.        ]])
+&gt;&gt;&gt; c
+array([[ 0.1463623 ],
+       [ 0.66483154],
+       [ 0.4666803 ],
+       [ 0.        ],
+       [ 0.5646119 ]])
+
+</pre>
+
+<!-- ==================== INSTANCE METHODS ==================== -->
+<a name="section-InstanceMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Instance Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-InstanceMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.algorithms.nipals.SparsePLSR-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">l</span>=<span class="summary-sig-default"><code class="variable-group">[</code>0.0<code class="variable-op">, </code>0.0<code class="variable-group">]</code></span>,
+        <span class="summary-sig-arg">penalise_y</span>=<span class="summary-sig-default">True</span>,
+        <span class="summary-sig-arg">max_iter</span>=<span class="summary-sig-default">200</span>,
+        <span class="summary-sig-arg">eps</span>=<span class="summary-sig-default">5e-08</span>,
+        <span class="summary-sig-arg">**kwargs</span>)</span><br />
+      x.__init__(...) initializes x; see help(type(x)) for signature</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.algorithms.nipals-pysrc.html#SparsePLSR.__init__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.algorithms.nipals.SparsePLSR-class.html#run" class="summary-sig-name">run</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">XY</span>,
+        <span class="summary-sig-arg">wc</span>=<span class="summary-sig-default">None</span>)</span><br />
+      A NIPALS implementation for sparse PLS regresison.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.algorithms.nipals-pysrc.html#SparsePLSR.run">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html">bases.BaseAlgorithm</a></code></b>:
+      <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#get_params">get_params</a></code>,
+      <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#set_params">set_params</a></code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.algorithms.bases.IterativeAlgorithm-class.html">bases.IterativeAlgorithm</a></code></b>:
+      <code><a href="parsimony.algorithms.bases.IterativeAlgorithm-class.html#iter_reset">iter_reset</a></code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__delattr__</code>,
+      <code>__format__</code>,
+      <code>__getattribute__</code>,
+      <code>__hash__</code>,
+      <code>__new__</code>,
+      <code>__reduce__</code>,
+      <code>__reduce_ex__</code>,
+      <code>__repr__</code>,
+      <code>__setattr__</code>,
+      <code>__sizeof__</code>,
+      <code>__str__</code>,
+      <code>__subclasshook__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== STATIC METHODS ==================== -->
+<a name="section-StaticMethods"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Static Methods</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-StaticMethods"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html">bases.BaseAlgorithm</a></code></b>:
+      <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#check_compatibility">check_compatibility</a></code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== CLASS VARIABLES ==================== -->
+<a name="section-ClassVariables"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Class Variables</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-ClassVariables"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="__abstractmethods__"></a><span class="summary-name">__abstractmethods__</span> = <code title="frozenset([])"><code class="variable-group">frozenset([</code><code class="variable-group">])</code></code>
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="_abc_negative_cache_version"></a><span class="summary-name">_abc_negative_cache_version</span> = <code title="14">14</code>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.algorithms.bases.ImplicitAlgorithm-class.html">bases.ImplicitAlgorithm</a></code></b>:
+      <code><a href="parsimony.algorithms.bases.ImplicitAlgorithm-class.html#__metaclass__">__metaclass__</a></code>
+      </p>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html">bases.BaseAlgorithm</a></code></b> (private):
+      <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_cache" onclick="show_private();">_abc_cache</a></code>,
+      <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_negative_cache" onclick="show_private();">_abc_negative_cache</a></code>,
+      <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_registry" onclick="show_private();">_abc_registry</a></code>
+      </p></div>
+    </td>
+  </tr>
+</table>
+<!-- ==================== PROPERTIES ==================== -->
+<a name="section-Properties"></a>
+<table class="summary" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Properties</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-Properties"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+  <tr>
+    <td colspan="2" class="summary">
+    <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
+      <code>__class__</code>
+      </p>
+    </td>
+  </tr>
+</table>
+<!-- ==================== METHOD DETAILS ==================== -->
+<a name="section-MethodDetails"></a>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="table-header">
+  <td colspan="2" class="table-header">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr valign="top">
+        <td align="left"><span class="table-header">Method Details</span></td>
+        <td align="right" valign="top"
+         ><span class="options">[<a href="#section-MethodDetails"
+         class="privatelink" onclick="toggle_private();"
+         >hide private</a>]</span></td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>
+<a name="__init__"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">l</span>=<span class="sig-default"><code class="variable-group">[</code>0.0<code class="variable-op">, </code>0.0<code class="variable-group">]</code></span>,
+        <span class="sig-arg">penalise_y</span>=<span class="sig-default">True</span>,
+        <span class="sig-arg">max_iter</span>=<span class="sig-default">200</span>,
+        <span class="sig-arg">eps</span>=<span class="sig-default">5e-08</span>,
+        <span class="sig-arg">**kwargs</span>)</span>
+    <br /><em class="fname">(Constructor)</em>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.algorithms.nipals-pysrc.html#SparsePLSR.__init__">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>x.__init__(...) initializes x; see help(type(x)) for signature</p>
+  <dl class="fields">
+    <dt>Overrides:
+        object.__init__
+        <dd><em class="note">(inherited documentation)</em></dd>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<a name="run"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">run</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">XY</span>,
+        <span class="sig-arg">wc</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.algorithms.nipals-pysrc.html#SparsePLSR.run">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+A NIPALS implementation for sparse PLS regresison.
+
+Parameters
+----------
+XY : List of two numpy arrays. XY[0] is n-by-p and XY[1] is n-by-q. The
+        independent and dependent variables.
+
+wc : List of numpy array. The start vectors.
+
+Returns
+-------
+w : Numpy array, p-by-1. The weight vector of X.
+
+c : Numpy array, q-by-1. The weight vector of Y.
+
+</pre>
+  <dl class="fields">
+    <dt>Overrides:
+        <a href="parsimony.algorithms.bases.ImplicitAlgorithm-class.html#run">bases.ImplicitAlgorithm.run</a>
+    </dt>
+  </dl>
+</td></tr></table>
+</div>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="parsimony-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sun Jul  6 11:32:51 2014
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

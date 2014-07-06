@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>parsimony.algorithms.deflation</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="parsimony-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="parsimony-module.html">Package&nbsp;parsimony</a> ::
+        <a href="parsimony.algorithms-module.html">Package&nbsp;algorithms</a> ::
+        Module&nbsp;deflation
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="parsimony.algorithms.deflation-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="parsimony.algorithms.deflation-module.html">Module parsimony.algorithms.deflation</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno"> 1</tt>  <tt class="py-line"><tt class="py-comment"># -*- coding: utf-8 -*-</tt> </tt>
+<a name="L2"></a><tt class="py-lineno"> 2</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L3"></a><tt class="py-lineno"> 3</tt>  <tt class="py-line"><tt class="py-docstring">The :mod:`parsimony.algorithms.deflation` module contains deflation procedures.</tt> </tt>
+<a name="L4"></a><tt class="py-lineno"> 4</tt>  <tt class="py-line"><tt class="py-docstring">functions.</tt> </tt>
+<a name="L5"></a><tt class="py-lineno"> 5</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L6"></a><tt class="py-lineno"> 6</tt>  <tt class="py-line"><tt class="py-docstring">Created on Fri Mar 21 15:18:56 2014</tt> </tt>
+<a name="L7"></a><tt class="py-lineno"> 7</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L8"></a><tt class="py-lineno"> 8</tt>  <tt class="py-line"><tt class="py-docstring">Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.</tt> </tt>
+<a name="L9"></a><tt class="py-lineno"> 9</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L10"></a><tt class="py-lineno">10</tt>  <tt class="py-line"><tt class="py-docstring">@author:  Tommy L&#246;fstedt</tt> </tt>
+<a name="L11"></a><tt class="py-lineno">11</tt>  <tt class="py-line"><tt class="py-docstring">@email:   lofstedt.tommy@gmail.com</tt> </tt>
+<a name="L12"></a><tt class="py-lineno">12</tt>  <tt class="py-line"><tt class="py-docstring">@license: BSD 3-clause.</tt> </tt>
+<a name="L13"></a><tt class="py-lineno">13</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L14"></a><tt class="py-lineno">14</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">abc</tt> </tt>
+<a name="L15"></a><tt class="py-lineno">15</tt>  <tt class="py-line"> </tt>
+<a name="L16"></a><tt class="py-lineno">16</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">numpy</tt> <tt class="py-keyword">as</tt> <tt class="py-name">np</tt> </tt>
+<a name="L17"></a><tt class="py-lineno">17</tt>  <tt class="py-line"> </tt>
+<a name="L18"></a><tt class="py-lineno">18</tt>  <tt class="py-line"><tt class="py-name">__all__</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">"ProjectionDeflation"</tt><tt class="py-op">,</tt> </tt>
+<a name="L19"></a><tt class="py-lineno">19</tt>  <tt class="py-line">           <tt class="py-string">"RowProjectionDeflation"</tt><tt class="py-op">,</tt> <tt class="py-string">"ColumnProjectionDeflation"</tt><tt class="py-op">,</tt> </tt>
+<a name="L20"></a><tt class="py-lineno">20</tt>  <tt class="py-line">           <tt class="py-string">"RankOneDeflation"</tt><tt class="py-op">]</tt> </tt>
+<a name="Deflation"></a><div id="Deflation-def"><a name="L21"></a><tt class="py-lineno">21</tt>  <tt class="py-line"> </tt>
+<a name="L22"></a><tt class="py-lineno">22</tt>  <tt class="py-line"> </tt>
+<a name="L23"></a><tt class="py-lineno">23</tt> <a class="py-toggle" href="#" id="Deflation-toggle" onclick="return toggle('Deflation');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.algorithms.deflation.Deflation-class.html">Deflation</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Deflation-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="Deflation-expanded"><a name="L24"></a><tt class="py-lineno">24</tt>  <tt class="py-line">    <tt id="link-0" class="py-name" targets="Variable parsimony.algorithms.bases.ExplicitAlgorithm.__metaclass__=parsimony.algorithms.bases.ExplicitAlgorithm-class.html#__metaclass__,Variable parsimony.algorithms.bases.ImplicitAlgorithm.__metaclass__=parsimony.algorithms.bases.ImplicitAlgorithm-class.html#__metaclass__,Variable parsimony.datasets.simulate.grad.NesterovFunction.__metaclass__=parsimony.datasets.simulate.grad.NesterovFunction-class.html#__metaclass__,Variable parsimony.estimators.LogisticRegressionEstimator.__metaclass__=parsimony.estimators.LogisticRegressionEstimator-class.html#__metaclass__,Variable parsimony.estimators.RegressionEstimator.__metaclass__=parsimony.estimators.RegressionEstimator-class.html#__metaclass__,Variable parsimony.functions.multiblock.properties.MultiblockFunction.__metaclass__=parsimony.functions.multiblock.properties.MultiblockFunction-class.html#__metaclass__,Variable parsimony.functions.properties.AtomicFunction.__metaclass__=parsimony.functions.properties.AtomicFunction-class.html#__metaclass__,Variable parsimony.functions.properties.CompositeFunction.__metaclass__=parsimony.functions.properties.CompositeFunction-class.html#__metaclass__"><a title="parsimony.algorithms.bases.ExplicitAlgorithm.__metaclass__
+parsimony.algorithms.bases.ImplicitAlgorithm.__metaclass__
+parsimony.datasets.simulate.grad.NesterovFunction.__metaclass__
+parsimony.estimators.LogisticRegressionEstimator.__metaclass__
+parsimony.estimators.RegressionEstimator.__metaclass__
+parsimony.functions.multiblock.properties.MultiblockFunction.__metaclass__
+parsimony.functions.properties.AtomicFunction.__metaclass__
+parsimony.functions.properties.CompositeFunction.__metaclass__" class="py-name" href="#" onclick="return doclink('link-0', '__metaclass__', 'link-0');">__metaclass__</a></tt> <tt class="py-op">=</tt> <tt class="py-name">abc</tt><tt class="py-op">.</tt><tt id="link-1" class="py-name" targets="Class abc.ABCMeta=abc.ABCMeta-class.html"><a title="abc.ABCMeta" class="py-name" href="#" onclick="return doclink('link-1', 'ABCMeta', 'link-1');">ABCMeta</a></tt> </tt>
+<a name="L25"></a><tt class="py-lineno">25</tt>  <tt class="py-line"> </tt>
+<a name="L26"></a><tt class="py-lineno">26</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">abc</tt><tt class="py-op">.</tt><tt class="py-name">abstractmethod</tt> </tt>
+<a name="Deflation.deflate"></a><div id="Deflation.deflate-def"><a name="L27"></a><tt class="py-lineno">27</tt> <a class="py-toggle" href="#" id="Deflation.deflate-toggle" onclick="return toggle('Deflation.deflate');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.algorithms.deflation.Deflation-class.html#deflate">deflate</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">X</tt><tt class="py-op">,</tt> <tt class="py-param">w</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="Deflation.deflate-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="Deflation.deflate-expanded"><a name="L28"></a><tt class="py-lineno">28</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">'Abstract method "deflate" must be '</tt> \ </tt>
+<a name="L29"></a><tt class="py-lineno">29</tt>  <tt class="py-line">                                  <tt class="py-string">'specialised!'</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L30"></a><tt class="py-lineno">30</tt>  <tt class="py-line"> </tt>
+<a name="RowProjectionDeflation"></a><div id="RowProjectionDeflation-def"><a name="L31"></a><tt class="py-lineno">31</tt>  <tt class="py-line"> </tt>
+<a name="L32"></a><tt class="py-lineno">32</tt> <a class="py-toggle" href="#" id="RowProjectionDeflation-toggle" onclick="return toggle('RowProjectionDeflation');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.algorithms.deflation.RowProjectionDeflation-class.html">RowProjectionDeflation</a><tt class="py-op">(</tt><tt class="py-base-class">Deflation</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RowProjectionDeflation-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="RowProjectionDeflation-expanded"><a name="L33"></a><tt class="py-lineno">33</tt>  <tt class="py-line"> </tt>
+<a name="RowProjectionDeflation.deflate"></a><div id="RowProjectionDeflation.deflate-def"><a name="L34"></a><tt class="py-lineno">34</tt> <a class="py-toggle" href="#" id="RowProjectionDeflation.deflate-toggle" onclick="return toggle('RowProjectionDeflation.deflate');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.algorithms.deflation.RowProjectionDeflation-class.html#deflate">deflate</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">X</tt><tt class="py-op">,</tt> <tt class="py-param">w</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RowProjectionDeflation.deflate-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="RowProjectionDeflation.deflate-expanded"><a name="L35"></a><tt class="py-lineno">35</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">X</tt> <tt class="py-op">-</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">dot</tt><tt class="py-op">(</tt><tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">dot</tt><tt class="py-op">(</tt><tt class="py-name">X</tt><tt class="py-op">,</tt> <tt class="py-name">w</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">w</tt><tt class="py-op">.</tt><tt class="py-name">T</tt><tt class="py-op">)</tt> <tt class="py-op">/</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">dot</tt><tt class="py-op">(</tt><tt class="py-name">w</tt><tt class="py-op">.</tt><tt class="py-name">T</tt><tt class="py-op">,</tt> <tt class="py-name">w</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L36"></a><tt class="py-lineno">36</tt>  <tt class="py-line"> </tt>
+<a name="L37"></a><tt class="py-lineno">37</tt>  <tt class="py-line"> </tt>
+<a name="L38"></a><tt class="py-lineno">38</tt>  <tt class="py-line"><tt class="py-name">ProjectionDeflation</tt> <tt class="py-op">=</tt> <tt id="link-2" class="py-name" targets="Class parsimony.algorithms.deflation.RowProjectionDeflation=parsimony.algorithms.deflation.RowProjectionDeflation-class.html"><a title="parsimony.algorithms.deflation.RowProjectionDeflation" class="py-name" href="#" onclick="return doclink('link-2', 'RowProjectionDeflation', 'link-2');">RowProjectionDeflation</a></tt> </tt>
+<a name="ColumnProjectionDeflation"></a><div id="ColumnProjectionDeflation-def"><a name="L39"></a><tt class="py-lineno">39</tt>  <tt class="py-line"> </tt>
+<a name="L40"></a><tt class="py-lineno">40</tt>  <tt class="py-line"> </tt>
+<a name="L41"></a><tt class="py-lineno">41</tt> <a class="py-toggle" href="#" id="ColumnProjectionDeflation-toggle" onclick="return toggle('ColumnProjectionDeflation');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.algorithms.deflation.ColumnProjectionDeflation-class.html">ColumnProjectionDeflation</a><tt class="py-op">(</tt><tt class="py-base-class">Deflation</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ColumnProjectionDeflation-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="ColumnProjectionDeflation-expanded"><a name="L42"></a><tt class="py-lineno">42</tt>  <tt class="py-line"> </tt>
+<a name="ColumnProjectionDeflation.deflate"></a><div id="ColumnProjectionDeflation.deflate-def"><a name="L43"></a><tt class="py-lineno">43</tt> <a class="py-toggle" href="#" id="ColumnProjectionDeflation.deflate-toggle" onclick="return toggle('ColumnProjectionDeflation.deflate');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.algorithms.deflation.ColumnProjectionDeflation-class.html#deflate">deflate</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">X</tt><tt class="py-op">,</tt> <tt class="py-param">t</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ColumnProjectionDeflation.deflate-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="ColumnProjectionDeflation.deflate-expanded"><a name="L44"></a><tt class="py-lineno">44</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">X</tt> <tt class="py-op">-</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">dot</tt><tt class="py-op">(</tt><tt class="py-name">t</tt> <tt class="py-op">/</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">dot</tt><tt class="py-op">(</tt><tt class="py-name">t</tt><tt class="py-op">.</tt><tt class="py-name">T</tt><tt class="py-op">,</tt> <tt class="py-name">t</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">dot</tt><tt class="py-op">(</tt><tt class="py-name">t</tt><tt class="py-op">.</tt><tt class="py-name">T</tt><tt class="py-op">,</tt> <tt class="py-name">X</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L45"></a><tt class="py-lineno">45</tt>  <tt class="py-line"> </tt>
+<a name="RankOneDeflation"></a><div id="RankOneDeflation-def"><a name="L46"></a><tt class="py-lineno">46</tt>  <tt class="py-line"> </tt>
+<a name="L47"></a><tt class="py-lineno">47</tt> <a class="py-toggle" href="#" id="RankOneDeflation-toggle" onclick="return toggle('RankOneDeflation');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.algorithms.deflation.RankOneDeflation-class.html">RankOneDeflation</a><tt class="py-op">(</tt><tt class="py-base-class">Deflation</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RankOneDeflation-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="RankOneDeflation-expanded"><a name="L48"></a><tt class="py-lineno">48</tt>  <tt class="py-line"> </tt>
+<a name="RankOneDeflation.deflate"></a><div id="RankOneDeflation.deflate-def"><a name="L49"></a><tt class="py-lineno">49</tt> <a class="py-toggle" href="#" id="RankOneDeflation.deflate-toggle" onclick="return toggle('RankOneDeflation.deflate');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.algorithms.deflation.RankOneDeflation-class.html#deflate">deflate</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">X</tt><tt class="py-op">,</tt> <tt class="py-param">t</tt><tt class="py-op">,</tt> <tt class="py-param">p</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RankOneDeflation.deflate-collapsed" style="display:none;" pad="++" indent="++++++++"></div><div id="RankOneDeflation.deflate-expanded"><a name="L50"></a><tt class="py-lineno">50</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">X</tt> <tt class="py-op">-</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">dot</tt><tt class="py-op">(</tt><tt class="py-name">t</tt><tt class="py-op">,</tt> <tt class="py-name">p</tt><tt class="py-op">.</tt><tt class="py-name">T</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L51"></a><tt class="py-lineno">51</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="parsimony-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sun Jul  6 11:32:54 2014
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

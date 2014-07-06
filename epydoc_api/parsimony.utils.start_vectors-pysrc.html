@@ -1,0 +1,1185 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>parsimony.utils.start_vectors</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="parsimony-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="parsimony-module.html">Package&nbsp;parsimony</a> ::
+        <a href="parsimony.utils-module.html" onclick="show_private();">Package&nbsp;utils</a> ::
+        Module&nbsp;start_vectors
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="parsimony.utils.start_vectors-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="parsimony.utils.start_vectors-module.html">Module parsimony.utils.start_vectors</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-comment"># -*- coding: utf-8 -*-</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-docstring">Created on Thu Mar 28 15:35:26 2013</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-docstring">Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.</tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"><tt class="py-docstring">@author:  Tommy L&#246;fstedt</tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-docstring">@email:   tommy.loefstedt@cea.fr</tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-docstring">@license: BSD 3-clause.</tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">abc</tt> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">numpy</tt> <tt class="py-keyword">as</tt> <tt class="py-name">np</tt> </tt>
+<a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-op">.</tt> <tt class="py-keyword">import</tt> <tt id="link-0" class="py-name" targets="Module parsimony.utils.maths=parsimony.utils.maths-module.html"><a title="parsimony.utils.maths" class="py-name" href="#" onclick="return doclink('link-0', 'maths', 'link-0');">maths</a></tt> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line"> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"><tt class="py-name">__all__</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">'BaseStartVector'</tt><tt class="py-op">,</tt> <tt class="py-string">'IdentityStartVector'</tt><tt class="py-op">,</tt> <tt class="py-string">'RandomStartVector'</tt><tt class="py-op">,</tt> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line">           <tt class="py-string">'OnesStartVector'</tt><tt class="py-op">,</tt> <tt class="py-string">'ZerosStartVector'</tt><tt class="py-op">]</tt> </tt>
+<a name="BaseStartVector"></a><div id="BaseStartVector-def"><a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line"> </tt>
+<a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line"> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt> <a class="py-toggle" href="#" id="BaseStartVector-toggle" onclick="return toggle('BaseStartVector');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.utils.start_vectors.BaseStartVector-class.html">BaseStartVector</a><tt class="py-op">(</tt><tt class="py-base-class">object</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseStartVector-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="BaseStartVector-expanded"><a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line">    <tt class="py-docstring">"""Base class for start vector generation.</tt> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line"><tt class="py-docstring">    Parameters</tt> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line"><tt class="py-docstring">    ----------</tt> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line"><tt class="py-docstring">    normalise : Bool. Whether or not to normalise the vector that is returned.</tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line"><tt class="py-docstring">    seed : Integer or None. The seed to the pseudo-random number generator. If</tt> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line"><tt class="py-docstring">            none, no seed is used. The seed is set at initialisation, so if the</tt> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line"><tt class="py-docstring">            RNG is used in between initialisation and utilisation, then the</tt> </tt>
+<a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line"><tt class="py-docstring">            random numbers will change. Default is None. The seed is not used</tt> </tt>
+<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line"><tt class="py-docstring">            by all implementing classes.</tt> </tt>
+<a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line">    <tt id="link-1" class="py-name" targets="Variable parsimony.algorithms.bases.ExplicitAlgorithm.__metaclass__=parsimony.algorithms.bases.ExplicitAlgorithm-class.html#__metaclass__,Variable parsimony.algorithms.bases.ImplicitAlgorithm.__metaclass__=parsimony.algorithms.bases.ImplicitAlgorithm-class.html#__metaclass__,Variable parsimony.datasets.simulate.grad.NesterovFunction.__metaclass__=parsimony.datasets.simulate.grad.NesterovFunction-class.html#__metaclass__,Variable parsimony.estimators.LogisticRegressionEstimator.__metaclass__=parsimony.estimators.LogisticRegressionEstimator-class.html#__metaclass__,Variable parsimony.estimators.RegressionEstimator.__metaclass__=parsimony.estimators.RegressionEstimator-class.html#__metaclass__,Variable parsimony.functions.multiblock.properties.MultiblockFunction.__metaclass__=parsimony.functions.multiblock.properties.MultiblockFunction-class.html#__metaclass__,Variable parsimony.functions.properties.AtomicFunction.__metaclass__=parsimony.functions.properties.AtomicFunction-class.html#__metaclass__,Variable parsimony.functions.properties.CompositeFunction.__metaclass__=parsimony.functions.properties.CompositeFunction-class.html#__metaclass__"><a title="parsimony.algorithms.bases.ExplicitAlgorithm.__metaclass__
+parsimony.algorithms.bases.ImplicitAlgorithm.__metaclass__
+parsimony.datasets.simulate.grad.NesterovFunction.__metaclass__
+parsimony.estimators.LogisticRegressionEstimator.__metaclass__
+parsimony.estimators.RegressionEstimator.__metaclass__
+parsimony.functions.multiblock.properties.MultiblockFunction.__metaclass__
+parsimony.functions.properties.AtomicFunction.__metaclass__
+parsimony.functions.properties.CompositeFunction.__metaclass__" class="py-name" href="#" onclick="return doclink('link-1', '__metaclass__', 'link-1');">__metaclass__</a></tt> <tt class="py-op">=</tt> <tt class="py-name">abc</tt><tt class="py-op">.</tt><tt id="link-2" class="py-name" targets="Class abc.ABCMeta=abc.ABCMeta-class.html"><a title="abc.ABCMeta" class="py-name" href="#" onclick="return doclink('link-2', 'ABCMeta', 'link-2');">ABCMeta</a></tt> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line"> </tt>
+<a name="BaseStartVector.__init__"></a><div id="BaseStartVector.__init__-def"><a name="L35"></a><tt class="py-lineno"> 35</tt> <a class="py-toggle" href="#" id="BaseStartVector.__init__-toggle" onclick="return toggle('BaseStartVector.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.start_vectors.BaseStartVector-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">normalise</tt><tt class="py-op">=</tt><tt class="py-name">True</tt><tt class="py-op">,</tt> <tt class="py-param">seed</tt><tt class="py-op">=</tt><tt class="py-name">None</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseStartVector.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseStartVector.__init__-expanded"><a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line">        <tt class="py-name">super</tt><tt class="py-op">(</tt><tt id="link-3" class="py-name" targets="Class parsimony.utils.start_vectors.BaseStartVector=parsimony.utils.start_vectors.BaseStartVector-class.html"><a title="parsimony.utils.start_vectors.BaseStartVector" class="py-name" href="#" onclick="return doclink('link-3', 'BaseStartVector', 'link-3');">BaseStartVector</a></tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt id="link-4" class="py-name" targets="Method parsimony.algorithms._explicit.BacktrackingLineSearch.__init__()=parsimony.algorithms._explicit.BacktrackingLineSearch-class.html#__init__,Method parsimony.algorithms._explicit.Bisection.__init__()=parsimony.algorithms._explicit.Bisection-class.html#__init__,Method parsimony.algorithms._explicit.CONESTA.__init__()=parsimony.algorithms._explicit.CONESTA-class.html#__init__,Method parsimony.algorithms._explicit.DykstrasProjectionAlgorithm.__init__()=parsimony.algorithms._explicit.DykstrasProjectionAlgorithm-class.html#__init__,Method parsimony.algorithms._explicit.DynamicCONESTA.__init__()=parsimony.algorithms._explicit.DynamicCONESTA-class.html#__init__,Method parsimony.algorithms._explicit.ExcessiveGapMethod.__init__()=parsimony.algorithms._explicit.ExcessiveGapMethod-class.html#__init__,Method parsimony.algorithms._explicit.FISTA.__init__()=parsimony.algorithms._explicit.FISTA-class.html#__init__,Method parsimony.algorithms._explicit.GradientDescent.__init__()=parsimony.algorithms._explicit.GradientDescent-class.html#__init__,Method parsimony.algorithms._explicit.ISTA.__init__()=parsimony.algorithms._explicit.ISTA-class.html#__init__,Method parsimony.algorithms._explicit.NaiveCONESTA.__init__()=parsimony.algorithms._explicit.NaiveCONESTA-class.html#__init__,Method parsimony.algorithms._explicit.NewtonRaphson.__init__()=parsimony.algorithms._explicit.NewtonRaphson-class.html#__init__,Method parsimony.algorithms._explicit.ParallelDykstrasProjectionAlgorithm.__init__()=parsimony.algorithms._explicit.ParallelDykstrasProjectionAlgorithm-class.html#__init__,Method parsimony.algorithms._explicit.ParallelDykstrasProximalAlgorithm.__init__()=parsimony.algorithms._explicit.ParallelDykstrasProximalAlgorithm-class.html#__init__,Method parsimony.algorithms._explicit.StaticCONESTA.__init__()=parsimony.algorithms._explicit.StaticCONESTA-class.html#__init__,Method parsimony.algorithms.bases.InformationAlgorithm.__init__()=parsimony.algorithms.bases.InformationAlgorithm-class.html#__init__,Method parsimony.algorithms.bases.IterativeAlgorithm.__init__()=parsimony.algorithms.bases.IterativeAlgorithm-class.html#__init__,Method parsimony.algorithms.gradient.GradientDescent.__init__()=parsimony.algorithms.gradient.GradientDescent-class.html#__init__,Method parsimony.algorithms.multiblock.MultiblockCONESTA.__init__()=parsimony.algorithms.multiblock.MultiblockCONESTA-class.html#__init__,Method parsimony.algorithms.multiblock.MultiblockFISTA.__init__()=parsimony.algorithms.multiblock.MultiblockFISTA-class.html#__init__,Method parsimony.algorithms.nipals.PLSR.__init__()=parsimony.algorithms.nipals.PLSR-class.html#__init__,Method parsimony.algorithms.nipals.SparsePLSR.__init__()=parsimony.algorithms.nipals.SparsePLSR-class.html#__init__,Method parsimony.algorithms.primaldual.CONESTA.__init__()=parsimony.algorithms.primaldual.CONESTA-class.html#__init__,Method parsimony.algorithms.primaldual.DynamicCONESTA.__init__()=parsimony.algorithms.primaldual.DynamicCONESTA-class.html#__init__,Method parsimony.algorithms.primaldual.ExcessiveGapMethod.__init__()=parsimony.algorithms.primaldual.ExcessiveGapMethod-class.html#__init__,Method parsimony.algorithms.primaldual.NaiveCONESTA.__init__()=parsimony.algorithms.primaldual.NaiveCONESTA-class.html#__init__,Method parsimony.algorithms.primaldual.StaticCONESTA.__init__()=parsimony.algorithms.primaldual.StaticCONESTA-class.html#__init__,Method parsimony.algorithms.proximal.DykstrasProjectionAlgorithm.__init__()=parsimony.algorithms.proximal.DykstrasProjectionAlgorithm-class.html#__init__,Method parsimony.algorithms.proximal.DykstrasProximalAlgorithm.__init__()=parsimony.algorithms.proximal.DykstrasProximalAlgorithm-class.html#__init__,Method parsimony.algorithms.proximal.FISTA.__init__()=parsimony.algorithms.proximal.FISTA-class.html#__init__,Method parsimony.algorithms.proximal.ISTA.__init__()=parsimony.algorithms.proximal.ISTA-class.html#__init__,Method parsimony.algorithms.proximal.ParallelDykstrasProjectionAlgorithm.__init__()=parsimony.algorithms.proximal.ParallelDykstrasProjectionAlgorithm-class.html#__init__,Method parsimony.algorithms.proximal.ParallelDykstrasProximalAlgorithm.__init__()=parsimony.algorithms.proximal.ParallelDykstrasProximalAlgorithm-class.html#__init__,Method parsimony.algorithms.utils.BacktrackingLineSearch.__init__()=parsimony.algorithms.utils.BacktrackingLineSearch-class.html#__init__,Method parsimony.algorithms.utils.Bisection.__init__()=parsimony.algorithms.utils.Bisection-class.html#__init__,Method parsimony.algorithms.utils.NewtonRaphson.__init__()=parsimony.algorithms.utils.NewtonRaphson-class.html#__init__,Method parsimony.datasets.simulate.grad.Function.__init__()=parsimony.datasets.simulate.grad.Function-class.html#__init__,Method parsimony.datasets.simulate.grad.GroupLasso.__init__()=parsimony.datasets.simulate.grad.GroupLasso-class.html#__init__,Method parsimony.datasets.simulate.grad.L1.__init__()=parsimony.datasets.simulate.grad.L1-class.html#__init__,Method parsimony.datasets.simulate.grad.L2.__init__()=parsimony.datasets.simulate.grad.L2-class.html#__init__,Method parsimony.datasets.simulate.grad.L2Squared.__init__()=parsimony.datasets.simulate.grad.L2Squared-class.html#__init__,Method parsimony.datasets.simulate.grad.NesterovFunction.__init__()=parsimony.datasets.simulate.grad.NesterovFunction-class.html#__init__,Method parsimony.datasets.simulate.grad.SmoothedGroupLasso.__init__()=parsimony.datasets.simulate.grad.SmoothedGroupLasso-class.html#__init__,Method parsimony.datasets.simulate.grad.SmoothedGroupTotalVariation.__init__()=parsimony.datasets.simulate.grad.SmoothedGroupTotalVariation-class.html#__init__,Method parsimony.datasets.simulate.grad.SmoothedL1.__init__()=parsimony.datasets.simulate.grad.SmoothedL1-class.html#__init__,Method parsimony.datasets.simulate.grad.SmoothedTotalVariation.__init__()=parsimony.datasets.simulate.grad.SmoothedTotalVariation-class.html#__init__,Method parsimony.datasets.simulate.grad.TotalVariation.__init__()=parsimony.datasets.simulate.grad.TotalVariation-class.html#__init__,Method parsimony.datasets.simulate.simulate.LinearRegressionData.__init__()=parsimony.datasets.simulate.simulate.LinearRegressionData-class.html#__init__,Method parsimony.datasets.simulate.utils.ConstantValue.__init__()=parsimony.datasets.simulate.utils.ConstantValue-class.html#__init__,Method parsimony.datasets.simulate.utils.RandomUniform.__init__()=parsimony.datasets.simulate.utils.RandomUniform-class.html#__init__,Method parsimony.datasets.utils.Dimaond.__init__()=parsimony.datasets.utils.Dimaond-class.html#__init__,Method parsimony.datasets.utils.Dot.__init__()=parsimony.datasets.utils.Dot-class.html#__init__,Method parsimony.datasets.utils.ObjImage.__init__()=parsimony.datasets.utils.ObjImage-class.html#__init__,Method parsimony.datasets.utils.Square.__init__()=parsimony.datasets.utils.Square-class.html#__init__,Method parsimony.estimators.BaseEstimator.__init__()=parsimony.estimators.BaseEstimator-class.html#__init__,Method parsimony.estimators.ElasticNet.__init__()=parsimony.estimators.ElasticNet-class.html#__init__,Method parsimony.estimators.Lasso.__init__()=parsimony.estimators.Lasso-class.html#__init__,Method parsimony.estimators.LinearRegression.__init__()=parsimony.estimators.LinearRegression-class.html#__init__,Method parsimony.estimators.LinearRegressionL1L2GL.__init__()=parsimony.estimators.LinearRegressionL1L2GL-class.html#__init__,Method parsimony.estimators.LinearRegressionL1L2TV.__init__()=parsimony.estimators.LinearRegressionL1L2TV-class.html#__init__,Method parsimony.estimators.LinearRegressionL2SmoothedL1TV.__init__()=parsimony.estimators.LinearRegressionL2SmoothedL1TV-class.html#__init__,Method parsimony.estimators.LogisticRegression.__init__()=parsimony.estimators.LogisticRegression-class.html#__init__,Method parsimony.estimators.LogisticRegressionEstimator.__init__()=parsimony.estimators.LogisticRegressionEstimator-class.html#__init__,Method parsimony.estimators.LogisticRegressionL1L2GL.__init__()=parsimony.estimators.LogisticRegressionL1L2GL-class.html#__init__,Method parsimony.estimators.LogisticRegressionL1L2TV.__init__()=parsimony.estimators.LogisticRegressionL1L2TV-class.html#__init__,Method parsimony.estimators.PLSRegression.__init__()=parsimony.estimators.PLSRegression-class.html#__init__,Method parsimony.estimators.RegressionEstimator.__init__()=parsimony.estimators.RegressionEstimator-class.html#__init__,Method parsimony.estimators.RidgeLogisticRegression.__init__()=parsimony.estimators.RidgeLogisticRegression-class.html#__init__,Method parsimony.estimators.RidgeRegression.__init__()=parsimony.estimators.RidgeRegression-class.html#__init__,Method parsimony.estimators.SparsePLSRegression.__init__()=parsimony.estimators.SparsePLSRegression-class.html#__init__,Method parsimony.functions.combinedfunctions.CombinedFunction.__init__()=parsimony.functions.combinedfunctions.CombinedFunction-class.html#__init__,Method parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.__init__()=parsimony.functions.combinedfunctions.LinearRegressionL1L2GL-class.html#__init__,Method parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.__init__()=parsimony.functions.combinedfunctions.LinearRegressionL1L2TV-class.html#__init__,Method parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.__init__()=parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV-class.html#__init__,Method parsimony.functions.combinedfunctions.LogisticRegressionL1L2GL.__init__()=parsimony.functions.combinedfunctions.LogisticRegressionL1L2GL-class.html#__init__,Method parsimony.functions.combinedfunctions.LogisticRegressionL1L2TV.__init__()=parsimony.functions.combinedfunctions.LogisticRegressionL1L2TV-class.html#__init__,Method parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.__init__()=parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV-class.html#__init__,Method parsimony.functions.losses.LatentVariableVariance.__init__()=parsimony.functions.losses.LatentVariableVariance-class.html#__init__,Method parsimony.functions.losses.LinearFunction.__init__()=parsimony.functions.losses.LinearFunction-class.html#__init__,Method parsimony.functions.losses.LinearRegression.__init__()=parsimony.functions.losses.LinearRegression-class.html#__init__,Method parsimony.functions.losses.LogisticRegression.__init__()=parsimony.functions.losses.LogisticRegression-class.html#__init__,Method parsimony.functions.losses.RidgeLogisticRegression.__init__()=parsimony.functions.losses.RidgeLogisticRegression-class.html#__init__,Method parsimony.functions.losses.RidgeRegression.__init__()=parsimony.functions.losses.RidgeRegression-class.html#__init__,Method parsimony.functions.multiblock.losses.CombinedMultiblockFunction.__init__()=parsimony.functions.multiblock.losses.CombinedMultiblockFunction-class.html#__init__,Method parsimony.functions.multiblock.losses.GeneralisedMultiblock.__init__()=parsimony.functions.multiblock.losses.GeneralisedMultiblock-class.html#__init__,Method parsimony.functions.multiblock.losses.LatentVariableCovariance.__init__()=parsimony.functions.multiblock.losses.LatentVariableCovariance-class.html#__init__,Method parsimony.functions.multiblock.losses.MultiblockFunctionWrapper.__init__()=parsimony.functions.multiblock.losses.MultiblockFunctionWrapper-class.html#__init__,Method parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper.__init__()=parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html#__init__,Method parsimony.functions.nesterov.gl.GroupLassoOverlap.__init__()=parsimony.functions.nesterov.gl.GroupLassoOverlap-class.html#__init__,Method parsimony.functions.nesterov.grouptv.GroupTotalVariation.__init__()=parsimony.functions.nesterov.grouptv.GroupTotalVariation-class.html#__init__,Method parsimony.functions.nesterov.l1.L1.__init__()=parsimony.functions.nesterov.l1.L1-class.html#__init__,Method parsimony.functions.nesterov.l1tv.L1TV.__init__()=parsimony.functions.nesterov.l1tv.L1TV-class.html#__init__,Method parsimony.functions.nesterov.properties.NesterovFunction.__init__()=parsimony.functions.nesterov.properties.NesterovFunction-class.html#__init__,Method parsimony.functions.nesterov.tv.TotalVariation.__init__()=parsimony.functions.nesterov.tv.TotalVariation-class.html#__init__,Method parsimony.functions.penalties.L0.__init__()=parsimony.functions.penalties.L0-class.html#__init__,Method parsimony.functions.penalties.L1.__init__()=parsimony.functions.penalties.L1-class.html#__init__,Method parsimony.functions.penalties.L1L2Squared.__init__()=parsimony.functions.penalties.L1L2Squared-class.html#__init__,Method parsimony.functions.penalties.L2.__init__()=parsimony.functions.penalties.L2-class.html#__init__,Method parsimony.functions.penalties.L2Squared.__init__()=parsimony.functions.penalties.L2Squared-class.html#__init__,Method parsimony.functions.penalties.LInf.__init__()=parsimony.functions.penalties.LInf-class.html#__init__,Method parsimony.functions.penalties.QuadraticConstraint.__init__()=parsimony.functions.penalties.QuadraticConstraint-class.html#__init__,Method parsimony.functions.penalties.RGCCAConstraint.__init__()=parsimony.functions.penalties.RGCCAConstraint-class.html#__init__,Method parsimony.functions.penalties.SufficientDescentCondition.__init__()=parsimony.functions.penalties.SufficientDescentCondition-class.html#__init__,Method parsimony.functions.penalties.ZeroFunction.__init__()=parsimony.functions.penalties.ZeroFunction-class.html#__init__,Method parsimony.functions.properties.CombinedProjectionOperator.__init__()=parsimony.functions.properties.CombinedProjectionOperator-class.html#__init__,Method parsimony.functions.properties.OR.__init__()=parsimony.functions.properties.OR-class.html#__init__,Method parsimony.utils.start_vectors.BaseStartVector.__init__()=parsimony.utils.start_vectors.BaseStartVector-class.html#__init__,Method parsimony.utils.start_vectors.IdentityStartVector.__init__()=parsimony.utils.start_vectors.IdentityStartVector-class.html#__init__,Method parsimony.utils.start_vectors.OnesStartVector.__init__()=parsimony.utils.start_vectors.OnesStartVector-class.html#__init__,Method parsimony.utils.start_vectors.RandomStartVector.__init__()=parsimony.utils.start_vectors.RandomStartVector-class.html#__init__,Method parsimony.utils.start_vectors.ZerosStartVector.__init__()=parsimony.utils.start_vectors.ZerosStartVector-class.html#__init__,Method parsimony.utils.utils.AnonymousClass.__init__()=parsimony.utils.utils.AnonymousClass-class.html#__init__"><a title="parsimony.algorithms._explicit.BacktrackingLineSearch.__init__
+parsimony.algorithms._explicit.Bisection.__init__
+parsimony.algorithms._explicit.CONESTA.__init__
+parsimony.algorithms._explicit.DykstrasProjectionAlgorithm.__init__
+parsimony.algorithms._explicit.DynamicCONESTA.__init__
+parsimony.algorithms._explicit.ExcessiveGapMethod.__init__
+parsimony.algorithms._explicit.FISTA.__init__
+parsimony.algorithms._explicit.GradientDescent.__init__
+parsimony.algorithms._explicit.ISTA.__init__
+parsimony.algorithms._explicit.NaiveCONESTA.__init__
+parsimony.algorithms._explicit.NewtonRaphson.__init__
+parsimony.algorithms._explicit.ParallelDykstrasProjectionAlgorithm.__init__
+parsimony.algorithms._explicit.ParallelDykstrasProximalAlgorithm.__init__
+parsimony.algorithms._explicit.StaticCONESTA.__init__
+parsimony.algorithms.bases.InformationAlgorithm.__init__
+parsimony.algorithms.bases.IterativeAlgorithm.__init__
+parsimony.algorithms.gradient.GradientDescent.__init__
+parsimony.algorithms.multiblock.MultiblockCONESTA.__init__
+parsimony.algorithms.multiblock.MultiblockFISTA.__init__
+parsimony.algorithms.nipals.PLSR.__init__
+parsimony.algorithms.nipals.SparsePLSR.__init__
+parsimony.algorithms.primaldual.CONESTA.__init__
+parsimony.algorithms.primaldual.DynamicCONESTA.__init__
+parsimony.algorithms.primaldual.ExcessiveGapMethod.__init__
+parsimony.algorithms.primaldual.NaiveCONESTA.__init__
+parsimony.algorithms.primaldual.StaticCONESTA.__init__
+parsimony.algorithms.proximal.DykstrasProjectionAlgorithm.__init__
+parsimony.algorithms.proximal.DykstrasProximalAlgorithm.__init__
+parsimony.algorithms.proximal.FISTA.__init__
+parsimony.algorithms.proximal.ISTA.__init__
+parsimony.algorithms.proximal.ParallelDykstrasProjectionAlgorithm.__init__
+parsimony.algorithms.proximal.ParallelDykstrasProximalAlgorithm.__init__
+parsimony.algorithms.utils.BacktrackingLineSearch.__init__
+parsimony.algorithms.utils.Bisection.__init__
+parsimony.algorithms.utils.NewtonRaphson.__init__
+parsimony.datasets.simulate.grad.Function.__init__
+parsimony.datasets.simulate.grad.GroupLasso.__init__
+parsimony.datasets.simulate.grad.L1.__init__
+parsimony.datasets.simulate.grad.L2.__init__
+parsimony.datasets.simulate.grad.L2Squared.__init__
+parsimony.datasets.simulate.grad.NesterovFunction.__init__
+parsimony.datasets.simulate.grad.SmoothedGroupLasso.__init__
+parsimony.datasets.simulate.grad.SmoothedGroupTotalVariation.__init__
+parsimony.datasets.simulate.grad.SmoothedL1.__init__
+parsimony.datasets.simulate.grad.SmoothedTotalVariation.__init__
+parsimony.datasets.simulate.grad.TotalVariation.__init__
+parsimony.datasets.simulate.simulate.LinearRegressionData.__init__
+parsimony.datasets.simulate.utils.ConstantValue.__init__
+parsimony.datasets.simulate.utils.RandomUniform.__init__
+parsimony.datasets.utils.Dimaond.__init__
+parsimony.datasets.utils.Dot.__init__
+parsimony.datasets.utils.ObjImage.__init__
+parsimony.datasets.utils.Square.__init__
+parsimony.estimators.BaseEstimator.__init__
+parsimony.estimators.ElasticNet.__init__
+parsimony.estimators.Lasso.__init__
+parsimony.estimators.LinearRegression.__init__
+parsimony.estimators.LinearRegressionL1L2GL.__init__
+parsimony.estimators.LinearRegressionL1L2TV.__init__
+parsimony.estimators.LinearRegressionL2SmoothedL1TV.__init__
+parsimony.estimators.LogisticRegression.__init__
+parsimony.estimators.LogisticRegressionEstimator.__init__
+parsimony.estimators.LogisticRegressionL1L2GL.__init__
+parsimony.estimators.LogisticRegressionL1L2TV.__init__
+parsimony.estimators.PLSRegression.__init__
+parsimony.estimators.RegressionEstimator.__init__
+parsimony.estimators.RidgeLogisticRegression.__init__
+parsimony.estimators.RidgeRegression.__init__
+parsimony.estimators.SparsePLSRegression.__init__
+parsimony.functions.combinedfunctions.CombinedFunction.__init__
+parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.__init__
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.__init__
+parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.__init__
+parsimony.functions.combinedfunctions.LogisticRegressionL1L2GL.__init__
+parsimony.functions.combinedfunctions.LogisticRegressionL1L2TV.__init__
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.__init__
+parsimony.functions.losses.LatentVariableVariance.__init__
+parsimony.functions.losses.LinearFunction.__init__
+parsimony.functions.losses.LinearRegression.__init__
+parsimony.functions.losses.LogisticRegression.__init__
+parsimony.functions.losses.RidgeLogisticRegression.__init__
+parsimony.functions.losses.RidgeRegression.__init__
+parsimony.functions.multiblock.losses.CombinedMultiblockFunction.__init__
+parsimony.functions.multiblock.losses.GeneralisedMultiblock.__init__
+parsimony.functions.multiblock.losses.LatentVariableCovariance.__init__
+parsimony.functions.multiblock.losses.MultiblockFunctionWrapper.__init__
+parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper.__init__
+parsimony.functions.nesterov.gl.GroupLassoOverlap.__init__
+parsimony.functions.nesterov.grouptv.GroupTotalVariation.__init__
+parsimony.functions.nesterov.l1.L1.__init__
+parsimony.functions.nesterov.l1tv.L1TV.__init__
+parsimony.functions.nesterov.properties.NesterovFunction.__init__
+parsimony.functions.nesterov.tv.TotalVariation.__init__
+parsimony.functions.penalties.L0.__init__
+parsimony.functions.penalties.L1.__init__
+parsimony.functions.penalties.L1L2Squared.__init__
+parsimony.functions.penalties.L2.__init__
+parsimony.functions.penalties.L2Squared.__init__
+parsimony.functions.penalties.LInf.__init__
+parsimony.functions.penalties.QuadraticConstraint.__init__
+parsimony.functions.penalties.RGCCAConstraint.__init__
+parsimony.functions.penalties.SufficientDescentCondition.__init__
+parsimony.functions.penalties.ZeroFunction.__init__
+parsimony.functions.properties.CombinedProjectionOperator.__init__
+parsimony.functions.properties.OR.__init__
+parsimony.utils.start_vectors.BaseStartVector.__init__
+parsimony.utils.start_vectors.IdentityStartVector.__init__
+parsimony.utils.start_vectors.OnesStartVector.__init__
+parsimony.utils.start_vectors.RandomStartVector.__init__
+parsimony.utils.start_vectors.ZerosStartVector.__init__
+parsimony.utils.utils.AnonymousClass.__init__" class="py-name" href="#" onclick="return doclink('link-4', '__init__', 'link-4');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line"> </tt>
+<a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">normalise</tt> <tt class="py-op">=</tt> <tt class="py-name">normalise</tt> </tt>
+<a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">seed</tt> <tt class="py-op">=</tt> <tt class="py-name">seed</tt> </tt>
+<a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">seed</tt> <tt class="py-keyword">is</tt> <tt class="py-keyword">not</tt> <tt class="py-name">None</tt><tt class="py-op">:</tt> </tt>
+<a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line">            <tt class="py-name">np</tt><tt class="py-op">.</tt><tt id="link-5" class="py-name" targets="Function parsimony.datasets.simulate.beta.random()=parsimony.datasets.simulate.beta-module.html#random"><a title="parsimony.datasets.simulate.beta.random" class="py-name" href="#" onclick="return doclink('link-5', 'random', 'link-5');">random</a></tt><tt class="py-op">.</tt><tt class="py-name">seed</tt><tt class="py-op">(</tt><tt class="py-name">seed</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line"> </tt>
+<a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line">    <tt class="py-decorator">@</tt><tt class="py-decorator">abc</tt><tt class="py-op">.</tt><tt class="py-name">abstractmethod</tt> </tt>
+<a name="BaseStartVector.get_vector"></a><div id="BaseStartVector.get_vector-def"><a name="L44"></a><tt class="py-lineno"> 44</tt> <a class="py-toggle" href="#" id="BaseStartVector.get_vector-toggle" onclick="return toggle('BaseStartVector.get_vector');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.start_vectors.BaseStartVector-class.html#get_vector">get_vector</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">size</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="BaseStartVector.get_vector-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="BaseStartVector.get_vector-expanded"><a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line"> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">NotImplementedError</tt><tt class="py-op">(</tt><tt class="py-string">'Abstract method "get_vector" must be '</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line">                                  <tt class="py-string">'specialised!'</tt><tt class="py-op">)</tt> </tt>
+</div></div><a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line"> </tt>
+<a name="IdentityStartVector"></a><div id="IdentityStartVector-def"><a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line"> </tt>
+<a name="L50"></a><tt class="py-lineno"> 50</tt> <a class="py-toggle" href="#" id="IdentityStartVector-toggle" onclick="return toggle('IdentityStartVector');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.utils.start_vectors.IdentityStartVector-class.html">IdentityStartVector</a><tt class="py-op">(</tt><tt class="py-base-class">BaseStartVector</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="IdentityStartVector-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="IdentityStartVector-expanded"><a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line">    <tt class="py-docstring">"""A pre-determined start vector.</tt> </tt>
+<a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line"><tt class="py-docstring">    Parameters</tt> </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line"><tt class="py-docstring">    ----------</tt> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line"><tt class="py-docstring">    vector : Numpy array. The predetermined start vector</tt> </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line"><tt class="py-docstring">    Examples</tt> </tt>
+<a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line"><tt class="py-docstring">    --------</tt> </tt>
+<a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; from parsimony.utils.start_vectors import IdentityStartVector</tt> </tt>
+<a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; start_vector = IdentityStartVector(np.array([[0.5], [2.0], [0.3],</tt> </tt>
+<a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line"><tt class="py-docstring">    ...                                              [1.0]]))</tt> </tt>
+<a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; start_vector.get_vector()</tt> </tt>
+<a name="L63"></a><tt class="py-lineno"> 63</tt>  <tt class="py-line"><tt class="py-docstring">    array([[ 0.5],</tt> </tt>
+<a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line"><tt class="py-docstring">           [ 2. ],</tt> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line"><tt class="py-docstring">           [ 0.3],</tt> </tt>
+<a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line"><tt class="py-docstring">           [ 1. ]])</tt> </tt>
+<a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="IdentityStartVector.__init__"></a><div id="IdentityStartVector.__init__-def"><a name="L68"></a><tt class="py-lineno"> 68</tt> <a class="py-toggle" href="#" id="IdentityStartVector.__init__-toggle" onclick="return toggle('IdentityStartVector.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.start_vectors.IdentityStartVector-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">vector</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kwargs</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="IdentityStartVector.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="IdentityStartVector.__init__-expanded"><a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line"> </tt>
+<a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line">        <tt class="py-name">super</tt><tt class="py-op">(</tt><tt id="link-6" class="py-name" targets="Class parsimony.utils.start_vectors.IdentityStartVector=parsimony.utils.start_vectors.IdentityStartVector-class.html"><a title="parsimony.utils.start_vectors.IdentityStartVector" class="py-name" href="#" onclick="return doclink('link-6', 'IdentityStartVector', 'link-6');">IdentityStartVector</a></tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt id="link-7" class="py-name"><a title="parsimony.algorithms._explicit.BacktrackingLineSearch.__init__
+parsimony.algorithms._explicit.Bisection.__init__
+parsimony.algorithms._explicit.CONESTA.__init__
+parsimony.algorithms._explicit.DykstrasProjectionAlgorithm.__init__
+parsimony.algorithms._explicit.DynamicCONESTA.__init__
+parsimony.algorithms._explicit.ExcessiveGapMethod.__init__
+parsimony.algorithms._explicit.FISTA.__init__
+parsimony.algorithms._explicit.GradientDescent.__init__
+parsimony.algorithms._explicit.ISTA.__init__
+parsimony.algorithms._explicit.NaiveCONESTA.__init__
+parsimony.algorithms._explicit.NewtonRaphson.__init__
+parsimony.algorithms._explicit.ParallelDykstrasProjectionAlgorithm.__init__
+parsimony.algorithms._explicit.ParallelDykstrasProximalAlgorithm.__init__
+parsimony.algorithms._explicit.StaticCONESTA.__init__
+parsimony.algorithms.bases.InformationAlgorithm.__init__
+parsimony.algorithms.bases.IterativeAlgorithm.__init__
+parsimony.algorithms.gradient.GradientDescent.__init__
+parsimony.algorithms.multiblock.MultiblockCONESTA.__init__
+parsimony.algorithms.multiblock.MultiblockFISTA.__init__
+parsimony.algorithms.nipals.PLSR.__init__
+parsimony.algorithms.nipals.SparsePLSR.__init__
+parsimony.algorithms.primaldual.CONESTA.__init__
+parsimony.algorithms.primaldual.DynamicCONESTA.__init__
+parsimony.algorithms.primaldual.ExcessiveGapMethod.__init__
+parsimony.algorithms.primaldual.NaiveCONESTA.__init__
+parsimony.algorithms.primaldual.StaticCONESTA.__init__
+parsimony.algorithms.proximal.DykstrasProjectionAlgorithm.__init__
+parsimony.algorithms.proximal.DykstrasProximalAlgorithm.__init__
+parsimony.algorithms.proximal.FISTA.__init__
+parsimony.algorithms.proximal.ISTA.__init__
+parsimony.algorithms.proximal.ParallelDykstrasProjectionAlgorithm.__init__
+parsimony.algorithms.proximal.ParallelDykstrasProximalAlgorithm.__init__
+parsimony.algorithms.utils.BacktrackingLineSearch.__init__
+parsimony.algorithms.utils.Bisection.__init__
+parsimony.algorithms.utils.NewtonRaphson.__init__
+parsimony.datasets.simulate.grad.Function.__init__
+parsimony.datasets.simulate.grad.GroupLasso.__init__
+parsimony.datasets.simulate.grad.L1.__init__
+parsimony.datasets.simulate.grad.L2.__init__
+parsimony.datasets.simulate.grad.L2Squared.__init__
+parsimony.datasets.simulate.grad.NesterovFunction.__init__
+parsimony.datasets.simulate.grad.SmoothedGroupLasso.__init__
+parsimony.datasets.simulate.grad.SmoothedGroupTotalVariation.__init__
+parsimony.datasets.simulate.grad.SmoothedL1.__init__
+parsimony.datasets.simulate.grad.SmoothedTotalVariation.__init__
+parsimony.datasets.simulate.grad.TotalVariation.__init__
+parsimony.datasets.simulate.simulate.LinearRegressionData.__init__
+parsimony.datasets.simulate.utils.ConstantValue.__init__
+parsimony.datasets.simulate.utils.RandomUniform.__init__
+parsimony.datasets.utils.Dimaond.__init__
+parsimony.datasets.utils.Dot.__init__
+parsimony.datasets.utils.ObjImage.__init__
+parsimony.datasets.utils.Square.__init__
+parsimony.estimators.BaseEstimator.__init__
+parsimony.estimators.ElasticNet.__init__
+parsimony.estimators.Lasso.__init__
+parsimony.estimators.LinearRegression.__init__
+parsimony.estimators.LinearRegressionL1L2GL.__init__
+parsimony.estimators.LinearRegressionL1L2TV.__init__
+parsimony.estimators.LinearRegressionL2SmoothedL1TV.__init__
+parsimony.estimators.LogisticRegression.__init__
+parsimony.estimators.LogisticRegressionEstimator.__init__
+parsimony.estimators.LogisticRegressionL1L2GL.__init__
+parsimony.estimators.LogisticRegressionL1L2TV.__init__
+parsimony.estimators.PLSRegression.__init__
+parsimony.estimators.RegressionEstimator.__init__
+parsimony.estimators.RidgeLogisticRegression.__init__
+parsimony.estimators.RidgeRegression.__init__
+parsimony.estimators.SparsePLSRegression.__init__
+parsimony.functions.combinedfunctions.CombinedFunction.__init__
+parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.__init__
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.__init__
+parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.__init__
+parsimony.functions.combinedfunctions.LogisticRegressionL1L2GL.__init__
+parsimony.functions.combinedfunctions.LogisticRegressionL1L2TV.__init__
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.__init__
+parsimony.functions.losses.LatentVariableVariance.__init__
+parsimony.functions.losses.LinearFunction.__init__
+parsimony.functions.losses.LinearRegression.__init__
+parsimony.functions.losses.LogisticRegression.__init__
+parsimony.functions.losses.RidgeLogisticRegression.__init__
+parsimony.functions.losses.RidgeRegression.__init__
+parsimony.functions.multiblock.losses.CombinedMultiblockFunction.__init__
+parsimony.functions.multiblock.losses.GeneralisedMultiblock.__init__
+parsimony.functions.multiblock.losses.LatentVariableCovariance.__init__
+parsimony.functions.multiblock.losses.MultiblockFunctionWrapper.__init__
+parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper.__init__
+parsimony.functions.nesterov.gl.GroupLassoOverlap.__init__
+parsimony.functions.nesterov.grouptv.GroupTotalVariation.__init__
+parsimony.functions.nesterov.l1.L1.__init__
+parsimony.functions.nesterov.l1tv.L1TV.__init__
+parsimony.functions.nesterov.properties.NesterovFunction.__init__
+parsimony.functions.nesterov.tv.TotalVariation.__init__
+parsimony.functions.penalties.L0.__init__
+parsimony.functions.penalties.L1.__init__
+parsimony.functions.penalties.L1L2Squared.__init__
+parsimony.functions.penalties.L2.__init__
+parsimony.functions.penalties.L2Squared.__init__
+parsimony.functions.penalties.LInf.__init__
+parsimony.functions.penalties.QuadraticConstraint.__init__
+parsimony.functions.penalties.RGCCAConstraint.__init__
+parsimony.functions.penalties.SufficientDescentCondition.__init__
+parsimony.functions.penalties.ZeroFunction.__init__
+parsimony.functions.properties.CombinedProjectionOperator.__init__
+parsimony.functions.properties.OR.__init__
+parsimony.utils.start_vectors.BaseStartVector.__init__
+parsimony.utils.start_vectors.IdentityStartVector.__init__
+parsimony.utils.start_vectors.OnesStartVector.__init__
+parsimony.utils.start_vectors.RandomStartVector.__init__
+parsimony.utils.start_vectors.ZerosStartVector.__init__
+parsimony.utils.utils.AnonymousClass.__init__" class="py-name" href="#" onclick="return doclink('link-7', '__init__', 'link-4');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-op">**</tt><tt class="py-name">kwargs</tt><tt class="py-op">)</tt> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line"> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">vector</tt> <tt class="py-op">=</tt> <tt class="py-name">vector</tt> </tt>
+</div><a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line"> </tt>
+<a name="IdentityStartVector.get_vector"></a><div id="IdentityStartVector.get_vector-def"><a name="L74"></a><tt class="py-lineno"> 74</tt> <a class="py-toggle" href="#" id="IdentityStartVector.get_vector-toggle" onclick="return toggle('IdentityStartVector.get_vector');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.start_vectors.IdentityStartVector-class.html#get_vector">get_vector</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-op">*</tt><tt class="py-param">args</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kwargs</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="IdentityStartVector.get_vector-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="IdentityStartVector.get_vector-expanded"><a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line">        <tt class="py-docstring">"""Return the predetermined start vector</tt> </tt>
+<a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line"><tt class="py-docstring">        Examples</tt> </tt>
+<a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line"><tt class="py-docstring">        --------</tt> </tt>
+<a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line"><tt class="py-docstring">        &gt;&gt;&gt; from parsimony.utils.start_vectors import IdentityStartVector</tt> </tt>
+<a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line"><tt class="py-docstring">        &gt;&gt;&gt; start_vector = IdentityStartVector(np.array([[0.5], [2.0], [0.3],</tt> </tt>
+<a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line"><tt class="py-docstring">        ...                                              [1.0]]))</tt> </tt>
+<a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line"><tt class="py-docstring">        &gt;&gt;&gt; start_vector.get_vector()</tt> </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt>  <tt class="py-line"><tt class="py-docstring">        array([[ 0.5],</tt> </tt>
+<a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line"><tt class="py-docstring">               [ 2. ],</tt> </tt>
+<a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line"><tt class="py-docstring">               [ 0.3],</tt> </tt>
+<a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line"><tt class="py-docstring">               [ 1. ]])</tt> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">vector</tt> </tt>
+</div></div><a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line"> </tt>
+<a name="RandomStartVector"></a><div id="RandomStartVector-def"><a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line"> </tt>
+<a name="L91"></a><tt class="py-lineno"> 91</tt> <a class="py-toggle" href="#" id="RandomStartVector-toggle" onclick="return toggle('RandomStartVector');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.utils.start_vectors.RandomStartVector-class.html">RandomStartVector</a><tt class="py-op">(</tt><tt class="py-base-class">BaseStartVector</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RandomStartVector-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="RandomStartVector-expanded"><a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line">    <tt class="py-docstring">"""A start vector of uniformly distributed random values.</tt> </tt>
+<a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line"><tt class="py-docstring">    Parameters</tt> </tt>
+<a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line"><tt class="py-docstring">    ----------</tt> </tt>
+<a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line"><tt class="py-docstring">    normalise : Bool. If True, normalise the randomly created vectors.</tt> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line"><tt class="py-docstring">            Default is True.</tt> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line"><tt class="py-docstring">    seed : Integer or None. The seed to the pseudo-random number generator. If</tt> </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line"><tt class="py-docstring">            none, no seed is used. The seed is set at initialisation, so if the</tt> </tt>
+<a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line"><tt class="py-docstring">            RNG is used in between initialisation and utilisation, then the</tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line"><tt class="py-docstring">            random numbers will change. Default is None.</tt> </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line"><tt class="py-docstring">    limits : List or tuple. A list or tuple with two elements, the lower and</tt> </tt>
+<a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line"><tt class="py-docstring">            upper limits of the uniform distribution. If normalise=True, then</tt> </tt>
+<a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line"><tt class="py-docstring">            these limits may not be honoured. Default is (0.0, 1.0).</tt> </tt>
+<a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line"><tt class="py-docstring">    Examples</tt> </tt>
+<a name="L109"></a><tt class="py-lineno">109</tt>  <tt class="py-line"><tt class="py-docstring">    --------</tt> </tt>
+<a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; from parsimony.utils.start_vectors import RandomStartVector</tt> </tt>
+<a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt;</tt> </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; # Without normalization</tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; start_vector = RandomStartVector(normalise=False, seed=42)</tt> </tt>
+<a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; random = start_vector.get_vector(3)</tt> </tt>
+<a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; print random</tt> </tt>
+<a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line"><tt class="py-docstring">    [[ 0.37454012]</tt> </tt>
+<a name="L117"></a><tt class="py-lineno">117</tt>  <tt class="py-line"><tt class="py-docstring">     [ 0.95071431]</tt> </tt>
+<a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line"><tt class="py-docstring">     [ 0.73199394]]</tt> </tt>
+<a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; print maths.norm(random)</tt> </tt>
+<a name="L120"></a><tt class="py-lineno">120</tt>  <tt class="py-line"><tt class="py-docstring">    1.25696186254</tt> </tt>
+<a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt;</tt> </tt>
+<a name="L122"></a><tt class="py-lineno">122</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; # With normalization</tt> </tt>
+<a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; start_vector_normalized = RandomStartVector(normalise=True, seed=2)</tt> </tt>
+<a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; random_normalized = start_vector_normalized.get_vector(3)</tt> </tt>
+<a name="L125"></a><tt class="py-lineno">125</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; print random_normalized</tt> </tt>
+<a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line"><tt class="py-docstring">    [[ 0.62101956]</tt> </tt>
+<a name="L127"></a><tt class="py-lineno">127</tt>  <tt class="py-line"><tt class="py-docstring">     [ 0.03692864]</tt> </tt>
+<a name="L128"></a><tt class="py-lineno">128</tt>  <tt class="py-line"><tt class="py-docstring">     [ 0.78292463]]</tt> </tt>
+<a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; print maths.norm(random_normalized)</tt> </tt>
+<a name="L130"></a><tt class="py-lineno">130</tt>  <tt class="py-line"><tt class="py-docstring">    1.0</tt> </tt>
+<a name="L131"></a><tt class="py-lineno">131</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt;</tt> </tt>
+<a name="L132"></a><tt class="py-lineno">132</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; # With limits</tt> </tt>
+<a name="L133"></a><tt class="py-lineno">133</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; start_vector_normalized = RandomStartVector(normalise=True, seed=2,</tt> </tt>
+<a name="L134"></a><tt class="py-lineno">134</tt>  <tt class="py-line"><tt class="py-docstring">    ...                                             limits=(-1, 1))</tt> </tt>
+<a name="L135"></a><tt class="py-lineno">135</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; random_limits = start_vector_normalized.get_vector(3)</tt> </tt>
+<a name="L136"></a><tt class="py-lineno">136</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; print random_limits</tt> </tt>
+<a name="L137"></a><tt class="py-lineno">137</tt>  <tt class="py-line"><tt class="py-docstring">    [[-0.1330817 ]</tt> </tt>
+<a name="L138"></a><tt class="py-lineno">138</tt>  <tt class="py-line"><tt class="py-docstring">     [-0.98571123]</tt> </tt>
+<a name="L139"></a><tt class="py-lineno">139</tt>  <tt class="py-line"><tt class="py-docstring">     [ 0.10326001]]</tt> </tt>
+<a name="L140"></a><tt class="py-lineno">140</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; print maths.norm(random_limits)</tt> </tt>
+<a name="L141"></a><tt class="py-lineno">141</tt>  <tt class="py-line"><tt class="py-docstring">    1.0</tt> </tt>
+<a name="L142"></a><tt class="py-lineno">142</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L143"></a><tt class="py-lineno">143</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="RandomStartVector.__init__"></a><div id="RandomStartVector.__init__-def"><a name="L144"></a><tt class="py-lineno">144</tt> <a class="py-toggle" href="#" id="RandomStartVector.__init__-toggle" onclick="return toggle('RandomStartVector.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.start_vectors.RandomStartVector-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">limits</tt><tt class="py-op">=</tt><tt class="py-op">(</tt><tt class="py-number">0.0</tt><tt class="py-op">,</tt> <tt class="py-number">1.0</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kwargs</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RandomStartVector.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="RandomStartVector.__init__-expanded"><a name="L145"></a><tt class="py-lineno">145</tt>  <tt class="py-line"> </tt>
+<a name="L146"></a><tt class="py-lineno">146</tt>  <tt class="py-line">        <tt class="py-name">super</tt><tt class="py-op">(</tt><tt id="link-8" class="py-name" targets="Class parsimony.utils.start_vectors.RandomStartVector=parsimony.utils.start_vectors.RandomStartVector-class.html"><a title="parsimony.utils.start_vectors.RandomStartVector" class="py-name" href="#" onclick="return doclink('link-8', 'RandomStartVector', 'link-8');">RandomStartVector</a></tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt id="link-9" class="py-name"><a title="parsimony.algorithms._explicit.BacktrackingLineSearch.__init__
+parsimony.algorithms._explicit.Bisection.__init__
+parsimony.algorithms._explicit.CONESTA.__init__
+parsimony.algorithms._explicit.DykstrasProjectionAlgorithm.__init__
+parsimony.algorithms._explicit.DynamicCONESTA.__init__
+parsimony.algorithms._explicit.ExcessiveGapMethod.__init__
+parsimony.algorithms._explicit.FISTA.__init__
+parsimony.algorithms._explicit.GradientDescent.__init__
+parsimony.algorithms._explicit.ISTA.__init__
+parsimony.algorithms._explicit.NaiveCONESTA.__init__
+parsimony.algorithms._explicit.NewtonRaphson.__init__
+parsimony.algorithms._explicit.ParallelDykstrasProjectionAlgorithm.__init__
+parsimony.algorithms._explicit.ParallelDykstrasProximalAlgorithm.__init__
+parsimony.algorithms._explicit.StaticCONESTA.__init__
+parsimony.algorithms.bases.InformationAlgorithm.__init__
+parsimony.algorithms.bases.IterativeAlgorithm.__init__
+parsimony.algorithms.gradient.GradientDescent.__init__
+parsimony.algorithms.multiblock.MultiblockCONESTA.__init__
+parsimony.algorithms.multiblock.MultiblockFISTA.__init__
+parsimony.algorithms.nipals.PLSR.__init__
+parsimony.algorithms.nipals.SparsePLSR.__init__
+parsimony.algorithms.primaldual.CONESTA.__init__
+parsimony.algorithms.primaldual.DynamicCONESTA.__init__
+parsimony.algorithms.primaldual.ExcessiveGapMethod.__init__
+parsimony.algorithms.primaldual.NaiveCONESTA.__init__
+parsimony.algorithms.primaldual.StaticCONESTA.__init__
+parsimony.algorithms.proximal.DykstrasProjectionAlgorithm.__init__
+parsimony.algorithms.proximal.DykstrasProximalAlgorithm.__init__
+parsimony.algorithms.proximal.FISTA.__init__
+parsimony.algorithms.proximal.ISTA.__init__
+parsimony.algorithms.proximal.ParallelDykstrasProjectionAlgorithm.__init__
+parsimony.algorithms.proximal.ParallelDykstrasProximalAlgorithm.__init__
+parsimony.algorithms.utils.BacktrackingLineSearch.__init__
+parsimony.algorithms.utils.Bisection.__init__
+parsimony.algorithms.utils.NewtonRaphson.__init__
+parsimony.datasets.simulate.grad.Function.__init__
+parsimony.datasets.simulate.grad.GroupLasso.__init__
+parsimony.datasets.simulate.grad.L1.__init__
+parsimony.datasets.simulate.grad.L2.__init__
+parsimony.datasets.simulate.grad.L2Squared.__init__
+parsimony.datasets.simulate.grad.NesterovFunction.__init__
+parsimony.datasets.simulate.grad.SmoothedGroupLasso.__init__
+parsimony.datasets.simulate.grad.SmoothedGroupTotalVariation.__init__
+parsimony.datasets.simulate.grad.SmoothedL1.__init__
+parsimony.datasets.simulate.grad.SmoothedTotalVariation.__init__
+parsimony.datasets.simulate.grad.TotalVariation.__init__
+parsimony.datasets.simulate.simulate.LinearRegressionData.__init__
+parsimony.datasets.simulate.utils.ConstantValue.__init__
+parsimony.datasets.simulate.utils.RandomUniform.__init__
+parsimony.datasets.utils.Dimaond.__init__
+parsimony.datasets.utils.Dot.__init__
+parsimony.datasets.utils.ObjImage.__init__
+parsimony.datasets.utils.Square.__init__
+parsimony.estimators.BaseEstimator.__init__
+parsimony.estimators.ElasticNet.__init__
+parsimony.estimators.Lasso.__init__
+parsimony.estimators.LinearRegression.__init__
+parsimony.estimators.LinearRegressionL1L2GL.__init__
+parsimony.estimators.LinearRegressionL1L2TV.__init__
+parsimony.estimators.LinearRegressionL2SmoothedL1TV.__init__
+parsimony.estimators.LogisticRegression.__init__
+parsimony.estimators.LogisticRegressionEstimator.__init__
+parsimony.estimators.LogisticRegressionL1L2GL.__init__
+parsimony.estimators.LogisticRegressionL1L2TV.__init__
+parsimony.estimators.PLSRegression.__init__
+parsimony.estimators.RegressionEstimator.__init__
+parsimony.estimators.RidgeLogisticRegression.__init__
+parsimony.estimators.RidgeRegression.__init__
+parsimony.estimators.SparsePLSRegression.__init__
+parsimony.functions.combinedfunctions.CombinedFunction.__init__
+parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.__init__
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.__init__
+parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.__init__
+parsimony.functions.combinedfunctions.LogisticRegressionL1L2GL.__init__
+parsimony.functions.combinedfunctions.LogisticRegressionL1L2TV.__init__
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.__init__
+parsimony.functions.losses.LatentVariableVariance.__init__
+parsimony.functions.losses.LinearFunction.__init__
+parsimony.functions.losses.LinearRegression.__init__
+parsimony.functions.losses.LogisticRegression.__init__
+parsimony.functions.losses.RidgeLogisticRegression.__init__
+parsimony.functions.losses.RidgeRegression.__init__
+parsimony.functions.multiblock.losses.CombinedMultiblockFunction.__init__
+parsimony.functions.multiblock.losses.GeneralisedMultiblock.__init__
+parsimony.functions.multiblock.losses.LatentVariableCovariance.__init__
+parsimony.functions.multiblock.losses.MultiblockFunctionWrapper.__init__
+parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper.__init__
+parsimony.functions.nesterov.gl.GroupLassoOverlap.__init__
+parsimony.functions.nesterov.grouptv.GroupTotalVariation.__init__
+parsimony.functions.nesterov.l1.L1.__init__
+parsimony.functions.nesterov.l1tv.L1TV.__init__
+parsimony.functions.nesterov.properties.NesterovFunction.__init__
+parsimony.functions.nesterov.tv.TotalVariation.__init__
+parsimony.functions.penalties.L0.__init__
+parsimony.functions.penalties.L1.__init__
+parsimony.functions.penalties.L1L2Squared.__init__
+parsimony.functions.penalties.L2.__init__
+parsimony.functions.penalties.L2Squared.__init__
+parsimony.functions.penalties.LInf.__init__
+parsimony.functions.penalties.QuadraticConstraint.__init__
+parsimony.functions.penalties.RGCCAConstraint.__init__
+parsimony.functions.penalties.SufficientDescentCondition.__init__
+parsimony.functions.penalties.ZeroFunction.__init__
+parsimony.functions.properties.CombinedProjectionOperator.__init__
+parsimony.functions.properties.OR.__init__
+parsimony.utils.start_vectors.BaseStartVector.__init__
+parsimony.utils.start_vectors.IdentityStartVector.__init__
+parsimony.utils.start_vectors.OnesStartVector.__init__
+parsimony.utils.start_vectors.RandomStartVector.__init__
+parsimony.utils.start_vectors.ZerosStartVector.__init__
+parsimony.utils.utils.AnonymousClass.__init__" class="py-name" href="#" onclick="return doclink('link-9', '__init__', 'link-4');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-op">**</tt><tt class="py-name">kwargs</tt><tt class="py-op">)</tt> </tt>
+<a name="L147"></a><tt class="py-lineno">147</tt>  <tt class="py-line"> </tt>
+<a name="L148"></a><tt class="py-lineno">148</tt>  <tt class="py-line">        <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">limits</tt> <tt class="py-op">=</tt> <tt class="py-name">limits</tt> </tt>
+</div><a name="L149"></a><tt class="py-lineno">149</tt>  <tt class="py-line"> </tt>
+<a name="RandomStartVector.get_vector"></a><div id="RandomStartVector.get_vector-def"><a name="L150"></a><tt class="py-lineno">150</tt> <a class="py-toggle" href="#" id="RandomStartVector.get_vector-toggle" onclick="return toggle('RandomStartVector.get_vector');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.start_vectors.RandomStartVector-class.html#get_vector">get_vector</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">size</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="RandomStartVector.get_vector-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="RandomStartVector.get_vector-expanded"><a name="L151"></a><tt class="py-lineno">151</tt>  <tt class="py-line">        <tt class="py-docstring">"""Return randomly generated vector of given shape.</tt> </tt>
+<a name="L152"></a><tt class="py-lineno">152</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L153"></a><tt class="py-lineno">153</tt>  <tt class="py-line"><tt class="py-docstring">        Parameters</tt> </tt>
+<a name="L154"></a><tt class="py-lineno">154</tt>  <tt class="py-line"><tt class="py-docstring">        ----------</tt> </tt>
+<a name="L155"></a><tt class="py-lineno">155</tt>  <tt class="py-line"><tt class="py-docstring">        size : Positive integer. Size of the vector to generate. The shape of</tt> </tt>
+<a name="L156"></a><tt class="py-lineno">156</tt>  <tt class="py-line"><tt class="py-docstring">                the output is (size, 1).</tt> </tt>
+<a name="L157"></a><tt class="py-lineno">157</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L158"></a><tt class="py-lineno">158</tt>  <tt class="py-line"><tt class="py-docstring">        Examples</tt> </tt>
+<a name="L159"></a><tt class="py-lineno">159</tt>  <tt class="py-line"><tt class="py-docstring">        --------</tt> </tt>
+<a name="L160"></a><tt class="py-lineno">160</tt>  <tt class="py-line"><tt class="py-docstring">        &gt;&gt;&gt; from parsimony.utils.start_vectors import RandomStartVector</tt> </tt>
+<a name="L161"></a><tt class="py-lineno">161</tt>  <tt class="py-line"><tt class="py-docstring">        &gt;&gt;&gt; start_vector = RandomStartVector(normalise=False, seed=42)</tt> </tt>
+<a name="L162"></a><tt class="py-lineno">162</tt>  <tt class="py-line"><tt class="py-docstring">        &gt;&gt;&gt; random = start_vector.get_vector(3)</tt> </tt>
+<a name="L163"></a><tt class="py-lineno">163</tt>  <tt class="py-line"><tt class="py-docstring">        &gt;&gt;&gt; print random</tt> </tt>
+<a name="L164"></a><tt class="py-lineno">164</tt>  <tt class="py-line"><tt class="py-docstring">        [[ 0.37454012]</tt> </tt>
+<a name="L165"></a><tt class="py-lineno">165</tt>  <tt class="py-line"><tt class="py-docstring">         [ 0.95071431]</tt> </tt>
+<a name="L166"></a><tt class="py-lineno">166</tt>  <tt class="py-line"><tt class="py-docstring">         [ 0.73199394]]</tt> </tt>
+<a name="L167"></a><tt class="py-lineno">167</tt>  <tt class="py-line"><tt class="py-docstring">        &gt;&gt;&gt;</tt> </tt>
+<a name="L168"></a><tt class="py-lineno">168</tt>  <tt class="py-line"><tt class="py-docstring">        &gt;&gt;&gt; start_vector = RandomStartVector(normalise=False, seed=1,</tt> </tt>
+<a name="L169"></a><tt class="py-lineno">169</tt>  <tt class="py-line"><tt class="py-docstring">        ...                                  limits=(-1, 2))</tt> </tt>
+<a name="L170"></a><tt class="py-lineno">170</tt>  <tt class="py-line"><tt class="py-docstring">        &gt;&gt;&gt; random = start_vector.get_vector(3)</tt> </tt>
+<a name="L171"></a><tt class="py-lineno">171</tt>  <tt class="py-line"><tt class="py-docstring">        &gt;&gt;&gt; print random</tt> </tt>
+<a name="L172"></a><tt class="py-lineno">172</tt>  <tt class="py-line"><tt class="py-docstring">        [[ 0.25106601]</tt> </tt>
+<a name="L173"></a><tt class="py-lineno">173</tt>  <tt class="py-line"><tt class="py-docstring">         [ 1.16097348]</tt> </tt>
+<a name="L174"></a><tt class="py-lineno">174</tt>  <tt class="py-line"><tt class="py-docstring">         [-0.99965688]]</tt> </tt>
+<a name="L175"></a><tt class="py-lineno">175</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L176"></a><tt class="py-lineno">176</tt>  <tt class="py-line">        <tt class="py-name">l</tt> <tt class="py-op">=</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">limits</tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L177"></a><tt class="py-lineno">177</tt>  <tt class="py-line">        <tt class="py-name">u</tt> <tt class="py-op">=</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">limits</tt><tt class="py-op">[</tt><tt class="py-number">1</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L178"></a><tt class="py-lineno">178</tt>  <tt class="py-line"> </tt>
+<a name="L179"></a><tt class="py-lineno">179</tt>  <tt class="py-line">        <tt class="py-name">size</tt> <tt class="py-op">=</tt> <tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">size</tt><tt class="py-op">)</tt> </tt>
+<a name="L180"></a><tt class="py-lineno">180</tt>  <tt class="py-line">        <tt class="py-name">vector</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt id="link-10" class="py-name"><a title="parsimony.datasets.simulate.beta.random" class="py-name" href="#" onclick="return doclink('link-10', 'random', 'link-5');">random</a></tt><tt class="py-op">.</tt><tt id="link-11" class="py-name" targets="Method parsimony.datasets.simulate.utils.RandomUniform.rand()=parsimony.datasets.simulate.utils.RandomUniform-class.html#rand"><a title="parsimony.datasets.simulate.utils.RandomUniform.rand" class="py-name" href="#" onclick="return doclink('link-11', 'rand', 'link-11');">rand</a></tt><tt class="py-op">(</tt><tt class="py-name">size</tt><tt class="py-op">,</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt> <tt class="py-op">*</tt> <tt class="py-op">(</tt><tt class="py-name">u</tt> <tt class="py-op">-</tt> <tt class="py-name">l</tt><tt class="py-op">)</tt> <tt class="py-op">+</tt> <tt class="py-name">l</tt>  <tt class="py-comment"># Random vector.</tt> </tt>
+<a name="L181"></a><tt class="py-lineno">181</tt>  <tt class="py-line"> </tt>
+<a name="L182"></a><tt class="py-lineno">182</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">normalise</tt><tt class="py-op">:</tt> </tt>
+<a name="L183"></a><tt class="py-lineno">183</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-name">vector</tt> <tt class="py-op">/</tt> <tt id="link-12" class="py-name"><a title="parsimony.utils.maths" class="py-name" href="#" onclick="return doclink('link-12', 'maths', 'link-0');">maths</a></tt><tt class="py-op">.</tt><tt id="link-13" class="py-name" targets="Function parsimony.utils.maths.norm()=parsimony.utils.maths-module.html#norm"><a title="parsimony.utils.maths.norm" class="py-name" href="#" onclick="return doclink('link-13', 'norm', 'link-13');">norm</a></tt><tt class="py-op">(</tt><tt class="py-name">vector</tt><tt class="py-op">)</tt> </tt>
+<a name="L184"></a><tt class="py-lineno">184</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L185"></a><tt class="py-lineno">185</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-name">vector</tt> </tt>
+</div></div><a name="L186"></a><tt class="py-lineno">186</tt>  <tt class="py-line"> </tt>
+<a name="OnesStartVector"></a><div id="OnesStartVector-def"><a name="L187"></a><tt class="py-lineno">187</tt>  <tt class="py-line"> </tt>
+<a name="L188"></a><tt class="py-lineno">188</tt> <a class="py-toggle" href="#" id="OnesStartVector-toggle" onclick="return toggle('OnesStartVector');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.utils.start_vectors.OnesStartVector-class.html">OnesStartVector</a><tt class="py-op">(</tt><tt class="py-base-class">BaseStartVector</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="OnesStartVector-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="OnesStartVector-expanded"><a name="L189"></a><tt class="py-lineno">189</tt>  <tt class="py-line">    <tt class="py-docstring">"""A start vector of ones.</tt> </tt>
+<a name="L190"></a><tt class="py-lineno">190</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L191"></a><tt class="py-lineno">191</tt>  <tt class="py-line"><tt class="py-docstring">    Parameters</tt> </tt>
+<a name="L192"></a><tt class="py-lineno">192</tt>  <tt class="py-line"><tt class="py-docstring">    ----------</tt> </tt>
+<a name="L193"></a><tt class="py-lineno">193</tt>  <tt class="py-line"><tt class="py-docstring">    normalise : Bool. If True, normalise the randomly created vectors</tt> </tt>
+<a name="L194"></a><tt class="py-lineno">194</tt>  <tt class="py-line"><tt class="py-docstring">            Default is False</tt> </tt>
+<a name="L195"></a><tt class="py-lineno">195</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L196"></a><tt class="py-lineno">196</tt>  <tt class="py-line"><tt class="py-docstring">    Examples</tt> </tt>
+<a name="L197"></a><tt class="py-lineno">197</tt>  <tt class="py-line"><tt class="py-docstring">    --------</tt> </tt>
+<a name="L198"></a><tt class="py-lineno">198</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; from parsimony.utils.start_vectors import OnesStartVector</tt> </tt>
+<a name="L199"></a><tt class="py-lineno">199</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L200"></a><tt class="py-lineno">200</tt>  <tt class="py-line"><tt class="py-docstring">    # Without normalization</tt> </tt>
+<a name="L201"></a><tt class="py-lineno">201</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; start_vector = OnesStartVector(normalise=False)</tt> </tt>
+<a name="L202"></a><tt class="py-lineno">202</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; ones = start_vector.get_vector(3)</tt> </tt>
+<a name="L203"></a><tt class="py-lineno">203</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; print ones</tt> </tt>
+<a name="L204"></a><tt class="py-lineno">204</tt>  <tt class="py-line"><tt class="py-docstring">    [[ 1.]</tt> </tt>
+<a name="L205"></a><tt class="py-lineno">205</tt>  <tt class="py-line"><tt class="py-docstring">     [ 1.]</tt> </tt>
+<a name="L206"></a><tt class="py-lineno">206</tt>  <tt class="py-line"><tt class="py-docstring">     [ 1.]]</tt> </tt>
+<a name="L207"></a><tt class="py-lineno">207</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; print maths.norm(ones)</tt> </tt>
+<a name="L208"></a><tt class="py-lineno">208</tt>  <tt class="py-line"><tt class="py-docstring">    1.73205080757</tt> </tt>
+<a name="L209"></a><tt class="py-lineno">209</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L210"></a><tt class="py-lineno">210</tt>  <tt class="py-line"><tt class="py-docstring">    # With normalization</tt> </tt>
+<a name="L211"></a><tt class="py-lineno">211</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; start_vector_normalized = OnesStartVector(normalise=True)</tt> </tt>
+<a name="L212"></a><tt class="py-lineno">212</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; ones_normalized = start_vector_normalized.get_vector(3)</tt> </tt>
+<a name="L213"></a><tt class="py-lineno">213</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; print ones_normalized</tt> </tt>
+<a name="L214"></a><tt class="py-lineno">214</tt>  <tt class="py-line"><tt class="py-docstring">    [[ 0.57735027]</tt> </tt>
+<a name="L215"></a><tt class="py-lineno">215</tt>  <tt class="py-line"><tt class="py-docstring">     [ 0.57735027]</tt> </tt>
+<a name="L216"></a><tt class="py-lineno">216</tt>  <tt class="py-line"><tt class="py-docstring">     [ 0.57735027]]</tt> </tt>
+<a name="L217"></a><tt class="py-lineno">217</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; print maths.norm(ones_normalized)</tt> </tt>
+<a name="L218"></a><tt class="py-lineno">218</tt>  <tt class="py-line"><tt class="py-docstring">    1.0</tt> </tt>
+<a name="L219"></a><tt class="py-lineno">219</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="OnesStartVector.__init__"></a><div id="OnesStartVector.__init__-def"><a name="L220"></a><tt class="py-lineno">220</tt> <a class="py-toggle" href="#" id="OnesStartVector.__init__-toggle" onclick="return toggle('OnesStartVector.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.start_vectors.OnesStartVector-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">normalise</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kwargs</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="OnesStartVector.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="OnesStartVector.__init__-expanded"><a name="L221"></a><tt class="py-lineno">221</tt>  <tt class="py-line"> </tt>
+<a name="L222"></a><tt class="py-lineno">222</tt>  <tt class="py-line">        <tt class="py-name">super</tt><tt class="py-op">(</tt><tt id="link-14" class="py-name" targets="Class parsimony.utils.start_vectors.OnesStartVector=parsimony.utils.start_vectors.OnesStartVector-class.html"><a title="parsimony.utils.start_vectors.OnesStartVector" class="py-name" href="#" onclick="return doclink('link-14', 'OnesStartVector', 'link-14');">OnesStartVector</a></tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt id="link-15" class="py-name"><a title="parsimony.algorithms._explicit.BacktrackingLineSearch.__init__
+parsimony.algorithms._explicit.Bisection.__init__
+parsimony.algorithms._explicit.CONESTA.__init__
+parsimony.algorithms._explicit.DykstrasProjectionAlgorithm.__init__
+parsimony.algorithms._explicit.DynamicCONESTA.__init__
+parsimony.algorithms._explicit.ExcessiveGapMethod.__init__
+parsimony.algorithms._explicit.FISTA.__init__
+parsimony.algorithms._explicit.GradientDescent.__init__
+parsimony.algorithms._explicit.ISTA.__init__
+parsimony.algorithms._explicit.NaiveCONESTA.__init__
+parsimony.algorithms._explicit.NewtonRaphson.__init__
+parsimony.algorithms._explicit.ParallelDykstrasProjectionAlgorithm.__init__
+parsimony.algorithms._explicit.ParallelDykstrasProximalAlgorithm.__init__
+parsimony.algorithms._explicit.StaticCONESTA.__init__
+parsimony.algorithms.bases.InformationAlgorithm.__init__
+parsimony.algorithms.bases.IterativeAlgorithm.__init__
+parsimony.algorithms.gradient.GradientDescent.__init__
+parsimony.algorithms.multiblock.MultiblockCONESTA.__init__
+parsimony.algorithms.multiblock.MultiblockFISTA.__init__
+parsimony.algorithms.nipals.PLSR.__init__
+parsimony.algorithms.nipals.SparsePLSR.__init__
+parsimony.algorithms.primaldual.CONESTA.__init__
+parsimony.algorithms.primaldual.DynamicCONESTA.__init__
+parsimony.algorithms.primaldual.ExcessiveGapMethod.__init__
+parsimony.algorithms.primaldual.NaiveCONESTA.__init__
+parsimony.algorithms.primaldual.StaticCONESTA.__init__
+parsimony.algorithms.proximal.DykstrasProjectionAlgorithm.__init__
+parsimony.algorithms.proximal.DykstrasProximalAlgorithm.__init__
+parsimony.algorithms.proximal.FISTA.__init__
+parsimony.algorithms.proximal.ISTA.__init__
+parsimony.algorithms.proximal.ParallelDykstrasProjectionAlgorithm.__init__
+parsimony.algorithms.proximal.ParallelDykstrasProximalAlgorithm.__init__
+parsimony.algorithms.utils.BacktrackingLineSearch.__init__
+parsimony.algorithms.utils.Bisection.__init__
+parsimony.algorithms.utils.NewtonRaphson.__init__
+parsimony.datasets.simulate.grad.Function.__init__
+parsimony.datasets.simulate.grad.GroupLasso.__init__
+parsimony.datasets.simulate.grad.L1.__init__
+parsimony.datasets.simulate.grad.L2.__init__
+parsimony.datasets.simulate.grad.L2Squared.__init__
+parsimony.datasets.simulate.grad.NesterovFunction.__init__
+parsimony.datasets.simulate.grad.SmoothedGroupLasso.__init__
+parsimony.datasets.simulate.grad.SmoothedGroupTotalVariation.__init__
+parsimony.datasets.simulate.grad.SmoothedL1.__init__
+parsimony.datasets.simulate.grad.SmoothedTotalVariation.__init__
+parsimony.datasets.simulate.grad.TotalVariation.__init__
+parsimony.datasets.simulate.simulate.LinearRegressionData.__init__
+parsimony.datasets.simulate.utils.ConstantValue.__init__
+parsimony.datasets.simulate.utils.RandomUniform.__init__
+parsimony.datasets.utils.Dimaond.__init__
+parsimony.datasets.utils.Dot.__init__
+parsimony.datasets.utils.ObjImage.__init__
+parsimony.datasets.utils.Square.__init__
+parsimony.estimators.BaseEstimator.__init__
+parsimony.estimators.ElasticNet.__init__
+parsimony.estimators.Lasso.__init__
+parsimony.estimators.LinearRegression.__init__
+parsimony.estimators.LinearRegressionL1L2GL.__init__
+parsimony.estimators.LinearRegressionL1L2TV.__init__
+parsimony.estimators.LinearRegressionL2SmoothedL1TV.__init__
+parsimony.estimators.LogisticRegression.__init__
+parsimony.estimators.LogisticRegressionEstimator.__init__
+parsimony.estimators.LogisticRegressionL1L2GL.__init__
+parsimony.estimators.LogisticRegressionL1L2TV.__init__
+parsimony.estimators.PLSRegression.__init__
+parsimony.estimators.RegressionEstimator.__init__
+parsimony.estimators.RidgeLogisticRegression.__init__
+parsimony.estimators.RidgeRegression.__init__
+parsimony.estimators.SparsePLSRegression.__init__
+parsimony.functions.combinedfunctions.CombinedFunction.__init__
+parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.__init__
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.__init__
+parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.__init__
+parsimony.functions.combinedfunctions.LogisticRegressionL1L2GL.__init__
+parsimony.functions.combinedfunctions.LogisticRegressionL1L2TV.__init__
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.__init__
+parsimony.functions.losses.LatentVariableVariance.__init__
+parsimony.functions.losses.LinearFunction.__init__
+parsimony.functions.losses.LinearRegression.__init__
+parsimony.functions.losses.LogisticRegression.__init__
+parsimony.functions.losses.RidgeLogisticRegression.__init__
+parsimony.functions.losses.RidgeRegression.__init__
+parsimony.functions.multiblock.losses.CombinedMultiblockFunction.__init__
+parsimony.functions.multiblock.losses.GeneralisedMultiblock.__init__
+parsimony.functions.multiblock.losses.LatentVariableCovariance.__init__
+parsimony.functions.multiblock.losses.MultiblockFunctionWrapper.__init__
+parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper.__init__
+parsimony.functions.nesterov.gl.GroupLassoOverlap.__init__
+parsimony.functions.nesterov.grouptv.GroupTotalVariation.__init__
+parsimony.functions.nesterov.l1.L1.__init__
+parsimony.functions.nesterov.l1tv.L1TV.__init__
+parsimony.functions.nesterov.properties.NesterovFunction.__init__
+parsimony.functions.nesterov.tv.TotalVariation.__init__
+parsimony.functions.penalties.L0.__init__
+parsimony.functions.penalties.L1.__init__
+parsimony.functions.penalties.L1L2Squared.__init__
+parsimony.functions.penalties.L2.__init__
+parsimony.functions.penalties.L2Squared.__init__
+parsimony.functions.penalties.LInf.__init__
+parsimony.functions.penalties.QuadraticConstraint.__init__
+parsimony.functions.penalties.RGCCAConstraint.__init__
+parsimony.functions.penalties.SufficientDescentCondition.__init__
+parsimony.functions.penalties.ZeroFunction.__init__
+parsimony.functions.properties.CombinedProjectionOperator.__init__
+parsimony.functions.properties.OR.__init__
+parsimony.utils.start_vectors.BaseStartVector.__init__
+parsimony.utils.start_vectors.IdentityStartVector.__init__
+parsimony.utils.start_vectors.OnesStartVector.__init__
+parsimony.utils.start_vectors.RandomStartVector.__init__
+parsimony.utils.start_vectors.ZerosStartVector.__init__
+parsimony.utils.utils.AnonymousClass.__init__" class="py-name" href="#" onclick="return doclink('link-15', '__init__', 'link-4');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">normalise</tt><tt class="py-op">=</tt><tt class="py-name">normalise</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-name">kwargs</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L223"></a><tt class="py-lineno">223</tt>  <tt class="py-line"> </tt>
+<a name="OnesStartVector.get_vector"></a><div id="OnesStartVector.get_vector-def"><a name="L224"></a><tt class="py-lineno">224</tt> <a class="py-toggle" href="#" id="OnesStartVector.get_vector-toggle" onclick="return toggle('OnesStartVector.get_vector');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.start_vectors.OnesStartVector-class.html#get_vector">get_vector</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">size</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="OnesStartVector.get_vector-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="OnesStartVector.get_vector-expanded"><a name="L225"></a><tt class="py-lineno">225</tt>  <tt class="py-line">        <tt class="py-docstring">"""Return vector of ones of chosen shape</tt> </tt>
+<a name="L226"></a><tt class="py-lineno">226</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L227"></a><tt class="py-lineno">227</tt>  <tt class="py-line"><tt class="py-docstring">        Parameters</tt> </tt>
+<a name="L228"></a><tt class="py-lineno">228</tt>  <tt class="py-line"><tt class="py-docstring">        ----------</tt> </tt>
+<a name="L229"></a><tt class="py-lineno">229</tt>  <tt class="py-line"><tt class="py-docstring">        size : Positive integer. Size of the vector to generate. The shape of</tt> </tt>
+<a name="L230"></a><tt class="py-lineno">230</tt>  <tt class="py-line"><tt class="py-docstring">                the output is (size, 1).</tt> </tt>
+<a name="L231"></a><tt class="py-lineno">231</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L232"></a><tt class="py-lineno">232</tt>  <tt class="py-line"><tt class="py-docstring">        Examples</tt> </tt>
+<a name="L233"></a><tt class="py-lineno">233</tt>  <tt class="py-line"><tt class="py-docstring">        --------</tt> </tt>
+<a name="L234"></a><tt class="py-lineno">234</tt>  <tt class="py-line"><tt class="py-docstring">        &gt;&gt;&gt; from parsimony.utils.start_vectors import OnesStartVector</tt> </tt>
+<a name="L235"></a><tt class="py-lineno">235</tt>  <tt class="py-line"><tt class="py-docstring">        &gt;&gt;&gt; start_vector = OnesStartVector()</tt> </tt>
+<a name="L236"></a><tt class="py-lineno">236</tt>  <tt class="py-line"><tt class="py-docstring">        &gt;&gt;&gt; ones = start_vector.get_vector(3)</tt> </tt>
+<a name="L237"></a><tt class="py-lineno">237</tt>  <tt class="py-line"><tt class="py-docstring">        &gt;&gt;&gt; print ones</tt> </tt>
+<a name="L238"></a><tt class="py-lineno">238</tt>  <tt class="py-line"><tt class="py-docstring">        [[ 1.]</tt> </tt>
+<a name="L239"></a><tt class="py-lineno">239</tt>  <tt class="py-line"><tt class="py-docstring">         [ 1.]</tt> </tt>
+<a name="L240"></a><tt class="py-lineno">240</tt>  <tt class="py-line"><tt class="py-docstring">         [ 1.]]</tt> </tt>
+<a name="L241"></a><tt class="py-lineno">241</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L242"></a><tt class="py-lineno">242</tt>  <tt class="py-line">        <tt class="py-name">size</tt> <tt class="py-op">=</tt> <tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">size</tt><tt class="py-op">)</tt> </tt>
+<a name="L243"></a><tt class="py-lineno">243</tt>  <tt class="py-line">        <tt class="py-name">vector</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">ones</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">size</tt><tt class="py-op">,</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">)</tt>  <tt class="py-comment"># Using a vector of ones.</tt> </tt>
+<a name="L244"></a><tt class="py-lineno">244</tt>  <tt class="py-line"> </tt>
+<a name="L245"></a><tt class="py-lineno">245</tt>  <tt class="py-line">        <tt class="py-keyword">if</tt> <tt class="py-name">self</tt><tt class="py-op">.</tt><tt class="py-name">normalise</tt><tt class="py-op">:</tt> </tt>
+<a name="L246"></a><tt class="py-lineno">246</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-name">vector</tt> <tt class="py-op">/</tt> <tt id="link-16" class="py-name"><a title="parsimony.utils.maths" class="py-name" href="#" onclick="return doclink('link-16', 'maths', 'link-0');">maths</a></tt><tt class="py-op">.</tt><tt id="link-17" class="py-name"><a title="parsimony.utils.maths.norm" class="py-name" href="#" onclick="return doclink('link-17', 'norm', 'link-13');">norm</a></tt><tt class="py-op">(</tt><tt class="py-name">vector</tt><tt class="py-op">)</tt> </tt>
+<a name="L247"></a><tt class="py-lineno">247</tt>  <tt class="py-line">        <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L248"></a><tt class="py-lineno">248</tt>  <tt class="py-line">            <tt class="py-keyword">return</tt> <tt class="py-name">vector</tt> </tt>
+</div></div><a name="L249"></a><tt class="py-lineno">249</tt>  <tt class="py-line"> </tt>
+<a name="ZerosStartVector"></a><div id="ZerosStartVector-def"><a name="L250"></a><tt class="py-lineno">250</tt>  <tt class="py-line"> </tt>
+<a name="L251"></a><tt class="py-lineno">251</tt> <a class="py-toggle" href="#" id="ZerosStartVector-toggle" onclick="return toggle('ZerosStartVector');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="parsimony.utils.start_vectors.ZerosStartVector-class.html">ZerosStartVector</a><tt class="py-op">(</tt><tt class="py-base-class">BaseStartVector</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ZerosStartVector-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="ZerosStartVector-expanded"><a name="L252"></a><tt class="py-lineno">252</tt>  <tt class="py-line">    <tt class="py-docstring">"""A start vector of zeros.</tt> </tt>
+<a name="L253"></a><tt class="py-lineno">253</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L254"></a><tt class="py-lineno">254</tt>  <tt class="py-line"><tt class="py-docstring">    Use with care! Be aware that using this in algorithms that are not aware</tt> </tt>
+<a name="L255"></a><tt class="py-lineno">255</tt>  <tt class="py-line"><tt class="py-docstring">    may result in division by zero since the norm of this start vector is 0.</tt> </tt>
+<a name="L256"></a><tt class="py-lineno">256</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L257"></a><tt class="py-lineno">257</tt>  <tt class="py-line"><tt class="py-docstring">    Examples</tt> </tt>
+<a name="L258"></a><tt class="py-lineno">258</tt>  <tt class="py-line"><tt class="py-docstring">    --------</tt> </tt>
+<a name="L259"></a><tt class="py-lineno">259</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; from parsimony.utils.start_vectors import ZerosStartVector</tt> </tt>
+<a name="L260"></a><tt class="py-lineno">260</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; start_vector = ZerosStartVector()</tt> </tt>
+<a name="L261"></a><tt class="py-lineno">261</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; zeros = start_vector.get_vector(3)</tt> </tt>
+<a name="L262"></a><tt class="py-lineno">262</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; print zeros</tt> </tt>
+<a name="L263"></a><tt class="py-lineno">263</tt>  <tt class="py-line"><tt class="py-docstring">    [[ 0.]</tt> </tt>
+<a name="L264"></a><tt class="py-lineno">264</tt>  <tt class="py-line"><tt class="py-docstring">     [ 0.]</tt> </tt>
+<a name="L265"></a><tt class="py-lineno">265</tt>  <tt class="py-line"><tt class="py-docstring">     [ 0.]]</tt> </tt>
+<a name="L266"></a><tt class="py-lineno">266</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="ZerosStartVector.__init__"></a><div id="ZerosStartVector.__init__-def"><a name="L267"></a><tt class="py-lineno">267</tt> <a class="py-toggle" href="#" id="ZerosStartVector.__init__-toggle" onclick="return toggle('ZerosStartVector.__init__');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.start_vectors.ZerosStartVector-class.html#__init__">__init__</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-param">kwargs</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ZerosStartVector.__init__-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="ZerosStartVector.__init__-expanded"><a name="L268"></a><tt class="py-lineno">268</tt>  <tt class="py-line"> </tt>
+<a name="L269"></a><tt class="py-lineno">269</tt>  <tt class="py-line">        <tt class="py-name">kwargs</tt><tt class="py-op">.</tt><tt class="py-name">pop</tt><tt class="py-op">(</tt><tt class="py-string">'normalise'</tt><tt class="py-op">,</tt> <tt class="py-name">False</tt><tt class="py-op">)</tt>  <tt class="py-comment"># We do not care about this argument.</tt> </tt>
+<a name="L270"></a><tt class="py-lineno">270</tt>  <tt class="py-line"> </tt>
+<a name="L271"></a><tt class="py-lineno">271</tt>  <tt class="py-line">        <tt class="py-name">super</tt><tt class="py-op">(</tt><tt id="link-18" class="py-name" targets="Class parsimony.utils.start_vectors.ZerosStartVector=parsimony.utils.start_vectors.ZerosStartVector-class.html"><a title="parsimony.utils.start_vectors.ZerosStartVector" class="py-name" href="#" onclick="return doclink('link-18', 'ZerosStartVector', 'link-18');">ZerosStartVector</a></tt><tt class="py-op">,</tt> <tt class="py-name">self</tt><tt class="py-op">)</tt><tt class="py-op">.</tt><tt id="link-19" class="py-name"><a title="parsimony.algorithms._explicit.BacktrackingLineSearch.__init__
+parsimony.algorithms._explicit.Bisection.__init__
+parsimony.algorithms._explicit.CONESTA.__init__
+parsimony.algorithms._explicit.DykstrasProjectionAlgorithm.__init__
+parsimony.algorithms._explicit.DynamicCONESTA.__init__
+parsimony.algorithms._explicit.ExcessiveGapMethod.__init__
+parsimony.algorithms._explicit.FISTA.__init__
+parsimony.algorithms._explicit.GradientDescent.__init__
+parsimony.algorithms._explicit.ISTA.__init__
+parsimony.algorithms._explicit.NaiveCONESTA.__init__
+parsimony.algorithms._explicit.NewtonRaphson.__init__
+parsimony.algorithms._explicit.ParallelDykstrasProjectionAlgorithm.__init__
+parsimony.algorithms._explicit.ParallelDykstrasProximalAlgorithm.__init__
+parsimony.algorithms._explicit.StaticCONESTA.__init__
+parsimony.algorithms.bases.InformationAlgorithm.__init__
+parsimony.algorithms.bases.IterativeAlgorithm.__init__
+parsimony.algorithms.gradient.GradientDescent.__init__
+parsimony.algorithms.multiblock.MultiblockCONESTA.__init__
+parsimony.algorithms.multiblock.MultiblockFISTA.__init__
+parsimony.algorithms.nipals.PLSR.__init__
+parsimony.algorithms.nipals.SparsePLSR.__init__
+parsimony.algorithms.primaldual.CONESTA.__init__
+parsimony.algorithms.primaldual.DynamicCONESTA.__init__
+parsimony.algorithms.primaldual.ExcessiveGapMethod.__init__
+parsimony.algorithms.primaldual.NaiveCONESTA.__init__
+parsimony.algorithms.primaldual.StaticCONESTA.__init__
+parsimony.algorithms.proximal.DykstrasProjectionAlgorithm.__init__
+parsimony.algorithms.proximal.DykstrasProximalAlgorithm.__init__
+parsimony.algorithms.proximal.FISTA.__init__
+parsimony.algorithms.proximal.ISTA.__init__
+parsimony.algorithms.proximal.ParallelDykstrasProjectionAlgorithm.__init__
+parsimony.algorithms.proximal.ParallelDykstrasProximalAlgorithm.__init__
+parsimony.algorithms.utils.BacktrackingLineSearch.__init__
+parsimony.algorithms.utils.Bisection.__init__
+parsimony.algorithms.utils.NewtonRaphson.__init__
+parsimony.datasets.simulate.grad.Function.__init__
+parsimony.datasets.simulate.grad.GroupLasso.__init__
+parsimony.datasets.simulate.grad.L1.__init__
+parsimony.datasets.simulate.grad.L2.__init__
+parsimony.datasets.simulate.grad.L2Squared.__init__
+parsimony.datasets.simulate.grad.NesterovFunction.__init__
+parsimony.datasets.simulate.grad.SmoothedGroupLasso.__init__
+parsimony.datasets.simulate.grad.SmoothedGroupTotalVariation.__init__
+parsimony.datasets.simulate.grad.SmoothedL1.__init__
+parsimony.datasets.simulate.grad.SmoothedTotalVariation.__init__
+parsimony.datasets.simulate.grad.TotalVariation.__init__
+parsimony.datasets.simulate.simulate.LinearRegressionData.__init__
+parsimony.datasets.simulate.utils.ConstantValue.__init__
+parsimony.datasets.simulate.utils.RandomUniform.__init__
+parsimony.datasets.utils.Dimaond.__init__
+parsimony.datasets.utils.Dot.__init__
+parsimony.datasets.utils.ObjImage.__init__
+parsimony.datasets.utils.Square.__init__
+parsimony.estimators.BaseEstimator.__init__
+parsimony.estimators.ElasticNet.__init__
+parsimony.estimators.Lasso.__init__
+parsimony.estimators.LinearRegression.__init__
+parsimony.estimators.LinearRegressionL1L2GL.__init__
+parsimony.estimators.LinearRegressionL1L2TV.__init__
+parsimony.estimators.LinearRegressionL2SmoothedL1TV.__init__
+parsimony.estimators.LogisticRegression.__init__
+parsimony.estimators.LogisticRegressionEstimator.__init__
+parsimony.estimators.LogisticRegressionL1L2GL.__init__
+parsimony.estimators.LogisticRegressionL1L2TV.__init__
+parsimony.estimators.PLSRegression.__init__
+parsimony.estimators.RegressionEstimator.__init__
+parsimony.estimators.RidgeLogisticRegression.__init__
+parsimony.estimators.RidgeRegression.__init__
+parsimony.estimators.SparsePLSRegression.__init__
+parsimony.functions.combinedfunctions.CombinedFunction.__init__
+parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.__init__
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.__init__
+parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.__init__
+parsimony.functions.combinedfunctions.LogisticRegressionL1L2GL.__init__
+parsimony.functions.combinedfunctions.LogisticRegressionL1L2TV.__init__
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.__init__
+parsimony.functions.losses.LatentVariableVariance.__init__
+parsimony.functions.losses.LinearFunction.__init__
+parsimony.functions.losses.LinearRegression.__init__
+parsimony.functions.losses.LogisticRegression.__init__
+parsimony.functions.losses.RidgeLogisticRegression.__init__
+parsimony.functions.losses.RidgeRegression.__init__
+parsimony.functions.multiblock.losses.CombinedMultiblockFunction.__init__
+parsimony.functions.multiblock.losses.GeneralisedMultiblock.__init__
+parsimony.functions.multiblock.losses.LatentVariableCovariance.__init__
+parsimony.functions.multiblock.losses.MultiblockFunctionWrapper.__init__
+parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper.__init__
+parsimony.functions.nesterov.gl.GroupLassoOverlap.__init__
+parsimony.functions.nesterov.grouptv.GroupTotalVariation.__init__
+parsimony.functions.nesterov.l1.L1.__init__
+parsimony.functions.nesterov.l1tv.L1TV.__init__
+parsimony.functions.nesterov.properties.NesterovFunction.__init__
+parsimony.functions.nesterov.tv.TotalVariation.__init__
+parsimony.functions.penalties.L0.__init__
+parsimony.functions.penalties.L1.__init__
+parsimony.functions.penalties.L1L2Squared.__init__
+parsimony.functions.penalties.L2.__init__
+parsimony.functions.penalties.L2Squared.__init__
+parsimony.functions.penalties.LInf.__init__
+parsimony.functions.penalties.QuadraticConstraint.__init__
+parsimony.functions.penalties.RGCCAConstraint.__init__
+parsimony.functions.penalties.SufficientDescentCondition.__init__
+parsimony.functions.penalties.ZeroFunction.__init__
+parsimony.functions.properties.CombinedProjectionOperator.__init__
+parsimony.functions.properties.OR.__init__
+parsimony.utils.start_vectors.BaseStartVector.__init__
+parsimony.utils.start_vectors.IdentityStartVector.__init__
+parsimony.utils.start_vectors.OnesStartVector.__init__
+parsimony.utils.start_vectors.RandomStartVector.__init__
+parsimony.utils.start_vectors.ZerosStartVector.__init__
+parsimony.utils.utils.AnonymousClass.__init__" class="py-name" href="#" onclick="return doclink('link-19', '__init__', 'link-4');">__init__</a></tt><tt class="py-op">(</tt><tt class="py-name">normalise</tt><tt class="py-op">=</tt><tt class="py-name">False</tt><tt class="py-op">,</tt> <tt class="py-op">**</tt><tt class="py-name">kwargs</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L272"></a><tt class="py-lineno">272</tt>  <tt class="py-line"> </tt>
+<a name="ZerosStartVector.get_vector"></a><div id="ZerosStartVector.get_vector-def"><a name="L273"></a><tt class="py-lineno">273</tt> <a class="py-toggle" href="#" id="ZerosStartVector.get_vector-toggle" onclick="return toggle('ZerosStartVector.get_vector');">-</a><tt class="py-line">    <tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.start_vectors.ZerosStartVector-class.html#get_vector">get_vector</a><tt class="py-op">(</tt><tt class="py-param">self</tt><tt class="py-op">,</tt> <tt class="py-param">size</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ZerosStartVector.get_vector-collapsed" style="display:none;" pad="+++" indent="++++++++"></div><div id="ZerosStartVector.get_vector-expanded"><a name="L274"></a><tt class="py-lineno">274</tt>  <tt class="py-line">        <tt class="py-docstring">"""Return vector of zeros of chosen shape.</tt> </tt>
+<a name="L275"></a><tt class="py-lineno">275</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L276"></a><tt class="py-lineno">276</tt>  <tt class="py-line"><tt class="py-docstring">        Parameters</tt> </tt>
+<a name="L277"></a><tt class="py-lineno">277</tt>  <tt class="py-line"><tt class="py-docstring">        ----------</tt> </tt>
+<a name="L278"></a><tt class="py-lineno">278</tt>  <tt class="py-line"><tt class="py-docstring">        size : Positive integer. Size of the vector to generate. The shape of</tt> </tt>
+<a name="L279"></a><tt class="py-lineno">279</tt>  <tt class="py-line"><tt class="py-docstring">                the output is (size, 1).</tt> </tt>
+<a name="L280"></a><tt class="py-lineno">280</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L281"></a><tt class="py-lineno">281</tt>  <tt class="py-line"><tt class="py-docstring">        Examples</tt> </tt>
+<a name="L282"></a><tt class="py-lineno">282</tt>  <tt class="py-line"><tt class="py-docstring">        --------</tt> </tt>
+<a name="L283"></a><tt class="py-lineno">283</tt>  <tt class="py-line"><tt class="py-docstring">        &gt;&gt;&gt; from parsimony.utils.start_vectors import ZerosStartVector</tt> </tt>
+<a name="L284"></a><tt class="py-lineno">284</tt>  <tt class="py-line"><tt class="py-docstring">        &gt;&gt;&gt; start_vector = ZerosStartVector()</tt> </tt>
+<a name="L285"></a><tt class="py-lineno">285</tt>  <tt class="py-line"><tt class="py-docstring">        &gt;&gt;&gt; zeros = start_vector.get_vector(3)</tt> </tt>
+<a name="L286"></a><tt class="py-lineno">286</tt>  <tt class="py-line"><tt class="py-docstring">        &gt;&gt;&gt; print zeros</tt> </tt>
+<a name="L287"></a><tt class="py-lineno">287</tt>  <tt class="py-line"><tt class="py-docstring">        [[ 0.]</tt> </tt>
+<a name="L288"></a><tt class="py-lineno">288</tt>  <tt class="py-line"><tt class="py-docstring">         [ 0.]</tt> </tt>
+<a name="L289"></a><tt class="py-lineno">289</tt>  <tt class="py-line"><tt class="py-docstring">         [ 0.]]</tt> </tt>
+<a name="L290"></a><tt class="py-lineno">290</tt>  <tt class="py-line"><tt class="py-docstring">        """</tt> </tt>
+<a name="L291"></a><tt class="py-lineno">291</tt>  <tt class="py-line">        <tt class="py-name">size</tt> <tt class="py-op">=</tt> <tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">size</tt><tt class="py-op">)</tt> </tt>
+<a name="L292"></a><tt class="py-lineno">292</tt>  <tt class="py-line">        <tt class="py-name">w</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">zeros</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">size</tt><tt class="py-op">,</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">)</tt>  <tt class="py-comment"># Using a vector of zeros.</tt> </tt>
+<a name="L293"></a><tt class="py-lineno">293</tt>  <tt class="py-line"> </tt>
+<a name="L294"></a><tt class="py-lineno">294</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">w</tt> </tt>
+</div></div><a name="L295"></a><tt class="py-lineno">295</tt>  <tt class="py-line"> </tt>
+<a name="L296"></a><tt class="py-lineno">296</tt>  <tt class="py-line"> </tt>
+<a name="L297"></a><tt class="py-lineno">297</tt>  <tt class="py-line"><tt class="py-comment">#class LargestStartVector(BaseStartVector):</tt> </tt>
+<a name="L298"></a><tt class="py-lineno">298</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L299"></a><tt class="py-lineno">299</tt>  <tt class="py-line"><tt class="py-comment">#    def __init__(self, normalise=True, **kwargs):</tt> </tt>
+<a name="L300"></a><tt class="py-lineno">300</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L301"></a><tt class="py-lineno">301</tt>  <tt class="py-line"><tt class="py-comment">#        super(LargestStartVector, self).__init__(normalise=normalise, **kwargs)</tt> </tt>
+<a name="L302"></a><tt class="py-lineno">302</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L303"></a><tt class="py-lineno">303</tt>  <tt class="py-line"><tt class="py-comment">#    def get_vector(self, X, axis=1):</tt> </tt>
+<a name="L304"></a><tt class="py-lineno">304</tt>  <tt class="py-line"><tt class="py-comment">#        if X == None:</tt> </tt>
+<a name="L305"></a><tt class="py-lineno">305</tt>  <tt class="py-line"><tt class="py-comment">#            raise ValueError('A matrix X must be must be given.')</tt> </tt>
+<a name="L306"></a><tt class="py-lineno">306</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L307"></a><tt class="py-lineno">307</tt>  <tt class="py-line"><tt class="py-comment">#        idx = np.argmax(np.sum(X ** 2.0, axis=axis))</tt> </tt>
+<a name="L308"></a><tt class="py-lineno">308</tt>  <tt class="py-line"><tt class="py-comment">#        if axis == 0:</tt> </tt>
+<a name="L309"></a><tt class="py-lineno">309</tt>  <tt class="py-line"><tt class="py-comment">#            w = X[:, [idx]]  # Using column with largest sum of squares</tt> </tt>
+<a name="L310"></a><tt class="py-lineno">310</tt>  <tt class="py-line"><tt class="py-comment">#        else:</tt> </tt>
+<a name="L311"></a><tt class="py-lineno">311</tt>  <tt class="py-line"><tt class="py-comment">#            w = X[[idx], :].T  # Using row with largest sum of squares</tt> </tt>
+<a name="L312"></a><tt class="py-lineno">312</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L313"></a><tt class="py-lineno">313</tt>  <tt class="py-line"><tt class="py-comment">#        if self.normalise:</tt> </tt>
+<a name="L314"></a><tt class="py-lineno">314</tt>  <tt class="py-line"><tt class="py-comment">#            return w / norm(w)</tt> </tt>
+<a name="L315"></a><tt class="py-lineno">315</tt>  <tt class="py-line"><tt class="py-comment">#        else:</tt> </tt>
+<a name="L316"></a><tt class="py-lineno">316</tt>  <tt class="py-line"><tt class="py-comment">#            return w</tt> </tt>
+<a name="L317"></a><tt class="py-lineno">317</tt>  <tt class="py-line"> </tt>
+<a name="L318"></a><tt class="py-lineno">318</tt>  <tt class="py-line"> </tt>
+<a name="L319"></a><tt class="py-lineno">319</tt>  <tt class="py-line"><tt class="py-comment">#class GaussianCurveVector(BaseStartVector):</tt> </tt>
+<a name="L320"></a><tt class="py-lineno">320</tt>  <tt class="py-line"><tt class="py-comment">#    """A start vector with the shape of a Gaussian curve.</tt> </tt>
+<a name="L321"></a><tt class="py-lineno">321</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L322"></a><tt class="py-lineno">322</tt>  <tt class="py-line"><tt class="py-comment">#    The gaussian is computed with respect to the numbers of dimension in a</tt> </tt>
+<a name="L323"></a><tt class="py-lineno">323</tt>  <tt class="py-line"><tt class="py-comment">#    supposed image. The output is thus a reshaped vector corresponsing to a 1-,</tt> </tt>
+<a name="L324"></a><tt class="py-lineno">324</tt>  <tt class="py-line"><tt class="py-comment">#    2-, 3- or higher-dimensional Gaussian curve.</tt> </tt>
+<a name="L325"></a><tt class="py-lineno">325</tt>  <tt class="py-line"><tt class="py-comment">#    """</tt> </tt>
+<a name="L326"></a><tt class="py-lineno">326</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L327"></a><tt class="py-lineno">327</tt>  <tt class="py-line"><tt class="py-comment">#    def __init__(self, **kwargs):</tt> </tt>
+<a name="L328"></a><tt class="py-lineno">328</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L329"></a><tt class="py-lineno">329</tt>  <tt class="py-line"><tt class="py-comment">#        super(GaussianCurveVector, self).__init__(**kwargs)</tt> </tt>
+<a name="L330"></a><tt class="py-lineno">330</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L331"></a><tt class="py-lineno">331</tt>  <tt class="py-line"><tt class="py-comment">#    def get_vector(self, shape=None, size=None, mean=None, cov=None, dims=2):</tt> </tt>
+<a name="L332"></a><tt class="py-lineno">332</tt>  <tt class="py-line"><tt class="py-comment">#        """ Computes a Gaussian curve-shaped starting vector.</tt> </tt>
+<a name="L333"></a><tt class="py-lineno">333</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L334"></a><tt class="py-lineno">334</tt>  <tt class="py-line"><tt class="py-comment">#        Parameters:</tt> </tt>
+<a name="L335"></a><tt class="py-lineno">335</tt>  <tt class="py-line"><tt class="py-comment">#        shape : A tuple. The shape of the start vector.</tt> </tt>
+<a name="L336"></a><tt class="py-lineno">336</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L337"></a><tt class="py-lineno">337</tt>  <tt class="py-line"><tt class="py-comment">#        size : A tuple. The size of the supposed image. Must have the form (Z,</tt> </tt>
+<a name="L338"></a><tt class="py-lineno">338</tt>  <tt class="py-line"><tt class="py-comment">#                Y, X).</tt> </tt>
+<a name="L339"></a><tt class="py-lineno">339</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L340"></a><tt class="py-lineno">340</tt>  <tt class="py-line"><tt class="py-comment">#        mean : A numpy array. The mean vector of the Gaussian. Default is zero.</tt> </tt>
+<a name="L341"></a><tt class="py-lineno">341</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L342"></a><tt class="py-lineno">342</tt>  <tt class="py-line"><tt class="py-comment">#        cov : A numpy array. The covariance matrix of the Gaussian. Default is</tt> </tt>
+<a name="L343"></a><tt class="py-lineno">343</tt>  <tt class="py-line"><tt class="py-comment">#                the identity.</tt> </tt>
+<a name="L344"></a><tt class="py-lineno">344</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L345"></a><tt class="py-lineno">345</tt>  <tt class="py-line"><tt class="py-comment">#        dims : A scalar. The number of dimensions of the output image. Default</tt> </tt>
+<a name="L346"></a><tt class="py-lineno">346</tt>  <tt class="py-line"><tt class="py-comment">#                is 2.</tt> </tt>
+<a name="L347"></a><tt class="py-lineno">347</tt>  <tt class="py-line"><tt class="py-comment">#        """</tt> </tt>
+<a name="L348"></a><tt class="py-lineno">348</tt>  <tt class="py-line"><tt class="py-comment">#        if size != None:</tt> </tt>
+<a name="L349"></a><tt class="py-lineno">349</tt>  <tt class="py-line"><tt class="py-comment">#            p = 1</tt> </tt>
+<a name="L350"></a><tt class="py-lineno">350</tt>  <tt class="py-line"><tt class="py-comment">#            for i in xrange(dims):</tt> </tt>
+<a name="L351"></a><tt class="py-lineno">351</tt>  <tt class="py-line"><tt class="py-comment">#                p *= size[i]</tt> </tt>
+<a name="L352"></a><tt class="py-lineno">352</tt>  <tt class="py-line"><tt class="py-comment">#            if axis == 1:</tt> </tt>
+<a name="L353"></a><tt class="py-lineno">353</tt>  <tt class="py-line"><tt class="py-comment">#                shape = (p, 1)</tt> </tt>
+<a name="L354"></a><tt class="py-lineno">354</tt>  <tt class="py-line"><tt class="py-comment">#            else:</tt> </tt>
+<a name="L355"></a><tt class="py-lineno">355</tt>  <tt class="py-line"><tt class="py-comment">#                shape = (1, p)</tt> </tt>
+<a name="L356"></a><tt class="py-lineno">356</tt>  <tt class="py-line"><tt class="py-comment">#        else:</tt> </tt>
+<a name="L357"></a><tt class="py-lineno">357</tt>  <tt class="py-line"><tt class="py-comment">#            if X != None:</tt> </tt>
+<a name="L358"></a><tt class="py-lineno">358</tt>  <tt class="py-line"><tt class="py-comment">#                p = X.shape[axis]</tt> </tt>
+<a name="L359"></a><tt class="py-lineno">359</tt>  <tt class="py-line"><tt class="py-comment">#                shape = (p, 1)</tt> </tt>
+<a name="L360"></a><tt class="py-lineno">360</tt>  <tt class="py-line"><tt class="py-comment">#            else:  # Assumes shape != None</tt> </tt>
+<a name="L361"></a><tt class="py-lineno">361</tt>  <tt class="py-line"><tt class="py-comment">#                p = shape[0] * shape[1]</tt> </tt>
+<a name="L362"></a><tt class="py-lineno">362</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L363"></a><tt class="py-lineno">363</tt>  <tt class="py-line"><tt class="py-comment">#            size = [0] * dims</tt> </tt>
+<a name="L364"></a><tt class="py-lineno">364</tt>  <tt class="py-line"><tt class="py-comment">#            for i in xrange(dims):  # Split in equal-sized hypercube</tt> </tt>
+<a name="L365"></a><tt class="py-lineno">365</tt>  <tt class="py-line"><tt class="py-comment">#                size[i] = round(float(p) ** (1.0 / float(dims)))</tt> </tt>
+<a name="L366"></a><tt class="py-lineno">366</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L367"></a><tt class="py-lineno">367</tt>  <tt class="py-line"><tt class="py-comment">#        if mean == None:</tt> </tt>
+<a name="L368"></a><tt class="py-lineno">368</tt>  <tt class="py-line"><tt class="py-comment">#            mean = [float(s - 1.0) / 2.0 for s in size]</tt> </tt>
+<a name="L369"></a><tt class="py-lineno">369</tt>  <tt class="py-line"><tt class="py-comment">#        if cov == None:</tt> </tt>
+<a name="L370"></a><tt class="py-lineno">370</tt>  <tt class="py-line"><tt class="py-comment">#            S = np.diag([s ** (1.0 / dims) for s in size])</tt> </tt>
+<a name="L371"></a><tt class="py-lineno">371</tt>  <tt class="py-line"><tt class="py-comment">#            invS = np.linalg.pinv(S)</tt> </tt>
+<a name="L372"></a><tt class="py-lineno">372</tt>  <tt class="py-line"><tt class="py-comment">#        else:</tt> </tt>
+<a name="L373"></a><tt class="py-lineno">373</tt>  <tt class="py-line"><tt class="py-comment">##            S = np.diag(np.diag(cov))</tt> </tt>
+<a name="L374"></a><tt class="py-lineno">374</tt>  <tt class="py-line"><tt class="py-comment">#            S = np.asarray(cov)</tt> </tt>
+<a name="L375"></a><tt class="py-lineno">375</tt>  <tt class="py-line"><tt class="py-comment">#            invS = np.linalg.pinv(S)</tt> </tt>
+<a name="L376"></a><tt class="py-lineno">376</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L377"></a><tt class="py-lineno">377</tt>  <tt class="py-line"><tt class="py-comment">#        a = np.arange(size[0])</tt> </tt>
+<a name="L378"></a><tt class="py-lineno">378</tt>  <tt class="py-line"><tt class="py-comment">#        ans = np.reshape(a, (a.shape[0], 1)).tolist()</tt> </tt>
+<a name="L379"></a><tt class="py-lineno">379</tt>  <tt class="py-line"><tt class="py-comment">#        for i in xrange(1, dims):</tt> </tt>
+<a name="L380"></a><tt class="py-lineno">380</tt>  <tt class="py-line"><tt class="py-comment">#            b = np.arange(size[i]).tolist()</tt> </tt>
+<a name="L381"></a><tt class="py-lineno">381</tt>  <tt class="py-line"><tt class="py-comment">#            ans = [y + [x] for x in b for y in ans]</tt> </tt>
+<a name="L382"></a><tt class="py-lineno">382</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L383"></a><tt class="py-lineno">383</tt>  <tt class="py-line"><tt class="py-comment">#        X = np.zeros((size))</tt> </tt>
+<a name="L384"></a><tt class="py-lineno">384</tt>  <tt class="py-line"><tt class="py-comment">#        for x in ans:</tt> </tt>
+<a name="L385"></a><tt class="py-lineno">385</tt>  <tt class="py-line"><tt class="py-comment">#            i = tuple(x)</tt> </tt>
+<a name="L386"></a><tt class="py-lineno">386</tt>  <tt class="py-line"><tt class="py-comment">#            x = np.array([x]) - np.array(mean)</tt> </tt>
+<a name="L387"></a><tt class="py-lineno">387</tt>  <tt class="py-line"><tt class="py-comment">#            v = np.dot(x, np.dot(invS, x.T))</tt> </tt>
+<a name="L388"></a><tt class="py-lineno">388</tt>  <tt class="py-line"><tt class="py-comment">#            X[i] = v[0, 0]</tt> </tt>
+<a name="L389"></a><tt class="py-lineno">389</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L390"></a><tt class="py-lineno">390</tt>  <tt class="py-line"><tt class="py-comment">#        X = np.exp(-0.5 * X)</tt> </tt>
+<a name="L391"></a><tt class="py-lineno">391</tt>  <tt class="py-line"><tt class="py-comment">#        X /= np.sum(X)</tt> </tt>
+<a name="L392"></a><tt class="py-lineno">392</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L393"></a><tt class="py-lineno">393</tt>  <tt class="py-line"><tt class="py-comment">##        s = []</tt> </tt>
+<a name="L394"></a><tt class="py-lineno">394</tt>  <tt class="py-line"><tt class="py-comment">##        X = 0</tt> </tt>
+<a name="L395"></a><tt class="py-lineno">395</tt>  <tt class="py-line"><tt class="py-comment">##        for i in xrange(dims):</tt> </tt>
+<a name="L396"></a><tt class="py-lineno">396</tt>  <tt class="py-line"><tt class="py-comment">##            x = np.arange(size[i]) - mean[i]</tt> </tt>
+<a name="L397"></a><tt class="py-lineno">397</tt>  <tt class="py-line"><tt class="py-comment">##            x = np.reshape(x, [size[i]] + s)</tt> </tt>
+<a name="L398"></a><tt class="py-lineno">398</tt>  <tt class="py-line"><tt class="py-comment">##            X = X + invS[i, i] * (x ** 2.0)</tt> </tt>
+<a name="L399"></a><tt class="py-lineno">399</tt>  <tt class="py-line"><tt class="py-comment">##            s.append(1)</tt> </tt>
+<a name="L400"></a><tt class="py-lineno">400</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L401"></a><tt class="py-lineno">401</tt>  <tt class="py-line"><tt class="py-comment">#        w = np.reshape(X, (p, 1))</tt> </tt>
+<a name="L402"></a><tt class="py-lineno">402</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L403"></a><tt class="py-lineno">403</tt>  <tt class="py-line"><tt class="py-comment">#        if self.normalise:</tt> </tt>
+<a name="L404"></a><tt class="py-lineno">404</tt>  <tt class="py-line"><tt class="py-comment">#            return w / norm(w)</tt> </tt>
+<a name="L405"></a><tt class="py-lineno">405</tt>  <tt class="py-line"><tt class="py-comment">#        else:</tt> </tt>
+<a name="L406"></a><tt class="py-lineno">406</tt>  <tt class="py-line"><tt class="py-comment">#            return w</tt> </tt>
+<a name="L407"></a><tt class="py-lineno">407</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L408"></a><tt class="py-lineno">408</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L409"></a><tt class="py-lineno">409</tt>  <tt class="py-line"><tt class="py-comment">#class GaussianCurveVectors(BaseStartVector):</tt> </tt>
+<a name="L410"></a><tt class="py-lineno">410</tt>  <tt class="py-line"><tt class="py-comment">#    """A start vector with multibple Gaussian curve shapes.</tt> </tt>
+<a name="L411"></a><tt class="py-lineno">411</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L412"></a><tt class="py-lineno">412</tt>  <tt class="py-line"><tt class="py-comment">#    The gaussians are in an imagined 1D or 2D image. The output is a reshaped</tt> </tt>
+<a name="L413"></a><tt class="py-lineno">413</tt>  <tt class="py-line"><tt class="py-comment">#    vector corresponsing to a 1- or 2-dimensional image.</tt> </tt>
+<a name="L414"></a><tt class="py-lineno">414</tt>  <tt class="py-line"><tt class="py-comment">#    """</tt> </tt>
+<a name="L415"></a><tt class="py-lineno">415</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L416"></a><tt class="py-lineno">416</tt>  <tt class="py-line"><tt class="py-comment">#    def __init__(self, num_points=3, normalise=True, **kwargs):</tt> </tt>
+<a name="L417"></a><tt class="py-lineno">417</tt>  <tt class="py-line"><tt class="py-comment">#        super(GaussianCurveVectors, self).__init__(normalise=normalise,</tt> </tt>
+<a name="L418"></a><tt class="py-lineno">418</tt>  <tt class="py-line"><tt class="py-comment">#                                                  **kwargs)</tt> </tt>
+<a name="L419"></a><tt class="py-lineno">419</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L420"></a><tt class="py-lineno">420</tt>  <tt class="py-line"><tt class="py-comment">#        self.num_points = num_points</tt> </tt>
+<a name="L421"></a><tt class="py-lineno">421</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L422"></a><tt class="py-lineno">422</tt>  <tt class="py-line"><tt class="py-comment">#    def get_vector(self, X=None, axis=1, shape=None, size=None,</tt> </tt>
+<a name="L423"></a><tt class="py-lineno">423</tt>  <tt class="py-line"><tt class="py-comment">#                   mean=None, cov=None, dims=2):</tt> </tt>
+<a name="L424"></a><tt class="py-lineno">424</tt>  <tt class="py-line"><tt class="py-comment">#        """ Computes a starting vector with set of Gaussian curve-shapes.</tt> </tt>
+<a name="L425"></a><tt class="py-lineno">425</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L426"></a><tt class="py-lineno">426</tt>  <tt class="py-line"><tt class="py-comment">#        Parameters:</tt> </tt>
+<a name="L427"></a><tt class="py-lineno">427</tt>  <tt class="py-line"><tt class="py-comment">#        X     : The matrix for which we need a start vector. Used in</tt> </tt>
+<a name="L428"></a><tt class="py-lineno">428</tt>  <tt class="py-line"><tt class="py-comment">#                conjunction with axis to determine the shape of the start</tt> </tt>
+<a name="L429"></a><tt class="py-lineno">429</tt>  <tt class="py-line"><tt class="py-comment">#                vector.</tt> </tt>
+<a name="L430"></a><tt class="py-lineno">430</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L431"></a><tt class="py-lineno">431</tt>  <tt class="py-line"><tt class="py-comment">#        axis  : The axis along X which the shape is taken.</tt> </tt>
+<a name="L432"></a><tt class="py-lineno">432</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L433"></a><tt class="py-lineno">433</tt>  <tt class="py-line"><tt class="py-comment">#        shape : The shape of the start vector, may be passed instead of X.</tt> </tt>
+<a name="L434"></a><tt class="py-lineno">434</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L435"></a><tt class="py-lineno">435</tt>  <tt class="py-line"><tt class="py-comment">#        size  : The size of the supposed image. Must have the form (Z, Y, X).</tt> </tt>
+<a name="L436"></a><tt class="py-lineno">436</tt>  <tt class="py-line"><tt class="py-comment">#                May be passed instead of X or shape.</tt> </tt>
+<a name="L437"></a><tt class="py-lineno">437</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L438"></a><tt class="py-lineno">438</tt>  <tt class="py-line"><tt class="py-comment">#        means : The mean vectors of the Gaussians. Default is random.</tt> </tt>
+<a name="L439"></a><tt class="py-lineno">439</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L440"></a><tt class="py-lineno">440</tt>  <tt class="py-line"><tt class="py-comment">#        covs  : The covariance matrices of the Gaussians. Default is random.</tt> </tt>
+<a name="L441"></a><tt class="py-lineno">441</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L442"></a><tt class="py-lineno">442</tt>  <tt class="py-line"><tt class="py-comment">#        dims  : The number of dimensions of the output image. Default is 2.</tt> </tt>
+<a name="L443"></a><tt class="py-lineno">443</tt>  <tt class="py-line"><tt class="py-comment">#        """</tt> </tt>
+<a name="L444"></a><tt class="py-lineno">444</tt>  <tt class="py-line"><tt class="py-comment">#        if size != None:</tt> </tt>
+<a name="L445"></a><tt class="py-lineno">445</tt>  <tt class="py-line"><tt class="py-comment">#            p = 1</tt> </tt>
+<a name="L446"></a><tt class="py-lineno">446</tt>  <tt class="py-line"><tt class="py-comment">#            for i in xrange(dims):</tt> </tt>
+<a name="L447"></a><tt class="py-lineno">447</tt>  <tt class="py-line"><tt class="py-comment">#                p *= size[i]</tt> </tt>
+<a name="L448"></a><tt class="py-lineno">448</tt>  <tt class="py-line"><tt class="py-comment">#            if axis == 1:</tt> </tt>
+<a name="L449"></a><tt class="py-lineno">449</tt>  <tt class="py-line"><tt class="py-comment">#                shape = (p, 1)</tt> </tt>
+<a name="L450"></a><tt class="py-lineno">450</tt>  <tt class="py-line"><tt class="py-comment">#            else:</tt> </tt>
+<a name="L451"></a><tt class="py-lineno">451</tt>  <tt class="py-line"><tt class="py-comment">#                shape = (1, p)</tt> </tt>
+<a name="L452"></a><tt class="py-lineno">452</tt>  <tt class="py-line"><tt class="py-comment">#        else:</tt> </tt>
+<a name="L453"></a><tt class="py-lineno">453</tt>  <tt class="py-line"><tt class="py-comment">#            if X != None:</tt> </tt>
+<a name="L454"></a><tt class="py-lineno">454</tt>  <tt class="py-line"><tt class="py-comment">#                p = X.shape[axis]</tt> </tt>
+<a name="L455"></a><tt class="py-lineno">455</tt>  <tt class="py-line"><tt class="py-comment">#                shape = (p, 1)</tt> </tt>
+<a name="L456"></a><tt class="py-lineno">456</tt>  <tt class="py-line"><tt class="py-comment">#            else:  # Assumes shape != None</tt> </tt>
+<a name="L457"></a><tt class="py-lineno">457</tt>  <tt class="py-line"><tt class="py-comment">#                p = shape[0] * shape[1]</tt> </tt>
+<a name="L458"></a><tt class="py-lineno">458</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L459"></a><tt class="py-lineno">459</tt>  <tt class="py-line"><tt class="py-comment">#            size = [0] * dims</tt> </tt>
+<a name="L460"></a><tt class="py-lineno">460</tt>  <tt class="py-line"><tt class="py-comment">#            for i in xrange(dims):  # Split in equal-sized hypercube</tt> </tt>
+<a name="L461"></a><tt class="py-lineno">461</tt>  <tt class="py-line"><tt class="py-comment">#                size[i] = round(float(p) ** (1.0 / float(dims)))</tt> </tt>
+<a name="L462"></a><tt class="py-lineno">462</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L463"></a><tt class="py-lineno">463</tt>  <tt class="py-line"><tt class="py-comment">#        means = np.random.rand(1, 2)</tt> </tt>
+<a name="L464"></a><tt class="py-lineno">464</tt>  <tt class="py-line"><tt class="py-comment">#        for i in xrange(1, self.num_points):</tt> </tt>
+<a name="L465"></a><tt class="py-lineno">465</tt>  <tt class="py-line"><tt class="py-comment">#            dist = 0.0</tt> </tt>
+<a name="L466"></a><tt class="py-lineno">466</tt>  <tt class="py-line"><tt class="py-comment">#            p_best = 0</tt> </tt>
+<a name="L467"></a><tt class="py-lineno">467</tt>  <tt class="py-line"><tt class="py-comment">#            for j in xrange(20):</tt> </tt>
+<a name="L468"></a><tt class="py-lineno">468</tt>  <tt class="py-line"><tt class="py-comment">#                p = np.random.rand(1, 2)</tt> </tt>
+<a name="L469"></a><tt class="py-lineno">469</tt>  <tt class="py-line"><tt class="py-comment">#                dist_curr = np.min(np.sqrt(np.sum((means - p) ** 2.0, axis=1)))</tt> </tt>
+<a name="L470"></a><tt class="py-lineno">470</tt>  <tt class="py-line"><tt class="py-comment">#                if dist_curr &gt; dist:</tt> </tt>
+<a name="L471"></a><tt class="py-lineno">471</tt>  <tt class="py-line"><tt class="py-comment">#                    p_best = p</tt> </tt>
+<a name="L472"></a><tt class="py-lineno">472</tt>  <tt class="py-line"><tt class="py-comment">#                    dist = dist_curr</tt> </tt>
+<a name="L473"></a><tt class="py-lineno">473</tt>  <tt class="py-line"><tt class="py-comment">#                if dist_curr &gt; 0.3:</tt> </tt>
+<a name="L474"></a><tt class="py-lineno">474</tt>  <tt class="py-line"><tt class="py-comment">#                    break</tt> </tt>
+<a name="L475"></a><tt class="py-lineno">475</tt>  <tt class="py-line"><tt class="py-comment">#            means = np.vstack((means, p_best))</tt> </tt>
+<a name="L476"></a><tt class="py-lineno">476</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L477"></a><tt class="py-lineno">477</tt>  <tt class="py-line"><tt class="py-comment">#        means[means &lt; 0.05] = 0.05</tt> </tt>
+<a name="L478"></a><tt class="py-lineno">478</tt>  <tt class="py-line"><tt class="py-comment">#        means[means &gt; 0.95] = 0.95</tt> </tt>
+<a name="L479"></a><tt class="py-lineno">479</tt>  <tt class="py-line"><tt class="py-comment">#        means[:, 0] *= size[0]</tt> </tt>
+<a name="L480"></a><tt class="py-lineno">480</tt>  <tt class="py-line"><tt class="py-comment">#        means[:, 1] *= size[1]</tt> </tt>
+<a name="L481"></a><tt class="py-lineno">481</tt>  <tt class="py-line"><tt class="py-comment">#        means = means.tolist()</tt> </tt>
+<a name="L482"></a><tt class="py-lineno">482</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L483"></a><tt class="py-lineno">483</tt>  <tt class="py-line"><tt class="py-comment">#        covs = [0] * self.num_points</tt> </tt>
+<a name="L484"></a><tt class="py-lineno">484</tt>  <tt class="py-line"><tt class="py-comment">#        for i in xrange(self.num_points):</tt> </tt>
+<a name="L485"></a><tt class="py-lineno">485</tt>  <tt class="py-line"><tt class="py-comment">#            S1 = np.diag((np.abs(np.diag(np.random.rand(2, 2))) * 0.5) + 0.5)</tt> </tt>
+<a name="L486"></a><tt class="py-lineno">486</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L487"></a><tt class="py-lineno">487</tt>  <tt class="py-line"><tt class="py-comment">#            S2 = np.random.rand(2, 2)</tt> </tt>
+<a name="L488"></a><tt class="py-lineno">488</tt>  <tt class="py-line"><tt class="py-comment">#            S2 = (((S2 + S2.T) / 2.0) - 0.5) * 0.9  # [0, 0.45]</tt> </tt>
+<a name="L489"></a><tt class="py-lineno">489</tt>  <tt class="py-line"><tt class="py-comment">#            S2 = S2 - np.diag(np.diag(S2))</tt> </tt>
+<a name="L490"></a><tt class="py-lineno">490</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L491"></a><tt class="py-lineno">491</tt>  <tt class="py-line"><tt class="py-comment">#            S = S1 + S2</tt> </tt>
+<a name="L492"></a><tt class="py-lineno">492</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L493"></a><tt class="py-lineno">493</tt>  <tt class="py-line"><tt class="py-comment">#            S /= np.max(S)</tt> </tt>
+<a name="L494"></a><tt class="py-lineno">494</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L495"></a><tt class="py-lineno">495</tt>  <tt class="py-line"><tt class="py-comment">#            S *= float(min(size))</tt> </tt>
+<a name="L496"></a><tt class="py-lineno">496</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L497"></a><tt class="py-lineno">497</tt>  <tt class="py-line"><tt class="py-comment">#            covs[i] = S.tolist()</tt> </tt>
+<a name="L498"></a><tt class="py-lineno">498</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L499"></a><tt class="py-lineno">499</tt>  <tt class="py-line"><tt class="py-comment">#        vector = GaussianCurveVector(normalise=False)</tt> </tt>
+<a name="L500"></a><tt class="py-lineno">500</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L501"></a><tt class="py-lineno">501</tt>  <tt class="py-line"><tt class="py-comment">#        X = np.zeros(shape)</tt> </tt>
+<a name="L502"></a><tt class="py-lineno">502</tt>  <tt class="py-line"><tt class="py-comment">#        for i in xrange(self.num_points):</tt> </tt>
+<a name="L503"></a><tt class="py-lineno">503</tt>  <tt class="py-line"><tt class="py-comment">#            X = X + vector.get_vector(size=size, dims=dims,</tt> </tt>
+<a name="L504"></a><tt class="py-lineno">504</tt>  <tt class="py-line"><tt class="py-comment">#                                      mean=means[i], cov=covs[i])</tt> </tt>
+<a name="L505"></a><tt class="py-lineno">505</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L506"></a><tt class="py-lineno">506</tt>  <tt class="py-line"><tt class="py-comment">#        w = np.reshape(X, size)</tt> </tt>
+<a name="L507"></a><tt class="py-lineno">507</tt>  <tt class="py-line"><tt class="py-comment">#</tt> </tt>
+<a name="L508"></a><tt class="py-lineno">508</tt>  <tt class="py-line"><tt class="py-comment">#        if self.normalise:</tt> </tt>
+<a name="L509"></a><tt class="py-lineno">509</tt>  <tt class="py-line"><tt class="py-comment">#            return w / norm(w)</tt> </tt>
+<a name="L510"></a><tt class="py-lineno">510</tt>  <tt class="py-line"><tt class="py-comment">#        else:</tt> </tt>
+<a name="L511"></a><tt class="py-lineno">511</tt>  <tt class="py-line"><tt class="py-comment">#            return w</tt> </tt>
+<a name="L512"></a><tt class="py-lineno">512</tt>  <tt class="py-line"> </tt>
+<a name="L513"></a><tt class="py-lineno">513</tt>  <tt class="py-line"> </tt>
+<a name="L514"></a><tt class="py-lineno">514</tt>  <tt class="py-line"><tt class="py-keyword">if</tt> <tt class="py-name">__name__</tt> <tt class="py-op">==</tt> <tt class="py-string">"__main__"</tt><tt class="py-op">:</tt> </tt>
+<a name="L515"></a><tt class="py-lineno">515</tt>  <tt class="py-line">    <tt class="py-keyword">import</tt> <tt class="py-name">doctest</tt> </tt>
+<a name="L516"></a><tt class="py-lineno">516</tt>  <tt class="py-line">    <tt class="py-name">doctest</tt><tt class="py-op">.</tt><tt class="py-name">testmod</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L517"></a><tt class="py-lineno">517</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="parsimony-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sun Jul  6 11:32:53 2014
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>
