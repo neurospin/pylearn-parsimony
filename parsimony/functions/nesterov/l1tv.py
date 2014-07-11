@@ -17,7 +17,7 @@ import math
 import scipy.sparse as sparse
 import numpy as np
 
-from .properties import NesterovFunction
+#from .properties import NesterovFunction
 from .. import properties
 import parsimony.utils.consts as consts
 import parsimony.utils.maths as maths
@@ -27,8 +27,8 @@ import l1
 __all__ = ["L1TV", "A_from_mask", "A_from_shape"]
 
 
-class L1TV(properties.AtomicFunction,
-           NesterovFunction,
+class L1TV(#properties.AtomicFunction,
+           properties.NesterovFunction,
            properties.Penalty,
            properties.Eigenvalues):
     """The proximal operator of the smoothed sum of the TV and L1 functions

@@ -4,15 +4,19 @@ Created on Mon Jan  6 14:13:42 2014
 
 Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
-@author:  Edouard Duchesnay
-@email:   edouard.duchesnay@cea.fr
+@author:  Edouard Duchesnay, Tommy Löfstedt
+@email:   edouard.duchesnay@cea.fr, lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
 import numpy as np
+import scipy.stats as ss
+import matplotlib.pyplot as plot
 
 __all__ = ["plot_map2d", "plot_classes"]
 
 COLORS = ["b", "g", "r", "c", "m", "y", "k", "w"]
+COLORS_FULL = ["blue", "green", "red", "cyan", "magenta", "yellow", "black",
+               "white"]
 MARKERS = ["+", ".", "o", "*", "p", "s", "x", "D", "h", "^"]
 LINE_STYLE = ["-", "--", "--.", ":"]
 
@@ -90,3 +94,62 @@ def plot_classes(X, classes, title=None, xlabel=None, ylabel=None, show=True):
 
         if show:
             plot.show()
+
+
+def plot_errorbars(X, classes=None, means=None, alpha=0.05,
+                   title=None, xlabel=None, ylabel=None,
+                   colors=None,
+                   show=True, latex=True):
+
+    B, n = X.shape
+    if classes is None:
+        classes = np.array([1] * n)
+    classes = np.array(classes).reshape((n, 1))
+
+    if colors is None:
+        colors = COLORS
+
+    data_mu = np.mean(X, axis=0)
+    data_df = np.array([B - 1] * n)
+    data_sd = np.std(X, axis=0)
+
+    x = np.arange(1, n + 1)
+
+    labels, cls_inverse = np.unique(classes, return_inverse=True)
+    labels = labels.ravel().tolist()
+
+#    plot.figure()
+    if latex:
+        plot.rc('text', usetex=True)
+        plot.rc('font', family='serif')
+    if means is not None:
+        plot.plot(x, means, '*',
+                  markerfacecolor="black", markeredgecolor="black",
+                  markersize=10)
+
+    ci = ss.t.ppf(1.0 - alpha / 2.0, data_df) * data_sd / np.sqrt(B)
+
+    for i in xrange(len(labels)):
+        ind = np.where(classes == labels[i])[0]
+
+        plot.errorbar(x[ind],
+                      data_mu[ind],
+                      yerr=ci[ind],
+                      fmt='o' + colors[i % len(colors)],
+                      color=colors[i % len(colors)],
+                      ecolor=colors[i % len(colors)],
+                      elinewidth=2,
+                      markeredgewidth=2,
+                      markeredgecolor=colors[i % len(colors)],
+                      capsize=5)
+
+    plot.xlim((0, n + 1))
+    plot.ylim((np.min(data_mu - ci) * 1.1, np.max(data_mu + ci) * 1.1))
+    if xlabel is not None:
+        plot.xlabel(xlabel)
+    if ylabel is not None:
+        plot.ylabel(ylabel)
+    if title is not None:
+        plot.title(title)
+    if show:
+        plot.show()

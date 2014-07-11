@@ -16,9 +16,9 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 import numpy as np
 
 from . import properties
-import nesterov.properties as nesterov_properties
-from .nesterov.l1 import L1 as SmoothedL1
-import nesterov
+#import nesterov.properties as nesterov_properties
+#from .nesterov.l1 import L1 as SmoothedL1
+#import nesterov
 from .nesterov.l1tv import L1TV
 from .nesterov.tv import TotalVariation
 from .nesterov.gl import GroupLassoOverlap
@@ -210,9 +210,9 @@ class CombinedFunction(properties.CompositeFunction,
 
 
 class LinearRegressionL1L2TV(properties.CompositeFunction,
-                             properties.Gradient,
-                             properties.LipschitzContinuousGradient,
-                             nesterov_properties.NesterovFunction,
+#                             properties.Gradient,
+#                             properties.LipschitzContinuousGradient,
+                             properties.NesterovFunction,
                              properties.ProximalOperator,
                              properties.Continuation,
                              properties.DualFunction,
@@ -1084,8 +1084,8 @@ class LogisticRegressionL1L2GL(LinearRegressionL1L2GL):
 
 
 class LinearRegressionL2SmoothedL1TV(properties.CompositeFunction,
-                                     properties.LipschitzContinuousGradient,
-                                     nesterov_properties.NesterovFunction,
+#                                     properties.LipschitzContinuousGradient,
+                                     properties.NesterovFunction,
                                      properties.GradientMap,
                                      properties.DualFunction,
                                      properties.StronglyConvex):
@@ -1330,9 +1330,9 @@ class LinearRegressionL2SmoothedL1TV(properties.CompositeFunction,
 
 
 class PrincipalComponentAnalysisL1TV(properties.CompositeFunction,
-                                     properties.Gradient,
-                                     properties.LipschitzContinuousGradient,
-                                     nesterov_properties.NesterovFunction,
+#                                     properties.Gradient,
+#                                     properties.LipschitzContinuousGradient,
+                                     properties.NesterovFunction,
                                      properties.ProximalOperator,
                                      properties.Continuation,
                                      properties.DualFunction,

@@ -35,7 +35,7 @@
 
 ./parsimony/utils/plot.py:
 -------------------------
-68: # TODO: Add the other cases.
+72: # TODO: Add the other cases.
 
 ./parsimony/utils/utils.py:
 --------------------------
@@ -84,9 +84,14 @@
 
 ./parsimony/functions/properties.py:
 -----------------------------------
-108: # TODO: Should all constraints have the projection operator?
+109: # TODO: Should all constraints have the projection operator?
 
-346: # TODO: Should L by default take a weight vector as argument?
+347: # TODO: Should L by default take a weight vector as argument?
+
+694: # TODO: This only work if the elements of self._A are scipy.sparse. We
+695: # should allow dense matrices as well.
+
+701: # TODO: Add max_iter here!
 
 ./parsimony/functions/combinedfunctions.py:
 ------------------------------------------
@@ -115,13 +120,13 @@
 
 ./parsimony/functions/nesterov/tv.py:
 ------------------------------------
-150: # TODO: This only work if the elements of self._A are scipy.sparse. We
-151: # should allow dense matrices as well.
+151: # TODO: This only work if the elements of self._A are scipy.sparse. We
+152: # should allow dense matrices as well.
 
-154: # TODO: Instead of p, this should really be the number of non-zero
-155: # rows of A.
+155: # TODO: Instead of p, this should really be the number of non-zero
+156: # rows of A.
 
-165: # TODO: Add max_iter here!
+166: # TODO: Add max_iter here!
 
 ./parsimony/functions/nesterov/l1tv.py:
 --------------------------------------
@@ -134,10 +139,10 @@
 
 ./parsimony/functions/nesterov/grouptv.py:
 -----------------------------------------
-157: # TODO: This only work if the elements of self._A are scipy.sparse. We
-158: # should allow dense matrices as well.
+158: # TODO: This only work if the elements of self._A are scipy.sparse. We
+159: # should allow dense matrices as well.
 
-164: # TODO: Add max_iter here!
+165: # TODO: Add max_iter here!
 
 ./parsimony/datasets/regression/dice5.py:
 ----------------------------------------
@@ -149,7 +154,7 @@
 
 ./parsimony/algorithms/primaldual.py:
 ------------------------------------
-203: # TODO: Warn if G_new < 0.
+202: # TODO: Warn if G_new < 0.
 
 ./parsimony/algorithms/utils.py:
 -------------------------------

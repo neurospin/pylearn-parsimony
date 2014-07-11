@@ -17,7 +17,7 @@ import math
 import scipy.sparse as sparse
 import numpy as np
 
-from .properties import NesterovFunction
+#from .properties import NesterovFunction
 from .. import properties
 import parsimony.utils.consts as consts
 import parsimony.utils.maths as maths
@@ -26,12 +26,13 @@ __all__ = ["TotalVariation",
            "A_from_mask", "A_from_subset_mask", "A_from_shape"]
 
 
-class TotalVariation(properties.AtomicFunction,
-                     NesterovFunction,
+class TotalVariation(#properties.AtomicFunction,
+                     properties.NesterovFunction,
                      properties.Penalty,
                      properties.Constraint,
-                     properties.Gradient,
-                     properties.LipschitzContinuousGradient):
+#                     properties.Gradient,
+#                     properties.LipschitzContinuousGradient
+                     ):
     """The smoothed Total variation (TV) function
 
         f(beta) = l * (TV(beta) - c),
