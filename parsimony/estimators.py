@@ -1350,11 +1350,14 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
 
     Parameters
     ----------
-    l1 : Non-negative float. The L1 regularization parameter.
+    l1 : Non-negative float. The Lagrange multiplier, or regularisation
+            constant, for the L1 penalty.
 
-    l2 : Non-negative float. The L2 regularization parameter.
+    l2 : Non-negative float. The Lagrange multiplier, or regularisation
+            constant, for the ridge (L2) penalty.
 
-    tv : Non-negative float. The total variation regularization parameter.
+    tv : Non-negative float. The Lagrange multiplier, or regularisation
+            constant, of the TV function.
 
     A : Numpy or (usually) scipy.sparse array. The linear operator for the
             smoothed total variation Nesterov function. A must be given.
@@ -1480,7 +1483,7 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
             #sample_weight = sample_weight.ravel()
 
         function = functions.LogisticRegressionL1L2TV(X, y,
-                                              self.l2, self.l1, self.tv,
+                                              self.l1, self.l2, self.tv,
                                               A=self.A,
                                               weights=sample_weight,
                                               penalty_start=self.penalty_start,
@@ -1521,11 +1524,14 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
 
     Parameters
     ----------
-    l1 : Non-negative float. The L1 regularization parameter.
+    l1 : Non-negative float. The Lagrange multiplier, or regularisation
+            constant, for the L1 penalty.
 
-    l2 : Non-negative float. The L2 regularization parameter.
+    l2 : Non-negative float. The Lagrange multiplier, or regularisation
+            constant, for the ridge (L2) penalty.
 
-    gl : Non-negative float. The group lasso regularization parameter.
+    gl : Non-negative float. The Lagrange multiplier, or regularisation
+            constant, of the group lasso function.
 
     A : Numpy or (usually) scipy.sparse array. The linear operator for the
             smoothed total variation Nesterov function. A must be given.
@@ -1579,22 +1585,22 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
     >>> y = np.random.randint(0, 2, (n, 1))
     >>> l1 = 0.1  # L1 coefficient
     >>> l2 = 0.9  # Ridge coefficient
-    >>> tv = 1.0  # TV coefficient
-    >>> lr = estimators.LogisticRegressionL1L2GL(l1, l2, tv, A=A,
+    >>> gl = 1.0  # TV coefficient
+    >>> lr = estimators.LogisticRegressionL1L2GL(l1, l2, gl, A=A,
     ...                      algorithm=primaldual.StaticCONESTA(max_iter=1000),
     ...                      mean=False)
     >>> res = lr.fit(X, y)
     >>> error = lr.score(X, y)
     >>> print "error = ", error
     error =  0.7
-    >>> lr = estimators.LogisticRegressionL1L2GL(l1, l2, tv, A=A,
+    >>> lr = estimators.LogisticRegressionL1L2GL(l1, l2, gl, A=A,
     ...                                algorithm=proximal.FISTA(max_iter=1000),
     ...                                mean=False)
     >>> lr = lr.fit(X, y)
     >>> error = lr.score(X, y)
     >>> print "error = ", error
     error =  0.7
-    >>> lr = estimators.LogisticRegressionL1L2GL(l1, l2, tv, A,
+    >>> lr = estimators.LogisticRegressionL1L2GL(l1, l2, gl, A,
     ...                                 algorithm=proximal.ISTA(max_iter=1000),
     ...                                 mean=False)
     >>> lr = lr.fit(X, y)
@@ -1653,7 +1659,7 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
             sample_weight = class_weight_to_sample_weight(self.class_weight, y)
         y, sample_weight = check_arrays(y, sample_weight)
         function = functions.LogisticRegressionL1L2GL(X, y,
-                                              self.l2, self.l1, self.gl,
+                                              self.l1, self.l2, self.gl,
                                               A=self.A,
                                               weights=sample_weight,
                                               penalty_start=self.penalty_start,
@@ -1690,19 +1696,19 @@ class LinearRegressionL2SmoothedL1TV(RegressionEstimator):
 
     Parameters
     ----------
-    l1 : Non-negative float. The L1 regularization parameter.
+    l2 : Non-negative float. The Lagrange multiplier, or regularisation
+            constant, for the ridge (L2) penalty.
 
-    l2 : Non-negative float. The L2 regularization parameter.
+    l1 : Non-negative float. The Lagrange multiplier, or regularisation
+            constant, for the L1 penalty.
 
-    tv : Non-negative float. The total variation regularization parameter.
+    tv : Non-negative float. The Lagrange multiplier, or regularisation
+            constant, of the TV function.
 
-    Atv : Numpy or (usually) scipy.sparse array. The linear operator for the
-            smoothed total variation Nesterov function. A must be given.
-
-    Al1 : Numpy or (usually) scipy.sparse array. The linear operator for the
-            smoothed L1 Nesterov function. A must be given.
-
-    mu : Non-negative float. The regularisation constant for the smoothing.
+    A : A list or tuple with 4 elements of (usually sparse) arrays. The linear
+            operator for the smoothed L1+TV. The first element must be the
+            linear operator for L1 and the following three for TV. May not be
+            None.
 
     algorithm : ExplicitAlgorithm. The algorithm that should be applied.
             Should be one of:
@@ -1739,18 +1745,17 @@ class LinearRegressionL2SmoothedL1TV(RegressionEstimator):
     >>> l1 = 0.1  # L1 coefficient
     >>> l2 = 0.9  # Ridge coefficient
     >>> tv = 1.0  # TV coefficient
-    >>> Atv, Al1 = l1tv.A_from_shape(shape, p, penalty_start=0)
-    >>> lr = estimators.LinearRegressionL2SmoothedL1TV(l1, l2, tv,
-    ...                 Atv=Atv, Al1=Al1,
+    >>> A = l1tv.A_from_shape(shape, p, penalty_start=0)
+    >>> lr = estimators.LinearRegressionL2SmoothedL1TV(l2, l1, tv, A,
     ...                 algorithm=primaldual.ExcessiveGapMethod(),
     ...                 algorithm_params=dict(max_iter=1000))
     >>> res = lr.fit(X, y)
     >>> error = lr.score(X, y)
     >>> print "error = ", error
-    error =  0.101661632451
+    error =  0.0683730496916
     """
-    def __init__(self, l1, l2, tv,
-                 Atv=None, Al1=None,
+    def __init__(self, l2, l1, tv,
+                 A=None,
                  algorithm=None, algorithm_params=dict(),
                  penalty_start=0,
                  mean=True):
@@ -1763,19 +1768,16 @@ class LinearRegressionL2SmoothedL1TV(RegressionEstimator):
         super(LinearRegressionL2SmoothedL1TV, self).__init__(
                                                      algorithm=algorithm)
 
-        self.l1 = float(l1)
         self.l2 = float(l2)
+        self.l1 = float(l1)
         self.tv = float(tv)
 
         if self.l2 < consts.TOLERANCE:
             warnings.warn("The ridge parameter should be non-zero.")
 
-        if Atv is None:
-            raise TypeError("Atv may not be None.")
-        self.Atv = Atv
-        if Al1 is None:
-            raise TypeError("Al1 may not be None.")
-        self.Al1 = Al1
+        if A is None:
+            raise TypeError("The A matrix may not be None.")
+        self.A = A
 
         self.penalty_start = int(penalty_start)
         self.mean = bool(mean)
@@ -1783,8 +1785,7 @@ class LinearRegressionL2SmoothedL1TV(RegressionEstimator):
     def get_params(self):
         """Returns a dictionary containing all the estimator's parameters.
         """
-        return {"l1": self.l1, "l2": self.l2, "tv": self.tv,
-                "Atv": self.Atv, "Al1": self.Al1,
+        return {"l1": self.l1, "l2": self.l2, "tv": self.tv, "A": self.A,
                 "penalty_start": self.penalty_start, "mean": self.mean}
 
     def fit(self, X, y, beta=None):
@@ -1793,7 +1794,7 @@ class LinearRegressionL2SmoothedL1TV(RegressionEstimator):
         X, y = check_arrays(X, y)
         function = functions.LinearRegressionL2SmoothedL1TV(X, y,
                                               self.l2, self.l1, self.tv,
-                                              Atv=self.Atv, Al1=self.Al1,
+                                              A=self.A,
                                               penalty_start=self.penalty_start,
                                               mean=self.mean)
 

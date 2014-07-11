@@ -21,17 +21,17 @@
 
 1327: # TODO: Should we use a seed here so that we get deterministic results?
 
-1492: # TODO: Should we use a seed here so that we get deterministic results?
+1495: # TODO: Should we use a seed here so that we get deterministic results?
 
-1665: # TODO: Should we use a seed here so that we get deterministic results?
+1671: # TODO: Should we use a seed here so that we get deterministic results?
 
-1932: # TODO: Should we use a seed here so that we get deterministic
-1933: # results?
-1934: #                if w is None or k > 0:
+1933: # TODO: Should we use a seed here so that we get deterministic
+1934: # results?
+1935: #                if w is None or k > 0:
 
-2151: # TODO: Should we use a seed here so that we get deterministic
-2152: # results?
-2153: #                if w is None or k > 0:
+2152: # TODO: Should we use a seed here so that we get deterministic
+2153: # results?
+2154: #                if w is None or k > 0:
 
 ./parsimony/utils/plot.py:
 -------------------------
@@ -86,12 +86,18 @@
 -----------------------------------
 109: # TODO: Should all constraints have the projection operator?
 
-347: # TODO: Should L by default take a weight vector as argument?
+355: # TODO: Should L by default take a weight vector as argument?
 
-694: # TODO: This only work if the elements of self._A are scipy.sparse. We
-695: # should allow dense matrices as well.
+717: # TODO: This only work if the elements of self._A are scipy.sparse. We
+718: # should allow dense matrices as well.
 
-701: # TODO: Add max_iter here!
+724: # TODO: Add max_iter here!
+
+792: # TODO: Avoid stacking here.
+
+794: # TODO: Add max_iter here!
+
+845: # TODO: Compute with FISTA instead!
 
 ./parsimony/functions/combinedfunctions.py:
 ------------------------------------------
@@ -103,16 +109,16 @@
 
 656: # TODO: This is not good. Solve this better!
 
-1159: # TODO: This is not a good solution. Can we solve this in a better way?
+1158: # TODO: This is not a good solution. Can we solve this in a better way?
 
-1211: # TODO: Use max_iter here!!
+1210: # TODO: Use max_iter here!!
 
-1261: # TODO: Kernelise this function! See how I did in
-1262: # LinearRegressionL1L2TV._beta_hat.
+1260: # TODO: Kernelise this function! See how I did in
+1261: # LinearRegressionL1L2TV._beta_hat.
 
-1304: # TODO: Add this function or refactor API!
+1303: # TODO: Add this function or refactor API!
 
-1387: # TODO: This is not a nice solution. Can we solve it better?
+1386: # TODO: This is not a nice solution. Can we solve it better?
 
 ./parsimony/functions/multiblock/losses.py:
 ------------------------------------------
@@ -130,12 +136,18 @@
 
 ./parsimony/functions/nesterov/l1tv.py:
 --------------------------------------
-64: # WARNING: Number of non-zero rows may differ from p.
+62: # WARNING: Number of non-zero rows may differ from p.
 
-151: # TODO: Instead of p, this should really be the number of non-zero
-152: # rows of A.
+145: # TODO: Instead of p, this should really be the number of non-zero
+146: # rows of A.
 
-163: # TODO: Add max_iter here!!
+157: # TODO: Add max_iter here!!
+
+266: # TODO: Do we need to take the number of variables here?
+267: # Why not use np.prod(shape) + penalty_start instead and save a parameter?
+
+290: # TODO: Do we need to take the number of variables here?
+291: # Why not use np.prod(shape) + penalty_start instead and save a parameter?
 
 ./parsimony/functions/nesterov/grouptv.py:
 -----------------------------------------
@@ -176,16 +188,16 @@
 
 ./parsimony/algorithms/proximal.py:
 ----------------------------------
-324: else:  # TODO: Fix this!
+328: else:  # TODO: Fix this!
 
-400: # TODO: Investigate what is a good default value here!
+404: # TODO: Investigate what is a good default value here!
 
-454: # TODO: Investigate what is a good default value here!
+458: # TODO: Investigate what is a good default value here!
 
-507: # TODO: Investigate what is a good default value here!
+511: # TODO: Investigate what is a good default value here!
 
-546: # TODO: Does the weights really matter when the function is the
-547: # indicator function?
+550: # TODO: Does the weights really matter when the function is the
+551: # indicator function?
 
-581: # TODO: Investigate what is a good default value here!
+585: # TODO: Investigate what is a good default value here!
 

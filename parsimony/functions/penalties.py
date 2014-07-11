@@ -83,7 +83,7 @@ class ZeroFunction(properties.AtomicFunction,
 
         return self._zero
 
-    def prox(self, x, factor=1.0):
+    def prox(self, x, factor=1.0, **kwargs):
         """The corresponding proximal operator.
 
         From the interface "ProximalOperator".
@@ -148,7 +148,7 @@ class L1(properties.AtomicFunction,
 
         return self.l * (maths.norm1(beta_) - self.c)
 
-    def prox(self, beta, factor=1.0):
+    def prox(self, beta, factor=1.0, **kwargs):
         """The corresponding proximal operator.
 
         From the interface "ProximalOperator".
@@ -339,7 +339,7 @@ class L0(properties.AtomicFunction,
 
         return self.l * (maths.norm0(x_) - self.c)
 
-    def prox(self, x, factor=1.0):
+    def prox(self, x, factor=1.0, **kwargs):
         """The corresponding proximal operator.
 
         From the interface "ProximalOperator".
@@ -519,7 +519,7 @@ class LInf(properties.AtomicFunction,
 
         return self.l * (maths.normInf(x_) - self.c)
 
-    def prox(self, x, factor=1.0):
+    def prox(self, x, factor=1.0, **kwargs):
         """The corresponding proximal operator.
 
         From the interface "ProximalOperator".
@@ -696,7 +696,7 @@ class L2(properties.AtomicFunction,
 
         return self.l * (maths.norm(beta_) - self.c)
 
-    def prox(self, beta, factor=1.0):
+    def prox(self, beta, factor=1.0, **kwargs):
         """The corresponding proximal operator.
 
         From the interface "ProximalOperator".
@@ -884,7 +884,7 @@ class L2Squared(properties.AtomicFunction,
         """
         return self.l
 
-    def prox(self, beta, factor=1.0):
+    def prox(self, beta, factor=1.0, **kwargs):
         """The corresponding proximal operator.
 
         From the interface "ProximalOperator".
@@ -1021,7 +1021,7 @@ class L1L2Squared(properties.AtomicFunction,
 
         return self.l1 * maths.norm1(beta_)
 
-    def prox(self, beta, factor=1.0):
+    def prox(self, beta, factor=1.0, **kwargs):
         """The corresponding proximal operator.
 
         From the interface "ProximalOperator".

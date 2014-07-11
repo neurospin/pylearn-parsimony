@@ -153,14 +153,14 @@ class CombinedFunction(properties.CompositeFunction,
 
         return grad
 
-    def prox(self, x, factor=1.0):
+    def prox(self, x, factor=1.0, **kwargs):
         """The proximal operator of the non-differentiable part of the
         function.
 
         From the interface "ProximalOperator".
         """
         # TODO: We currently only allow one proximal operator. Fix this!
-        return self._prox[0].prox(x, factor=factor)
+        return self._prox[0].prox(x, factor=factor, **kwargs)
 
     def proj(self, x):
         raise NotImplementedError("Not yet implemented.")
@@ -342,7 +342,7 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
         return self.rr.L() \
              + self.tv.L()
 
-    def prox(self, beta, factor=1.0):
+    def prox(self, beta, factor=1.0, **kwargs):
         """The proximal operator of the non-differentiable part of the
         function.
 
@@ -720,13 +720,13 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
         return self.rr.L() \
              + self.gl.L()
 
-    def prox(self, beta, factor=1.0):
+    def prox(self, beta, factor=1.0, **kwargs):
         """The proximal operator of the non-differentiable part of the
         function.
 
         From the interface "ProximalOperator".
         """
-        return self.l1.prox(beta, factor)
+        return self.l1.prox(beta, factor, **kwargs)
 
     def estimate_mu(self, beta):
         """Computes a "good" value of mu with respect to the given beta.
@@ -988,7 +988,7 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
 class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
     """Combination (sum) of RidgeLogisticRegression, L1 and TotalVariation.
     """
-    def __init__(self, X, y, k, l, g, A=None, mu=0.0, weights=None,
+    def __init__(self, X, y, l1, l2, tv, A=None, mu=0.0, weights=None,
                  penalty_start=0, mean=True):
         """
         Parameters
@@ -997,13 +997,13 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
 
         y : Numpy array. The y vector for the logistic regression.
 
-        k : Non-negative float. The Lagrange multiplier, or regularisation
-                constant, for the ridge penalty.
-
-        l : Non-negative float. The Lagrange multiplier, or regularisation
+        l1 : Non-negative float. The Lagrange multiplier, or regularisation
                 constant, for the L1 penalty.
 
-        g : Non-negative float. The Lagrange multiplier, or regularisation
+        l2 : Non-negative float. The Lagrange multiplier, or regularisation
+                constant, for the ridge (L2) penalty.
+
+        tv : Non-negative float. The Lagrange multiplier, or regularisation
                 constant, of the smoothed TV function.
 
         A : Numpy array (usually sparse). The linear operator for the Nesterov
@@ -1024,12 +1024,12 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
         self.X = X
         self.y = y
 
-        self.rr = RidgeLogisticRegression(X, y, k,
+        self.rr = RidgeLogisticRegression(X, y, l2,
                                           weights=weights,
                                           penalty_start=penalty_start,
                                           mean=mean)
-        self.l1 = L1(l, penalty_start=penalty_start)
-        self.tv = TotalVariation(g, A=A, mu=mu, penalty_start=penalty_start)
+        self.l1 = L1(l1, penalty_start=penalty_start)
+        self.tv = TotalVariation(tv, A=A, mu=mu, penalty_start=penalty_start)
 
         self.penalty_start = penalty_start
         self.mean = mean
@@ -1040,7 +1040,7 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
 class LogisticRegressionL1L2GL(LinearRegressionL1L2GL):
     """Combination (sum) of RidgeLogisticRegression, L1 and TotalVariation.
     """
-    def __init__(self, X, y, k, l, g, A=None, mu=0.0, weights=None,
+    def __init__(self, X, y, l1, l2, gl, A=None, mu=0.0, weights=None,
                  penalty_start=0, mean=True):
         """
         Parameters
@@ -1049,14 +1049,14 @@ class LogisticRegressionL1L2GL(LinearRegressionL1L2GL):
 
         y : Numpy array. The y vector for the logistic regression.
 
-        k : Non-negative float. The Lagrange multiplier, or regularisation
-                constant, for the ridge penalty.
-
-        l : Non-negative float. The Lagrange multiplier, or regularisation
+        l1 : Non-negative float. The Lagrange multiplier, or regularisation
                 constant, for the L1 penalty.
 
-        g : Non-negative float. The Lagrange multiplier, or regularisation
-                constant, of the smoothed GL function.
+        l2 : Non-negative float. The Lagrange multiplier, or regularisation
+                constant, for the ridge (L2) penalty.
+
+        gl : Non-negative float. The Lagrange multiplier, or regularisation
+                constant, of the smoothed function.
 
         A : Numpy array (usually sparse). The linear operator for the Nesterov
                 formulation for GL. May not be None!
@@ -1073,9 +1073,10 @@ class LogisticRegressionL1L2GL(LinearRegressionL1L2GL):
         self.X = X
         self.y = y
 
-        self.rr = RidgeLogisticRegression(X, y, k, weights=weights, mean=mean)
-        self.l1 = L1(l, penalty_start=penalty_start)
-        self.gl = GroupLassoOverlap(g, A=A, mu=mu, penalty_start=penalty_start)
+        self.rr = RidgeLogisticRegression(X, y, l2, weights=weights, mean=mean)
+        self.l1 = L1(l1, penalty_start=penalty_start)
+        self.gl = GroupLassoOverlap(gl, A=A, mu=mu,
+                                    penalty_start=penalty_start)
 
         self.penalty_start = penalty_start
         self.mean = mean
@@ -1098,23 +1099,21 @@ class LinearRegressionL2SmoothedL1TV(properties.CompositeFunction,
 
     y : Numpy array. The y vector for the ridge regression.
 
-    l : Non-negative float. The Lagrange multiplier, or regularisation
+    l2 : Non-negative float. The Lagrange multiplier, or regularisation
+            constant, for the ridge (L2) penalty.
+
+    l1 : Non-negative float. The Lagrange multiplier, or regularisation
             constant, for the L1 penalty.
 
-    k : Non-negative float. The Lagrange multiplier, or regularisation
-            constant, for the ridge penalty.
-
-    g : Non-negative float. The Lagrange multiplier, or regularisation
+    tv : Non-negative float. The Lagrange multiplier, or regularisation
             constant, of the TV function.
 
-    Atv : Numpy array (usually sparse). The linear operator for the Nesterov
-            formulation of the smoothed TV function. May not be None!
+    A : A list or tuple with 4 elements of (usually sparse) arrays. The linear
+            operator for the smoothed L1+TV. The first element must be the
+            linear operator for L1 and the following three for TV. May not be
+            None.
 
-    Al1 : Numpy array (usually sparse). The linear operator for the Nesterov
-            formulation of the smoothed L1 function. May not be None!
-
-    mu : Non-negative float. The regularisation constant for the smoothing of
-            the TV function.
+    mu : Non-negative float. The regularisation constant for the smoothing.
 
     penalty_start : Non-negative integer. The number of columns, variables
             etc., to except from penalisation. Equivalently, the first index
@@ -1123,20 +1122,20 @@ class LinearRegressionL2SmoothedL1TV(properties.CompositeFunction,
     mean : Boolean. Whether to compute the squared loss or the mean squared
             loss. Default is True, the mean squared loss.
     """
-    def __init__(self, X, y, l, k, g, Atv=None, Al1=None, mu=consts.TOLERANCE,
+    def __init__(self, X, y, l2, l1, tv, A=None, mu=consts.TOLERANCE,
                  penalty_start=0, mean=True):
 
-        if k < consts.TOLERANCE:
+        if l2 < consts.TOLERANCE:
             raise ValueError("The L2 regularisation constant must be " + \
                              "non-zero.")
 
         self.X = X
         self.y = y
 
-        self.g = RidgeRegression(X, y, k,
+        self.g = RidgeRegression(X, y, l2,
                                  penalty_start=penalty_start,
                                  mean=mean)
-        self.h = L1TV(l, g, Atv=Atv, Al1=Al1, mu=mu,
+        self.h = L1TV(l1=l1, tv=tv, A=A, mu=mu,
                       penalty_start=penalty_start)
 
         self.mu = float(mu)
@@ -1451,13 +1450,13 @@ class PrincipalComponentAnalysisL1TV(properties.CompositeFunction,
         return self.pca.L() \
              + self.tv.L()
 
-    def prox(self, beta, factor=1.0):
+    def prox(self, beta, factor=1.0, **kwargs):
         """The proximal operator of the non-differentiable part of the
         function.
 
         From the interface "ProximalOperator".
         """
-        return self.l1.prox(beta, factor)
+        return self.l1.prox(beta, factor, **kwargs)
 
     def estimate_mu(self, beta):
         """Computes a "good" value of mu with respect to the given beta.

@@ -75,14 +75,35 @@ class TestTotalVariation(TestCase):
             beta_parsimony = fista.run(function, beta_parsimony)
 
         berr = np.linalg.norm(beta_parsimony - beta_star)
-#        print "berr:", berr
+        print "berr:", berr
         assert berr < 5e-2
 
         f_parsimony = function.f(beta_parsimony)
         f_star = function.f(beta_star)
         ferr = abs(f_parsimony - f_star)
-#        print "ferr:", ferr
+        print "ferr:", ferr
         assert ferr < 5e-4
+
+        # Test proximal operator
+        beta_parsimony = beta_start
+
+        function = CombinedFunction()
+        function.add_function(functions.losses.LinearRegression(X, y,
+                                                                mean=False))
+        function.add_prox(tv.TotalVariation(l=g, A=A, mu=mu, penalty_start=0))
+
+        fista = proximal.FISTA(eps=eps, max_iter=830)
+        beta_parsimony = fista.run(function, beta_parsimony)
+
+        berr = np.linalg.norm(beta_parsimony - beta_star)
+        print "berr:", berr
+        assert berr < 5e-0
+
+        f_parsimony = function.f(beta_parsimony)
+        f_star = function.f(beta_star)
+        ferr = abs(f_parsimony - f_star)
+        print "ferr:", ferr
+        assert ferr < 5e-1
 
     def test_smooth(self):
 
