@@ -34,7 +34,7 @@ git checkout -b gh-pages origin/gh-pages
 alias cp='cp'
 cp -r $curdir/_build/html/* $outdir
 git add .
-git commit -a -m "DOC: update pages"
+git commit -a -m "DOC: Updated pages."
 git push origin gh-pages
 cd $curdir
 rm -rf $outdir
