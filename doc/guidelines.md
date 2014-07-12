@@ -109,3 +109,4 @@ Possible tag list for the first line
 - **PERF**: When improving performance,
 - **TEST**: When adding or modifying a test,
 - **WRG**: When correcting a warning.
+- **MAINT**: When doing maintenance work.
