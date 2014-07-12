@@ -10,7 +10,8 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 import numpy as np
 
-__all__ = ["k_fold", "stratified_k_fold"]
+__all__ = ["k_fold", "stratified_k_fold",
+           "bootstrap", "stratified_bootstrap"]
 
 
 def k_fold(n, K=7):
@@ -72,3 +73,67 @@ def stratified_k_fold(y, K=7):
         train = list(all_ids.difference(test))
 
         yield train, test
+
+
+def bootstrap(n, B=100, seed=None):
+    """Bootstrap sample iterator.
+
+    Returns indices for a bootstrap training set.
+
+    Parameters
+    ----------
+    n : Positive integer greater than one. The number of samples.
+
+    B : Positive integer greater than or equal to two. The number of bootstrap
+            samples to draw.
+
+    seed : Integer. A random seed to initialise the random number generator
+            with. Use in order to obtain deterministic results. The seed is not
+            used if the seed is None.
+    """
+    if seed is not None:
+        np.random.seed(seed)
+
+    for b in xrange(B):
+        sample = np.random.randint(0, n, size=n).tolist()
+
+        yield sample
+
+
+def stratified_bootstrap(y, B=100, seed=None):
+    """Stratified bootstrap sample iterator.
+
+    Returns indices for a bootstrap training set.
+
+    Parameters
+    ----------
+    y : Numpy array with n > 1 elements. The class labels. These labels are
+            used to stratify the samples.
+
+    B : Positive integer greater than or equal to two. The number of bootstrap
+            samples to draw.
+
+    seed : Integer. A random seed to initialise the random number generator
+            with. Use in order to obtain deterministic results. The seed is not
+            used if the seed is None.
+    """
+    y = np.array(y)
+    n = np.prod(y.shape)
+    y = np.reshape(y, (n, 1))
+
+    # Assign the class labels to different folds
+    labels, y_inverse = np.unique(y, return_inverse=True)
+    count = np.bincount(y_inverse).tolist()
+    for b in xrange(B):
+        sample = -np.ones(y.shape, dtype=np.int)
+        for i in xrange(len(count)):
+            c = count[i]  # Current class
+            cls = y_inverse == i  # Find class among samples
+            i = np.where(cls)[0]  # Class indices
+            # Class sample
+            s = np.random.randint(0, c, size=c)
+
+            # Save the samples
+            sample[cls] = i[s].reshape((c, 1))
+
+        yield sample.ravel().tolist()

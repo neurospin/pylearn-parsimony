@@ -16,11 +16,11 @@ import numbers
 
 import numpy as np
 
-import parsimony.utils as utils
+#import parsimony.utils as utils
 import parsimony.functions.properties as properties
 import parsimony.utils.consts as consts
 import properties as mb_properties
-import parsimony.functions.nesterov.properties as n_properties
+#import parsimony.functions.nesterov.properties as n_properties
 
 __all__ = ["CombinedMultiblockFunction",
            "MultiblockFunctionWrapper", "MultiblockNesterovFunctionWrapper",
@@ -96,7 +96,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
                 self._p[i] = list()
                 self._N[i] = list()
                 for di in penalties[i]:
-                    if isinstance(di, n_properties.NesterovFunction):
+                    if isinstance(di, properties.NesterovFunction):
                         self._N[i].append(di)
                     else:
                         self._p[i].append(di)
@@ -163,7 +163,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
         if not isinstance(penalty, properties.Penalty):
             raise ValueError("Not a penalty.")
 
-        if isinstance(penalty, n_properties.NesterovFunction):
+        if isinstance(penalty, properties.NesterovFunction):
             self._N[i].append(penalty)
         else:
             if isinstance(penalty, properties.Gradient):
@@ -368,7 +368,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
                         L += fijk.L(w[index])
                 elif isinstance(fijk, mb_properties.MultiblockGradient):
                     if not isinstance(fijk,
-                                      mb_properties.MultiblockLipschitzContinuousGradient):
+                          mb_properties.MultiblockLipschitzContinuousGradient):
                         all_lipschitz = False
                         break
                     else:
@@ -389,7 +389,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
                         pass
                     elif isinstance(fijk, mb_properties.MultiblockGradient):
                         if not isinstance(fijk,
-                                          mb_properties.MultiblockLipschitzContinuousGradient):
+                          mb_properties.MultiblockLipschitzContinuousGradient):
                             all_lipschitz = False
                             break
                         else:
@@ -524,7 +524,7 @@ class MultiblockFunctionWrapper(properties.CompositeFunction,
 
 
 class MultiblockNesterovFunctionWrapper(MultiblockFunctionWrapper,
-                                        n_properties.NesterovFunction,
+                                        properties.NesterovFunction,
                                         properties.Continuation):
 
     def __init__(self, function, w, index):

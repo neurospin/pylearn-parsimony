@@ -15,7 +15,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 import numpy as np
 import scipy.sparse as sparse
 
-from .properties import NesterovFunction
+#from .properties import NesterovFunction
 from .. import properties
 import parsimony.utils.consts as consts
 import parsimony.utils.maths as maths
@@ -23,12 +23,13 @@ import parsimony.utils.maths as maths
 __all__ = ["L1", "A_from_variables"]
 
 
-class L1(properties.AtomicFunction,
-         NesterovFunction,
+class L1(#properties.AtomicFunction,
+         properties.NesterovFunction,
          properties.Penalty,
          properties.Constraint,
-         properties.Gradient,
-         properties.LipschitzContinuousGradient):
+#         properties.Gradient,
+#         properties.LipschitzContinuousGradient
+         ):
     """The proximal operator of the smoothed L1 function
 
         f(beta) = l * (L1mu(beta) - c),

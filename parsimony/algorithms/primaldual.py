@@ -28,7 +28,7 @@ import parsimony.utils.maths as maths
 import parsimony.utils.consts as consts
 from parsimony.algorithms.utils import Info
 import parsimony.functions.properties as properties
-import parsimony.functions.nesterov.properties as nesterov_properties
+#import parsimony.functions.nesterov.properties as nesterov_properties
 from proximal import FISTA
 
 __all__ = ["CONESTA", "StaticCONESTA", "DynamicCONESTA", "NaiveCONESTA",
@@ -65,8 +65,8 @@ class CONESTA(bases.ExplicitAlgorithm,
     min_iter : Non-negative integer less than or equal to max_iter. Minimum
             number of iterations that must be performed. Default is 1.
     """
-    INTERFACES = [nesterov_properties.NesterovFunction,
-                  properties.Gradient,
+    INTERFACES = [properties.NesterovFunction,
+#                  properties.Gradient,
                   properties.StepSize,
                   properties.ProximalOperator,
                   properties.Continuation,
@@ -96,15 +96,15 @@ class CONESTA(bases.ExplicitAlgorithm,
         self.dynamic = dynamic
 
         if dynamic:
-            self.INTERFACES = [nesterov_properties.NesterovFunction,
-                               properties.Gradient,
+            self.INTERFACES = [properties.NesterovFunction,
+#                               properties.Gradient,
                                properties.StepSize,
                                properties.ProximalOperator,
                                properties.Continuation,
                                properties.DualFunction]
         else:
-            self.INTERFACES = [nesterov_properties.NesterovFunction,
-                               properties.Gradient,
+            self.INTERFACES = [properties.NesterovFunction,
+#                               properties.Gradient,
                                properties.StepSize,
                                properties.ProximalOperator,
                                properties.Continuation]
@@ -166,7 +166,6 @@ class CONESTA(bases.ExplicitAlgorithm,
 #                                      conesta_stop=[self.mu_min])
 #            self.fista_info.clear()
             beta = algorithm.run(function, beta)
-            #print "CONESTA loop", i, "FISTA=",self.fista_info[Info.num_iter], "TOT iter:", self.num_iter
 
             self.num_iter += algorithm.num_iter
 
@@ -299,8 +298,8 @@ class NaiveCONESTA(bases.ExplicitAlgorithm,
     min_iter : Non-negative integer less than or equal to max_iter. Minimum
             number of iterations that must be performed. Default is 1.
     """
-    INTERFACES = [nesterov_properties.NesterovFunction,
-                  properties.Gradient,
+    INTERFACES = [properties.NesterovFunction,
+#                  properties.Gradient,
                   properties.StepSize,
                   properties.ProximalOperator,
                   properties.Continuation]
@@ -463,8 +462,8 @@ class ExcessiveGapMethod(bases.ExplicitAlgorithm,
     min_iter : Non-negative integer less than or equal to max_iter. Minimum
             number of iterations that must be performed. Default is 1.
     """
-    INTERFACES = [nesterov_properties.NesterovFunction,
-                  properties.LipschitzContinuousGradient,
+    INTERFACES = [properties.NesterovFunction,
+#                  properties.LipschitzContinuousGradient,
                   properties.GradientMap,
                   properties.DualFunction,
                   properties.StronglyConvex]

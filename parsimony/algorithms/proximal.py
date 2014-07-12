@@ -141,7 +141,9 @@ class ISTA(bases.ExplicitAlgorithm,
 
             betaold = betanew
             betanew = function.prox(betaold - step * function.grad(betaold),
-                                    step)
+                            step,
+                            eps=1.0 / (float(i) ** (2.0 + consts.TOLERANCE)))
+#                            eps=1.0 / (float(i) ** (4.0 + consts.TOLERANCE)))
 
             if self.info_requested(Info.time):
                 t.append(utils.time_cpu() - tm)
@@ -280,7 +282,9 @@ class FISTA(bases.ExplicitAlgorithm,
 
             betaold = betanew
             betanew = function.prox(z - step * function.grad(z),
-                                    step)
+                            step,
+                            eps=1.0 / (float(i) ** (2.0 + consts.TOLERANCE)))
+#                            eps=1.0 / (float(i) ** (4.0 + consts.TOLERANCE)))
 
             if self.info_requested(Info.time):
                 t.append(utils.time_cpu() - tm)

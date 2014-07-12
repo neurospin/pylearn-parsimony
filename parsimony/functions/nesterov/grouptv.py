@@ -15,19 +15,20 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 import scipy.sparse as sparse
 import numpy as np
 
-from .properties import NesterovFunction
+#from .properties import NesterovFunction
 from .. import properties
 import parsimony.utils.consts as consts
 
 __all__ = ["GroupTotalVariation", "A_from_masks", "A_from_rects"]
 
 
-class GroupTotalVariation(properties.AtomicFunction,
-                          NesterovFunction,
+class GroupTotalVariation(#properties.AtomicFunction,
+                          properties.NesterovFunction,
                           properties.Penalty,
                           properties.Constraint,
-                          properties.Gradient,
-                          properties.LipschitzContinuousGradient):
+#                          properties.Gradient,
+#                          properties.LipschitzContinuousGradient
+                          ):
     """The smoothed Group total variation (Group TV) function
 
         f(beta) = l * (GroupTV(beta) - c),

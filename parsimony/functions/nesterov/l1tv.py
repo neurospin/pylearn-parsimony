@@ -17,7 +17,7 @@ import math
 import scipy.sparse as sparse
 import numpy as np
 
-from .properties import NesterovFunction
+#from .properties import NesterovFunction
 from .. import properties
 import parsimony.utils.consts as consts
 import parsimony.utils.maths as maths
@@ -27,31 +27,29 @@ import l1
 __all__ = ["L1TV", "A_from_mask", "A_from_shape"]
 
 
-class L1TV(properties.AtomicFunction,
-           NesterovFunction,
+class L1TV(properties.NesterovFunction,
            properties.Penalty,
            properties.Eigenvalues):
     """The proximal operator of the smoothed sum of the TV and L1 functions
 
-        f(beta) = (l * L1(beta) + g * TV(beta))_mu,
+        f(beta) = (l1 * L1(beta) + tv * TV(beta))_mu,
 
     where (...)_mu means that what's within parentheses is smoothed.
     """
-    def __init__(self, l, g, Atv=None, Al1=None, mu=0.0, penalty_start=0):
+    def __init__(self, l1, tv, A=None, mu=0.0, penalty_start=0):
         """
         Parameters
         ----------
-        l : Non-negative float. The Lagrange multiplier, or regularisation
+        l1 : Non-negative float. The Lagrange multiplier, or regularisation
                 constant, of the smoothed L1 part of the function.
 
-        g : Non-negative float. The Lagrange multiplier, or regularisation
+        tv : Non-negative float. The Lagrange multiplier, or regularisation
                 constant, of the smoothed total variation part of the function.
 
-        Atv : A (usually sparse) matrix. The linear operator for the smoothed
-                total variation part. May not be None.
-
-        Al1 : A (usually sparse) matrix. The linear operator for the smoothed
-                L1 part. May not be None.
+        A : A list or tuple with 4 elements of (usually sparse) arrays. The
+                linear operator for the smoothed L1+TV. The first element must
+                be the linear operator for L1 and the following three for TV.
+                May not be None.
 
         mu : Non-negative float. The regularisation constant for the smoothing.
 
@@ -59,20 +57,16 @@ class L1TV(properties.AtomicFunction,
                 etc., to exempt from penalisation. Equivalently, the first
                 index to be penalised. Default is 0, all columns are included.
         """
-        self.g = float(g)
+        self.g = float(tv)
 
         # WARNING: Number of non-zero rows may differ from p.
-        self._p = Atv[0].shape[1]
-        if Al1 is None:
-            Al1 = sparse.eye(self._p, self._p)
-        elif isinstance(Al1, (list, tuple)):
-            Al1 = Al1[0]
-        A = [l * Al1,
-             g * Atv[0],
-             g * Atv[1],
-             g * Atv[2]]
+        self._p = A[0].shape[1]
+        A = [l1 * A[0],
+             tv * A[1],
+             tv * A[2],
+             tv * A[3]]
 
-        super(L1TV, self).__init__(l, A=A, mu=mu, penalty_start=penalty_start)
+        super(L1TV, self).__init__(l1, A=A, mu=mu, penalty_start=penalty_start)
 
         self.reset()
 
@@ -188,6 +182,17 @@ class L1TV(properties.AtomicFunction,
 #
 #        return Aa
 
+    def lA(self):
+        """ Linear operator of the Nesterov function multiplied by the
+        corresponding Lagrange multipliers.
+
+        Note that in this case, the A matrices are already multiplied by the
+        Lagrange multipliers.
+        """
+        A = self.A()
+
+        return A
+
     def alpha(self, beta):
         """ Dual variable of the Nesterov function.
 
@@ -253,10 +258,13 @@ class L1TV(properties.AtomicFunction,
         """
         A = self.A()
 
+        # A[0] is L1, A[1-3] is TV.
         return (A[0].shape[0] / 2.0) \
              + (A[1].shape[0] / 2.0)
 
 
+# TODO: Do we need to take the number of variables here?
+# Why not use np.prod(shape) + penalty_start instead and save a parameter?
 def A_from_mask(mask, num_variables, penalty_start=0):
     """Generates the linear operator for the total variation Nesterov function
     from a mask for a 3D image.
@@ -276,9 +284,11 @@ def A_from_mask(mask, num_variables, penalty_start=0):
     Atv, _ = tv.A_from_mask(mask)
     Al1 = l1.A_from_variables(num_variables, penalty_start=penalty_start)
 
-    return Atv, Al1
+    return Al1[0], Atv[0], Atv[1], Atv[2]
 
 
+# TODO: Do we need to take the number of variables here?
+# Why not use np.prod(shape) + penalty_start instead and save a parameter?
 def A_from_shape(shape, num_variables, penalty_start=0):
     """Generates the linear operator for the total variation Nesterov function
     from the shape of a 3D image.
@@ -300,4 +310,4 @@ def A_from_shape(shape, num_variables, penalty_start=0):
     Atv, _ = tv.A_from_shape(shape)
     Al1 = l1.A_from_variables(num_variables, penalty_start=penalty_start)
 
-    return Atv, Al1
+    return Al1[0], Atv[0], Atv[1], Atv[2]
