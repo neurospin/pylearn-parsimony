@@ -8,6 +8,8 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
+import time
+
 import numpy as np
 
 from parsimony.functions import CombinedFunction
@@ -22,10 +24,10 @@ import parsimony.utils.start_vectors as start_vectors
 np.random.seed(42)
 
 px = 10
-py = 1
+py = 10
 pz = 1
 shape = (pz, py, px)
-n, p = 5, np.prod(shape)
+n, p = 50, np.prod(shape)
 
 l = 0.618
 k = 0.01
@@ -64,7 +66,9 @@ A = l1tv.A_from_shape(shape, p)
 function.add_prox(l1tv.L1TV(l, g, A=A, mu=mu, penalty_start=0))
 #function.add_prox(tv.TotalVariation(l=g, A=A, mu=mu, penalty_start=0))
 
+t = time.time()
 beta = alg.run(function, beta_start)
+print "Time:", time.time() - t
 
 berr = np.linalg.norm(beta - beta_star)
 print "berr:", berr

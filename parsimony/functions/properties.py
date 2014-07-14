@@ -842,20 +842,37 @@ class NesterovFunction(Gradient,
         else:
             alpha = self._alpha  # Use the solution from the last run
 
+        alpha_ = alpha
+
         # TODO: Compute with FISTA instead!
-        for it in xrange(max_iter):
+        for it in xrange(1, max_iter + 1):
+
+            # ISTA
+#            z = alpha
+
+#            # FISTA
+            if it == 1:  # Since we do few iterations, this speeds up slightly
+                z = alpha
+            else:
+                z = [0] * len(alpha)
+                for i in xrange(len(alpha)):
+                    z[i] = alpha[i] \
+                         + ((it - 2.0) / (it + 1.0)) * (alpha[i] - alpha_[i])
+
+            alpha_ = alpha
+
             # Step size
-            step = f.step(alpha)
+            step = f.step(z)
 
             # Gradient
-            grad = f.grad(alpha)
+            grad = f.grad(z)
 
-            # Gradient step for each block of alpha
-            for i in xrange(len(alpha)):
-                alpha[i] -= step * grad[i]
+            # Gradient step for each "block"
+            for i in xrange(len(z)):
+                z[i] -= step * grad[i]
 
             # Project onto the compact set K
-            alpha = f.prox(alpha)
+            alpha = f.prox(z)
 
             # Compute the proximal operator
             Aa = A[0].T.dot(alpha[0])
@@ -867,12 +884,13 @@ class NesterovFunction(Gradient,
                     + factor * self.f(y) \
                 - 0.5 * (maths.norm(beta) ** 2.0 - maths.norm(y) ** 2.0)
 
-            if it % 10 == 0 and it > 0:
-                print "gap:", gap
-                print "f  :", f.f(alpha)
+#            if it % 10 == 0:
+#                print "gap:", gap
+#                print "f  :", f.f(alpha)
 
             if gap < eps:
 #                print "Converged!"
+#                print "Converged in %d iterations!" % it
                 break
 
         self._alpha = alpha
