@@ -64,7 +64,7 @@ class ISTA(bases.ExplicitAlgorithm,
     >>> X = np.random.rand(100, 50)
     >>> y = np.random.rand(100, 1)
     >>> A = sparse.csr_matrix((50, 50))  # Unused here
-    >>> function = LinearRegressionL1L2TV(X, y, l=0.0, k=0.0, g=0.0,
+    >>> function = LinearRegressionL1L2TV(X, y, 0.0, 0.0, 0.0,
     ...                                   A=A, mu=0.0)
     >>> ista = ISTA(max_iter=10000)
     >>> beta1 = ista.run(function, np.random.rand(50, 1))
@@ -76,7 +76,7 @@ class ISTA(bases.ExplicitAlgorithm,
     >>> X = np.random.rand(100, 50)
     >>> y = np.random.rand(100, 1)
     >>> A = sparse.csr_matrix((50, 50))  # Unused here
-    >>> function = LinearRegressionL1L2TV(X, y, l=0.1, k=0.0, g=0.0,
+    >>> function = LinearRegressionL1L2TV(X, y, 0.1, 0.0, 0.0,
     ...                                   A=A, mu=0.0)
     >>> ista = ISTA(max_iter=10000)
     >>> beta1 = ista.run(function, np.random.rand(50, 1))
@@ -201,7 +201,7 @@ class FISTA(bases.ExplicitAlgorithm,
     >>> X = np.random.rand(100, 50)
     >>> y = np.random.rand(100, 1)
     >>> A = sparse.csr_matrix((50, 50))  # Unused here
-    >>> function = LinearRegressionL1L2TV(X, y, k=0.0, l=0.0, g=0.0,
+    >>> function = LinearRegressionL1L2TV(X, y, 0.0, 0.0, 0.0,
     ...                                   A=A, mu=0.0)
     >>> fista = FISTA(max_iter=10000)
     >>> beta1 = fista.run(function, np.random.rand(50, 1))
@@ -213,7 +213,7 @@ class FISTA(bases.ExplicitAlgorithm,
     >>> X = np.random.rand(100, 50)
     >>> y = np.random.rand(100, 1)
     >>> A = sparse.csr_matrix((50, 50))  # Unused here
-    >>> function = LinearRegressionL1L2TV(X, y, k=0.0, l=0.1, g=0.0,
+    >>> function = LinearRegressionL1L2TV(X, y, 0.1, 0.0, 0.0,
     ...                                   A=A, mu=0.0)
     >>> fista = FISTA(max_iter=10000)
     >>> beta1 = fista.run(function, np.random.rand(50, 1))

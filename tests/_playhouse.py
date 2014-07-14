@@ -14,6 +14,7 @@ import numpy as np
 
 from parsimony.functions import CombinedFunction
 import parsimony.algorithms.proximal as proximal
+import parsimony.algorithms.primaldual as primaldual
 import parsimony.functions as functions
 import parsimony.functions.penalties as penalties
 import parsimony.functions.nesterov.tv as tv
@@ -36,7 +37,7 @@ g = 1.1
 start_vector = start_vectors.RandomStartVector(normalise=True)
 beta = start_vector.get_vector(p)
 
-alpha = 1.0
+alpha = 0.9
 Sigma = alpha * np.eye(p, p) \
       + (1.0 - alpha) * np.random.randn(p, p)
 mean = np.zeros(p)
@@ -56,15 +57,19 @@ max_iter = 20000
 
 beta_start = start_vector.get_vector(p)
 
-alg = proximal.FISTA(eps=eps, max_iter=max_iter)
+#alg = proximal.FISTA(eps=eps, max_iter=max_iter)
+alg = primaldual.DynamicCONESTA(eps=eps, max_iter=max_iter)
 
-function = CombinedFunction()
-function.add_function(functions.losses.LinearRegression(X, y,
-                                                       mean=False))
-function.add_penalty(penalties.L2Squared(l=k))
-A = l1tv.A_from_shape(shape, p)
-function.add_prox(l1tv.L1TV(l, g, A=A, mu=mu, penalty_start=0))
-#function.add_prox(tv.TotalVariation(l=g, A=A, mu=mu, penalty_start=0))
+#function = CombinedFunction()
+#function.add_function(functions.losses.LinearRegression(X, y,
+#                                                       mean=False))
+#function.add_penalty(penalties.L2Squared(l=k))
+#A = l1tv.A_from_shape(shape, p)
+#function.add_prox(l1tv.L1TV(l, g, A=A, mu=mu, penalty_start=0))
+##function.add_prox(tv.TotalVariation(l=g, A=A, mu=mu, penalty_start=0))
+
+function = functions.LinearRegressionL1L2TV(X, y, l, k, g, A=A,
+                                            penalty_start=0)
 
 t = time.time()
 beta = alg.run(function, beta_start)

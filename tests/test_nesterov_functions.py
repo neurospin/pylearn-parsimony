@@ -212,7 +212,7 @@ class TestL1TV(TestCase):
         X, y, beta_star = lr.load(beta)
 
         eps = 1e-8
-        max_iter = 790
+        max_iter = 810
 
         alg = proximal.FISTA(eps=eps, max_iter=max_iter)
 

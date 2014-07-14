@@ -779,7 +779,7 @@ class LinearRegressionL1L2TV(RegressionEstimator):
         X, y = check_arrays(X, y)
 
         function = functions.LinearRegressionL1L2TV(X, y,
-                                              self.l2, self.l1, self.tv,
+                                              self.l1, self.l2, self.tv,
                                               A=self.A,
                                               penalty_start=self.penalty_start,
                                               mean=self.mean)

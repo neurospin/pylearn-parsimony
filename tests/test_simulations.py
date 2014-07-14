@@ -772,7 +772,7 @@ class TestSimulations(TestCase):
                                       penalty_start=1,
                                       mean=False)
         estimator.fit(X, y)
-        function = LinearRegressionL1L2TV(X, y, k, l, g, A=A, mu=estimator.mu,
+        function = LinearRegressionL1L2TV(X, y, l, k, g, A=A, mu=estimator.mu,
                                           penalty_start=1)
 
         err = np.linalg.norm(estimator.beta - beta_star) \

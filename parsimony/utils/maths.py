@@ -12,7 +12,8 @@ import numpy as np
 
 from parsimony.utils.consts import TOLERANCE
 
-__all__ = ["norm", "normFro", "norm1", "norm0", "normInf", "corr", "cov"]
+__all__ = ["norm", "normFro", "norm1", "norm0", "normInf", "corr", "cov",
+           "positive"]
 
 
 def norm(x):
@@ -190,6 +191,23 @@ def cov(a, b):
         return ip[0, 0]
     else:
         return ip
+
+
+def positive(x):
+    """The function
+
+        max(x, 0).
+
+    Returns a numpy array.
+
+    Example
+    -------
+    >>> import numpy as np
+    >>> from parsimony.utils.maths import positive
+    >>> np.maximum([1,-1,2], [0,0,0])
+    array([1, 0, 2])
+    """
+    return np.maximum(x, np.zeros(np.array(x).shape))
 
 
 if __name__ == "__main__":

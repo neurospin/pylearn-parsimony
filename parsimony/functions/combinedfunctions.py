@@ -27,6 +27,7 @@ from .losses import RidgeRegression
 from .losses import RidgeLogisticRegression
 from .losses import LatentVariableVariance
 import parsimony.utils.consts as consts
+import parsimony.utils.maths as maths
 
 __all__ = ["CombinedFunction",
            "LinearRegressionL1L2TV", "LinearRegressionL1L2GL",
@@ -210,8 +211,6 @@ class CombinedFunction(properties.CompositeFunction,
 
 
 class LinearRegressionL1L2TV(properties.CompositeFunction,
-#                             properties.Gradient,
-#                             properties.LipschitzContinuousGradient,
                              properties.NesterovFunction,
                              properties.ProximalOperator,
                              properties.Continuation,
@@ -219,45 +218,44 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
                              properties.StronglyConvex,
                              properties.StepSize):
     """Combination (sum) of LinearRegression, L1, L2 and TotalVariation.
+
+    Parameters:
+    ----------
+    X : Numpy array. The X matrix for the ridge regression.
+
+    y : Numpy array. The y vector for the ridge regression.
+
+    l1 : Non-negative float. The Lagrange multiplier, or regularisation
+            constant, for the L1 penalty.
+
+    l2 : Non-negative float. The Lagrange multiplier, or regularisation
+            constant, for the ridge penalty.
+
+    tv : Non-negative float. The Lagrange multiplier, or regularisation
+            constant, of the smoothed TV function.
+
+    A : Numpy array (usually sparse). The linear operator for the Nesterov
+            formulation of TV. May not be None!
+
+    mu : Non-negative float. The regularisation constant for the smoothing
+            of the TV function.
+
+    penalty_start : Non-negative integer. The number of columns, variables
+            etc., to except from penalisation. Equivalently, the first
+            index to be penalised. Default is 0, all columns are included.
+
+    mean : Boolean. Whether to compute the squared loss or the mean
+            squared loss. Default is True, the mean squared loss.
     """
-    def __init__(self, X, y, k, l, g, A=None, mu=0.0, penalty_start=0,
+    def __init__(self, X, y, l1, l2, tv, A=None, mu=0.0, penalty_start=0,
                  mean=True):
-        """
-        Parameters:
-        ----------
-        X : Numpy array. The X matrix for the ridge regression.
-
-        y : Numpy array. The y vector for the ridge regression.
-
-        k : Non-negative float. The Lagrange multiplier, or regularisation
-                constant, for the ridge penalty.
-
-        l : Non-negative float. The Lagrange multiplier, or regularisation
-                constant, for the L1 penalty.
-
-        g : Non-negative float. The Lagrange multiplier, or regularisation
-                constant, of the smoothed TV function.
-
-        A : Numpy array (usually sparse). The linear operator for the Nesterov
-                formulation of TV. May not be None!
-
-        mu : Non-negative float. The regularisation constant for the smoothing
-                of the TV function.
-
-        penalty_start : Non-negative integer. The number of columns, variables
-                etc., to except from penalisation. Equivalently, the first
-                index to be penalised. Default is 0, all columns are included.
-
-        mean : Boolean. Whether to compute the squared loss or the mean
-                squared loss. Default is True, the mean squared loss.
-        """
         self.X = X
         self.y = y
 
-        self.rr = RidgeRegression(X, y, k, penalty_start=penalty_start,
+        self.rr = RidgeRegression(X, y, l2, penalty_start=penalty_start,
                                   mean=mean)
-        self.l1 = L1(l, penalty_start=penalty_start)
-        self.tv = TotalVariation(g, A=A, mu=mu, penalty_start=penalty_start)
+        self.l1 = L1(l1, penalty_start=penalty_start)
+        self.tv = TotalVariation(tv, A=A, mu=mu, penalty_start=penalty_start)
 
         self.penalty_start = penalty_start
         self.mean = mean
@@ -523,6 +521,21 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
 
         From the interface "DualFunction".
         """
+#        a = np.dot(self.X, beta) - self.y
+#
+#        alpha = self.tv.alpha(beta)
+#        g = self.rr.f(beta) + self.l1.f(beta) + self.tv.phi(alpha, beta)
+#
+#        f_ = 0.5 * maths.norm(a) ** 2.0 + np.dot(self.y.T, a)
+#
+#        z = -np.dot(self.X.T, a)
+#        h_ = (1.0 / (2 * self.rr.k)) * np.sum(maths.positive(np.abs(z) \
+#                - (self.tv.l * self.Aa(alpha) + self.l1.l)) ** 2.0)
+#
+#        gap = g + f_ + h_
+#
+#        print "Fenchel duality gap:", gap
+
 #        alpha = self.tv.alpha(beta)
 #
 #        P = self.rr.f(beta) \
@@ -597,7 +610,7 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
 class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
     """Combination (sum) of RidgeRegression, L1 and Overlapping Group Lasso.
     """
-    def __init__(self, X, y, l, k, g, A=None, mu=0.0, penalty_start=0,
+    def __init__(self, X, y, l1, l2, gl, A=None, mu=0.0, penalty_start=0,
                  mean=True):
         """
         Parameters:
@@ -606,13 +619,13 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
 
         y : Numpy array (n-by-1). The y vector for the ridge regression.
 
-        l : Non-negative float. The Lagrange multiplier, or regularisation
+        l1 : Non-negative float. The Lagrange multiplier, or regularisation
                 constant, for the L1 penalty.
 
-        k : Non-negative float. The Lagrange multiplier, or regularisation
+        l2 : Non-negative float. The Lagrange multiplier, or regularisation
                 constant, for the ridge penalty.
 
-        g : Non-negative float. The Lagrange multiplier, or regularisation
+        gl : Non-negative float. The Lagrange multiplier, or regularisation
                 constant, of the overlapping group L1-L2 function.
 
         A : Numpy array (usually sparse). The linear operator for the Nesterov
@@ -631,10 +644,11 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
         self.X = X
         self.y = y
 
-        self.rr = RidgeRegression(X, y, k, penalty_start=penalty_start,
+        self.rr = RidgeRegression(X, y, l2, penalty_start=penalty_start,
                                   mean=mean)
-        self.l1 = L1(l, penalty_start=penalty_start)
-        self.gl = GroupLassoOverlap(g, A=A, mu=mu, penalty_start=penalty_start)
+        self.l1 = L1(l1, penalty_start=penalty_start)
+        self.gl = GroupLassoOverlap(gl, A=A, mu=mu,
+                                    penalty_start=penalty_start)
 
         self.penalty_start = penalty_start
         self.mean = mean
