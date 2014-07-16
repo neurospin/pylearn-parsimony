@@ -144,7 +144,11 @@ def plot_errorbars(X, classes=None, means=None, alpha=0.05,
                       capsize=5)
 
     plot.xlim((0, n + 1))
-    plot.ylim((np.min(data_mu - ci) * 1.1, np.max(data_mu + ci) * 1.1))
+    mn = np.min(data_mu - ci)
+    mx = np.max(data_mu + ci)
+    d = mx - mn
+    plot.ylim((mn - d * 0.05, mx + d * 0.05))
+
     if xlabel is not None:
         plot.xlabel(xlabel)
     if ylabel is not None:

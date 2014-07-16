@@ -69,7 +69,8 @@ alg = primaldual.DynamicCONESTA(eps=eps, max_iter=max_iter)
 ##function.add_prox(tv.TotalVariation(l=g, A=A, mu=mu, penalty_start=0))
 
 function = functions.LinearRegressionL1L2TV(X, y, l, k, g, A=A,
-                                            penalty_start=0)
+                                            penalty_start=0,
+                                            mean=False)
 
 t = time.time()
 beta = alg.run(function, beta_start)

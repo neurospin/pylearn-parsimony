@@ -10,7 +10,9 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 import numpy as np
 
-__all__ = ["sensitivity", "specificity"]
+import parsimony.utils.consts as consts
+
+__all__ = ["sensitivity", "specificity", "fleiss_kappa"]
 
 
 def sensitivity(cond, test):
@@ -64,3 +66,41 @@ def accuracy(cond, test):
     spec = (true_pos.sum() + true_neg.sum()) / float(n)
 
     return spec
+
+
+def fleiss_kappa(W, k):
+    """Computes Fleiss' kappa for a set of variables classified into k
+    categories by a number of different raters.
+
+    W is a matrix with shape (variables, raters) with k categories between
+    0, ..., k - 1.
+    """
+    N, n = W.shape
+    if n <= 1:
+        raise ValueError("At least two ratings are needed")
+    A = np.zeros((N, k))
+    Nn = N * n
+    p = [0.0] * k
+    for j in xrange(k):
+        A[:, j] = np.sum(W == j, axis=1)
+
+        p[j] = np.sum(A[:, j]) / float(Nn)
+
+    P = [0.0] * N
+    for i in xrange(N):
+        for j in xrange(k):
+            P[i] += A[i, j] ** 2.0
+        P[i] -= n
+        P[i] /= float(n * (n - 1))
+
+    P_ = sum(P) / float(N)
+    Pe = sum([pj ** 2.0 for pj in p])
+
+    if abs(Pe - 1) < consts.TOLERANCE:
+        kappa = 1.0
+    else:
+        kappa = (P_ - Pe) / (1.0 - Pe)
+    if kappa > 1.0:
+        kappa = 1.0
+
+    return kappa
