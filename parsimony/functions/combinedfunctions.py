@@ -542,8 +542,14 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
 #        g = self.rr.f(beta) + self.l1.f(beta) + self.tv.f(beta)
         g = self.f(beta)
 
-        a = np.dot(self.X, beta) - self.y
-        f_ = 0.5 * maths.norm(a) ** 2.0 + np.dot(self.y.T, a)[0, 0]
+        n = float(self.X.shape[0])
+
+        if self.mean:
+            a = (np.dot(self.X, beta) - self.y) / n
+            f_ = (n / 2.0) * maths.norm(a) ** 2.0 + np.dot(self.y.T, a)[0, 0]
+        else:
+            a = np.dot(self.X, beta) - self.y
+            f_ = (1.0 / 2.0) * maths.norm(a) ** 2.0 + np.dot(self.y.T, a)[0, 0]
 
         z = -np.dot(self.X.T, a)
         h_ = (1.0 / (2 * self.rr.k)) \
