@@ -1363,24 +1363,18 @@ class LinearRegressionL2SmoothedL1TV(properties.CompositeFunction,
 
 
 class PrincipalComponentAnalysisL1TV(properties.CompositeFunction,
-#                                     properties.Gradient,
-#                                     properties.LipschitzContinuousGradient,
                                      properties.NesterovFunction,
-                                     properties.ProximalOperator,
                                      properties.Continuation,
                                      properties.DualFunction,
                                      properties.StronglyConvex,
                                      properties.StepSize):
     """Combination (sum) of PCA (Variance), L1 and TotalVariation
     """
-    def __init__(self, X, k, l, g, A=None, mu=0.0, penalty_start=0):
+    def __init__(self, X, l, g, A=None, mu=0.0, penalty_start=0):
         """
         Parameters:
         ----------
         X : Numpy array. The X matrix for the ridge regression.
-
-        k : Non-negative float. The Lagrange multiplier, or regularisation
-                constant, for the ridge penalty.
 
         l : Non-negative float. The Lagrange multiplier, or regularisation
                 constant, for the L1 penalty.
