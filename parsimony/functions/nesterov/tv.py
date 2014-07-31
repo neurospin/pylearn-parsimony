@@ -543,9 +543,15 @@ def nesterov_linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, of
     weights : Numpy array. The weight put on the gradient of every point.
             Default is weight 1 for each point, or equivalently, no weight. The
             weights is a numpy array of the same shape as mask.
-
-    Example
+    Returns
     -------
+    out1 : [sparse_matrix, ...]. Linear operator for the total variation 
+           Nesterov function computed over a mesh.
+
+    out2 : int. n_compacts
+
+    Examples
+    --------
     >>> import numpy as np
     >>> import parsimony.functions.nesterov.tv as tv_helper
     >>> mesh_coord = np.array([[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2]])
