@@ -497,6 +497,16 @@ class TestTotalVariation(TestCase):
         assert np.array_equal(A_true[2], A_shape[2].todense())
         assert np.array_equal(A_shape[2].todense(), A_shape[2].todense())
 
+    def test_tvhelper_nesterov_linear_operator_from_mesh(self):
+        import parsimony.functions.nesterov.tv as tv_helper
+        mesh_coord = np.array([[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2]])
+        mesh_triangles = np.array([[0 ,1, 3], [0, 2 ,3], [2, 3, 5], [2, 4, 5]])
+        A, _ = tv_helper.nesterov_linear_operator_from_mesh(mesh_coord, mesh_triangles)        
+        a =[[np.where(l)[0].tolist() for l in a.toarray()] for a in A]        
+        b = [[[], [0, 1], [0, 2], [0, 3], [2, 4], [2, 5]],
+             [[], [],     [],     [1, 3], [],     [3, 5]],
+             [[], [],     [],     [2, 3], [],     [4, 5]]]
+        assert a == b
 
 if __name__ == "__main__":
     import unittest
