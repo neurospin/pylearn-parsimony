@@ -87,9 +87,15 @@ class TotalVariation(#properties.AtomicFunction,
             beta_ = beta
 
         A = self.A()
-        return self.l * (np.sum(np.sqrt(A[0].dot(beta_) ** 2.0 +
-                                        A[1].dot(beta_) ** 2.0 +
-                                        A[2].dot(beta_) ** 2.0)) - self.c)
+        abeta2 = A[0].dot(beta_) ** 2.0
+        for k in xrange(1, len(A)):
+            abeta2 += A[k].dot(beta_) ** 2
+
+        return self.l * (np.sum(np.sqrt(abeta2)) - self.c)
+#
+#        return self.l * (np.sum(np.sqrt(A[0].dot(beta_) ** 2.0 +
+#                                        A[1].dot(beta_) ** 2.0 +
+#                                        A[2].dot(beta_) ** 2.0)) - self.c)
 
     def phi(self, alpha, beta):
         """Function value with known alpha.
@@ -126,9 +132,13 @@ class TotalVariation(#properties.AtomicFunction,
             beta_ = beta
 
         A = self.A()
-        val = np.sum(np.sqrt(A[0].dot(beta_) ** 2.0 +
-                             A[1].dot(beta_) ** 2.0 +
-                             A[2].dot(beta_) ** 2.0))
+        abeta2 = A[0].dot(beta_) ** 2.0
+        for k in xrange(1, len(A)):
+            abeta2 += A[k].dot(beta_) ** 2
+        val = np.sum(np.sqrt(abeta2))
+#        val = np.sum(np.sqrt(A[0].dot(beta_) ** 2.0 +
+#                             A[1].dot(beta_) ** 2.0 +
+#                             A[2].dot(beta_) ** 2.0))
         return val <= self.c
 
     def L(self):
@@ -209,23 +219,42 @@ class TotalVariation(#properties.AtomicFunction,
 #
 #        return alpha
 
+# old version limited to tv with 3 A matrices
+#    def project(self, a):
+#        """ Projection onto the compact space of the Nesterov function.
+#
+#        From the interface "NesterovFunction".
+#        """
+#        import pickle
+#        pickle.dump(a, open("/tmp/a.pkl", "wb"))
+#        ax = a[0]
+#        ay = a[1]
+#        az = a[2]
+#        anorm = ax ** 2.0 + ay ** 2.0 + az ** 2.0
+#        i = anorm > 1.0
+#
+#        anorm_i = anorm[i] ** 0.5  # Square root is taken here. Faster.
+#        ax[i] = np.divide(ax[i], anorm_i)
+#        ay[i] = np.divide(ay[i], anorm_i)
+#        az[i] = np.divide(az[i], anorm_i)
+#
+#        return [ax, ay, az]
+
     def project(self, a):
         """ Projection onto the compact space of the Nesterov function.
 
         From the interface "NesterovFunction".
         """
-        ax = a[0]
-        ay = a[1]
-        az = a[2]
-        anorm = ax ** 2.0 + ay ** 2.0 + az ** 2.0
+        anorm = a[0] ** 2.0
+        for k in xrange(1, len(a)):
+            anorm += a[k] ** 2
         i = anorm > 1.0
 
         anorm_i = anorm[i] ** 0.5  # Square root is taken here. Faster.
-        ax[i] = np.divide(ax[i], anorm_i)
-        ay[i] = np.divide(ay[i], anorm_i)
-        az[i] = np.divide(az[i], anorm_i)
+        for k in xrange(len(a)):
+            a[k][i] = np.divide(a[k][i], anorm_i)
 
-        return [ax, ay, az]
+        return a
 
     def M(self):
         """ The maximum value of the regularisation of the dual variable. We
