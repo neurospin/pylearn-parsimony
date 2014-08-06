@@ -23,7 +23,8 @@ import parsimony.utils.consts as consts
 import parsimony.utils.maths as maths
 
 __all__ = ["TotalVariation",
-           "A_from_mask", "A_from_subset_mask", "A_from_shape"]
+           "A_from_mask", "A_from_subset_mask", "A_from_shape",
+           "nesterov_linear_operator_from_mesh"]
 
 
 class TotalVariation(#properties.AtomicFunction,
@@ -86,9 +87,15 @@ class TotalVariation(#properties.AtomicFunction,
             beta_ = beta
 
         A = self.A()
-        return self.l * (np.sum(np.sqrt(A[0].dot(beta_) ** 2.0 +
-                                        A[1].dot(beta_) ** 2.0 +
-                                        A[2].dot(beta_) ** 2.0)) - self.c)
+        abeta2 = A[0].dot(beta_) ** 2.0
+        for k in xrange(1, len(A)):
+            abeta2 += A[k].dot(beta_) ** 2
+
+        return self.l * (np.sum(np.sqrt(abeta2)) - self.c)
+#
+#        return self.l * (np.sum(np.sqrt(A[0].dot(beta_) ** 2.0 +
+#                                        A[1].dot(beta_) ** 2.0 +
+#                                        A[2].dot(beta_) ** 2.0)) - self.c)
 
     def phi(self, alpha, beta):
         """Function value with known alpha.
@@ -125,9 +132,13 @@ class TotalVariation(#properties.AtomicFunction,
             beta_ = beta
 
         A = self.A()
-        val = np.sum(np.sqrt(A[0].dot(beta_) ** 2.0 +
-                             A[1].dot(beta_) ** 2.0 +
-                             A[2].dot(beta_) ** 2.0))
+        abeta2 = A[0].dot(beta_) ** 2.0
+        for k in xrange(1, len(A)):
+            abeta2 += A[k].dot(beta_) ** 2
+        val = np.sum(np.sqrt(abeta2))
+#        val = np.sum(np.sqrt(A[0].dot(beta_) ** 2.0 +
+#                             A[1].dot(beta_) ** 2.0 +
+#                             A[2].dot(beta_) ** 2.0))
         return val <= self.c
 
     def L(self):
@@ -208,23 +219,42 @@ class TotalVariation(#properties.AtomicFunction,
 #
 #        return alpha
 
+# old version limited to tv with 3 A matrices
+#    def project(self, a):
+#        """ Projection onto the compact space of the Nesterov function.
+#
+#        From the interface "NesterovFunction".
+#        """
+#        import pickle
+#        pickle.dump(a, open("/tmp/a.pkl", "wb"))
+#        ax = a[0]
+#        ay = a[1]
+#        az = a[2]
+#        anorm = ax ** 2.0 + ay ** 2.0 + az ** 2.0
+#        i = anorm > 1.0
+#
+#        anorm_i = anorm[i] ** 0.5  # Square root is taken here. Faster.
+#        ax[i] = np.divide(ax[i], anorm_i)
+#        ay[i] = np.divide(ay[i], anorm_i)
+#        az[i] = np.divide(az[i], anorm_i)
+#
+#        return [ax, ay, az]
+
     def project(self, a):
         """ Projection onto the compact space of the Nesterov function.
 
         From the interface "NesterovFunction".
         """
-        ax = a[0]
-        ay = a[1]
-        az = a[2]
-        anorm = ax ** 2.0 + ay ** 2.0 + az ** 2.0
+        anorm = a[0] ** 2.0
+        for k in xrange(1, len(a)):
+            anorm += a[k] ** 2
         i = anorm > 1.0
 
         anorm_i = anorm[i] ** 0.5  # Square root is taken here. Faster.
-        ax[i] = np.divide(ax[i], anorm_i)
-        ay[i] = np.divide(ay[i], anorm_i)
-        az[i] = np.divide(az[i], anorm_i)
+        for k in xrange(len(a)):
+            a[k][i] = np.divide(a[k][i], anorm_i)
 
-        return [ax, ay, az]
+        return a
 
     def M(self):
         """ The maximum value of the regularisation of the dual variable. We
@@ -512,3 +542,99 @@ def A_from_shape(shape, weights=None):
         Az = sparse.csr_matrix((p, p), dtype=float)
 
     return [Ax, Ay, Az], (nz * ny * nx - 1)
+
+def nesterov_linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0, weights=None):
+    """Generates the linear operator for the total variation Nesterov function
+    from a mesh.
+
+    Parameters
+    ----------
+    mesh_coord: Numpy array [n, 3] of float.
+
+    mesh_triangles: Numpy array [n_triangles, 3] of (integer) indices of the
+        three nodes forming the triangle. 
+
+    mask : Numpy array [n,] of integers/boolean.
+            Non-null values correspond to columns of X. Groups may be
+            defined using different values in the mask. TV will be applied
+            within groups of the same value in the mask.
+
+    offset: Non-negative integer. The index of the first column, variable,
+            where TV applies. This is different from penalty_start which
+            define where the penalty applies. The offset defines where TV
+            applies within the penalised variables.
+
+                Example: X := [Intercept, Age, Weight, Image]. Intercept is
+                not penalized, TV does not apply on Age and Weight but only on
+                Image. Thus: penalty_start = 1, offset = 2 (skip Age and
+                Weight).
+
+    weights : Numpy array. The weight put on the gradient of every point.
+            Default is weight 1 for each point, or equivalently, no weight. The
+            weights is a numpy array of the same shape as mask.
+    Returns
+    -------
+    out1 : [sparse_matrix, ...]. Linear operator for the total variation 
+           Nesterov function computed over a mesh.
+
+    out2 : int. n_compacts
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import parsimony.functions.nesterov.tv as tv_helper
+    >>> mesh_coord = np.array([[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2]])
+    >>> mesh_triangles = np.array([[0 ,1, 3], [0, 2 ,3], [2, 3, 5], [2, 4, 5]])
+    >>> A, _ = tv_helper.nesterov_linear_operator_from_mesh(mesh_coord, mesh_triangles)
+    """
+    if mask is None: mask = np.ones(mesh_coord.shape[0], dtype=bool)
+    assert mask.shape[0] ==  mesh_coord.shape[0]
+    mask_bool = mask != 0
+    mask_idx = np.where(mask_bool)[0]
+    # Mapping from full array to masked array.
+    map_full2masked = np.zeros(mask.shape, dtype=int)
+    map_full2masked[:] = -1
+    map_full2masked[mask_bool] = np.arange(np.sum(mask_bool)) + offset
+    ## 1) Associate edges to nodes
+    nodes_with_edges = [[] for i in xrange(mesh_coord.shape[0])]
+    def connect_edge_to_node(node_idx1, node_idx2, nodes_with_edges):
+            if np.sum(mesh_coord[node_idx1] - mesh_coord[node_idx2]) >= 0: # attach edge to first node
+                edge = [node_idx1, node_idx2]
+                if not edge in nodes_with_edges[node_idx1]:
+                    nodes_with_edges[node_idx1].append(edge)
+            else:  # attach edge to second node
+                edge = [node_idx2, node_idx1]
+                if not edge in nodes_with_edges[node_idx2]:
+                    nodes_with_edges[node_idx2].append(edge)
+    for i in xrange(mesh_triangles.shape[0]):
+        t = mesh_triangles[i, :]
+        connect_edge_to_node(t[0], t[1], nodes_with_edges)
+        connect_edge_to_node(t[0], t[2], nodes_with_edges)
+        connect_edge_to_node(t[1], t[2], nodes_with_edges)
+    max_connectivity = np.max(np.array([len(n) for n in nodes_with_edges]))
+    # 3. build sparse matrices
+    # 1..max_connectivity of i, j and value
+    A = [[[], [], []] for i in xrange(max_connectivity)]
+    n_compacts = 0
+    for node_idx in mask_idx:
+        #node_idx = 0
+        found = False
+        node = nodes_with_edges[node_idx]
+        for i, v in enumerate(node):
+            found = False
+            if weights is not None:
+                w = weights[i]
+            else:
+                w = 1.0
+            #print i, v
+            node1_idx, node2_idx = v
+            if mask_bool[node1_idx] and mask_bool[node2_idx]:
+                found = True
+                A[i][0] += [map_full2masked[node1_idx], map_full2masked[node1_idx]]
+                A[i][1] += [map_full2masked[node1_idx], map_full2masked[node2_idx]]
+                A[i][2] += [-w, w]
+        if found:
+            n_compacts += 1
+    p = mask.sum()
+    A = [sparse.csr_matrix((A[i][2], (A[i][0], A[i][1])), shape=(p, p)) for i in xrange(len(A))]
+    return A, n_compacts

@@ -14,7 +14,7 @@ from sklearn.metrics import precision_recall_fscore_support
 from  parsimony import datasets
 import parsimony.functions.nesterov.tv as tv_helper
 from parsimony.estimators import LogisticRegressionL1L2TV
-from parsimony.algorithms.explicit import StaticCONESTA
+from parsimony.algorithms.primaldual import StaticCONESTA
 from sklearn.linear_model import LogisticRegression
 from parsimony.utils import plot_map2d
 
