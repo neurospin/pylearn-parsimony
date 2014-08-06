@@ -29,6 +29,7 @@ from parsimony.algorithms.utils import Info
 import parsimony.functions.properties as properties
 
 __all__ = ["ISTA", "FISTA",
+           "ADMM",
 
 #           "ProjectionADMM",
            "DykstrasProjectionAlgorithm",
@@ -236,8 +237,8 @@ class FISTA(bases.ExplicitAlgorithm,
                      Info.fvalue,
                      Info.converged]
 
-    def __init__(self, eps=consts.TOLERANCE,
-                 info=[], max_iter=10000, min_iter=1,
+    def __init__(self, info=[],
+                 eps=consts.TOLERANCE, max_iter=10000, min_iter=1,
                  conesta_stop=None):
 
         super(FISTA, self).__init__(info=info,
@@ -388,6 +389,110 @@ class FISTA(bases.ExplicitAlgorithm,
 #                break
 #
 #        return z
+
+
+class ADMM(bases.ExplicitAlgorithm,
+           bases.IterativeAlgorithm,
+           bases.InformationAlgorithm):
+    """The alternating direction method of multipliers (ADMM). Computes the
+    minimum of the sum of two functions with associated proximal or projection
+    operators. Solves problems on the form
+
+        min. f(x, y) = g(x) + h(y)
+        s.t. y = x
+
+    The functions have associated proximal or projection operators.
+
+    Parameters
+    ----------
+    info : List or tuple of utils.consts.Info. What, if any, extra run
+            information should be stored. Default is an empty list, which means
+            that no run information is computed nor returned.
+
+    eps : Positive float. Tolerance for the stopping criterion.
+
+    max_iter : Non-negative integer. Maximum allowed number of iterations.
+
+    min_iter : Non-negative integer less than or equal to max_iter. Minimum
+            number of iterations that must be performed. Default is 1.
+    """
+    INTERFACES = [properties.SplittableFunction,
+                  properties.OR(properties.ProximalOperator,
+                                properties.ProjectionOperator)]
+
+    INFO_PROVIDED = [Info.ok,
+                     Info.num_iter,
+                     Info.time,
+                     Info.fvalue,
+                     Info.converged]
+
+    def __init__(self, info=[],
+                 eps=consts.TOLERANCE,
+                 max_iter=1000, min_iter=1):
+                 # TODO: Investigate what is a good default value here!
+
+        super(ADMM, self).__init__(info=info,
+                                   max_iter=max_iter,
+                                   min_iter=min_iter)
+
+        self.eps = max(consts.FLOAT_EPSILON, float(eps))
+
+    @bases.force_reset
+    @bases.check_compatibility
+    def run(self, functions, xy):
+        """Finds the minimum of two functions with associated proximal
+        operators.
+
+        Parameters
+        ----------
+        functions : List or tuple with two Functions or a SplittableFunction.
+                The two functions.
+
+        xy : List or tuple with two elements, numpy arrays. The starting points
+        for the minimisation.
+        """
+        if isinstance(functions, properties.SplittableFunction):
+            functions = [functions.g, functions.h]
+        else:
+            functions = list(functions)
+
+        x_new = xy[0]
+        y_new = xy[1]
+        z_new = x_new.copy()
+        u_new = y_new.copy()
+        for i in xrange(1, self.max_iter + 1):
+
+            x_old = x_new
+            z_old = z_new
+            u_old = u_new
+
+            if isinstance(functions[0], properties.ProximalOperator):
+                x_new = functions[0].prox(z_old - u_old)
+            else:
+                x_new = functions[0].proj(z_old - u_old)
+
+            y_new = x_new  # TODO: Allow a linear operator here.
+
+            if isinstance(functions[1], properties.ProximalOperator):
+                z_new = functions[1].prox(y_new + u_old)
+            else:
+                z_new = functions[1].proj(y_new + u_old)
+
+            # The order here is important! Do not change!
+            u_new = (y_new - z_new) + u_old
+
+#            if i == 1:
+#                if maths.norm(x_new - x_old) < self.eps and i >= self.min_iter:
+#                    print "Stopping criterion kicked in!"
+#                    break
+#            else:
+#                if maths.norm(x_new - x_old) / maths.norm(x_old) < self.eps \
+#                        and i >= self.min_iter:
+#                    print "Stopping criterion kicked in!"
+#                    break
+
+        return z_new
+
 
 class DykstrasProximalAlgorithm(bases.ExplicitAlgorithm):
     """Dykstra's proximal algorithm. Computes the minimum of the sum of two

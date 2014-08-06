@@ -63,7 +63,7 @@ class Function(object):
 
 
 class AtomicFunction(Function):
-    """ This is a function that is not in general supposed to be minimised by
+    """This is a function that is not in general supposed to be minimised by
     itself. Instead it should be combined with other atomic functions and
     composite functions into composite functions.
     """
@@ -71,7 +71,7 @@ class AtomicFunction(Function):
 
 
 class CompositeFunction(Function):
-    """ This is a function that is the combination (e.g. sum) of other
+    """This is a function that is the combination (e.g. sum) of other
     composite or atomic functions. It may also be a constrained function.
     """
     __metaclass__ = abc.ABCMeta
@@ -88,6 +88,42 @@ class CompositeFunction(Function):
 #        empty list if no constraint functions exist.
 #        """
 #        return self.constraints
+
+
+class IndicatorFunction(Function):
+    """Represents an indicator function.
+
+    I.e. f(x) = 0 if x is in the associated set and infinity otherwise.
+    """
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def f(self, *args, **kwargs):
+        """Function value.
+        """
+        raise NotImplementedError('Abstract method "f" must be '
+                                  'specialised!')
+
+
+class SplittableFunction(Function):
+    """Represents a function that is the sum of two other functions such that
+
+        f(x) = g(x) + h(x),
+
+    i.e. that
+
+        self.f(x) = self.g.f(x) + self.h.f(x).
+
+    The first function, g(x), is accessed as self.g(...) and the second
+    function, h(x), is accessed as self.h(...).
+    """
+    __metaclass__ = abc.ABCMeta
+
+    def f(self, x):
+        """Function value.
+        """
+        return self.g.f(x) \
+             + self.h.f(x)
 
 
 class Penalty(object):
@@ -135,12 +171,13 @@ class ProximalOperator(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def prox(self, beta, factor=1.0, eps=consts.TOLERANCE, max_iter=100):
+    def prox(self, x, factor=1.0, eps=consts.TOLERANCE, max_iter=100,
+             index=0):
         """The proximal operator corresponding to the function.
 
         Parameters
         ----------
-        beta : Numpy array (p-by-1). The point at which to apply the proximal
+        x : Numpy array (p-by-1). The point at which to apply the proximal
                 operator.
 
         factor : Positive float. A factor by which the Lagrange multiplier is
@@ -153,9 +190,44 @@ class ProximalOperator(object):
         max_iter : Positive integer. This is the maximum number of iterations
                 for inexact proximal methods, where the proximal operator is
                 approximated numerically.
+
+        index : Non-negative integer. For multivariate functions, this
+                identifies the variable for which the proximal operator is
+                associated.
         """
         raise NotImplementedError('Abstract method "prox" must be '
                                   'specialised!')
+
+
+class AugmentedProximalOperator(ProximalOperator):
+    """Given the problem
+
+        min. f(x)
+        s.t. x = z
+
+    the augmented Lagrangian is
+
+        L(x)  = f(x) + y'(x - z) + (rho / 2) * ||x - z||²
+            === f(x) + (rho / 2) * ||x - z + u||²
+              = prox_{(1 / rho) * f}(z - u)
+
+    where y = rho * u is a dual variable associated to the constraint x = z,
+    and ||.||² is the squared L2 norm. We note that this is the proximal
+    operator of f(x) at the point z - u.
+
+    This Function represents the proximal operator of f at z - u, given the
+    augmented Lagrangian.
+
+    Parameters
+    ----------
+    rho : Non-negative float. The regularisation constant for the augmented
+            Lagrangian.
+    """
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, rho=1.0):
+
+        self.rho = max(0.0, float(rho))
 
 
 class ProjectionOperator(object):

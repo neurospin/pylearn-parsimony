@@ -475,7 +475,7 @@ def A_from_shape(shape, weights=None):
                     Ax.indptr[i + 1]] = 0
         Ax.eliminate_zeros()
     else:
-        Ax = sparse.csc_matrix((p, p), dtype=float)
+        Ax = sparse.csr_matrix((p, p), dtype=float)
 
     if ny > 1:
         if weights is not None:
@@ -492,7 +492,7 @@ def A_from_shape(shape, weights=None):
                     Ay.indptr[i + 1]] = 0
         Ay.eliminate_zeros()
     else:
-        Ay = sparse.csc_matrix((p, p), dtype=float)
+        Ay = sparse.csr_matrix((p, p), dtype=float)
 
     if nz > 1:
         if weights is not None:
@@ -509,6 +509,6 @@ def A_from_shape(shape, weights=None):
                     Az.indptr[i + 1]] = 0
         Az.eliminate_zeros()
     else:
-        Az = sparse.csc_matrix((p, p), dtype=float)
+        Az = sparse.csr_matrix((p, p), dtype=float)
 
     return [Ax, Ay, Az], (nz * ny * nx - 1)

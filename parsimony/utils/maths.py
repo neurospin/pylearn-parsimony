@@ -11,6 +11,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 import numpy as np
 
 from parsimony.utils.consts import TOLERANCE
+from . import linalgs
 
 __all__ = ["norm", "normFro", "norm1", "norm0", "normInf", "corr", "cov",
            "positive"]
@@ -32,9 +33,15 @@ def norm(x):
     """
     n, p = x.shape
     if p == 1:
-        return np.sqrt(np.dot(x.T, x))[0, 0]
+        if isinstance(x, linalgs.MultipartArray):
+            return np.sqrt(x.T.dot(x))[0, 0]
+        else:
+            return np.sqrt(np.dot(x.T, x))[0, 0]
     elif n == 1:
-        return np.sqrt(np.dot(x, x.T))[0, 0]
+        if isinstance(x, linalgs.MultipartArray):
+            return np.sqrt(x.dot(x.T))[0, 0]
+        else:
+            return np.sqrt(np.dot(x, x.T))[0, 0]
     else:
         return np.linalg.norm(x)
 

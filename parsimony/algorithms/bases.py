@@ -35,14 +35,18 @@ class BaseAlgorithm(object):
     def check_compatibility(function, required_properties):
         """Check if the function considered implements the given properties.
         """
-        for prop in required_properties:
-            if isinstance(prop, properties.OR):
-                if not prop.evaluate(function):
-                    raise ValueError("%s does not implement properties %s" %
-                                    (str(function), str(prop)))
-            elif not isinstance(function, prop):
-                raise ValueError("%s does not implement interface %s" %
-                                (str(function), str(prop)))
+        if not isinstance(function, (list, tuple)):
+            function = [function]
+
+        for f in function:
+            for prop in required_properties:
+                if isinstance(prop, properties.OR):
+                    if not prop.evaluate(f):
+                        raise ValueError("%s does not implement all " \
+                                         "properties %s" % (str(f), str(prop)))
+                elif not isinstance(f, prop):
+                    raise ValueError("%s does not implement interface %s" %
+                                    (str(f), str(prop)))
 
     def set_params(self, **kwargs):
 

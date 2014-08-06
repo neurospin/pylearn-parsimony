@@ -214,6 +214,7 @@ def A_from_variables(num_variables, penalty_start=0):
             Default is 0, all variables are included.
     """
     A = sparse.eye(num_variables - penalty_start,
-                   num_variables - penalty_start)
+                   num_variables - penalty_start,
+                   format="csr")
 
     return [A]

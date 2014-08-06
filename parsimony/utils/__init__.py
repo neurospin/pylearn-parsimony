@@ -18,6 +18,7 @@ from .plot import plot_map2d
 from .classif_label import class_weight_to_sample_weight, check_labels
 from . import start_vectors
 from . import resampling
+from . import linalgs
 
 
 __all__ = ["maths", "consts",
@@ -26,4 +27,4 @@ __all__ = ["maths", "consts",
            "optimal_shrinkage", "AnonymousClass",
            "plot_map2d",
            "class_weight_to_sample_weight", "check_labels",
-           "start_vectors", "resampling"]
+           "start_vectors", "resampling", "linalgs"]

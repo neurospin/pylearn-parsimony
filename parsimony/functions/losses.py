@@ -25,6 +25,7 @@ try:
 except ValueError:
     import parsimony.functions.properties as properties  # Run as a script
 import parsimony.utils as utils
+import parsimony.utils.consts as consts
 
 __all__ = ["LinearRegression", "RidgeRegression",
            "LogisticRegression", "RidgeLogisticRegression",

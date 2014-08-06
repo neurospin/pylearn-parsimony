@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-The :mod:`parsimony.functions.objectives.functions` module contains rady-made
+The :mod:`parsimony.functions.objectives.functions` module contains ready-made
 common combinations of loss functions and penalties that can be used right
 away to analyse real data.
 
@@ -22,10 +22,12 @@ from . import properties
 from .nesterov.l1tv import L1TV
 from .nesterov.tv import TotalVariation
 from .nesterov.gl import GroupLassoOverlap
-from .penalties import L1, ZeroFunction
+from .penalties import ZeroFunction, L1, LinearVariableConstraint
+from .penalties import RidgeSquaredError
 from .losses import RidgeRegression
 from .losses import RidgeLogisticRegression
 from .losses import LatentVariableVariance
+import parsimony.utils.linalgs as linalgs
 import parsimony.utils.consts as consts
 import parsimony.utils.maths as maths
 
@@ -33,6 +35,7 @@ __all__ = ["CombinedFunction",
            "LinearRegressionL1L2TV", "LinearRegressionL1L2GL",
            "LogisticRegressionL1L2TV", "LogisticRegressionL1L2GL",
            "LinearRegressionL2SmoothedL1TV",
+           "AugmentedLinearRegressionL1L2TV",
            "PrincipalComponentAnalysisL1TV"]
 
 # TODO: Add penalty_start and mean to all of these!
@@ -221,9 +224,9 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
 
     Parameters:
     ----------
-    X : Numpy array. The X matrix for the ridge regression.
+    X : Numpy array. The X matrix for the linear regression.
 
-    y : Numpy array. The y vector for the ridge regression.
+    y : Numpy array. The y vector for the linear regression.
 
     l1 : Non-negative float. The Lagrange multiplier, or regularisation
             constant, for the L1 penalty.
@@ -644,9 +647,9 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
         """
         Parameters:
         ----------
-        X : Numpy array (n-by-p). The X matrix for the ridge regression.
+        X : Numpy array (n-by-p). The X matrix for the linear regression.
 
-        y : Numpy array (n-by-1). The y vector for the ridge regression.
+        y : Numpy array (n-by-1). The y vector for the linear regression.
 
         l1 : Non-negative float. The Lagrange multiplier, or regularisation
                 constant, for the L1 penalty.
@@ -1036,9 +1039,9 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
         """
         Parameters
         ----------
-        X : Numpy array. The X matrix (n-by-p) for the logistic regression.
+        X : Numpy array (n-by-p). The X matrix for the logistic regression.
 
-        y : Numpy array. The y vector for the logistic regression.
+        y : Numpy array (n-by-1). The y vector for the logistic regression.
 
         l1 : Non-negative float. The Lagrange multiplier, or regularisation
                 constant, for the L1 penalty.
@@ -1369,6 +1372,160 @@ class LinearRegressionL2SmoothedL1TV(properties.CompositeFunction,
         From the interface "NesterovFunction".
         """
         return self.h.project(a)
+
+
+class AugmentedLinearRegressionL1L2TV(properties.SplittableFunction,
+                                      properties.AugmentedProximalOperator):
+    """Combination (sum) of LinearRegression, L1, L2 and 1D TotalVariation
+    with a linear constraint. Represents the problem
+
+        min. f(b) = g(x)
+                    + h(r)
+                  = (1 / 2) ||Xb - y||² + (k / 2) ||b||²
+                    + l ||r_1||_1 + g ||r_tv||_1,
+        s.t. r = Db.
+
+    The proximal operators of the splittable functions are assumed to be from
+    augmented Lagrangians.
+
+    Parameters
+    ----------
+    X : Numpy array. The X matrix for the linear regression.
+
+    y : Numpy array. The y vector for the linear regression.
+
+    l1 : Non-negative float. The Lagrange multiplier, or regularisation
+            constant, for the L1 penalty.
+
+    l2 : Non-negative float. The Lagrange multiplier, or regularisation
+            constant, for the ridge penalty.
+
+    tv : Non-negative float. The Lagrange multiplier, or regularisation
+            constant, of the total variation function.
+
+    A : List or tuple of numpy (or usually sparse scipy) arrays. The linear
+            operator for the constraints.
+
+    rho : Positive float. The parameter for the augmented Lagrangian.
+
+    penalty_start : Non-negative integer. The number of columns, variables
+            etc., to except from penalisation. Equivalently, the first
+            index to be penalised. Default is 0, all columns are included.
+
+    mean : Boolean. Whether to compute the squared loss or the mean
+            squared loss. Default is True, the mean squared loss.
+    """
+    def __init__(self, X, y, l1, l2, tv, A=None, rho=1.0, penalty_start=0,
+                 mean=True):
+
+        super(AugmentedLinearRegressionL1L2TV, self).__init__(rho=rho)
+
+        self.X = X
+        self.y = y
+
+        class MultipleFunctions(properties.Function,
+                                properties.ProximalOperator):
+
+            def __init__(self, functions):
+                self.funcs = functions
+
+            def f(self, xrr):
+                if isinstance(xrr, linalgs.MultipartArray):
+                    xrr = xrr.get_parts()
+
+                f = self.funcs[0].f(xrr[0]) \
+                  + self.funcs[1].f(xrr[1])
+
+                return f
+
+            def reset(self):
+                self.funcs[0].reset()
+                self.funcs[1].reset()
+
+            def prox(self, xrr, factor=1.0, eps=consts.TOLERANCE,
+                     max_iter=100):
+
+                if isinstance(xrr, linalgs.MultipartArray):
+                    xrr = xrr.get_parts()
+
+                parts = [0, 0]
+
+                parts[0] = self.funcs[0].prox(xrr[0], factor=factor,
+                                              eps=eps, max_iter=max_iter)
+                parts[1] = self.funcs[1].prox(xrr[1], factor=factor,
+                                              eps=eps, max_iter=max_iter)
+
+                return linalgs.MultipartArray(parts, vertical=True)
+
+        class L1TV(properties.SplittableFunction,
+                   properties.ProximalOperator):
+
+            def __init__(self, l1, tv, p):
+                self.l1 = float(l1)
+                self.tv = float(tv)
+                self.p = max(1, int(p))
+
+                self.g = L1(l1)
+                self.h = L1(tv)
+
+            def reset(self):
+                self.g.reset()
+                self.h.reset()
+
+            def f(self, x):
+                """Function value.
+                """
+                x1 = x[:self.p, :]
+                x2 = x[self.p:, :]
+
+                return self.g.f(x1) \
+                     + self.h.f(x2)
+
+            def prox(self, x, factor=1.0, eps=consts.TOLERANCE, max_iter=100):
+
+                x1 = x[:self.p, :]
+                x2 = x[self.p:, :]
+
+                y = np.vstack((self.g.prox(x1, factor=factor,
+                                           eps=eps, max_iter=max_iter),
+                               self.h.prox(x2, factor=factor,
+                                           eps=eps, max_iter=max_iter)))
+
+                return y
+
+        self.g = MultipleFunctions([RidgeSquaredError(X, y, l2, l=1.0 / rho,
+                                                   penalty_start=penalty_start,
+                                                   mean=mean),
+                                    L1TV(l1 / rho, tv / rho, A[0].shape[1])])
+
+        if len(A) == 4:
+            A = A[:2]  # Skip 2nd and 3rd dimension of the image (they are 1)
+
+        self.h = LinearVariableConstraint(A, penalty_start=penalty_start,
+                                          solver=linalgs.TridiagonalSolver())
+
+        self.penalty_start = max(0, int(penalty_start))
+        self.mean = bool(mean)
+
+        self.reset()
+
+    def reset(self):
+
+        self.g.reset()
+        self.h.reset()
+
+    def f(self, xy):
+
+        if isinstance(xy, linalgs.MultipartArray):
+            xy = xy.get_parts()
+
+        return self.g.f(xy[0]) \
+             + self.h.f(xy[1])
+
+    def prox(self, x, **kwargs):
+
+        raise NotImplementedError("Use the prox of the parts of the " \
+                                  "splitted function, g.prox() and h.prox().")
 
 
 class PrincipalComponentAnalysisL1TV(properties.CompositeFunction,
