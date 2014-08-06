@@ -23,7 +23,7 @@ import parsimony.utils.maths as maths
 import parsimony.utils as utils
 
 __all__ = ["TotalVariation",
-           "A_from_mask", "A_from_subset_mask", "A_from_shape",
+           "A_from_mask", "A_from_subset_mask", "A_from_shape", "A_from_mesh",
            "nesterov_linear_operator_from_mesh"]
 
 
@@ -590,7 +590,7 @@ def A_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0, weights=None):
     >>> mesh_coord = np.array([[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2]])
     >>> mesh_triangles = np.array([[0 ,1, 3], [0, 2 ,3], [2, 3, 5], [2, 4, 5]])
     >>> A, _ = tv_helper.nesterov_linear_operator_from_mesh(mesh_coord,
-    ....                                                    mesh_triangles)
+    ...                                                     mesh_triangles)
     """
     if mask is None:
         mask = np.ones(mesh_coord.shape[0], dtype=bool)
