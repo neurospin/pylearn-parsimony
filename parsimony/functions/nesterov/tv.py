@@ -17,23 +17,19 @@ import math
 import scipy.sparse as sparse
 import numpy as np
 
-#from .properties import NesterovFunction
 from .. import properties
 import parsimony.utils.consts as consts
 import parsimony.utils.maths as maths
+import parsimony.utils as utils
 
 __all__ = ["TotalVariation",
            "A_from_mask", "A_from_subset_mask", "A_from_shape",
            "nesterov_linear_operator_from_mesh"]
 
 
-class TotalVariation(#properties.AtomicFunction,
-                     properties.NesterovFunction,
+class TotalVariation(properties.NesterovFunction,
                      properties.Penalty,
-                     properties.Constraint,
-#                     properties.Gradient,
-#                     properties.LipschitzContinuousGradient
-                     ):
+                     properties.Constraint):
     """The smoothed Total variation (TV) function
 
         f(beta) = l * (TV(beta) - c),
@@ -543,23 +539,30 @@ def A_from_shape(shape, weights=None):
 
     return [Ax, Ay, Az], (nz * ny * nx - 1)
 
-def nesterov_linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0, weights=None):
+
+@utils.deprecated("A_from_mesh")
+def nesterov_linear_operator_from_mesh(*args, **kwargs):
+
+    return A_from_mesh(*args, **kwargs)
+
+
+def A_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0, weights=None):
     """Generates the linear operator for the total variation Nesterov function
     from a mesh.
 
     Parameters
     ----------
-    mesh_coord: Numpy array [n, 3] of float.
+    mesh_coord : Numpy array [n, 3] of float.
 
-    mesh_triangles: Numpy array [n_triangles, 3] of (integer) indices of the
-        three nodes forming the triangle. 
+    mesh_triangles : Numpy array, n_triangles-by-3. The (integer) indices of
+            the three nodes forming the triangle.
 
-    mask : Numpy array [n,] of integers/boolean.
-            Non-null values correspond to columns of X. Groups may be
-            defined using different values in the mask. TV will be applied
-            within groups of the same value in the mask.
+    mask : Numpy array (shape (n,)) of integers/boolean. Non-null values
+            correspond to columns of X. Groups may be defined using different
+            values in the mask. TV will be applied within groups of the same
+            value in the mask.
 
-    offset: Non-negative integer. The index of the first column, variable,
+    offset : Non-negative integer. The index of the first column, variable,
             where TV applies. This is different from penalty_start which
             define where the penalty applies. The offset defines where TV
             applies within the penalised variables.
@@ -572,12 +575,13 @@ def nesterov_linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, of
     weights : Numpy array. The weight put on the gradient of every point.
             Default is weight 1 for each point, or equivalently, no weight. The
             weights is a numpy array of the same shape as mask.
+
     Returns
     -------
-    out1 : [sparse_matrix, ...]. Linear operator for the total variation 
+    out1 : List or sparse matrices. Linear operator for the total variation
            Nesterov function computed over a mesh.
 
-    out2 : int. n_compacts
+    out2 : Integer. The number of compacts.
 
     Examples
     --------
@@ -585,10 +589,12 @@ def nesterov_linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, of
     >>> import parsimony.functions.nesterov.tv as tv_helper
     >>> mesh_coord = np.array([[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2]])
     >>> mesh_triangles = np.array([[0 ,1, 3], [0, 2 ,3], [2, 3, 5], [2, 4, 5]])
-    >>> A, _ = tv_helper.nesterov_linear_operator_from_mesh(mesh_coord, mesh_triangles)
+    >>> A, _ = tv_helper.nesterov_linear_operator_from_mesh(mesh_coord,
+    ....                                                    mesh_triangles)
     """
-    if mask is None: mask = np.ones(mesh_coord.shape[0], dtype=bool)
-    assert mask.shape[0] ==  mesh_coord.shape[0]
+    if mask is None:
+        mask = np.ones(mesh_coord.shape[0], dtype=bool)
+    assert mask.shape[0] == mesh_coord.shape[0]
     mask_bool = mask != 0
     mask_idx = np.where(mask_bool)[0]
     # Mapping from full array to masked array.
@@ -597,8 +603,10 @@ def nesterov_linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, of
     map_full2masked[mask_bool] = np.arange(np.sum(mask_bool)) + offset
     ## 1) Associate edges to nodes
     nodes_with_edges = [[] for i in xrange(mesh_coord.shape[0])]
+
     def connect_edge_to_node(node_idx1, node_idx2, nodes_with_edges):
-            if np.sum(mesh_coord[node_idx1] - mesh_coord[node_idx2]) >= 0: # attach edge to first node
+            # Attach edge to first node.
+            if np.sum(mesh_coord[node_idx1] - mesh_coord[node_idx2]) >= 0:
                 edge = [node_idx1, node_idx2]
                 if not edge in nodes_with_edges[node_idx1]:
                     nodes_with_edges[node_idx1].append(edge)
@@ -630,11 +638,15 @@ def nesterov_linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, of
             node1_idx, node2_idx = v
             if mask_bool[node1_idx] and mask_bool[node2_idx]:
                 found = True
-                A[i][0] += [map_full2masked[node1_idx], map_full2masked[node1_idx]]
-                A[i][1] += [map_full2masked[node1_idx], map_full2masked[node2_idx]]
+                A[i][0] += [map_full2masked[node1_idx],
+                            map_full2masked[node1_idx]]
+                A[i][1] += [map_full2masked[node1_idx],
+                            map_full2masked[node2_idx]]
                 A[i][2] += [-w, w]
         if found:
             n_compacts += 1
     p = mask.sum()
-    A = [sparse.csr_matrix((A[i][2], (A[i][0], A[i][1])), shape=(p, p)) for i in xrange(len(A))]
+    A = [sparse.csr_matrix((A[i][2], (A[i][0], A[i][1])),
+                           shape=(p, p)) for i in xrange(len(A))]
+
     return A, n_compacts
