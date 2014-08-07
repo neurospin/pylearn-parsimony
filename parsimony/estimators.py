@@ -22,6 +22,7 @@ import parsimony.functions.losses as losses
 import parsimony.functions.multiblock.losses as mb_losses
 import parsimony.functions.penalties as penalties
 import parsimony.utils.start_vectors as start_vectors
+import parsimony.utils.linalgs as linalgs
 import parsimony.algorithms.bases as bases
 import parsimony.algorithms.gradient as gradient
 import parsimony.algorithms.proximal as proximal
@@ -674,6 +675,7 @@ class LinearRegressionL1L2TV(RegressionEstimator):
                 2. DynamicCONESTA(...)
                 3. FISTA(...)
                 4. ISTA(...)
+                5. ADMM(...)
 
             Default is StaticCONESTA(...).
 
@@ -689,6 +691,9 @@ class LinearRegressionL1L2TV(RegressionEstimator):
 
     mean : Boolean. Whether to compute the squared loss or the mean squared
             loss. Default is True, the mean squared loss.
+
+    rho : Positive float. Regularisation constant only used in ADMM. Default
+            is 1.0.
 
     Examples
     --------
@@ -715,6 +720,7 @@ class LinearRegressionL1L2TV(RegressionEstimator):
     >>> error = lr.score(X, y)
     >>> print "error = ", error
     error =  0.0683839364837
+    >>>
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                     algorithm=primaldual.DynamicCONESTA(max_iter=1000),
     ...                     mean=False)
@@ -722,6 +728,7 @@ class LinearRegressionL1L2TV(RegressionEstimator):
     >>> error = lr.score(X, y)
     >>> print "error = ", error
     error =  0.0683839298003
+    >>>
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                                algorithm=proximal.FISTA(max_iter=1000),
     ...                                mean=False)
@@ -729,6 +736,7 @@ class LinearRegressionL1L2TV(RegressionEstimator):
     >>> error = lr.score(X, y)
     >>> print "error = ", error
     error =  1.58175771272
+    >>>
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                                 algorithm=proximal.ISTA(max_iter=1000),
     ...                                 mean=False)
@@ -736,12 +744,24 @@ class LinearRegressionL1L2TV(RegressionEstimator):
     >>> error = lr.score(X, y)
     >>> print "error = ", error
     error =  2.075830689
+    >>>
+    >>> import parsimony.functions.nesterov.l1tv as l1tv
+    >>> np.random.seed(1337)
+    >>> A = l1tv.A_from_shape(shape, p, penalty_start=0)
+    >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
+    ...                                 algorithm=proximal.ADMM(max_iter=1000),
+    ...                                 mean=False)
+    >>> lr = lr.fit(X, y)
+    >>> error = lr.score(X, y)
+    >>> print "error = ", error
+    error =  0.0623552412543
     """
     def __init__(self, l1, l2, tv,
                  A=None, mu=consts.TOLERANCE,
                  algorithm=None, algorithm_params=dict(),
                  penalty_start=0,
-                 mean=True):
+                 mean=True,
+                 rho=1.0):
 
         if algorithm is None:
             algorithm = primaldual.StaticCONESTA(**algorithm_params)
@@ -765,36 +785,76 @@ class LinearRegressionL1L2TV(RegressionEstimator):
 
         self.penalty_start = int(penalty_start)
         self.mean = bool(mean)
+        self.rho = float(rho)
+
+        self.tv_function = None
 
     def get_params(self):
         """Return a dictionary containing all the estimator's parameters
         """
         return {"l1": self.l1, "l2": self.l2, "tv": self.tv,
                 "A": self.A, "mu": self.mu,
-                "penalty_start": self.penalty_start, "mean": self.mean}
+                "penalty_start": self.penalty_start, "mean": self.mean,
+                "rho": self.rho}
 
     def fit(self, X, y, beta=None):
         """Fit the estimator to the data.
         """
         X, y = check_arrays(X, y)
 
-        function = functions.LinearRegressionL1L2TV(X, y,
+        if isinstance(self.algorithm, proximal.ADMM):
+
+            function = functions.AugmentedLinearRegressionL1L2TV(X, y,
                                               self.l1, self.l2, self.tv,
                                               A=self.A,
+                                              rho=self.rho,
                                               penalty_start=self.penalty_start,
                                               mean=self.mean)
+
+            # TODO: Should we use a seed here so that we get deterministic
+            # results?
+            p = X.shape[1]
+            if beta is None:
+                x = self.start_vector.get_vector(p)
+                r = self.start_vector.get_vector(2 * p)
+            else:
+                x = beta
+                r = np.vstack((beta, np.zeros((p, 1))))
+
+            xr = linalgs.MultipartArray([x, r])
+            beta = [xr, xr]
+
+            self.tv_function = functions.nesterov.tv.TotalVariation(self.tv,
+                                              A=self.A,
+                                              mu=self.mu,
+                                              penalty_start=self.penalty_start)
+
+        else:
+            function = functions.LinearRegressionL1L2TV(X, y,
+                                             self.l1, self.l2, self.tv,
+                                             A=self.A,
+                                             penalty_start=self.penalty_start,
+                                             mean=self.mean)
+
+            self.tv_function = function.tv
+
+            # TODO: Should we use a seed here so that we get deterministic
+            # results?
+            if beta is None:
+                beta = self.start_vector.get_vector(X.shape[1])
+
         self.algorithm.check_compatibility(function,
                                            self.algorithm.INTERFACES)
 
-        # TODO: Should we use a seed here so that we get deterministic results?
-        if beta is None:
-            beta = self.start_vector.get_vector(X.shape[1])
-
         if self.mu is None:
-            self.mu = function.estimate_mu(beta)
+#            self.mu = function.estimate_mu(beta)
+            self.mu = self.tv_function.estimate_mu(beta)
 
         function.set_params(mu=self.mu)
         self.beta = self.algorithm.run(function, beta)
+
+        if isinstance(self.algorithm, proximal.ADMM):
+            self.beta = self.beta.get_parts()[0]
 
         return self
 

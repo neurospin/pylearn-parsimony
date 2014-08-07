@@ -199,8 +199,8 @@ class CONESTA(bases.ExplicitAlgorithm,
                 G_new = function.gap(beta, eps=eps_plus,
                                      max_iter=self.max_iter - self.num_iter)
 
-                # TODO: Warn if G_new < 0.
-                G_new = abs(G_new)  # Just in case ...
+                # TODO: Warn if G_new < -consts.TOLERANCE.
+                G_new = abs(G_new)  # May happen close to machine epsilon.
 
                 if G_new < G:
                     G = G_new
