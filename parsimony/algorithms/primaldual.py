@@ -221,7 +221,7 @@ class CONESTA(bases.ExplicitAlgorithm,
                 Gval.append(G)
 
             if G <= self.eps:
-                print "New stopping criterion kicked in!"
+#                print "New stopping criterion kicked in!"
                 break
 
             if (G <= consts.TOLERANCE and mu[-1] <= consts.TOLERANCE) or stop:

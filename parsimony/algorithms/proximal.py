@@ -481,15 +481,15 @@ class ADMM(bases.ExplicitAlgorithm,
             # The order here is important! Do not change!
             u_new = (y_new - z_new) + u_old
 
-#            if i == 1:
-#                if maths.norm(x_new - x_old) < self.eps and i >= self.min_iter:
+            if i == 1:
+                if maths.norm(x_new - x_old) < self.eps and i >= self.min_iter:
 #                    print "Stopping criterion kicked in!"
-#                    break
-#            else:
-#                if maths.norm(x_new - x_old) / maths.norm(x_old) < self.eps \
-#                        and i >= self.min_iter:
+                    break
+            else:
+                if maths.norm(x_new - x_old) / maths.norm(x_old) < self.eps \
+                        and i >= self.min_iter:
 #                    print "Stopping criterion kicked in!"
-#                    break
+                    break
 
         return z_new
 
@@ -722,7 +722,6 @@ class ParallelDykstrasProximalAlgorithm(bases.ExplicitAlgorithm):
 
         num_prox = len(prox)
         num_proj = len(proj)
-#        num = num_proj + num_prox
 
         if weights is None:
             weights = [1. / float(num_prox + num_proj)] * (num_prox + num_proj)
@@ -739,10 +738,6 @@ class ParallelDykstrasProximalAlgorithm(bases.ExplicitAlgorithm):
                 p[i] = prox[i].prox(z[i], factor)
             for i in xrange(num_proj):
                 p[num_prox + i] = proj[i].proj(z[num_prox + i])
-#                if proj[i].f(p[i]) > 0.2:
-#                if abs(proj[i].c - 1.0) < 0.001:
-#                    print "före :", proj[i].f(z[num_prox + i]), np.linalg.norm(z[num_prox + i])
-#                    print "efter:", proj[i].f(p[i]), np.linalg.norm(p[i])
 
             x_old = x_new
             x_new = np.zeros(x_old.shape)

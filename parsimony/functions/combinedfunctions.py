@@ -1388,6 +1388,8 @@ class AugmentedLinearRegressionL1L2TV(properties.SplittableFunction,
     The proximal operators of the splittable functions are assumed to be from
     augmented Lagrangians.
 
+    Note: This function only works for 1-dimensional total variation.
+
     Parameters
     ----------
     X : Numpy array. The X matrix for the linear regression.
