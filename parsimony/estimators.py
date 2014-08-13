@@ -676,6 +676,7 @@ class LinearRegressionL1L2TV(RegressionEstimator):
                 3. FISTA(...)
                 4. ISTA(...)
                 5. ADMM(...)
+                6. NaiveCONESTA(...)
 
             Default is StaticCONESTA(...).
 

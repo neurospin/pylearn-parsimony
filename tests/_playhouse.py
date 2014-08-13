@@ -25,6 +25,9 @@ import parsimony.datasets.simulate.l1_l2_tvmu as l1_l2_tvmu
 import parsimony.utils.start_vectors as start_vectors
 import parsimony.utils.maths as maths
 import parsimony.utils.linalgs as linalgs
+import parsimony.estimators as estimators
+
+import simulate
 
 np.random.seed(42)
 
@@ -55,11 +58,19 @@ snr = 100.0
 
 mu = 5e-8
 
-A, _ = tv.A_from_shape(shape)
-X, y, beta_star = l1_l2_tvmu.load(l, k, g, beta, M, e, A, mu, snr=snr)
+#A, _ = tv.A_from_shape(shape)
+#X, y, beta_star = l1_l2_tvmu.load(l, k, g, beta, M, e, A, mu, snr=snr)
+
+A = simulate.functions.TotalVariation.A_from_shape(shape)
+funcs = [simulate.functions.L1(l),
+         simulate.functions.L2Squared(k),
+         simulate.functions.SmoothedTotalVariation(g, A, mu=mu)]
+simulator = simulate.LinearRegressionData(funcs, M, e, snr=snr,
+                                          intercept=False)
+X, y, beta_star = simulator.load(beta)
 
 eps = 1e-8
-max_iter = 10000
+max_iter = 2000
 penalty_start = 0
 
 beta_start = start_vector.get_vector(p)
@@ -73,12 +84,13 @@ beta_start = start_vector.get_vector(p)
 
 
 
-print "============="
-print "===CONESTA==="
-print "============="
+print "==============="
+print "=== CONESTA ==="
+print "==============="
 
 #alg = proximal.FISTA(eps=eps, max_iter=max_iter)
 alg = primaldual.DynamicCONESTA(eps=eps, max_iter=max_iter, mu_min=mu)
+#alg = primaldual.NaiveCONESTA(eps=eps, max_iter=max_iter, mu_min=mu)
 
 #function = CombinedFunction()
 #function.add_function(functions.losses.LinearRegression(X, y,
@@ -177,29 +189,34 @@ rho = 1.0
 
 
 
-print "==============="
-print "===ADMM real==="
-print "==============="
+print "============"
+print "=== ADMM ==="
+print "============"
 
 t_ = time.time()
 
 A = l1tv.A_from_shape(shape, p, penalty_start=penalty_start)
 
-function = combinedfunctions.AugmentedLinearRegressionL1L2TV(X, y, l, k, g,
-                                                   A=A,
-                                                   rho=rho,
-                                                   penalty_start=penalty_start,
-                                                   mean=False)
+admm = estimators.LinearRegressionL1L2TV(l, k, g, A,
+                                    algorithm=proximal.ADMM(eps=eps,
+                                                            max_iter=max_iter),
+                                    mean=False)
+admm.fit(X, y)
 
-algorithm = proximal.ADMM(eps=eps, max_iter=max_iter)
-
-x = linalgs.MultipartArray([np.zeros((p, 1)),
-                            np.zeros((2 * p, 1))])
-
-xr = algorithm.run(function, [x, x])
-#prof.run("xr = run_alg(algorithm, function, [x, x])")
-
-x = xr.get_parts()
+#function = combinedfunctions.AugmentedLinearRegressionL1L2TV(X, y, l, k, g,
+#                                                   A=A,
+#                                                   rho=rho,
+#                                                   penalty_start=penalty_start,
+#                                                   mean=False)
+#
+#algorithm = proximal.ADMM(eps=eps, max_iter=max_iter)
+#
+#x = linalgs.MultipartArray([np.zeros((p, 1)),
+#                            np.zeros((2 * p, 1))])
+#
+#xr = algorithm.run(function, [x, x])
+#
+#x = xr.get_parts()
 
 print "Time:", time.time() - t_
 
@@ -207,18 +224,18 @@ print "n:", n, ", p:", p
 
 print "F CONESTA     :", func.f(beta)
 #print "F ADMM test   :", func.f(z)
-print "F ADMM        :", func.f(x[0])
-print "F ADMM        :", function.f([x, x])
+print "F ADMM        :", func.f(admm.beta)
+#print "F ADMM        :", function.f([x, x])
 
 print "Berr CONESTA  :", np.linalg.norm(beta_star - beta)
 #print "Beta ADMM test:", np.linalg.norm(beta_star - z)
-print "Berr ADMM     :", np.linalg.norm(beta_star - x[0])
+print "Berr ADMM     :", np.linalg.norm(beta_star - admm.beta)
 
 print "Ferr CONESTA  :", abs(f_star - func.f(beta))
 #print "Err ADMM test:", abs(f_star - func.f(z))
-print "Ferr ADMM     :", abs(f_star - func.f(x[0]))
-print "Ferr ADMM     :", abs(f_star - function.f([x, x]))
+print "Ferr ADMM     :", abs(f_star - func.f(admm.beta))
+#print "Ferr ADMM     :", abs(f_star - function.f([x, x]))
 
 print "Gap CONESTA   :", func.gap(beta)
-print "Gap ADMM      :", func.gap(x[0])
+print "Gap ADMM      :", func.gap(admm.beta)
 print "Gap beta_star :", func.gap(beta_star)

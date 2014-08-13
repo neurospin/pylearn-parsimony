@@ -1408,7 +1408,7 @@ class AugmentedLinearRegressionL1L2TV(properties.SplittableFunction,
     A : List or tuple of numpy (or usually sparse scipy) arrays. The linear
             operator for the constraints.
 
-    rho : Positive float. The parameter for the augmented Lagrangian.
+    rho : Positive float. The penalty parameter for the augmented Lagrangian.
 
     penalty_start : Non-negative integer. The number of columns, variables
             etc., to except from penalisation. Equivalently, the first
@@ -1510,6 +1510,19 @@ class AugmentedLinearRegressionL1L2TV(properties.SplittableFunction,
         self.mean = bool(mean)
 
         self.reset()
+
+    def set_rho(self, rho):
+        """Update the penalty parameter.
+
+        From the interface "AugmentedProximalOperator".
+        """
+        rho = max(0.0, float(rho))
+
+        self.g.funcs[0].l = 1.0 / rho
+        self.g.funcs[1].g.l = self.g.funcs[1].l1 / rho
+        self.g.funcs[1].h.l = self.g.funcs[1].tv / rho
+
+        self.rho = rho
 
     def reset(self):
 

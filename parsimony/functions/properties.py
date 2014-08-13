@@ -229,6 +229,12 @@ class AugmentedProximalOperator(ProximalOperator):
 
         self.rho = max(0.0, float(rho))
 
+    def set_rho(self, rho):
+        """Update the penalty parameter.
+        """
+        rho = max(0.0, float(rho))
+        self.rho = rho
+
 
 class ProjectionOperator(object):
 

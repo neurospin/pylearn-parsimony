@@ -405,6 +405,16 @@ class ADMM(bases.ExplicitAlgorithm,
 
     Parameters
     ----------
+    rho : Positive float. The penalty parameter.
+
+    mu : Float, greater than 1. The factor within which the primal and dual
+            variables should be kept. Set to less than or equal to 1 if you
+            don't want to update the penalty parameter rho dynamically.
+
+    tau_incr : Float, greater than 1. Increase rho by a factor tau_incr.
+
+    tau_decr : Float, greater than 1. Decrease rho by a factor tau_incr.
+
     info : List or tuple of utils.consts.Info. What, if any, extra run
             information should be stored. Default is an empty list, which means
             that no run information is computed nor returned.
@@ -417,6 +427,7 @@ class ADMM(bases.ExplicitAlgorithm,
             number of iterations that must be performed. Default is 1.
     """
     INTERFACES = [properties.SplittableFunction,
+                  properties.AugmentedProximalOperator,
                   properties.OR(properties.ProximalOperator,
                                 properties.ProjectionOperator)]
 
@@ -426,14 +437,19 @@ class ADMM(bases.ExplicitAlgorithm,
                      Info.fvalue,
                      Info.converged]
 
-    def __init__(self, info=[],
-                 eps=consts.TOLERANCE,
-                 max_iter=1000, min_iter=1):
+    def __init__(self, rho=1.0, mu=10.0, tau_incr=2.0, tau_decr=2.0,
+                 info=[],
+                 eps=consts.TOLERANCE, max_iter=1000, min_iter=1):
                  # TODO: Investigate what is a good default value here!
 
         super(ADMM, self).__init__(info=info,
                                    max_iter=max_iter,
                                    min_iter=min_iter)
+
+        self.rho = max(consts.FLOAT_EPSILON, float(rho))
+        self.mu = max(1.0, float(mu))
+        self.tau_incr = max(1.0, float(tau_incr))
+        self.tau_decr = max(1.0, float(tau_decr))
 
         self.eps = max(consts.FLOAT_EPSILON, float(eps))
 
@@ -451,10 +467,17 @@ class ADMM(bases.ExplicitAlgorithm,
         xy : List or tuple with two elements, numpy arrays. The starting points
         for the minimisation.
         """
-        if isinstance(functions, properties.SplittableFunction):
-            functions = [functions.g, functions.h]
-        else:
-            functions = list(functions)
+        if self.info_requested(Info.ok):
+            self.info_set(Info.ok, False)
+
+        if self.info_requested(Info.time):
+            t = []
+        if self.info_requested(Info.fvalue):
+            f = []
+        if self.info_requested(Info.converged):
+            self.info_set(Info.converged, False)
+
+        funcs = [functions.g, functions.h]
 
         x_new = xy[0]
         y_new = xy[1]
@@ -462,34 +485,76 @@ class ADMM(bases.ExplicitAlgorithm,
         u_new = y_new.copy()
         for i in xrange(1, self.max_iter + 1):
 
+            if self.info_requested(Info.time):
+                tm = utils.time_cpu()
+
             x_old = x_new
             z_old = z_new
             u_old = u_new
 
-            if isinstance(functions[0], properties.ProximalOperator):
-                x_new = functions[0].prox(z_old - u_old)
+            if isinstance(funcs[0], properties.ProximalOperator):
+                x_new = funcs[0].prox(z_old - u_old)
             else:
-                x_new = functions[0].proj(z_old - u_old)
+                x_new = funcs[0].proj(z_old - u_old)
 
             y_new = x_new  # TODO: Allow a linear operator here.
 
-            if isinstance(functions[1], properties.ProximalOperator):
-                z_new = functions[1].prox(y_new + u_old)
+            if isinstance(funcs[1], properties.ProximalOperator):
+                z_new = funcs[1].prox(y_new + u_old)
             else:
-                z_new = functions[1].proj(y_new + u_old)
+                z_new = funcs[1].proj(y_new + u_old)
 
             # The order here is important! Do not change!
             u_new = (y_new - z_new) + u_old
 
+            if self.info_requested(Info.time):
+                t.append(utils.time_cpu() - tm)
+            if self.info_requested(Info.fvalue):
+                fval = funcs[0].f(z_new) + funcs[1].f(z_new)
+                f.append(fval)
+
             if i == 1:
                 if maths.norm(x_new - x_old) < self.eps and i >= self.min_iter:
 #                    print "Stopping criterion kicked in!"
+                    if self.info_requested(Info.converged):
+                        self.info_set(Info.converged, True)
+
                     break
             else:
                 if maths.norm(x_new - x_old) / maths.norm(x_old) < self.eps \
                         and i >= self.min_iter:
 #                    print "Stopping criterion kicked in!"
+                    if self.info_requested(Info.converged):
+                        self.info_set(Info.converged, True)
+
                     break
+
+            # Update the penalty parameter, rho, dynamically.
+            if self.mu > 1.0:
+                r = x_new - z_new
+                s = (z_new - z_old) * -self.rho
+                norm_r = maths.norm(r)
+                norm_s = maths.norm(s)
+                if norm_r > self.mu * norm_s:
+                    self.rho = self.rho * self.tau_incr
+                elif norm_s > self.mu * norm_r:
+                    self.rho = self.rho / self.tau_decr
+#                else:
+#                    self.rho = self.rho
+
+                # Update the penalty parameter in the functions.
+                functions.set_rho(self.rho)
+
+        self.num_iter = i
+
+        if self.info_requested(Info.num_iter):
+            self.info_set(Info.num_iter, i)
+        if self.info_requested(Info.time):
+            self.info_set(Info.time, t)
+        if self.info_requested(Info.fvalue):
+            self.info_set(Info.fvalue, f)
+        if self.info_requested(Info.ok):
+            self.info_set(Info.ok, True)
 
         return z_new
 

@@ -1444,12 +1444,12 @@ class RidgeSquaredError(properties.CompositeFunction,
             squared loss. Default is True, the mean squared loss.
     """
     def __init__(self, X, y, k, l=1.0, penalty_start=0, mean=True):
-        self.l = float(l)
+        self.l = max(0.0, float(l))
         self.X = X
         self.y = y
-        self.k = float(k)
+        self.k = max(0.0, float(k))
 
-        self.penalty_start = int(penalty_start)
+        self.penalty_start = max(0, int(penalty_start))
         self.mean = bool(mean)
 
         self.reset()
@@ -1460,7 +1460,8 @@ class RidgeSquaredError(properties.CompositeFunction,
         From the interface "Function".
         """
         self._Xty = None
-        self._inv_XtX_klI = None
+        self._s2 = None
+        self._V = None
 
     def f(self, x):
         """Function value.
@@ -1474,12 +1475,12 @@ class RidgeSquaredError(properties.CompositeFunction,
         """
         if self.penalty_start > 0:
             x_ = x[self.penalty_start:, :]
-            Xx = np.dot(self.X[:, self.penalty_start:], x_)
+#            Xx = np.dot(self.X[:, self.penalty_start:], x_)
             Xx_ = np.dot(self.X, x) \
                - np.dot(self.X[:, :self.penalty_start],
                         x[:self.penalty_start, :])
-            print "penalties.RidgeSquaredError, DIFF:", \
-                    np.linalg.norm(Xx - Xx_)
+#            print "penalties.RidgeSquaredError, DIFF:", \
+#                    np.linalg.norm(Xx - Xx_)
         else:
             x_ = x
             Xx_ = np.dot(self.X, x_)
@@ -1606,25 +1607,42 @@ class RidgeSquaredError(properties.CompositeFunction,
         c = self.k + rho
 
         if n >= p:
-            if self._inv_XtX_klI is None:
-                # Ridge solution
-                XtX_klI = np.dot(self.X.T, self.X)
-                index = np.arange(min(XtX_klI.shape))
-                XtX_klI[index, index] += c
-                self._inv_XtX_klI = np.linalg.inv(XtX_klI)
+            if self._s2 is None or self._V is None:
+#                # Ridge solution
+#                XtX_klI = np.dot(self.X.T, self.X)
+#                index = np.arange(min(XtX_klI.shape))
+#                XtX_klI[index, index] += c
+#                self._inv_XtX_klI = np.linalg.inv(XtX_klI)
 
-            y = np.dot(self._inv_XtX_klI, v)
+                _, self._s2, self._V = np.linalg.svd(self.X)
+                self._V = self._V.T
+                self._s2 = self._s2.reshape((p, 1)) ** 2.0
+#                _inv_XtX_klI = np.dot(V, np.reciprocal(c + s ** 2) * V.T)
+
+#            y = np.dot(self._inv_XtX_klI, v)
+            y = np.dot(self._V,
+                       np.reciprocal(c + self._s2) * np.dot(self._V.T, v))
+
 
         else:  # If n < p
-            if self._inv_XtX_klI is None:
-                # Ridge solution using the Woodbury matrix identity.
-                XXt_klI = np.dot(self.X, self.X.T)
-                index = np.arange(min(XXt_klI.shape))
-                XXt_klI[index, index] += c
-                self._inv_XtX_klI = np.linalg.inv(XXt_klI)
+            if self._s2 is None or self._V is None:
+#                # Ridge solution using the Woodbury matrix identity.
+#                XXt_klI = np.dot(self.X, self.X.T)
+#                index = np.arange(min(XXt_klI.shape))
+#                XXt_klI[index, index] += c
+#                self._inv_XtX_klI = np.linalg.inv(XXt_klI)
 
-            y = (v - np.dot(self.X.T, np.dot(self._inv_XtX_klI,
-                                             np.dot(self.X, v)))) / c
+                _, self._s2, self._V = np.linalg.svd(self.X.T)
+                self._V = self._V.T
+                self._s2 = self._s2.reshape((n, 1)) ** 2.0
+#                _inv_XtX_klI = np.dot(V, np.reciprocal(c + s ** 2) * V.T)
+
+#            y = (v - np.dot(self.X.T, np.dot(self._inv_XtX_klI,
+#                                             np.dot(self.X, v)))) / c
+            Xv = np.dot(self.X, v)
+            y = (v - np.dot(self.X.T, np.dot(self._V,
+                                             np.reciprocal(c + self._s2) \
+                                                 * np.dot(self._V.T, Xv)))) / c
 
         return y
 

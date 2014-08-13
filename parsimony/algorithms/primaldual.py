@@ -66,19 +66,18 @@ class CONESTA(bases.ExplicitAlgorithm,
             number of iterations that must be performed. Default is 1.
     """
     INTERFACES = [properties.NesterovFunction,
-#                  properties.Gradient,
                   properties.StepSize,
                   properties.ProximalOperator,
                   properties.Continuation,
                   properties.DualFunction]
 
     INFO_PROVIDED = [Info.ok,
+                     Info.converged,
                      Info.num_iter,
                      Info.time,
                      Info.fvalue,
                      Info.gap,
-                     Info.mu,
-                     Info.converged]
+                     Info.mu]
 
     def __init__(self, mu_start=None, mu_min=consts.TOLERANCE,
                  tau=0.5, dynamic=False,
@@ -303,17 +302,16 @@ class NaiveCONESTA(bases.ExplicitAlgorithm,
             number of iterations that must be performed. Default is 1.
     """
     INTERFACES = [properties.NesterovFunction,
-#                  properties.Gradient,
                   properties.StepSize,
                   properties.ProximalOperator,
                   properties.Continuation]
 
     INFO_PROVIDED = [Info.ok,
+                     Info.converged,
                      Info.num_iter,
                      Info.time,
                      Info.fvalue,
-                     Info.mu,
-                     Info.converged]
+                     Info.mu]
 
     def __init__(self, mu_start=None, mu_min=consts.TOLERANCE,
                  tau=0.5,
@@ -326,21 +324,12 @@ class NaiveCONESTA(bases.ExplicitAlgorithm,
                                            min_iter=min_iter)
 
         self.mu_start = mu_start
-        self.mu_min = mu_min
-        self.tau = tau
+        if mu_start is not None:
+            self.mu_start = max(consts.TOLERANCE, mu_start)
+        self.mu_min = max(consts.TOLERANCE, mu_min)
+        self.tau = max(consts.TOLERANCE, tau)
 
-        self.eps = eps
-
-        # Copy the allowed info keys for FISTA.
-        fista_info = list()
-        for nfo in self.info_copy():
-            if nfo in FISTA.INFO_PROVIDED:
-                fista_info.append(nfo)
-        if Info.num_iter not in fista_info:
-            fista_info.append(Info.num_iter)
-
-        self.algorithm = FISTA(eps=eps, max_iter=max_iter, min_iter=min_iter,
-                               info=fista_info)
+        self.eps = max(consts.FLOAT_EPSILON, eps)
 
         self.num_iter = 0
 
@@ -348,7 +337,15 @@ class NaiveCONESTA(bases.ExplicitAlgorithm,
     @bases.check_compatibility
     def run(self, function, beta):
 
-#        self.info.clear()
+        # Copy the allowed info keys for FISTA.
+        fista_info = list()
+        for nfo in self.info_copy():
+            if nfo in FISTA.INFO_PROVIDED:
+                fista_info.append(nfo)
+        # Create the inner algorithm.
+        algorithm = FISTA(eps=self.eps,
+                          max_iter=self.max_iter, min_iter=self.min_iter,
+                          info=fista_info)
 
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, False)
@@ -378,17 +375,16 @@ class NaiveCONESTA(bases.ExplicitAlgorithm,
         i = 0
         while True:
             tnew = function.step(beta)
-            self.algorithm.set_params(step=tnew, eps=eps,
-                                      max_iter=self.max_iter - self.num_iter)
-#            self.fista_info.clear()
-            beta = self.algorithm.run(function, beta)
+            algorithm.set_params(step=tnew, eps=eps,
+                                 max_iter=self.max_iter - self.num_iter)
+            beta = algorithm.run(function, beta)
 
-            self.num_iter += self.algorithm.num_iter
+            self.num_iter += algorithm.num_iter
 
-            if Info.time in self.algorithm.info:
-                tval = self.algorithm.info_get(Info.time)
-            if Info.fvalue in self.algorithm.info:
-                fval = self.algorithm.info_get(Info.fvalue)
+            if Info.time in algorithm.info:
+                tval = algorithm.info_get(Info.time)
+            if Info.fvalue in algorithm.info:
+                fval = algorithm.info_get(Info.fvalue)
 
             if self.info_requested(Info.time):
                 t = t + tval
@@ -397,8 +393,9 @@ class NaiveCONESTA(bases.ExplicitAlgorithm,
 
             old_mu = function.set_mu(self.mu_min)
             # Take one ISTA step for use in the stopping criterion.
-            beta_tilde = function.prox(beta - tmin * function.grad(beta),
-                                       tmin)
+            beta_tilde = function.prox(beta - tmin * function.grad(beta), tmin,
+                                     eps=1.0 / (self.num_iter \
+                                                 ** (2.0 + consts.TOLERANCE)))
             function.set_mu(old_mu)
 
             if (1.0 / tmin) * maths.norm(beta - beta_tilde) < self.eps:
@@ -409,22 +406,22 @@ class NaiveCONESTA(bases.ExplicitAlgorithm,
                 break
 
             if self.num_iter >= self.max_iter:
+
                 break
 
             eps = max(self.tau * eps, consts.TOLERANCE)
 
-#            if eps <= consts.TOLERANCE:
-#                break
-
             if self.info_requested(Info.mu):
+                # mu_new = max(self.mu_min, self.tau * function.mu_max(eps))
                 mu_new = max(self.mu_min, self.tau * mu[-1])
                 mu = mu + [mu_new] * len(fval)
 
             else:
+                # mu_new = max(self.mu_min, self.tau * function.mu_max(eps))
                 mu_new = max(self.mu_min, self.tau * mu)
                 mu = mu_new
 
-            print "eps:", eps, ", mu:", mu_new
+#            print "eps:", eps, ", mu:", mu_new
             function.set_mu(mu_new)
 
             i = i + 1
@@ -473,11 +470,13 @@ class ExcessiveGapMethod(bases.ExplicitAlgorithm,
                   properties.StronglyConvex]
 
     INFO_PROVIDED = [Info.ok,
+                     Info.converged,
                      Info.num_iter,
                      Info.time,
                      Info.fvalue,
+                     Info.mu,
                      Info.bound,
-                     Info.converged]
+                     Info.beta]
 
     def __init__(self, eps=consts.TOLERANCE,
                  info=[], max_iter=10000, min_iter=1):
