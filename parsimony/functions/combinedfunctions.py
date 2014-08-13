@@ -1428,15 +1428,17 @@ class AugmentedLinearRegressionL1L2TV(properties.SplittableFunction,
         class MultipleFunctions(properties.Function,
                                 properties.ProximalOperator):
 
-            def __init__(self, functions):
+            def __init__(self, functions, rho):
                 self.funcs = functions
+                self.rho = rho
 
             def f(self, xrr):
                 if isinstance(xrr, linalgs.MultipartArray):
                     xrr = xrr.get_parts()
 
-                f = self.funcs[0].f(xrr[0]) \
-                  + self.funcs[1].f(xrr[1])
+                # Rescale the function values by rho.
+                f = self.funcs[0].f(xrr[0]) * self.rho \
+                  + self.funcs[1].f(xrr[1]) * self.rho
 
                 return f
 
@@ -1498,7 +1500,8 @@ class AugmentedLinearRegressionL1L2TV(properties.SplittableFunction,
         self.g = MultipleFunctions([RidgeSquaredError(X, y, l2, l=1.0 / rho,
                                                    penalty_start=penalty_start,
                                                    mean=mean),
-                                    L1TV(l1 / rho, tv / rho, A[0].shape[1])])
+                                    L1TV(l1 / rho, tv / rho, A[0].shape[1])],
+                                   rho)
 
         if len(A) == 4:
             A = A[:2]  # Skip 2nd and 3rd dimension of the image (they are 1)
@@ -1510,19 +1513,6 @@ class AugmentedLinearRegressionL1L2TV(properties.SplittableFunction,
         self.mean = bool(mean)
 
         self.reset()
-
-    def set_rho(self, rho):
-        """Update the penalty parameter.
-
-        From the interface "AugmentedProximalOperator".
-        """
-        rho = max(0.0, float(rho))
-
-        self.g.funcs[0].l = 1.0 / rho
-        self.g.funcs[1].g.l = self.g.funcs[1].l1 / rho
-        self.g.funcs[1].h.l = self.g.funcs[1].tv / rho
-
-        self.rho = rho
 
     def reset(self):
 
@@ -1541,6 +1531,26 @@ class AugmentedLinearRegressionL1L2TV(properties.SplittableFunction,
 
         raise NotImplementedError("Use the prox of the parts of the " \
                                   "splitted function, g.prox() and h.prox().")
+
+    def set_rho(self, rho):
+        """Update the penalty parameter.
+
+        From the interface "AugmentedProximalOperator".
+        """
+        rho = max(0.0, float(rho))
+
+        # Ridge regression
+        self.g.funcs[0].l = 1.0 / rho
+        # L1
+        self.g.funcs[1].g.l = self.g.funcs[1].l1 / rho
+        # TV
+        self.g.funcs[1].h.l = self.g.funcs[1].tv / rho
+
+        # MultipleFunctions
+        self.g.rho = rho
+
+        # self
+        self.rho = rho
 
 
 class PrincipalComponentAnalysisL1TV(properties.CompositeFunction,

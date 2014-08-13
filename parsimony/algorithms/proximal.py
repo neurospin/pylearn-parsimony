@@ -411,9 +411,7 @@ class ADMM(bases.ExplicitAlgorithm,
             variables should be kept. Set to less than or equal to 1 if you
             don't want to update the penalty parameter rho dynamically.
 
-    tau_incr : Float, greater than 1. Increase rho by a factor tau_incr.
-
-    tau_decr : Float, greater than 1. Decrease rho by a factor tau_incr.
+    tau : Float, greater than 1. Increase rho by a factor tau.
 
     info : List or tuple of utils.consts.Info. What, if any, extra run
             information should be stored. Default is an empty list, which means
@@ -437,7 +435,7 @@ class ADMM(bases.ExplicitAlgorithm,
                      Info.fvalue,
                      Info.converged]
 
-    def __init__(self, rho=1.0, mu=10.0, tau_incr=2.0, tau_decr=2.0,
+    def __init__(self, rho=1.0, mu=10.0, tau=1.0001,
                  info=[],
                  eps=consts.TOLERANCE, max_iter=1000, min_iter=1):
                  # TODO: Investigate what is a good default value here!
@@ -448,8 +446,7 @@ class ADMM(bases.ExplicitAlgorithm,
 
         self.rho = max(consts.FLOAT_EPSILON, float(rho))
         self.mu = max(1.0, float(mu))
-        self.tau_incr = max(1.0, float(tau_incr))
-        self.tau_decr = max(1.0, float(tau_decr))
+        self.tau = max(1.0, float(tau))
 
         self.eps = max(consts.FLOAT_EPSILON, float(eps))
 
@@ -535,12 +532,12 @@ class ADMM(bases.ExplicitAlgorithm,
                 s = (z_new - z_old) * -self.rho
                 norm_r = maths.norm(r)
                 norm_s = maths.norm(s)
+#                print "norm(r): ", norm_r, ", norm(s): ", norm_s, ", rho:", self.rho
+
                 if norm_r > self.mu * norm_s:
-                    self.rho = self.rho * self.tau_incr
+                    self.rho *= self.tau
                 elif norm_s > self.mu * norm_r:
-                    self.rho = self.rho / self.tau_decr
-#                else:
-#                    self.rho = self.rho
+                    self.rho /= self.tau
 
                 # Update the penalty parameter in the functions.
                 functions.set_rho(self.rho)

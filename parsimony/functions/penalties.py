@@ -1477,8 +1477,8 @@ class RidgeSquaredError(properties.CompositeFunction,
             x_ = x[self.penalty_start:, :]
 #            Xx = np.dot(self.X[:, self.penalty_start:], x_)
             Xx_ = np.dot(self.X, x) \
-               - np.dot(self.X[:, :self.penalty_start],
-                        x[:self.penalty_start, :])
+                - np.dot(self.X[:, :self.penalty_start],
+                         x[:self.penalty_start, :])
 #            print "penalties.RidgeSquaredError, DIFF:", \
 #                    np.linalg.norm(Xx - Xx_)
         else:

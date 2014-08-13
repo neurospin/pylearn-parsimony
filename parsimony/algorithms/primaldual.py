@@ -134,8 +134,8 @@ class CONESTA(bases.ExplicitAlgorithm,
         else:
             mu = [self.mu_start]
 
-        function.set_mu(self.mu_min)
-        tmin = function.step(beta)
+#        function.set_mu(self.mu_min)
+#        tmin = function.step(beta)
         function.set_mu(mu[0])
 
         max_eps = function.eps_max(mu[0])
@@ -174,19 +174,19 @@ class CONESTA(bases.ExplicitAlgorithm,
                 fval = algorithm.info_get(Info.fvalue)
 
             self.mu_min = min(self.mu_min, mu[-1])
-            tmin = min(tmin, tnew)
-            old_mu = function.set_mu(self.mu_min)
-            # Take one ISTA step for use in the stopping criterion.
-            beta_tilde = function.prox(beta - tmin * function.grad(beta),
-                                       tmin)
-            function.set_mu(old_mu)
+#            tmin = min(tmin, tnew)
+#            old_mu = function.set_mu(self.mu_min)
+#            # Take one ISTA step for use in the stopping criterion.
+#            beta_tilde = function.prox(beta - tmin * function.grad(beta),
+#                                       tmin)
+#            function.set_mu(old_mu)
 
-            if (1.0 / tmin) * maths.norm(beta - beta_tilde) < self.eps:
-
-                if self.info_requested(Info.converged):
-                    self.info_set(Info.converged, True)
-
-                stop = True
+#            if (1.0 / tmin) * maths.norm(beta - beta_tilde) < self.eps:
+#
+#                if self.info_requested(Info.converged):
+#                    self.info_set(Info.converged, True)
+#
+#                stop = True
 
             if self.num_iter >= self.max_iter:
                 stop = True
@@ -221,7 +221,10 @@ class CONESTA(bases.ExplicitAlgorithm,
 
             if G <= self.eps:
 #                print "New stopping criterion kicked in!"
-                break
+                if self.info_requested(Info.converged):
+                    self.info_set(Info.converged, True)
+
+                stop = True
 
             if (G <= consts.TOLERANCE and mu[-1] <= consts.TOLERANCE) or stop:
                 break
@@ -501,7 +504,6 @@ class ExcessiveGapMethod(bases.ExplicitAlgorithm,
         beta : Numpy array. A start vector. This is normally not given, but
                 left None, since the start vector is computed by the algorithm.
         """
-
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, False)
 
