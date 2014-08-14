@@ -201,6 +201,7 @@ class CONESTA(bases.ExplicitAlgorithm,
                 # TODO: Warn if G_new < -consts.TOLERANCE.
                 G_new = abs(G_new)  # May happen close to machine epsilon.
 
+#                print G_new, G
                 if G_new < G:
                     G = G_new
                 else:

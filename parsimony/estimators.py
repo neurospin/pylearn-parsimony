@@ -820,7 +820,9 @@ class LinearRegressionL1L2TV(RegressionEstimator):
                 r = self.start_vector.get_vector(2 * p)
             else:
                 x = beta
-                r = np.vstack((beta, np.zeros((p, 1))))
+#                r = np.vstack((beta, np.zeros((p, 1))))
+                r = np.vstack((np.zeros((p, 1)),
+                               np.zeros((p, 1))))
 
             xr = linalgs.MultipartArray([x, r])
             beta = [xr, xr]

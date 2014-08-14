@@ -536,8 +536,10 @@ class ADMM(bases.ExplicitAlgorithm,
 
                 if norm_r > self.mu * norm_s:
                     self.rho *= self.tau
+                    u_new /= self.tau  # Rescale dual variable.
                 elif norm_s > self.mu * norm_r:
                     self.rho /= self.tau
+                    u_new *= self.tau  # Rescale dual variable.
 
                 # Update the penalty parameter in the functions.
                 functions.set_rho(self.rho)

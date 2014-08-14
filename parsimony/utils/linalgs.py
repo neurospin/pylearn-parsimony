@@ -69,6 +69,8 @@ class MultipartArray(object):
                     self.parts[i] -= other
                 elif op == self.__ops.mul:
                     self.parts[i] *= other
+                elif op == self.__ops.div:
+                    self.parts[i] /= other
                 else:
                     raise ValueError("Operator not yet implemented!")
         elif isinstance(other, MultipartArray):
@@ -121,6 +123,18 @@ class MultipartArray(object):
     def __imul__(self, other):
         return self.__iop(other, self.__ops.mul)
 
+    def __idiv__(self, other):
+        if not np.isscalar(other):
+            raise ValueError("Operator not yet implemented for type!")
+
+        return self.__iop(other, self.__ops.div)
+
+    def __itruediv__(self, other):
+        if not np.isscalar(other):
+            raise ValueError("Operator not yet implemented for type!")
+
+        return self.__iop(float(other), self.__ops.div)
+
     def __op(self, other, op):
         new_parts = [0] * len(self.parts)
         if np.isscalar(other):
@@ -131,6 +145,8 @@ class MultipartArray(object):
                     new_parts[i] = self.parts[i] - other
                 elif op == self.__ops.mul:
                     new_parts[i] = self.parts[i] * other
+                elif op == self.__ops.div:
+                    new_parts[i] = self.parts[i] / other
                 else:
                     raise ValueError("Operator not yet implemented!")
         elif isinstance(other, MultipartArray):
@@ -182,6 +198,18 @@ class MultipartArray(object):
 
     def __mul__(self, other):
         return self.__op(other, self.__ops.mul)
+
+    def __div__(self, other):
+        if not np.isscalar(other):
+            raise ValueError("Operator not yet implemented for type!")
+
+        return self.__op(other, self.__ops.div)
+
+    def __truediv__(self, other):
+        if not np.isscalar(other):
+            raise ValueError("Operator not yet implemented for type!")
+
+        return self.__op(float(other), self.__ops.div)
 
     def dot(self, other):
         if self.vertical:
