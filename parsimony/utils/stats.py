@@ -12,11 +12,14 @@ import numpy as np
 
 import parsimony.utils.consts as consts
 
-__all__ = ["sensitivity", "specificity", "fleiss_kappa"]
+__all__ = ["sensitivity", "precision", "specificity", "npv", "F_score",
+           "fleiss_kappa"]
 
 
 def sensitivity(cond, test):
     """A test's ability to identify a condition correctly.
+
+    Also called true positive rate or recall.
 
     Parameters
     ----------
@@ -27,13 +30,46 @@ def sensitivity(cond, test):
     true_pos = np.logical_and((cond == 1), (test == 1))
     false_neg = np.logical_and((cond == 1), (test == 0))
 
-    sens = true_pos.sum() / float(true_pos.sum() + false_neg.sum())
+    TP = float(true_pos.sum())
+    FN = float(false_neg.sum())
 
-    return sens
+    if FN > 0:
+        value = TP / (TP + FN)
+    else:
+        value = 1.0
+
+    return value
+
+
+def precision(cond, test):
+    """A test's ability to correctly identify positive outcomes.
+
+    Also called positive predictive value, PPV.
+
+    Parameters
+    ----------
+    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.
+
+    test : Numpy array, boolean or 0/1 integer. The estimated outcome.
+    """
+    true_pos = np.logical_and((cond == 1), (test == 1))
+    false_pos = np.logical_and((cond == 0), (test == 1))
+
+    TP = float(true_pos.sum())
+    FP = float(false_pos.sum())
+
+    if FP > 0:
+        value = TP / (TP + FP)
+    else:
+        value = 1.0
+
+    return value
 
 
 def specificity(cond, test):
     """A test's ability to exclude a condition correctly.
+
+    Also called true negative rate.
 
     Parameters
     ----------
@@ -44,9 +80,40 @@ def specificity(cond, test):
     true_neg = np.logical_and((cond == 0), (test == 0))
     false_pos = np.logical_and((cond == 0), (test == 1))
 
-    spec = true_neg.sum() / float(false_pos.sum() + true_neg.sum())
+    TN = float(true_neg.sum())
+    FP = float(false_pos.sum())
 
-    return spec
+    if FP > 0:
+        value = TN / (TN + FP)
+    else:
+        value = 1.0
+
+    return value
+
+
+def npv(cond, test):
+    """A test's ability to correctly identify negative outcomes.
+
+    The negative predictive value, NPV.
+
+    Parameters
+    ----------
+    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.
+
+    test : Numpy array, boolean or 0/1 integer. The estimated outcome.
+    """
+    true_neg = np.logical_and((cond == 0), (test == 0))
+    false_neg = np.logical_and((cond == 1), (test == 0))
+
+    TN = float(true_neg.sum())
+    FN = float(false_neg.sum())
+
+    if FN > 0:
+        value = TN / (TN + FN)
+    else:
+        value = 1.0
+
+    return value
 
 
 def accuracy(cond, test):
@@ -61,11 +128,34 @@ def accuracy(cond, test):
     true_pos = np.logical_and((cond == 1), (test == 1))
     true_neg = np.logical_and((cond == 0), (test == 0))
 
+    TP = float(true_pos.sum())
+    TN = float(true_neg.sum())
+
     n = np.prod(cond.shape)
 
-    spec = (true_pos.sum() + true_neg.sum()) / float(n)
+    value = (TP + TN) / float(n)
 
-    return spec
+    return value
+
+
+def F_score(cond, test):
+    """A measure of a test's accuracy by a weighted average of the precision
+    and sensitivity.
+
+    Also called the harmonic mean of precision and sensitivity.
+
+    Parameters
+    ----------
+    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.
+
+    test : Numpy array, boolean or 0/1 integer. The estimated outcome.
+    """
+    PR = precision(cond, test)
+    RE = sensitivity(cond, test)
+
+    value = 2.0 * PR * RE / (PR + RE)
+
+    return value
 
 
 def fleiss_kappa(W, k):

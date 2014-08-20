@@ -348,17 +348,19 @@ class LogisticRegression(properties.AtomicFunction,
     weight for sample i.
 
     See [Hastie 2009, p.: 102, 119 and 161, Bishop 2006 p.: 206] for details.
+
+    Parameters
+    ----------
+    X : Numpy array (n-by-p). The regressor matrix.
+
+    y : Numpy array (n-by-1). The regressand vector.
+
+    weights: Numpy array (n-by-1). The sample's weights.
+
+    mean : Boolean. Whether to compute the squared loss or the mean squared
+            loss. Default is True, the mean squared loss.
     """
     def __init__(self, X, y, weights=None, mean=True):
-        """
-        Parameters
-        ----------
-        X : Numpy array (n-by-p). The regressor matrix.
-
-        y : Numpy array (n-by-1). The regressand vector.
-
-        weights: Numpy array (n-by-1). The sample's weights.
-        """
         self.X = X
         self.y = y
         if weights is None:
