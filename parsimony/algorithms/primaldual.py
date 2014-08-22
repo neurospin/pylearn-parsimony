@@ -152,11 +152,13 @@ class CONESTA(bases.ExplicitAlgorithm,
             self.info_set(Info.converged, False)
 
         i = 0
+#        k = 0
         while True:
             stop = False
 
             tnew = function.step(beta)
             eps_plus = min(max_eps, function.eps_opt(mu[-1]))
+#            eps_plus = eps_plus * (self.tau ** k)
 #            print "current iterations: ", self.num_iter, \
 #                    ", iterations left: ", self.max_iter - self.num_iter
             algorithm.set_params(step=tnew, eps=eps_plus,
@@ -195,17 +197,23 @@ class CONESTA(bases.ExplicitAlgorithm,
                 gap_time = utils.time_cpu()
 
             if self.dynamic:
-                G_new = function.gap(beta, eps=eps_plus,
+                G_new = function.gap(beta,
+                                     eps=eps_plus,
                                      max_iter=self.max_iter - self.num_iter)
 
                 # TODO: Warn if G_new < -consts.TOLERANCE.
                 G_new = abs(G_new)  # May happen close to machine epsilon.
 
-#                print G_new, G
+#                print " " * k, k, G_new, G, eps_plus, mu[-1], self.num_iter
                 if G_new < G:
                     G = G_new
+#                    G = self.tau * G
+#                    G = min(G_new, self.tau * G)
+#                    k = 0
                 else:
                     G = self.tau * G
+#                    k = k + 1
+#                    pass
 
             else:  # Static
 

@@ -197,7 +197,7 @@ class CombinedFunction(properties.CompositeFunction,
             for p in self._p:
                 L += p.L()
 
-        if all_lipschitz and L > 0.0:
+        if all_lipschitz and L > consts.TOLERANCE:
             step = 1.0 / L
         else:
             # If not all functions have Lipschitz continuous gradients, try

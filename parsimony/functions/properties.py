@@ -642,13 +642,13 @@ class NesterovFunction(Gradient,
 
     @abc.abstractmethod
     def phi(self, alpha, beta):
-        """ Function value with known alpha.
+        """Function value with known alpha.
         """
         raise NotImplementedError('Abstract method "phi" must be '
                                   'specialised!')
 
     def grad(self, beta):
-        """ Gradient of the function at beta.
+        """Gradient of the function at beta.
 
         Parameters
         ----------
@@ -657,7 +657,7 @@ class NesterovFunction(Gradient,
         if self.l < consts.TOLERANCE:
             return 0.0
 
-        # \beta need not be sliced here.
+        # beta need not be sliced here.
         alpha = self.alpha(beta)
 
         if self.penalty_start > 0:

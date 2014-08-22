@@ -23,13 +23,9 @@ import parsimony.utils.maths as maths
 __all__ = ["GroupLassoOverlap", "A_from_groups"]
 
 
-class GroupLassoOverlap(#properties.AtomicFunction,
-                        properties.NesterovFunction,
+class GroupLassoOverlap(properties.NesterovFunction,
                         properties.Penalty,
-                        properties.Constraint,
-#                        properties.Gradient,
-#                        properties.LipschitzContinuousGradient
-                        ):
+                        properties.Constraint):
     """Group L1-L2 function, with overlapping groups. Represents the
     function
 
