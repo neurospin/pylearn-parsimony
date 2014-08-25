@@ -908,9 +908,14 @@ class NesterovFunction(Gradient,
 #
 #            return [ax, ay, az]
 
+        if self.penalty_start > 0:
+            beta_ = beta[self.penalty_start:, :]
+        else:
+            beta_ = beta
+
         A = self.lA()
         t = factor
-        f = F(beta, A, t, self.project)
+        f = F(beta_, A, t, self.project)
 
         if self._alpha is None:
             alpha = [0] * len(A)
@@ -922,7 +927,6 @@ class NesterovFunction(Gradient,
 
         alpha_ = alpha
 
-        # TODO: Compute with FISTA instead!
         for it in xrange(1, max_iter + 1):
 
             # ISTA
@@ -956,11 +960,11 @@ class NesterovFunction(Gradient,
             Aa = A[0].T.dot(alpha[0])
             for i in xrange(1, len(A)):
                 Aa = Aa + A[i].T.dot(alpha[i])
-            y = beta - t * Aa
+            y = beta_ - t * Aa
 
-            gap = 0.5 * maths.norm(y - beta) ** 2.0 \
+            gap = 0.5 * maths.norm(y - beta_) ** 2.0 \
                     + factor * self.f(y) \
-                - 0.5 * (maths.norm(beta) ** 2.0 - maths.norm(y) ** 2.0)
+                - 0.5 * (maths.norm(beta_) ** 2.0 - maths.norm(y) ** 2.0)
 
 #            if it % 10 == 0:
 #                print "gap:", gap
@@ -972,5 +976,9 @@ class NesterovFunction(Gradient,
                 break
 
         self._alpha = alpha
+
+        if self.penalty_start > 0:
+            y = np.vstack((beta[:self.penalty_start, :],
+                           y))
 
         return y
