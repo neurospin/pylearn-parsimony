@@ -58,11 +58,11 @@ def load(n_samples=100, shape=(30, 30, 1),
     >>> X3d, y, beta3d, proba = datasets.classification.dice5.load(n_samples=n_samples,
     ...     shape=shape, snr=5, random_seed=1)
     >>> print "Likelihood=", np.prod(proba[y.ravel()==1]) * np.prod(1-proba[y.ravel()==0])
-    Likelihood= 3.85343753829e-06
+    Likelihood= 4.74865684423e-06
     >>> X3d, y, beta3d, proba = datasets.classification.dice5.load(n_samples=n_samples,
     ...     shape=shape, sigma_logit=5., random_seed=1)
     >>> print "Likelihood=", np.prod(proba[y.ravel()==1]) * np.prod(1-proba[y.ravel()==0])
-    Likelihood= 2.19102268035e-06
+    Likelihood= 4.51185595179e-07
     """
     X3d, y, beta3d = dice5regression.load(n_samples=n_samples, shape=shape, r2=1.,
                                             random_seed=random_seed, **kwargs)

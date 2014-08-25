@@ -10,46 +10,48 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from  parsimony import datasets
-import parsimony.functions.nesterov.tv as tv_helper
-from parsimony.estimators import LinearRegressionL1L2TV
-from parsimony.algorithms.explicit import StaticCONESTA
-from parsimony.utils import plot_map2d
-from sklearn.linear_model import ElasticNet
+import parsimony.datasets as datasets
+import parsimony.functions.nesterov.tv as nesterov_tv
+import parsimony.estimators as estimators
+import parsimony.algorithms as algorithms
+import parsimony.utils as utils
 from sklearn.metrics import r2_score
 
 ###########################################################################
 ## Dataset
 n_samples = 500
-shape = (30, 30, 1)
-X3d, y, beta3d = datasets.regression.dice5.load(n_samples=n_samples, shape=shape, r2=.75)
+shape = (100, 100, 1)
+X3d, y, beta3d = datasets.regression.dice5.load(n_samples=n_samples,
+    shape=shape, r2=.75, random_seed=0)
 X = X3d.reshape((n_samples, np.prod(shape)))
 n_train = 100
 Xtr = X[:n_train, :]
 ytr = y[:n_train]
 Xte = X[n_train:, :]
 yte = y[n_train:]
-
-alpha = 0.1  # global penalty
+alpha = 1.  # global penalty
 
 ###########################################################################
-## Sklearn Elasticnet
-#    Min: 1 / (2 * n_samples) * ||y - Xw||^2_2 +
-#        + alpha * l1_ratio * ||w||_1
-#        + 0.5 * alpha * (1 - l1_ratio) * ||w||^2_2
-#alpha = alpha_g * 1. / (2. * n_train)
+## Elasticnet
+# Min: (1 / (2 * n)) * ||X * beta - y||²_2
+#              + alpha * l * ||beta||_1
+#              + alpha * ((1.0 - l) / 2) * ||beta||²_2
+# Parsimony Elasticnet is based on FISTA, is then slower that scikit-learn one
 l1_ratio = .5
-enet = ElasticNet(alpha=alpha, l1_ratio=l1_ratio)
+enet = estimators.ElasticNet(alpha=alpha, l=.5)
 yte_pred_enet = enet.fit(Xtr, ytr).predict(Xte)
 
 ###########################################################################
 ## Fit LinearRegressionL1L2TV
-# 
-l1, l2, tv = alpha * np.array((.4, .1, .5))  # l2, l1, tv penalties
-A, n_compacts = tv_helper.A_from_shape(shape)
-#import parsimony.functions as functions
-#functions.RR_L1_TV(X, y, k, l, g, A=A)
-enettv = LinearRegressionL1L2TV(l1, l2, tv, A, algorithm=StaticCONESTA(max_iter=500))
+# Min: (1 / (2 * n)) * ||Xbeta - y||^2_2
+#    + l1 * ||beta||_1
+#    + (l2 / 2) * ||beta||^2_2
+#    + tv * TV(beta)
+#
+l1, l2, tv = alpha * np.array((.33, .33, .33))  # l1, l2, tv penalties
+A, n_compacts = nesterov_tv.A_from_shape(shape)
+algo = algorithms.primaldual.StaticCONESTA(max_iter=500)
+enettv = estimators.LinearRegressionL1L2TV(l1, l2, tv, A, algorithm=algo)
 yte_pred_enettv = enettv.fit(Xtr, ytr).predict(Xte)
 
 ###########################################################################
@@ -57,16 +59,16 @@ yte_pred_enettv = enettv.fit(Xtr, ytr).predict(Xte)
 
 # TODO: Please remove dependence on scikit-learn. Add required functionality
 # to parsimony instead.
-
+limits = np.array((beta3d.min(), beta3d.max()))
 plot = plt.subplot(131)
-plot_map2d(beta3d.reshape(shape), plot, title="beta star")
+utils.plot_map2d(beta3d.reshape(shape), plot, title="beta star")
 plot = plt.subplot(132)
-plot_map2d(enet.coef_.reshape(shape), plot, title="beta enet (R2=%.2f)" %
-    r2_score(yte, yte_pred_enet),
-             limits=(beta3d.min(), beta3d.max()))
+utils.plot_map2d(enet.beta.reshape(shape), plot, title="beta enet (R2=%.2f)" %
+    r2_score(yte, yte_pred_enet), limits=limits/1.)
+#utils.plot_map2d(enet.coef_.reshape(shape), plot, title="beta enet (R2=%.2f)" %
+#    r2_score(yte, yte_pred_enet), limits=limits/1.)
 plot = plt.subplot(133)
-plot_map2d(enettv.beta.reshape(shape), plot,
-           title="beta enettv (R2=%.2f)" \
-                 % r2_score(yte, yte_pred_enettv),
-             limits=(beta3d.min(), beta3d.max()))
+utils.plot_map2d(enettv.beta.reshape(shape), plot,
+                 title="beta enettv (R2=%.2f)"  % r2_score(yte, yte_pred_enettv),
+                 limits=limits/10.)
 plt.show()
