@@ -1234,7 +1234,7 @@ class LogisticRegression(LogisticRegressionEstimator):
                  mean=True):
 
         if algorithm is None:
-            algorithm = primaldual.GradientDescent(**algorithm_params)
+            algorithm = gradient.GradientDescent(**algorithm_params)
         else:
             algorithm.set_params(**algorithm_params)
 
