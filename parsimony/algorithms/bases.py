@@ -206,8 +206,11 @@ class InformationAlgorithm(object):
     ['fvalue']
     >>> lr = LinearRegression(X=np.random.rand(10,15), y=np.random.rand(10,1))
     >>> beta = gd.run(lr, np.random.rand(15, 1))
-    >>> gd.info_get(Info.fvalue)  # doctest:+ELLIPSIS
-    [0.068510926021035312, ... 1.8856122733915382e-12]
+    >>> fvalue = gd.info_get(Info.fvalue)
+    >>> round(fvalue[0], 10)
+    0.068510926
+    >>> round(fvalue[-1], 15)
+    1.886e-12
     """
     INFO_PROVIDED = []
 

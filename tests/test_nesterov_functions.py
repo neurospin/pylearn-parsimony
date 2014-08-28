@@ -63,11 +63,11 @@ class TestL1(TestCase):
                                             penalty_start=penalty_start))
 #        function.add_prox(penalties.L1(l, penalty_start=penalty_start))
 
-        fista = proximal.FISTA(eps=mu_min, max_iter=20000)
+        fista = proximal.FISTA(eps=mu_min, max_iter=23500)
         beta = fista.run(function, beta)
 
         berr = np.linalg.norm(beta - beta_star)
-#        print "berr:", berr
+        print "berr:", berr
         assert berr < 5e-2
 
         # Test proximal operator

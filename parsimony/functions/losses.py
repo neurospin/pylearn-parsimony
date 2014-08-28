@@ -103,8 +103,9 @@ class LinearRegression(properties.CompositeFunction,
         >>> y = np.random.rand(100, 1)
         >>> lr = LinearRegression(X=X, y=y)
         >>> beta = np.random.rand(150, 1)
-        >>> np.linalg.norm(lr.grad(beta) - lr.approx_grad(beta, eps=1e-4))
-        1.2935592057892195e-08
+        >>> round(np.linalg.norm(lr.grad(beta)
+        ...       - lr.approx_grad(beta, eps=1e-4)), 9)
+        1.3e-08
         """
         grad = np.dot(self.X.T, np.dot(self.X, beta) - self.y)
 
@@ -131,8 +132,8 @@ class LinearRegression(properties.CompositeFunction,
         >>> L_ = lr.approx_L((15, 1), 10000)
         >>> L >= L_
         True
-        >>> (L - L_) / L
-        0.14039091870818254
+        >>> round((L - L_) / L, 14)
+        0.14039091870818
         """
         if self._L is None:
 
@@ -264,8 +265,9 @@ class RidgeRegression(properties.CompositeFunction,
         >>> y = np.random.rand(100, 1)
         >>> rr = RidgeRegression(X=X, y=y, k=3.14159265)
         >>> beta = np.random.rand(150, 1)
-        >>> np.linalg.norm(rr.grad(beta) - rr.approx_grad(beta, eps=1e-4))
-        1.2951508180081868e-08
+        >>> round(np.linalg.norm(rr.grad(beta)
+        ...       - rr.approx_grad(beta, eps=1e-4)), 9)
+        1.3e-08
         """
         gradOLS = np.dot((np.dot(self.X, beta) - self.y).T, self.X).T
 
@@ -418,16 +420,18 @@ class LogisticRegression(properties.AtomicFunction,
         >>> y = np.random.randint(0, 2, (100, 1))
         >>> lr = LogisticRegression(X=X, y=y, mean=True)
         >>> beta = np.random.rand(150, 1)
-        >>> np.linalg.norm(lr.grad(beta) - lr.approx_grad(beta, eps=1e-4))
-        3.9485788278025618e-10
+        >>> round(np.linalg.norm(lr.grad(beta)
+        ...       - lr.approx_grad(beta, eps=1e-4)), 10)
+        4e-10
         >>>
         >>> np.random.seed(42)
         >>> X = np.random.rand(100, 150)
         >>> y = np.random.randint(0, 2, (100, 1))
         >>> lr = LogisticRegression(X=X, y=y, mean=False)
         >>> beta = np.random.rand(150, 1)
-        >>> np.linalg.norm(lr.grad(beta) - lr.approx_grad(beta, eps=1e-4))
-        3.9366299418257381e-08
+        >>> round(np.linalg.norm(lr.grad(beta)
+        ...       - lr.approx_grad(beta, eps=1e-4)), 9)
+        3.9e-08
         """
         Xbeta = np.dot(self.X, beta)
         pi = 1.0 / (1.0 + np.exp(-Xbeta))
@@ -459,8 +463,8 @@ class LogisticRegression(properties.AtomicFunction,
         >>> L_ = lr.approx_L((15, 1), 10000)
         >>> L >= L_
         True
-        >>> (L - L_) / L
-        0.4511091045798799
+        >>> round((L - L_) / L, 15)
+        0.45110910457988
         >>> lr = LogisticRegression(X=X, y=y, mean=False)
         >>> L = lr.L()
         >>> L_ = lr.approx_L((15, 1), 10000)
@@ -592,8 +596,9 @@ class RidgeLogisticRegression(properties.CompositeFunction,
         >>> y[y >= 0.5] = 1.0
         >>> rr = RidgeLogisticRegression(X=X, y=y, k=2.71828182, mean=True)
         >>> beta = np.random.rand(150, 1)
-        >>> np.linalg.norm(rr.grad(beta) - rr.approx_grad(beta, eps=1e-4))
-        7.2558745551696618e-10
+        >>> round(np.linalg.norm(rr.grad(beta)
+        ...       - rr.approx_grad(beta, eps=1e-4)), 11)
+        7.3e-10
         >>>
         >>> np.random.seed(42)
         >>> X = np.random.rand(100, 150)
@@ -602,8 +607,9 @@ class RidgeLogisticRegression(properties.CompositeFunction,
         >>> y[y >= 0.5] = 1.0
         >>> rr = RidgeLogisticRegression(X=X, y=y, k=2.71828182, mean=False)
         >>> beta = np.random.rand(150, 1)
-        >>> np.linalg.norm(rr.grad(beta) - rr.approx_grad(beta, eps=1e-4))
-        3.5290185882784444e-08
+        >>> np.linalg.norm(rr.grad(beta)
+        ...                - rr.approx_grad(beta, eps=1e-4)) < 5e-8
+        True
         """
         Xbeta = np.dot(self.X, beta)
         pi = 1.0 / (1.0 + np.exp(-Xbeta))
@@ -694,9 +700,9 @@ class LatentVariableVariance(properties.Function,
         >>> X = np.random.rand(50, 150)
         >>> w = np.random.rand(150, 1)
         >>> var = LatentVariableVariance(X)
-        >>> var.f(w)
-        -1295.8544751886152
-        >>> -np.dot(w.T, np.dot(X.T, np.dot(X, w)))[0, 0] / 49.0
+        >>> round(var.f(w), 12)
+        -1295.854475188615
+        >>> round(-np.dot(w.T, np.dot(X.T, np.dot(X, w)))[0, 0] / 49.0, 12)
         -1295.854475188615
         """
         Xw = np.dot(self.X, w)
@@ -721,8 +727,8 @@ class LatentVariableVariance(properties.Function,
         >>> X = np.random.rand(50, 150)
         >>> var = LatentVariableVariance(X)
         >>> w = np.random.rand(150, 1)
-        >>> np.linalg.norm(var.grad(w) - var.approx_grad(w, eps=1e-4))
-        1.0671280908550282e-08
+        >>> np.linalg.norm(var.grad(w) - var.approx_grad(w, eps=1e-4)) < 5e-8
+        True
         """
         grad = -np.dot(self.X.T, np.dot(self.X, w)) * (2.0 / self._n)
 
@@ -746,11 +752,11 @@ class LatentVariableVariance(properties.Function,
         >>> X = np.random.rand(50, 150)
         >>> w = np.random.rand(150, 1)
         >>> var = LatentVariableVariance(X)
-        >>> var.L()
-        47025.080978684098
+        >>> round(var.L(), 10)
+        47025.0809786841
         >>> _, S, _ = np.linalg.svd(np.dot(X.T, X))
-        >>> np.max(S) * 49 / 2.0
-        47025.080978684106
+        >>> round(np.max(S) * 49 / 2.0, 10)
+        47025.0809786841
         """
         if self._lambda_max is None:
             from parsimony.algorithms.nipals import FastSVD
@@ -781,8 +787,8 @@ class LatentVariableVariance(properties.Function,
         >>> var.step(w)
         2.1979627581251385e-05
         >>> _, S, _ = np.linalg.svd(np.dot(X.T, X))
-        >>> 1.0 / (np.max(S) * 49 / 2.0)
-        2.1979627581251389e-05
+        >>> round(1.0 / (np.max(S) * 49 / 2.0), 15)
+        2.1979627581e-05
         """
         return 1.0 / self.L()
 

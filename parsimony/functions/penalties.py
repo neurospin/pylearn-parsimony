@@ -737,8 +737,8 @@ class L2(properties.AtomicFunction,
         >>> np.random.seed(42)
         >>> l2 = L2(c=0.3183098861837907)
         >>> y1 = l2.proj(np.random.rand(100, 1) * 2.0 - 1.0)
-        >>> np.linalg.norm(y1)
-        0.3183098861837908
+        >>> round(np.linalg.norm(y1), 15)
+        0.318309886183791
         >>> y2 = np.random.rand(100, 1) * 2.0 - 1.0
         >>> l2.feasible(y2)
         False
@@ -795,7 +795,7 @@ class L2(properties.AtomicFunction,
         else:
             beta_ = beta
 
-        return maths.norm(beta_) <= self.c
+        return maths.norm(beta_) <= self.c + consts.FLOAT_EPSILON
 
 
 class L2Squared(properties.AtomicFunction,
@@ -859,18 +859,15 @@ class L2Squared(properties.AtomicFunction,
         >>> np.random.seed(42)
         >>> beta = np.random.rand(100, 1)
         >>> l2 = L2Squared(l=3.14159, c=2.71828)
-        >>> np.linalg.norm(l2.grad(beta) - l2.approx_grad(beta, eps=1e-4))
-        1.3549757024941964e-10
+        >>> np.linalg.norm(l2.grad(beta)
+        ...                - l2.approx_grad(beta, eps=1e-4)) < 5e-10
+        True
         >>>
         >>> l2 = L2Squared(l=3.14159, c=2.71828, penalty_start=5)
-        >>> np.linalg.norm(l2.grad(beta) - l2.approx_grad(beta, eps=1e-4))
-        2.1291553983770027e-10
+        >>> np.linalg.norm(l2.grad(beta)
+        ...                - l2.approx_grad(beta, eps=1e-4)) < 5e-10
+        True
         """
-#        if self.unbiased:
-#            n = self.X.shape[0] - 1.0
-#        else:
-#            n = self.X.shape[0]
-
         if self.penalty_start > 0:
             beta_ = beta[self.penalty_start:, :]
             grad = np.vstack((np.zeros((self.penalty_start, 1)),
@@ -920,8 +917,8 @@ class L2Squared(properties.AtomicFunction,
         >>> np.random.seed(42)
         >>> l2 = L2Squared(c=0.3183098861837907)
         >>> y1 = l2.proj(np.random.rand(100, 1) * 2.0 - 1.0)
-        >>> 0.5 * np.linalg.norm(y1) ** 2.0
-        0.31830988618379052
+        >>> round(0.5 * np.linalg.norm(y1) ** 2.0, 15)
+        0.318309886183791
         >>> y2 = np.random.rand(100, 1) * 2.0 - 1.0
         >>> l2.feasible(y2)
         False
@@ -982,7 +979,7 @@ class L2Squared(properties.AtomicFunction,
 
         sqnorm = np.dot(beta_.T, beta_)[0, 0]
 
-        return 0.5 * sqnorm <= self.c
+        return 0.5 * sqnorm <= self.c + consts.FLOAT_EPSILON
 
 
 class L1L2Squared(properties.AtomicFunction,
@@ -1280,8 +1277,8 @@ class RGCCAConstraint(QuadraticConstraint,
         >>> L2.f(x)
         5.7906381220390024
         >>> y = L2.proj(x)
-        >>> L2.f(y)
-        -2.2204460492503131e-16
+        >>> abs(L2.f(y)) <= 2.0 * consts.FLOAT_EPSILON
+        True
         >>> np.linalg.norm(y)
         0.99999999999999989
         """
@@ -1514,8 +1511,9 @@ class RidgeSquaredError(properties.CompositeFunction,
         >>> y = np.random.rand(100, 1)
         >>> rr = RidgeRegression(X=X, y=y, k=3.14159265)
         >>> beta = np.random.rand(150, 1)
-        >>> np.linalg.norm(rr.grad(beta) - rr.approx_grad(beta, eps=1e-4))
-        1.2951508180081868e-08
+        >>> round(np.linalg.norm(rr.grad(beta)
+        ...       - rr.approx_grad(beta, eps=1e-4)), 9)
+        1.3e-08
         """
         if self.penalty_start > 0:
             x_ = x[self.penalty_start:, :]

@@ -315,10 +315,11 @@ class PLSR(bases.ImplicitAlgorithm,
     >>> w_ = W[0, :].reshape(10, 1)
     >>> w_ = -w_ if w_[0, 0] < 0.0 else w_
     >>> w = -w if w[0, 0] < 0.0 else w
-    >>> np.linalg.norm(w - w_)
-    1.5288386388031829e-10
-    >>> np.dot(np.dot(X, w).T, np.dot(Y, c / np.linalg.norm(c)))[0, 0] - S[0]
-    0.0
+    >>> round(np.linalg.norm(w - w_), 15)
+    1.52884e-10
+    >>> abs(np.dot(np.dot(X, w).T,
+    ...            np.dot(Y, c / np.linalg.norm(c)))[0, 0] - S[0]) < 5e-15
+    True
     """
     def __init__(self, max_iter=200, eps=consts.TOLERANCE, **kwargs):
 

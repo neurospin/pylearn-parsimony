@@ -5,7 +5,7 @@ Created on Tue Jul  1 16:30:38 2014
 Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt
-@email:   tommy.loefstedt@cea.fr
+@email:   lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
 import numpy as np

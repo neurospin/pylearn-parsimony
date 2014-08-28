@@ -945,8 +945,8 @@ class LinearRegressionL1L2GL(RegressionEstimator):
     ...                                  mean=False)
     >>> res = lr.fit(X, y)
     >>> error = lr.score(X, y)
-    >>> print "error = ", error
-    error =  0.610280682745
+    >>> print "error = ", round(error, 11)
+    error =  0.61028068275
     >>> lr = estimators.LinearRegressionL1L2GL(l1, l2, gl, A,
     ...                                   algorithm=proximal.FISTA(),
     ...                                   algorithm_params=dict(max_iter=1000),

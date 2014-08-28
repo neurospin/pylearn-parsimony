@@ -70,8 +70,8 @@ class ISTA(bases.ExplicitAlgorithm,
     >>> ista = ISTA(max_iter=10000)
     >>> beta1 = ista.run(function, np.random.rand(50, 1))
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
-    >>> np.linalg.norm(beta1 - beta2)
-    0.00031215576325569361
+    >>> round(np.linalg.norm(beta1 - beta2), 15)
+    0.000312155763256
     >>>
     >>> np.random.seed(42)
     >>> X = np.random.rand(100, 50)
@@ -82,8 +82,8 @@ class ISTA(bases.ExplicitAlgorithm,
     >>> ista = ISTA(max_iter=10000)
     >>> beta1 = ista.run(function, np.random.rand(50, 1))
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
-    >>> np.linalg.norm(beta1 - beta2)
-    0.82723303104582557
+    >>> round(np.linalg.norm(beta1 - beta2), 14)
+    0.82723303104583
     >>> np.linalg.norm(beta2.ravel(), 0)
     50
     >>> np.linalg.norm(beta1.ravel(), 0)
@@ -207,8 +207,8 @@ class FISTA(bases.ExplicitAlgorithm,
     >>> fista = FISTA(max_iter=10000)
     >>> beta1 = fista.run(function, np.random.rand(50, 1))
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
-    >>> np.linalg.norm(beta1 - beta2)
-    4.618281654691976e-06
+    >>> round(np.linalg.norm(beta1 - beta2), 13)
+    4.6182817e-06
     >>>
     >>> np.random.seed(42)
     >>> X = np.random.rand(100, 50)
@@ -219,8 +219,8 @@ class FISTA(bases.ExplicitAlgorithm,
     >>> fista = FISTA(max_iter=10000)
     >>> beta1 = fista.run(function, np.random.rand(50, 1))
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
-    >>> np.linalg.norm(beta1 - beta2)
-    0.82723292510702928
+    >>> round(np.linalg.norm(beta1 - beta2), 14)
+    0.82723292510703
     >>> np.linalg.norm(beta2.ravel(), 0)
     50
     >>> np.linalg.norm(beta1.ravel(), 0)

@@ -356,8 +356,8 @@ class SparseSolver(Solver):
         >>> solver = linalgs.SparseSolver()
         >>> x = solver.solve(A, d)
         >>> x_ = np.linalg.solve(A.toarray(), d)
-        >>> print np.linalg.norm(x - x_)
-        7.7566778625e-16
+        >>> round(np.linalg.norm(x - x_), 15)
+        1e-15
         >>>
         >>> import time
         >>> n = 100
@@ -376,8 +376,8 @@ class SparseSolver(Solver):
         >>> t = time.time()
         >>> x_ = np.linalg.solve(A.toarray(), d)
         >>> print "Time:", time.time() - t  # doctest: +SKIP
-        >>> print np.linalg.norm(x - x_)
-        1.23532066753e-14
+        >>> np.linalg.norm(x - x_) < 5e-14
+        True
         >>>
         >>> n = 1000
         >>> a = np.random.rand(n); a[-1] = 0.0
@@ -396,8 +396,8 @@ class SparseSolver(Solver):
         >>> x_ = np.linalg.solve(A.toarray(), d)
         >>> print "Time:", time.time() - t  # doctest: +SKIP
         >>>
-        >>> print np.linalg.norm(x - x_)
-        2.07537619062e-12
+        >>> np.linalg.norm(x - x_) < 5e-11
+        True
         """
         n, p = A.shape
 
@@ -468,8 +468,8 @@ class TridiagonalSolver(Solver):
          [  1.34271395]
          [ -1.63358708]
          [  4.88318651]]
-        >>> print np.linalg.norm(x - x_)
-        4.41556228703e-14
+        >>> np.linalg.norm(x - x_) < 5e-14
+        True
         >>>
         >>> import time
         >>> n = 100
@@ -488,8 +488,8 @@ class TridiagonalSolver(Solver):
         >>> x_ = np.linalg.solve(A.toarray(), d)
         >>> print "Time:", time.time() - t  # doctest: +SKIP
         >>>
-        >>> print np.linalg.norm(x - x_)
-        1.27000191221e-12
+        >>> np.linalg.norm(x - x_) < 5e-12
+        True
         >>>
         >>> n = 1000
         >>> a = np.random.rand(n); a[-1] = 0.0
@@ -507,8 +507,8 @@ class TridiagonalSolver(Solver):
         >>> x_ = np.linalg.solve(A.toarray(), d)
         >>> print "Time:", time.time() - t  # doctest: +SKIP
         >>>
-        >>> print np.linalg.norm(x - x_)
-        4.58860446887e-09
+        >>> np.linalg.norm(x - x_) < 5e-9
+        True
         """
         # TODO: Put in compiled code for speed.
 
