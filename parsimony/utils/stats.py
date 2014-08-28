@@ -12,8 +12,39 @@ import numpy as np
 
 from . import consts
 
-__all__ = ["sensitivity", "precision", "specificity", "npv", "F_score",
-           "fleiss_kappa"]
+__all__ = ["multivariate_normal", "sensitivity", "precision", "specificity",
+           "npv", "F_score", "fleiss_kappa"]
+
+
+def multivariate_normal(mu, Sigma, n=1):
+    """Generates n random vectors from the multivariate normal distribution
+    with mean mu and covariance matrix Sigma.
+
+    This function is faster (roughly 11 times faster for a 600-by-4000 matrix
+    on my computer) than numpy.random.multivariate_normal. But use with care,
+    because it also does fewer controls!
+
+    See details at: https://en.wikipedia.org/wiki/Multivariate_normal_distribution#Drawing_values_from_the_distribution
+
+    Parameters
+    ----------
+    mu : Numpy array, shape (n, 1). The mean vector.
+
+    Sigma : Numpy array, shape (p, p). The covariance matrix.
+
+    n : Integer. The number of multivariate normal vectors to generate.
+    """
+    n = max(1, int(n))
+    p = Sigma.shape[0]
+    mu = mu.reshape((p,))
+
+    A = np.linalg.cholesky(Sigma)  # Sigma = A.A'
+    z = np.random.randn(p, n)  # Independent standard normal vector.
+
+    # Affine transformation property.
+    rand = mu[:, np.newaxis] + np.dot(A, z)
+
+    return rand.T
 
 
 def sensitivity(cond, test):
