@@ -10,7 +10,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 import numpy as np
 
-import parsimony.utils.consts as consts
+from . import consts
 
 __all__ = ["sensitivity", "precision", "specificity", "npv", "F_score",
            "fleiss_kappa"]
