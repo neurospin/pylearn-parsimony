@@ -11,12 +11,14 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 import numpy as np
 from scipy import ndimage
 from ..utils import Dot, ObjImage, spatial_smoothing, corr_to_coef
+from parsimony.datasets.utils import Dot, ObjImage, spatial_smoothing, corr_to_coef
+
 
 def load(n_samples=100, shape=(30, 30, 1),
                            r2=.75,
                            sigma_spatial_smoothing=1,
                            signal_std_pixel_obj_ratio=1.,
-                           model = "redundant",
+                           model = "independant",
                            random_seed=None):
     """Generates regression samples (images + target variable) and beta.
 
@@ -41,13 +43,51 @@ def load(n_samples=100, shape=(30, 30, 1),
     sigma_spatial_smoothing: Float. Standard deviation for Gaussian kernel
             (default is 1). High value promotes spatial correlation pixels.
 
-    model:  string (default "suppressor")
-        "redundant": A five points are carying predictive information. However
-        point 1 and 2 are redundant, as points 4 and 5.
+    model:  string or a dict (default "independant")
+        If model is "independant":
+            # All points has an independant latent
+            l1=1., l2=1., l3=1., l4=1., l5=1.,
+            # No shared variance:
+            l12=0., l45=0., l12345=0.,
+            # Five dots contribute equally:
+            b1=1., b2=1., b3=1., b4=-1., b5=-1.
 
-        "suppressor": Point 1, 3, 4 are carying predictive information while
-            point 2 is a suppressor of point 1 and point 5 is a suppressor of
-            point 3.
+        if model is a dictionary:
+            update (overwrite) independant model by dictionnary parameter
+            Example set betas of points 4 and 5 to 1
+            dict(b4=1., b5=1.)
+
+        If model is "redundant":
+            # Point-level signal in dots 1 an 2 stem from shared latent:
+            l1=0., l2=0., l12 =1.,
+            # l3 is independant:
+            l3=1.,
+            # Point-level signal in dots 4 an 5 stem from shared latent:
+            l4=0., l5=0., l45=1.,
+            # No global shared variance:
+            l12345 = 0.,
+            # Five dots contribute equally:
+            b1=1., b2=1., b3=1., b4=-1., b5=-1.
+
+        If model is "suppressor":
+            # Point-level signal in dot 2 stem only from shared latent:
+            l1=1, l2=0., l12=1.,
+            # l3 is independant:
+            l3 = 1.,
+            # Point-level signal in dot 5 stem from shared latent:
+            l4=1., l5=0., l45=1.,
+            # No global shared variance:
+            l12345 = 0.,
+            # Dot 2 suppresses shared signal with dot 1, dot 5 suppresses dot 4:
+            b1=1., b2=-1., b3=1., b4=1., b5=-1.
+
+            y = X1       - X2  + X3 + X4       - X5  + noise
+            y = l1 + l12 - l12 + l3 + l4 + l45 - l45 + noise
+            y = l1 + l3 + l4 + noise
+            So pixels of X2 and X5 are not correlated with the target y so they
+            will not be detected by univariate analysis. However, they
+            are usefull since they are suppressing unwilling variance that stem
+            from latents l12 and l45.
 
     signal_std_pixel_obj_ratio: Float. Controls the ratio between object-level signal
             and pixel-level signal for pixels within objects. If
@@ -72,52 +112,39 @@ def load(n_samples=100, shape=(30, 30, 1),
     Details
     -------
     The general procedure is:
+
         1) For each pixel i, Generate independant variables Xi ~ N(0, 1)
+
         2) Add object level structure corresponding to the five dots:
-           - Sample five latent variables ~ N(0, 1): l1, l12, l3, l4, l45.
+           - Sample five latent variables ~ N(0, 1): l1, l3, l4, l12, l45, l12345.
+           l1: latent (shared variance) for all pixels of point 1.
+           ...
+           l5: latent (shared variance) for all pixels of point 5.
+           l12: latent (shared variance) for all pixels of point 1 and 2.
+           l45: latent (shared variance) for all pixels of point 4 and 5 .
+           l12345: latent (shared variance) for all pixels of point 1, 2, 3, 4 and 5.
+
            - Pixel i of dots X1, X2, X3, X4, X5 are sampled as:
-             X1i = l1 + l12 + Xi
-             X2i = l2 + l12 + Xi
-             X3i = l3 + Xi
-             X4i = l4 + l45 + Xi
-             X5i = l5 + l45 + Xi
+             X1i = l1 + l12 + l12345 + Xi
+             X2i = l2 + l12 + l12345 + Xi
+             X3i = l3 + l12345 + Xi
+             X4i = l4 + l45 + l12345 + Xi
+             X5i = l5 + l45 + l12345 + Xi
              Note that:
-             Pixels of dot X1 share a common variance that stem from l1 + l12.
-             Pixels of dot X2 share a common variance that stem from l2 + l12.
+             Pixels of dot X1 share a common variance that stem from l1, l12 and l12345
+             Pixels of dot X2 share a common variance that stem from l1, l12 and l12345
              Pixels of dot X1 and pixel of dot X2 share a common variance that
              stem from l12.
              etc.
+
         4) Spatial Smoothing.
+
         5) Model: y = X beta + noise
         - Betas are null outside dots, and b1, b2, b3, b4, b5 within dots
         - Sample noise ~ N(0, 1)
         - Compute X beta then scale beta such that: r_squared(y, X beta) = r2
         Return X, y, beta
 
-        If model is "redundant":
-        Object-level signal in dots 1 an 2 stem from shared latent:
-        l1, l2, l12 = 0, 0, 1.
-        l3 is independant: l3 = 1.
-        Object-level signal in dots 4 an 5 stem from shared latent:
-        l4, l5, l45 = 0, 0, 1.
-        Five dots contribute equally: b1 = b2 = b3 = b4 = b5 = 1.
-
-        If model is "suppressor":
-        Object-level signal in dot 2 stem only from shared latent:
-        l1, l2, l12 = 1, 0, 1.
-        l3 is independant: l3 = 1
-        Object-level signal in dot 5 stem from shared latent:
-        l4, l5, l45 = 1, 0, 1.
-        Dot 2 suppresses shared signal with dot 1, dot 5 suppresses dot 4:
-        b1, b2, b3, b4, b5 = 1., -1., 1., 1., -1.
-
-        y = X1       - X2  + X3 + X4       - X5  + noise
-        y = l1 + l12 - l12 + l3 + l4 + l45 - l45 + noise
-        y = l1 + l3 + l4 + noise
-        So pixels of X2 and X5 are not correlated with the target y so they
-        will not be detected by univariate analysis. However, they
-        are usefull since they are suppressing unwilling variance that stem
-        from latents l12 and l45.
 
     Examples
     --------
@@ -150,41 +177,69 @@ def load(n_samples=100, shape=(30, 30, 1),
     X = np.random.normal(mu_e, signal_std_pix, n_samples * n_features)
     X3d = X.reshape(n_samples, nx, ny, nz)
     #########################################################################
-    ## 2. Build Objects
-    d1, d2, union12, d4, d5, union45, d3 = dice_five_with_union_of_pairs(shape)
-    if model == "redundant":
-        # Object-level signal in dots 1 an 2 stem from shared latent:
-        l1, l2, l12 = 0, 0, signal_std_obj
-        # l3 is independant:
-        l3 = signal_std_obj
-        # Object-level signal in dots 4 an 5 stem from shared latent:
-        l4, l5, l45 = 0, 0, signal_std_obj
-        # Five dots contribute equally:
-        b1 = b2 = b3 = b4 = b5 = 1.
-    if model == "suppressor":
-         # Object-level signal in dot 2 stem only from shared latent:
-        l1, l2, l12 = signal_std_obj, 0, signal_std_obj
-        # l3 is independant:
-        l3 = signal_std_obj
-         # Object-level signal in dot 5 stem from shared latent:
-        l4, l5, l45 = signal_std_obj, 0, signal_std_obj
-        # Dot 2 suppress shared signal with dot 1, dot 5 suppress dot 4:
-        b1, b2, b3, b4, b5 = 1., -1., 1., 1., -1.
-    d1.beta = b1
-    d1.std = l1
-    d2.beta = b2
-    d2.std = l2
+    ## 2. Tune points parameters latent and beta
+    # Default model independant points
+    model_ = dict(
+            # All points has an independant latent
+            l1=1., l2=1., l3=1., l4=1., l5=1.,
+            # No shared variance:
+            l12=0., l45=0., l12345=0.,
+            # Five dots contribute equally:
+            b1=1., b2=1., b3=1., b4=-1., b5=-1.)
+    if isinstance(model, dict):
+        model_.update(model)
+    elif model is "redundant":
+        model_ = dict(
+            # Point-level signal in dots 1 an 2 stem from shared latent:
+            l1=0., l2=0., l12 =1.,
+            # l3 is independant:
+            l3=1.,
+            # Point-level signal in dots 4 an 5 stem from shared latent:
+            l4=0., l5=0., l45=1.,
+            # No global shared variance:
+            l12345 = 0.,
+            # Five dots contribute equally:
+            b1=1., b2=1., b3=1., b4=-1., b5=-1.)
+    elif model is "suppressor":
+        model_ = dict(
+            # Point-level signal in dot 2 stem only from shared latent:
+            l1=1, l2=0., l12=1.,
+            # l3 is independant:
+            l3=1.,
+            # Point-level signal in dot 5 stem from shared latent:
+            l4=1., l5=0., l45=1.,
+            # No global shared variance:
+            l12345 = 0.,
+            # Dot 2 suppresses shared signal with dot 1, dot 5 suppresses dot 4:
+            b1=1., b2=-1., b3=1., b4=1., b5=-1.)
+    model_["l1"] *= signal_std_obj
+    model_["l2"] *= signal_std_obj
+    model_["l3"] *= signal_std_obj
+    model_["l4"] *= signal_std_obj
+    model_["l5"] *= signal_std_obj
+    model_["l12"] *= signal_std_obj
+    model_["l45"] *= signal_std_obj
+    model_["l12345"] *= signal_std_obj
+    #########################################################################
+    ## 3. Build Objects
+    d1, d2, d3, d4 ,d5, union12, union45, union12345 = dice_five_with_union_of_pairs(shape)
+    d1.std = model_["l1"]
+    d1.beta = model_["b1"]
+    d2.std = model_["l2"]
+    d2.beta = model_["b2"]
+    union12.std = model_["l12"]
     union12.beta = 0.
-    union12.std = l12
-    d4.beta = b4
-    d4.std = l4
-    d5.beta = b5
-    d5.std = l5
+    d4.std = model_["l4"]
+    d4.beta = model_["b4"]
+    d5.std = model_["l5"]
+    d5.beta = model_["b5"]
+    union45.std = model_["l45"]
     union45.beta = 0.
-    union45.std = l45
-    d3.beta = b3
-    d3.std = l3
-    objects = [d1, d2, union12, d4, d5, union45, d3]
+    d3.std = model_["l3"]
+    d3.beta = model_["b3"]
+    union12345.std = model_["l12345"]
+    union12345.beta = 0.
+    objects = [d1, d2, d3, d4 ,d5, union12, union45, union12345]
     #########################################################################
     ## 3. Object-level structured signal
     X3d, support = ObjImage.object_model(objects, X3d)
@@ -244,23 +299,13 @@ def dice_five_with_union_of_pairs(shape):
 
     Examples
     --------
-    #shape = (5, 5, 1)
-    beta = 1
-    std = 1
-    noise = np.zeros(shape)
+    shape = (5, 5, 1)
+    map = np.zeros(shape)
     info = np.zeros(shape)
-    for o in dice_five_with_union_of_pairs(shape, beta, std):
-       noise[o.get_mask()] += 1.
-       info[o.get_mask()] += 1.
-    plot = plt.subplot(121)
+    for o in dice_five_with_union_of_pairs(shape):
+       map[o.get_mask()] += 1.
     import matplotlib.pyplot as plt
-    cax = plot.matshow(noise.squeeze())
-    plt.colorbar(cax)
-    plt.title("Noise sum coeficients")
-    plot = plt.subplot(122)
-    cax = plot.matshow(info.squeeze())
-    plt.colorbar(cax)
-    plt.title("Informative sum coeficients")
+    plot.matshow(map.squeeze())
     plt.show()
     """
     nx, ny, nz = shape
@@ -282,4 +327,6 @@ def dice_five_with_union_of_pairs(shape):
     ## dot in the middle
     c3 = np.floor((nx / 2., ny / 2., nz / 2.))
     d3 = Dot(center=c3, size=s_obj, shape=shape)
-    return [d1, d2, union12, d4, d5, union45, d3]
+    union12345 = ObjImage(mask=d1.get_mask() + d2.get_mask() + d3.get_mask() +
+        d4.get_mask() + d5.get_mask())
+    return [d1, d2, d3, d4 ,d5, union12, union45, union12345]
