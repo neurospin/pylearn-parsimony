@@ -27,8 +27,8 @@ shape = (300, 300, 1)
 X3d, y, beta3d, proba = datasets.classification.dice5.load(n_samples=n_samples,
 shape=shape, snr=5, random_seed=0)
 X = X3d.reshape((n_samples, np.prod(beta3d.shape)))
-plt.plot(proba[y.ravel() == 1], "ro", proba[y.ravel() == 0], "bo")
-plt.show()
+#plt.plot(proba[y.ravel() == 1], "ro", proba[y.ravel() == 0], "bo")
+#plt.show()
 
 n_train = 100
 
