@@ -11,7 +11,11 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
-from nose.tools import nottest
+try:
+    from nose.tools import nottest
+except ImportError:
+    import sys
+    sys.exit('You must install "nose" in order to run the unit tests.')
 import unittest
 import abc
 import os
