@@ -21,8 +21,10 @@ def multivariate_normal(mu, Sigma, n=1):
     with mean mu and covariance matrix Sigma.
 
     This function is faster (roughly 11 times faster for a 600-by-4000 matrix
-    on my computer) than numpy.random.multivariate_normal. But use with care,
-    because it also does fewer controls!
+    on my computer) than numpy.random.multivariate_normal. This method differs
+    from  numpy's function in that it uses the Cholesky factorisation. Note
+    that this requires the covariance matrix to be positive definite, as
+    opposed to positive semi-definite in the numpy case.
 
     See details at: https://en.wikipedia.org/wiki/
     Multivariate_normal_distribution#Drawing_values_from_the_distribution
@@ -35,9 +37,23 @@ def multivariate_normal(mu, Sigma, n=1):
 
     n : Integer. The number of multivariate normal vectors to generate.
     """
+    # Type check.
     n = max(1, int(n))
+    mu = np.array(mu)
+    if not isinstance(Sigma, np.ndarray):
+        Sigma = np.array(Sigma)
+
+    # Check input dimensions.
+    if len(Sigma.shape) != 2 or Sigma.shape[0] != Sigma.shape[1]:
+        raise ValueError("Sigma must be a square matrix.")
     p = Sigma.shape[0]
-    mu = mu.reshape((p,))
+    if not (len(mu.shape) == 1 or \
+            (len(mu.shape) == 2 and min(mu.shape) == 1)):
+        raise ValueError("The mean 'mu' must be 1 dimensional or " \
+                         "p-by-1 dimensional")
+    mu = mu.reshape((max(mu.shape),))
+    if mu.shape[0] != Sigma.shape[0]:
+        raise ValueError("Mu and Sigma must have matching dimensions.")
 
     A = np.linalg.cholesky(Sigma)  # Sigma = A.A'
     z = np.random.randn(p, n)  # Independent standard normal vector.
