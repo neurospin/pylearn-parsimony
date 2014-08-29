@@ -61,8 +61,8 @@ class GradientDescent(bases.ExplicitAlgorithm,
     >>> function = RidgeRegression(X, y, k=0.0, mean=False)
     >>> beta1 = gd.run(function, np.random.rand(50, 1))
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
-    >>> round(np.linalg.norm(beta1 - beta2), 15)
-    0.000312155763255
+    >>> round(np.linalg.norm(beta1 - beta2), 13)
+    0.0003121557633
     """
     INTERFACES = [properties.Function,
                   properties.Gradient,

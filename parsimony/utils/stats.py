@@ -24,7 +24,8 @@ def multivariate_normal(mu, Sigma, n=1):
     on my computer) than numpy.random.multivariate_normal. But use with care,
     because it also does fewer controls!
 
-    See details at: https://en.wikipedia.org/wiki/Multivariate_normal_distribution#Drawing_values_from_the_distribution
+    See details at: https://en.wikipedia.org/wiki/
+    Multivariate_normal_distribution#Drawing_values_from_the_distribution
 
     Parameters
     ----------

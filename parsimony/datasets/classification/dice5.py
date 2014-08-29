@@ -51,21 +51,25 @@ def load(n_samples=100, shape=(30, 30, 1),
     Examples
     --------
     >>> import numpy as np
+    >>> np.random.seed(42)
     >>> import matplotlib.pyplot as plot
     >>> from  parsimony import datasets
     >>> n_samples = 100
     >>> shape = (11, 11, 1)
-    >>> X3d, y, beta3d, proba = datasets.classification.dice5.load(n_samples=n_samples,
-    ...     shape=shape, snr=5, random_seed=1)
-    >>> print "Likelihood=", np.prod(proba[y.ravel()==1]) * np.prod(1-proba[y.ravel()==0])
-    Likelihood= 4.74865684423e-06
-    >>> X3d, y, beta3d, proba = datasets.classification.dice5.load(n_samples=n_samples,
-    ...     shape=shape, sigma_logit=5., random_seed=1)
-    >>> print "Likelihood=", np.prod(proba[y.ravel()==1]) * np.prod(1-proba[y.ravel()==0])
-    Likelihood= 4.51185595179e-07
+    >>> X3d, y, beta3d, proba = datasets.classification.dice5.load(
+    ...     n_samples=n_samples, shape=shape, snr=5, random_seed=1)
+    >>> print "Likelihood = %f" % (np.prod(proba[y.ravel()==1])
+    ...                          * np.prod(1-proba[y.ravel()==0]))
+    Likelihood = 0.000002
+    >>> X3d, y, beta3d, proba = datasets.classification.dice5.load(
+    ...     n_samples=n_samples, shape=shape, sigma_logit=5., random_seed=1)
+    >>> print "Likelihood = %f" % (np.prod(proba[y.ravel()==1])
+    ...                          * np.prod(1-proba[y.ravel()==0]))
+    Likelihood = 0.000001
     """
-    X3d, y, beta3d = dice5regression.load(n_samples=n_samples, shape=shape, r2=1.,
-                                            random_seed=random_seed, **kwargs)
+    X3d, y, beta3d = dice5regression.load(n_samples=n_samples, shape=shape,
+                                          r2=1.0, random_seed=random_seed,
+                                          **kwargs)
     X = X3d.reshape((n_samples, np.prod(shape)))
     beta = beta3d.ravel()
     coef = float(sigma_logit) / np.sqrt(snr ** 2 + 1)
@@ -79,9 +83,8 @@ def load(n_samples=100, shape=(30, 30, 1),
     logit = np.dot(X, beta) + noise
     #np.std(np.dot(X, beta)) / np.std(noise)
     #np.std(logit)
-    proba = 1. / (1. + np.exp(-logit))
+    proba = 1.0 / (1.0 + np.exp(-logit))
     y = np.ones(y.shape)
-    y[proba < .5] = 0
+    y[proba < 0.5] = 0
+
     return X3d, y, beta3d, proba
-
-
