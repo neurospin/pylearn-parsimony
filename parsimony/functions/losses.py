@@ -23,7 +23,7 @@ import numpy as np
 try:
     from . import properties  # Only works when imported as a package.
 except ValueError:
-    import parsimony.functions.properties as properties  # Run as a script
+    import parsimony.functions.properties as properties  # Run as a script.
 import parsimony.utils as utils
 import parsimony.utils.consts as consts
 

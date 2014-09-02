@@ -35,10 +35,10 @@ __all__ = ["Info",
 class Info(object):
     """Enum-like class for information constants.
 
-    Fields may _NOT_ be None.
+    Fields may _NOT_ be None!
 
     This class will be replaced with Enum, so do not rely on the actual values
-    of the fields. Never use "ok", always use Info.ok.
+    of the fields. Never use the string "ok", always use Info.ok.
     """
     ok = "ok"  # Did everything go well?
     converged = "converged"  # Did the algorithm converge?

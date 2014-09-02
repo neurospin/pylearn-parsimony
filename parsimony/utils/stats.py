@@ -36,6 +36,21 @@ def multivariate_normal(mu, Sigma, n=1):
     Sigma : Numpy array, shape (p, p). The covariance matrix.
 
     n : Integer. The number of multivariate normal vectors to generate.
+
+    Example
+    -------
+    >>> import parsimony.utils.stats as stats
+    >>> import numpy as np
+    >>> np.random.seed(42)
+    >>> n, p = 50000, 100
+    >>> mu = np.random.rand(p, 1)
+    >>> alpha = 0.01
+    >>> Sigma = alpha * np.random.rand(p, p) + (1 - alpha) * np.eye(p, p)
+    >>> M = stats.multivariate_normal(mu, Sigma, n)
+    >>> mean = np.mean(M, axis=0)
+    >>> S = np.dot((M - mean).T, (M - mean)) / float(n - 1)
+    >>> round(np.linalg.norm(Sigma - S), 14)
+    0.51886218849785
     """
     # Type check.
     n = max(1, int(n))
