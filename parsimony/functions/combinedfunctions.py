@@ -529,7 +529,7 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
         alpha = [0] * len(A)
         anorm = 0.0
         for j in xrange(len(alpha)):
-            alpha[j] = A[j].dot(beta)
+            alpha[j] = A[j].dot(beta[self.penalty_start:, :])
             anorm += alpha[j] ** 2.0
         anorm **= 0.5
         i = anorm >= consts.TOLERANCE
@@ -555,8 +555,11 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
             f_ = (1.0 / 2.0) * maths.norm(a) ** 2.0 + np.dot(self.y.T, a)[0, 0]
 
         z = -np.dot(self.X.T, a)
+        Ata_tv = self.tv.l * self.tv.Aa(alpha)
+        if self.penalty_start > 0:
+            Ata_tv = np.vstack((np.zeros((self.penalty_start, 1)), Ata_tv))
         h_ = (1.0 / (2 * self.rr.k)) \
-           * np.sum(maths.positive(np.abs(z - self.tv.l * self.Aa(alpha)) \
+           * np.sum(maths.positive(np.abs(z - Ata_tv) \
            - (self.l1.l)) ** 2.0)
 
 #        print "g :", g
