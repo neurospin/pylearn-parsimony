@@ -37,7 +37,7 @@ px = 100
 py = 1
 pz = 1
 shape = (pz, py, px)
-n, p = 500, np.prod(shape)
+n, p = 50, np.prod(shape)
 
 l = 0.618
 k = 1.01
@@ -87,40 +87,40 @@ beta_start = start_vector.get_vector(p)
 
 
 
-print "==============="
-print "=== CONESTA ==="
-print "==============="
-
-#alg = proximal.FISTA(eps=eps, max_iter=max_iter)
-alg = primaldual.DynamicCONESTA(eps=eps, max_iter=max_iter, mu_min=mu)
-#alg = primaldual.NaiveCONESTA(eps=eps, max_iter=max_iter, mu_min=mu)
-
-#function = CombinedFunction()
-#function.add_function(functions.losses.LinearRegression(X, y,
-#                                                       mean=False))
-#function.add_penalty(penalties.L2Squared(l=k))
-#A = l1tv.A_from_shape(shape, p)
-#function.add_prox(l1tv.L1TV(l, g, A=A, mu=mu, penalty_start=0))
-##function.add_prox(tv.TotalVariation(l=g, A=A, mu=mu, penalty_start=0))
-
-func = functions.LinearRegressionL1L2TV(X, y, l, k, g, A=A,
-                                        penalty_start=penalty_start,
-                                        mean=False)
-
-t = time.time()
-beta = alg.run(func, beta_start)
-elapsed_time = time.time() - t
-print "Time:", elapsed_time
-
-berr = np.linalg.norm(beta - beta_star)
-print "berr:", berr
-#assert berr < 5e-2
-
-f_parsimony = func.f(beta)
-f_star = func.f(beta_star)
-ferr = abs(f_parsimony - f_star)
-print "ferr:", ferr
-#assert ferr < 5e-4
+#print "==============="
+#print "=== CONESTA ==="
+#print "==============="
+#
+##alg = proximal.FISTA(eps=eps, max_iter=max_iter)
+#alg = primaldual.DynamicCONESTA(eps=eps, max_iter=max_iter, mu_min=mu)
+##alg = primaldual.NaiveCONESTA(eps=eps, max_iter=max_iter, mu_min=mu)
+#
+##function = CombinedFunction()
+##function.add_function(functions.losses.LinearRegression(X, y,
+##                                                       mean=False))
+##function.add_penalty(penalties.L2Squared(l=k))
+##A = l1tv.A_from_shape(shape, p)
+##function.add_prox(l1tv.L1TV(l, g, A=A, mu=mu, penalty_start=0))
+###function.add_prox(tv.TotalVariation(l=g, A=A, mu=mu, penalty_start=0))
+#
+#func = functions.LinearRegressionL1L2TV(X, y, l, k, g, A=A,
+#                                        penalty_start=penalty_start,
+#                                        mean=False)
+#
+#t = time.time()
+#beta = alg.run(func, beta_start)
+#elapsed_time = time.time() - t
+#print "Time:", elapsed_time
+#
+#berr = np.linalg.norm(beta - beta_star)
+#print "berr:", berr
+##assert berr < 5e-2
+#
+#f_parsimony = func.f(beta)
+#f_star = func.f(beta_star)
+#ferr = abs(f_parsimony - f_star)
+#print "ferr:", ferr
+##assert ferr < 5e-4
 
 
 
@@ -155,31 +155,61 @@ print "ferr:", ferr
 
 
 
-#print "========================="
-#print "=== ShootingAlgorithm ==="
-#print "========================="
-#
-#alg = coordinate.ShootingAlgorithm(l, mean=False, info=[Info.fvalue],
-#                                   eps=eps, max_iter=max_iter)
-#
-#function = CombinedFunction()
-#function.add_function(functions.losses.LinearRegression(X, y, mean=False))
-#function.add_prox(penalties.L1(l=l))
-#
-#t = time.time()
-#beta = alg.run(X, y, beta_start)
-#elapsed_time = time.time() - t
-#print "Time:", elapsed_time
-#
-#berr = np.linalg.norm(beta - beta_star)
-#print "berr:", berr
-##assert berr < 5e-2
-#
-#f_parsimony = function.f(beta)
-#f_star = function.f(beta_star)
-#ferr = abs(f_parsimony - f_star)
-#print "ferr:", ferr
-##assert ferr < 5e-4
+print "========================="
+print "=== ShootingAlgorithm ==="
+print "========================="
+
+alg = coordinate.ShootingAlgorithm(l, mean=False, info=[Info.fvalue],
+                                   eps=eps, max_iter=max_iter)
+
+function = CombinedFunction()
+function.add_function(functions.losses.LinearRegression(X, y, mean=False))
+function.add_prox(penalties.L1(l=l))
+
+t = time.time()
+beta = alg.run(X, y, beta_start)
+elapsed_time = time.time() - t
+print "Time:", elapsed_time
+
+berr = np.linalg.norm(beta - beta_star)
+print "berr:", berr
+#assert berr < 5e-2
+
+f_parsimony = function.f(beta)
+f_star = function.f(beta_star)
+ferr = abs(f_parsimony - f_star)
+print "ferr:", ferr
+#assert ferr < 5e-4
+
+
+
+
+
+print "=================================="
+print "=== CoordinateDescentAlgorithm ==="
+print "=================================="
+
+alg = coordinate.LassoCoordinateDescent(l, mean=False, info=[Info.fvalue],
+                                        eps=eps, max_iter=max_iter)
+
+function = CombinedFunction()
+function.add_function(functions.losses.LinearRegression(X, y, mean=False))
+function.add_prox(penalties.L1(l=l))
+
+t = time.time()
+beta = alg.run(X, y, beta_start)
+elapsed_time = time.time() - t
+print "Time:", elapsed_time
+
+berr = np.linalg.norm(beta - beta_star)
+print "berr:", berr
+#assert berr < 5e-2
+
+f_parsimony = function.f(beta)
+f_star = function.f(beta_star)
+ferr = abs(f_parsimony - f_star)
+print "ferr:", ferr
+#assert ferr < 5e-4
 
 
 
