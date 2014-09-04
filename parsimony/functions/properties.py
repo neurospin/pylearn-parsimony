@@ -498,7 +498,7 @@ class DualFunction(object):
 
     @abc.abstractmethod
     def gap(self, beta, beta_hat=None, eps=consts.TOLERANCE):
-        """Compute the duality gap.
+        """Compute a duality gap.
         """
         raise NotImplementedError('Abstract method "gap" must be '
                                   'specialised!')

@@ -72,10 +72,10 @@ def load(l, k, g, beta, M, e, A, snr=None, intercept=False):
         def f(x):
             X, y = _generate(l, k, g, x * beta, M, e, A, intercept)
 
-            print "snr = %.5f = %.5f = |X.b| / |e| = %.5f / %.5f" \
-                   % (snr, np.linalg.norm(np.dot(X, x * beta)) \
-                                           / np.linalg.norm(e),
-                      np.linalg.norm(np.dot(X, x * beta)), np.linalg.norm(e))
+#            print "snr = %.5f = %.5f = |X.b| / |e| = %.5f / %.5f" \
+#                   % (snr, np.linalg.norm(np.dot(X, x * beta)) \
+#                                           / np.linalg.norm(e),
+#                      np.linalg.norm(np.dot(X, x * beta)), np.linalg.norm(e))
 
             return (np.linalg.norm(np.dot(X, x * beta)) \
                         / np.linalg.norm(e)) - snr

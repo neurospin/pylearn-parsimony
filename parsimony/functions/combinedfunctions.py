@@ -524,12 +524,17 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
 
         From the interface "DualFunction".
         """
+        if self.penalty_start > 0:
+            beta_ = beta[self.penalty_start:, :]
+        else:
+            beta_ = beta
+
 #        alpha = self.tv.alpha(beta)
         A = self.A()
         alpha = [0] * len(A)
         anorm = 0.0
         for j in xrange(len(alpha)):
-            alpha[j] = A[j].dot(beta)
+            alpha[j] = A[j].dot(beta_)
             anorm += alpha[j] ** 2.0
         anorm **= 0.5
         i = anorm >= consts.TOLERANCE
@@ -554,10 +559,14 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
             a = np.dot(self.X, beta) - self.y
             f_ = (1.0 / 2.0) * maths.norm(a) ** 2.0 + np.dot(self.y.T, a)[0, 0]
 
+        lAta = self.tv.l * self.tv.Aa(alpha)
+        if self.penalty_start > 0:
+            lAta = np.vstack((np.zeros((self.penalty_start, 1)),
+                              lAta))
+
         z = -np.dot(self.X.T, a)
         h_ = (1.0 / (2 * self.rr.k)) \
-           * np.sum(maths.positive(np.abs(z - self.tv.l * self.Aa(alpha)) \
-           - (self.l1.l)) ** 2.0)
+           * np.sum(maths.positive(np.abs(z - lAta) - self.l1.l) ** 2.0)
 
 #        print "g :", g
 #        print "f_:", f_
@@ -565,37 +574,6 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
         gap = g + f_ + h_
 
 #        print "Fenchel duality gap:", gap
-
-##        alpha = self.tv.alpha(beta)
-##
-##        P = self.rr.f(beta) \
-##          + self.l1.f(beta) \
-##          + self.tv.phi(alpha, beta)
-##
-##        beta_hat = self.betahat(alpha, beta)
-##
-##        D = self.rr.f(beta_hat) \
-##          + self.l1.f(beta_hat) \
-##          + self.tv.phi(alpha, beta_hat)
-#
-#        old_mu = self.get_mu()
-#        self.set_mu(consts.TOLERANCE)
-#
-#        alpha = self.tv.alpha(beta)
-#
-#        P = self.rr.f(beta) \
-#          + self.l1.f(beta) \
-#          + self.tv.phi(alpha, beta)
-#
-#        beta_hat = self.betahat(alpha, beta, eps=eps, max_iter=max_iter)
-#
-#        D = self.rr.f(beta_hat) \
-#          + self.l1.f(beta_hat) \
-#          + self.tv.phi(alpha, beta_hat)
-#
-#        self.set_mu(old_mu)
-#
-#        gap = P - D
 
         return gap
 
@@ -607,7 +585,7 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
         return self.tv.A()
 
     def Aa(self, alpha):
-        """Computes A^\T\alpha.
+        """Computes A'.alpha.
 
         From the interface "NesterovFunction".
         """
@@ -960,43 +938,91 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
 
         From the interface "DualFunction".
         """
-#        alpha_ = self.gl.alpha(beta)
+        if self.penalty_start > 0:
+            beta_ = beta[self.penalty_start:, :]
+        else:
+            beta_ = beta
+
+        A = self.A()
+        alpha = [0] * len(A)
+        for j in xrange(len(alpha)):
+            astar = A[j].dot(beta_)
+            normas = np.sqrt(np.sum(astar ** 2.0))
+            if normas > consts.TOLERANCE:
+                astar /= normas
+            else:
+                astar *= 0.0
+            alpha[j] = astar
+
+#        print "l.b'Aa :", self.tv.l * np.dot(beta.T, self.Aa(alpha))[0, 0]
+#        print "l.tv(b):", self.tv.f(beta)
+#        g = self.rr.f(beta) + self.l1.f(beta) + self.tv.f(beta)
+        g = self.f(beta)
+
+        n = float(self.X.shape[0])
+
+        if self.mean:
+            a = (np.dot(self.X, beta) - self.y) / n
+            f_ = (n / 2.0) * maths.norm(a) ** 2.0 + np.dot(self.y.T, a)[0, 0]
+        else:
+            a = np.dot(self.X, beta) - self.y
+            f_ = (1.0 / 2.0) * maths.norm(a) ** 2.0 + np.dot(self.y.T, a)[0, 0]
+
+        lAta = self.gl.l * self.gl.Aa(alpha)
+        if self.penalty_start > 0:
+            lAta = np.vstack((np.zeros((self.penalty_start, 1)),
+                              lAta))
+
+        z = -np.dot(self.X.T, a)
+        h_ = (1.0 / (2 * self.rr.k)) \
+           * np.sum(maths.positive(np.abs(z - lAta) - self.l1.l) ** 2.0)
+
+#        print "g :", g
+#        print "f_:", f_
+#        print "h_:", h_
+        gap = g + f_ + h_
+
+#        print "Fenchel duality gap:", gap
+
+        return gap
+
+##        alpha_ = self.gl.alpha(beta)
+##
+##        P_ = self.rr.f(beta) \
+##           + self.l1.f(beta) \
+##           + self.gl.phi(alpha_, beta)
+##
+##        beta_hat_ = self.betahat(alpha_, beta)
+##
+##        D_ = self.rr.f(beta_hat_) \
+##           + self.l1.f(beta_hat_) \
+##           + self.gl.phi(alpha_, beta_hat_)
 #
-#        P_ = self.rr.f(beta) \
-#           + self.l1.f(beta) \
-#           + self.gl.phi(alpha_, beta)
+#        mu = consts.TOLERANCE
+#        old_mu = self.gl.set_mu(mu)
 #
-#        beta_hat_ = self.betahat(alpha_, beta)
+#        alpha = self.gl.alpha(beta)
 #
-#        D_ = self.rr.f(beta_hat_) \
-#           + self.l1.f(beta_hat_) \
-#           + self.gl.phi(alpha_, beta_hat_)
-
-        mu = consts.TOLERANCE
-        old_mu = self.gl.set_mu(mu)
-
-        alpha = self.gl.alpha(beta)
-
-        P = self.rr.f(beta) \
-          + self.l1.f(beta) \
-          + self.gl.phi(alpha, beta)
-
-        beta_hat = self.betahat(alpha, beta, eps=eps, max_iter=max_iter)
-
-        D = self.rr.f(beta_hat) \
-          + self.l1.f(beta_hat) \
-          + self.gl.phi(alpha, beta_hat)
-
-#        print "rr.f  :", self.rr.f(beta) - self.rr.f(beta_hat)
-#        print "l1.f  :", self.l1.f(beta) - self.l1.f(beta_hat)
-#        print "gl.phi:", self.gl.phi(alpha, beta) - self.gl.phi(alpha, beta_hat)
-
-        self.gl.set_mu(old_mu)
-
-#        print "old gap:", (P_ - D_), ", new gap:", (P - D)
-#        print "new gap:", (P - D)
-
-        return P - D
+#        P = self.rr.f(beta) \
+#          + self.l1.f(beta) \
+#          + self.gl.phi(alpha, beta)
+#
+#        beta_hat = self.betahat(alpha, beta, eps=eps, max_iter=max_iter)
+#
+#        D = self.rr.f(beta_hat) \
+#          + self.l1.f(beta_hat) \
+#          + self.gl.phi(alpha, beta_hat)
+#
+##        print "rr.f  :", self.rr.f(beta) - self.rr.f(beta_hat)
+##        print "l1.f  :", self.l1.f(beta) - self.l1.f(beta_hat)
+##        print "gl.phi:", self.gl.phi(alpha, beta) - self.gl.phi(alpha, beta_hat)
+#
+#        self.gl.set_mu(old_mu)
+#
+##        print "old gap:", (P_ - D_), ", new gap:", (P - D)
+##        print "new gap:", (P - D)
+#
+#        return P - D
 
     def A(self):
         """Linear operator of the Nesterov function.

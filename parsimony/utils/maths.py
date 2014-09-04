@@ -214,7 +214,7 @@ def positive(x):
     >>> np.maximum([1,-1,2], [0,0,0])
     array([1, 0, 2])
     """
-    return np.maximum(x, np.zeros(np.array(x).shape))
+    return np.maximum(x, 0.0)
 
 
 if __name__ == "__main__":

@@ -718,33 +718,29 @@ class LinearRegressionL1L2TV(RegressionEstimator):
     ...                      algorithm=primaldual.StaticCONESTA(max_iter=1000),
     ...                      mean=False)
     >>> res = lr.fit(X, y)
-    >>> error = lr.score(X, y)
-    >>> print "error = ", error
-    error =  0.0683839364837
+    >>> round(lr.score(X, y), 15)
+    0.064175916917122
     >>>
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                     algorithm=primaldual.DynamicCONESTA(max_iter=1000),
     ...                     mean=False)
     >>> res = lr.fit(X, y)
-    >>> error = lr.score(X, y)
-    >>> print "error = ", error
-    error =  0.0683839298003
+    >>> round(lr.score(X, y), 15)
+    0.064329662049028
     >>>
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                                algorithm=proximal.FISTA(max_iter=1000),
     ...                                mean=False)
     >>> lr = lr.fit(X, y)
-    >>> error = lr.score(X, y)
-    >>> print "error = ", error
-    error =  1.58175771272
+    >>> round(lr.score(X, y), 15)
+    1.581757712718387
     >>>
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                                 algorithm=proximal.ISTA(max_iter=1000),
     ...                                 mean=False)
     >>> lr = lr.fit(X, y)
-    >>> error = lr.score(X, y)
-    >>> print "error = ", error
-    error =  2.075830689
+    >>> round(lr.score(X, y), 15)
+    2.075830688996743
     >>>
     >>> import parsimony.functions.nesterov.l1tv as l1tv
     >>> np.random.seed(1337)
@@ -753,9 +749,8 @@ class LinearRegressionL1L2TV(RegressionEstimator):
     ...                                 algorithm=proximal.ADMM(max_iter=1000),
     ...                                 mean=False)
     >>> lr = lr.fit(X, y)
-    >>> error = lr.score(X, y)
-    >>> print "error = ", error
-    error =  0.0623552412543
+    >>> round(lr.score(X, y), 15)
+    0.06235524125433
     """
     def __init__(self, l1, l2, tv,
                  A=None, mu=consts.TOLERANCE,
@@ -936,33 +931,32 @@ class LinearRegressionL1L2GL(RegressionEstimator):
     ...                                   algorithm_params=dict(max_iter=1000),
     ...                                   mean=False)
     >>> res = lr.fit(X, y)
-    >>> error = lr.score(X, y)
-    >>> print "error = ", error
-    error =  0.610191919564
+    >>> round(lr.score(X, y), 15)
+    0.611470339231968
+    >>>
     >>> lr = estimators.LinearRegressionL1L2GL(l1, l2, gl, A,
     ...                                  algorithm=primaldual.DynamicCONESTA(),
     ...                                  algorithm_params=dict(max_iter=1000),
     ...                                  mean=False)
     >>> res = lr.fit(X, y)
-    >>> error = lr.score(X, y)
-    >>> print "error = ", round(error, 11)
-    error =  0.61028068275
+    >>> round(lr.score(X, y), 15)
+    0.611894524406951
+    >>>
     >>> lr = estimators.LinearRegressionL1L2GL(l1, l2, gl, A,
     ...                                   algorithm=proximal.FISTA(),
     ...                                   algorithm_params=dict(max_iter=1000),
     ...                                   mean=False)
     >>> lr = lr.fit(X, y)
-    >>> error = lr.score(X, y)
-    >>> print "error = ", error
-    error =  10.7465249393
+    >>> round(lr.score(X, y), 14)
+    10.74652493929971
+    >>>
     >>> lr = estimators.LinearRegressionL1L2GL(l1, l2, gl, A,
     ...                                   algorithm=proximal.ISTA(),
     ...                                   algorithm_params=dict(max_iter=1000),
     ...                                   mean=False)
     >>> lr = lr.fit(X, y)
-    >>> error = lr.score(X, y)
-    >>> print "error = ", error
-    error =  11.0246211425
+    >>> round(lr.score(X, y), 14)
+    11.02462114246791
     """
     def __init__(self, l1, l2, gl,
                  A=None, mu=consts.TOLERANCE,

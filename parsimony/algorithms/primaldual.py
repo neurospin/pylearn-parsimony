@@ -79,36 +79,17 @@ class CONESTA(bases.ExplicitAlgorithm,
                      Info.gap,
                      Info.mu]
 
-    def __init__(self, mu_start=None, mu_min=consts.TOLERANCE,
-                 tau=0.5, dynamic=False,
-
-                 eps=consts.TOLERANCE,
-                 info=[], max_iter=10000, min_iter=1):
+    def __init__(self, mu_min=consts.TOLERANCE, tau=0.5, dynamic=True,
+                 info=[], eps=consts.TOLERANCE, max_iter=10000, min_iter=1):
 
         super(CONESTA, self).__init__(info=info,
-                                      max_iter=max_iter,
-                                      min_iter=min_iter)
+                                      max_iter=max_iter, min_iter=min_iter)
 
-        self.mu_start = mu_start
-        self.mu_min = mu_min
-        self.tau = tau
-        self.dynamic = dynamic
-
-        if dynamic:
-            self.INTERFACES = [properties.NesterovFunction,
-#                               properties.Gradient,
-                               properties.StepSize,
-                               properties.ProximalOperator,
-                               properties.Continuation,
-                               properties.DualFunction]
-        else:
-            self.INTERFACES = [properties.NesterovFunction,
-#                               properties.Gradient,
-                               properties.StepSize,
-                               properties.ProximalOperator,
-                               properties.Continuation]
-
-        self.eps = eps
+        self.mu_min = max(consts.TOLERANCE, float(mu_min))
+        self.tau = max(consts.TOLERANCE,
+                       min(float(tau), 1.0 - consts.TOLERANCE))
+        self.dynamic = bool(dynamic)
+        self.eps = max(consts.TOLERANCE, float(eps))
 
     @bases.force_reset
     @bases.check_compatibility
@@ -122,25 +103,25 @@ class CONESTA(bases.ExplicitAlgorithm,
 #        if not self.fista_info.allows(Info.num_iter):
 #            self.fista_info.add_key(Info.num_iter)
         # Create the inner algorithm.
-        algorithm = FISTA(eps=self.eps,
-                          max_iter=self.max_iter, min_iter=self.min_iter,
-                          info=fista_info)
+        algorithm = FISTA(use_gap=True, info=fista_info, eps=self.eps,
+                          max_iter=self.max_iter, min_iter=self.min_iter)
 
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, False)
 
-        if self.mu_start is None:
-            mu = [function.estimate_mu(beta)]
-        else:
-            mu = [self.mu_start]
+        G = self.tau * function.gap(beta, eps=self.eps, max_iter=self.max_iter)
 
-#        function.set_mu(self.mu_min)
-#        tmin = function.step(beta)
+        # Compute the upper bound on G and apply it.
+        max_eps = function.eps_max(function.mu_opt(G))
+        G = min(max_eps, G)
+
+        # Compute mu0.
+        mu = [function.mu_opt(G)]
+
+#        mu = [function.estimate_mu(beta)]
+#        G = function.eps_opt(mu[0])
+
         function.set_mu(mu[0])
-
-        max_eps = function.eps_max(mu[0])
-
-        G = min(max_eps, function.eps_opt(mu[0]))
 
         if self.info_requested(Info.time):
             t = []
@@ -152,71 +133,47 @@ class CONESTA(bases.ExplicitAlgorithm,
             self.info_set(Info.converged, False)
 
         i = 0
-#        k = 0
         while True:
             stop = False
 
             tnew = function.step(beta)
-            eps_plus = min(max_eps, function.eps_opt(mu[-1]))
-#            eps_plus = eps_plus * (self.tau ** k)
+#            eps = min(max_eps, function.eps_opt(mu[-1]))
+            eps = function.eps_opt(mu[-1])
 #            print "current iterations: ", self.num_iter, \
 #                    ", iterations left: ", self.max_iter - self.num_iter
-            algorithm.set_params(step=tnew, eps=eps_plus,
+            algorithm.set_params(step=tnew, eps=eps,
                                  max_iter=self.max_iter - self.num_iter,
                                  conesta_stop=None)
-#                                      conesta_stop=[self.mu_min])
-#            self.fista_info.clear()
             beta = algorithm.run(function, beta)
 
             self.num_iter += algorithm.num_iter
+            if self.num_iter >= self.max_iter:
+                stop = True
 
             if Info.time in algorithm.info:
                 tval = algorithm.info_get(Info.time)
             if Info.fvalue in algorithm.info:
                 fval = algorithm.info_get(Info.fvalue)
 
-            self.mu_min = min(self.mu_min, mu[-1])
-#            tmin = min(tmin, tnew)
-#            old_mu = function.set_mu(self.mu_min)
-#            # Take one ISTA step for use in the stopping criterion.
-#            beta_tilde = function.prox(beta - tmin * function.grad(beta),
-#                                       tmin)
-#            function.set_mu(old_mu)
-
-#            if (1.0 / tmin) * maths.norm(beta - beta_tilde) < self.eps:
-#
-#                if self.info_requested(Info.converged):
-#                    self.info_set(Info.converged, True)
-#
-#                stop = True
-
-            if self.num_iter >= self.max_iter:
-                stop = True
-
             if self.info_requested(Info.time):
                 gap_time = utils.time_cpu()
 
             if self.dynamic:
                 G_new = function.gap(beta,
-                                     eps=eps_plus,
+                                     eps=eps,
                                      max_iter=self.max_iter - self.num_iter)
 
                 # TODO: Warn if G_new < -consts.TOLERANCE.
                 G_new = abs(G_new)  # May happen close to machine epsilon.
 
-#                print " " * k, k, G_new, G, eps_plus, mu[-1], self.num_iter
+#                print G_new, G, eps, mu[-1], self.num_iter
+                # This should always be true here (except last continuation).
                 if G_new < G:
-                    G = G_new
-#                    G = self.tau * G
-#                    G = min(G_new, self.tau * G)
-#                    k = 0
-                else:
-                    G = self.tau * G
-#                    k = k + 1
-#                    pass
+                    G = self.tau * G_new
 
             else:  # Static
 
+#                print G, eps, mu[-1], self.num_iter
                 G = self.tau * G
 
             if self.info_requested(Info.time):
@@ -228,18 +185,17 @@ class CONESTA(bases.ExplicitAlgorithm,
             if self.info_requested(Info.gap):
                 Gval.append(G)
 
-            if G <= self.eps:
+            if G < self.eps:
 #                print "New stopping criterion kicked in!"
                 if self.info_requested(Info.converged):
                     self.info_set(Info.converged, True)
 
                 stop = True
 
-            if (G <= consts.TOLERANCE and mu[-1] <= consts.TOLERANCE) or stop:
+            if stop or (G < consts.TOLERANCE and mu[-1] < consts.TOLERANCE):
                 break
 
             mu_new = min(mu[-1], function.mu_opt(G))
-            self.mu_min = min(self.mu_min, mu_new)
             if self.info_requested(Info.mu):
                 mu = mu + [max(self.mu_min, mu_new)] * len(fval)
             else:
@@ -249,7 +205,8 @@ class CONESTA(bases.ExplicitAlgorithm,
             i = i + 1
 
         if self.info_requested(Info.num_iter):
-            self.info_set(Info.num_iter, i + 1)
+#            self.info_set(Info.num_iter, i + 1)
+            self.info_set(Info.num_iter, self.num_iter)
         if self.info_requested(Info.time):
             self.info_set(Info.time, t)
         if self.info_requested(Info.fvalue):

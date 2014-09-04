@@ -144,7 +144,6 @@ class ISTA(bases.ExplicitAlgorithm,
             betanew = function.prox(betaold - step * function.grad(betaold),
                             step,
                             eps=1.0 / (float(i) ** (2.0 + consts.TOLERANCE)))
-#                            eps=1.0 / (float(i) ** (4.0 + consts.TOLERANCE)))
 
             if self.info_requested(Info.time):
                 t.append(utils.time_cpu() - tm)
@@ -181,6 +180,14 @@ class FISTA(bases.ExplicitAlgorithm,
     Parameters
     ----------
     eps : Positive float. Tolerance for the stopping criterion.
+
+    use_gap : Boolean. If true, FISTA will use a dual gap, from the interface
+            DualFunction, in the stopping criterion as
+
+                    if function.gap(beta) < eps:
+                        break
+
+            Default is False, since the gap may be very expensive to compute.
 
     info : List or tuple of utils.consts.Info. What, if any, extra run
             information should be stored. Default is an empty list, which means
@@ -237,13 +244,15 @@ class FISTA(bases.ExplicitAlgorithm,
                      Info.fvalue,
                      Info.converged]
 
-    def __init__(self, info=[],
-                 eps=consts.TOLERANCE, max_iter=10000, min_iter=1,
+    def __init__(self, use_gap=False,
+                 info=[], eps=consts.TOLERANCE, max_iter=10000, min_iter=1,
                  conesta_stop=None):
 
         super(FISTA, self).__init__(info=info,
                                     max_iter=max_iter,
                                     min_iter=min_iter)
+
+        self.use_gap = bool(use_gap)
         self.eps = eps
         self.conesta_stop = conesta_stop
 
@@ -260,8 +269,6 @@ class FISTA(bases.ExplicitAlgorithm,
         """
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, False)
-
-#        step = function.step(beta)
 
         z = betanew = betaold = beta
 
@@ -284,7 +291,6 @@ class FISTA(bases.ExplicitAlgorithm,
             betaold = betanew
             betanew = function.prox(z - step * function.grad(z),
                             step,
-#                            eps=1.0 / (float(i) ** (2.0 + consts.TOLERANCE)))
                             eps=1.0 / (float(i) ** (4.0 + consts.TOLERANCE)))
 
             if self.info_requested(Info.time):
@@ -316,6 +322,21 @@ class FISTA(bases.ExplicitAlgorithm,
 
                     break
 
+            elif self.use_gap:
+
+                gap = function.gap(betanew,
+                                   eps=self.eps, max_iter=self.max_iter)
+
+                # TODO: Warn if G_new < -consts.TOLERANCE.
+                gap = abs(gap)  # May happen close to machine epsilon.
+
+                if gap < self.eps:
+                    if self.info_requested(Info.converged):
+                        self.info_set(Info.converged, True)
+
+#                    print "FISTA: Gap < eps!"
+
+                    break
             else:
                 if step > 0.0:
                     if (1.0 / step) * maths.norm(betanew - z) < self.eps \
