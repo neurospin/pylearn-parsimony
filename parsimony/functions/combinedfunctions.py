@@ -563,7 +563,6 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
         if self.penalty_start > 0:
             lAta = np.vstack((np.zeros((self.penalty_start, 1)),
                               lAta))
-
         z = -np.dot(self.X.T, a)
         h_ = (1.0 / (2 * self.rr.k)) \
            * np.sum(maths.positive(np.abs(z - lAta) - self.l1.l) ** 2.0)

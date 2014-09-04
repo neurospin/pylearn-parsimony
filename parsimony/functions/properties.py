@@ -927,6 +927,9 @@ class NesterovFunction(Gradient,
 
         alpha_ = alpha
 
+        # This loop call self.f(y) that will apply penalty_start that has
+        # already been applied. Create y_padded with penalty_start zeros.
+        y_padded = np.zeros(beta.shape)
         for it in xrange(1, max_iter + 1):
 
             # ISTA
@@ -961,9 +964,9 @@ class NesterovFunction(Gradient,
             for i in xrange(1, len(A)):
                 Aa = Aa + A[i].T.dot(alpha[i])
             y = beta_ - t * Aa
-
+            y_padded[self.penalty_start:, :] = y
             gap = 0.5 * maths.norm(y - beta_) ** 2.0 \
-                    + factor * self.f(y) \
+                    + factor * self.f(y_padded) \
                 - 0.5 * (maths.norm(beta_) ** 2.0 - maths.norm(y) ** 2.0)
 
 #            if it % 10 == 0:
