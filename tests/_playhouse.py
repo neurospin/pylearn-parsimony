@@ -33,11 +33,11 @@ import simulate
 
 np.random.seed(42)
 
-px = 100
+px = 1000
 py = 1
 pz = 1
 shape = (pz, py, px)
-n, p = 50, np.prod(shape)
+n, p = 500, np.prod(shape)
 
 l = 0.618
 k = 1.01
@@ -92,9 +92,8 @@ print "=== CONESTA ==="
 print "==============="
 
 #alg = proximal.FISTA(eps=eps, max_iter=max_iter)
-#alg = primaldual.DynamicCONESTA(eps=eps, max_iter=max_iter, mu_min=mu, tau=0.5)
+#alg = primaldual.CONESTA(eps=eps, max_iter=max_iter, mu_min=mu, tau=0.5)
 alg = primaldual.StaticCONESTA(eps=eps, max_iter=max_iter, mu_min=mu, tau=0.5)
-#alg = primaldual.NaiveCONESTA(eps=eps, max_iter=max_iter, mu_min=mu)
 
 #function = CombinedFunction()
 #function.add_function(functions.losses.LinearRegression(X, y,
