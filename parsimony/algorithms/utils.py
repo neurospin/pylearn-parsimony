@@ -49,6 +49,7 @@ class Info(object):
     mu = "mu"  # Smoothing constant at e.g. every iteration.
     bound = "bound"  # Upper bound at e.g. every iteration.
     beta = "beta"  # E.g. the start vector used.
+    continuations = "continuations"  # In continuation: Number of continuations
 
 
 class Bisection(bases.ExplicitAlgorithm,

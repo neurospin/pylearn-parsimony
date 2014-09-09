@@ -68,6 +68,7 @@ class CONESTA(bases.ExplicitAlgorithm,
     INFO_PROVIDED = [Info.ok,
                      Info.converged,
                      Info.num_iter,
+                     Info.continuations,
                      Info.time,
                      Info.fvalue,
                      Info.gap,
@@ -103,15 +104,15 @@ class CONESTA(bases.ExplicitAlgorithm,
             self.info_set(Info.ok, False)
 
         # Compute current gap and decrease by tau.
-        Gamma = self.tau * function.gap(beta, eps=self.eps,
-                                        max_iter=self.max_iter)
+        Gamma = function.gap(beta, eps=self.eps, max_iter=self.max_iter)
+        eps = self.tau * Gamma
 
-        # Compute the upper bound on the gap and apply it.
-        max_eps = function.eps_max(function.mu_opt(Gamma))
-        Gamma = min(max_eps, Gamma)
+        # Compute the upper bound on the smoothed gap and apply it.
+#        max_eps = function.eps_max(function.mu_opt(eps))
+#        eps = min(max_eps, eps)
 
         # Compute and set mu.
-        mu = [function.mu_opt(Gamma)]
+        mu = [function.mu_opt(eps)]
         function.set_mu(mu[0])
 
         # Initialise info variables.
@@ -129,7 +130,7 @@ class CONESTA(bases.ExplicitAlgorithm,
             stop = False
 
             # Current precision.
-            eps = function.eps_opt(mu[-1])
+#            eps = function.eps_opt(mu[-1])
             # Set current parameters to algorithm.
             algorithm.set_params(eps=eps,
                                  max_iter=self.max_iter - self.num_iter)
@@ -157,30 +158,28 @@ class CONESTA(bases.ExplicitAlgorithm,
                     gap_time = utils.time_cpu()
 
                 # Compute current gap.
-                G = function.gap(beta,
-                                 eps=eps,
-                                 max_iter=self.max_iter - self.num_iter)
+                Gamma = function.gap(beta,
+                                     eps=eps,
+                                     max_iter=self.max_iter - self.num_iter)
                 # TODO: Warn if G_new < -consts.TOLERANCE.
-                G = abs(G)  # May happen close to machine epsilon.
+                Gamma = abs(Gamma)  # May happen close to machine epsilon.
 
                 # Time the gap computation.
                 if self.info_requested(Info.time):
                     gap_time = utils.time_cpu() - gap_time
 
-                if G < self.eps:
+                if Gamma < self.eps:
 
                     if self.info_requested(Info.converged):
                         self.info_set(Info.converged, True)
 
                     stop = True
 
-            print G, Gamma, eps, mu[-1], self.num_iter
+            print Gamma, eps, mu[-1], self.num_iter
 
-            if stop or (G < consts.TOLERANCE and mu[-1] < consts.TOLERANCE):
+            if stop or (Gamma < consts.TOLERANCE \
+                            and mu[-1] < consts.TOLERANCE):
                 break
-
-            # Update Gamma.
-            Gamma = self.tau * G
 
             # Update info.
             if self.info_requested(Info.time):
@@ -191,19 +190,23 @@ class CONESTA(bases.ExplicitAlgorithm,
             if self.info_requested(Info.gap):
                 gap.append(Gamma)
 
+            # Update the precision eps.
+            eps = self.tau * Gamma
+
             # Compute and update mu.
-            mu_new = min(mu[-1], function.mu_opt(Gamma))
+            mu_new = max(min(mu[-1], function.mu_opt(eps)), self.mu_min)
             if self.info_requested(Info.mu):
-                mu = mu + [max(self.mu_min, mu_new)] * len(fval)
+                mu = mu + [mu_new] * len(fval)
             else:
-                mu.append(max(self.mu_min, mu_new))
+                mu.append(mu_new)
             function.set_mu(mu_new)
 
             i = i + 1
 
         if self.info_requested(Info.num_iter):
-#            self.info_set(Info.num_iter, i + 1)
             self.info_set(Info.num_iter, self.num_iter)
+        if self.info_requested(Info.continuations):
+            self.info_set(Info.continuations, i + 1)
         if self.info_requested(Info.time):
             self.info_set(Info.time, t)
         if self.info_requested(Info.fvalue):
@@ -252,6 +255,7 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
     INFO_PROVIDED = [Info.ok,
                      Info.converged,
                      Info.num_iter,
+                     Info.continuations,
                      Info.time,
                      Info.fvalue,
                      Info.mu]
@@ -287,13 +291,13 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
             self.info_set(Info.ok, False)
 
         # Compute current gap and decrease by tau.
-        eps = self.tau * function.gap(beta, eps=self.eps,
-                                      max_iter=self.max_iter)
+        Gamma = function.gap(beta, eps=self.eps, max_iter=self.max_iter)
+        eps = self.tau * Gamma
 
         # Compute the upper bound on the gap and apply it.
 #        max_eps = function.eps_max(0.5 * eps / function.eps_max(1.0))
-        max_eps = function.eps_max(function.mu_opt(eps))
-        eps = min(max_eps, eps)
+#        max_eps = function.eps_max(function.mu_opt(eps))
+#        eps = min(max_eps, eps)
 
         # Compute and set mu. We use 1/2 as in Chen et al. (2012).
         gM = function.eps_max(1.0)
@@ -340,26 +344,26 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
                     gap_time = utils.time_cpu()
 
                 # Compute current gap.
-                G = function.gap(beta,
-                                 eps=eps,
-                                 max_iter=self.max_iter - self.num_iter)
-                # TODO: Warn if G_new < -consts.TOLERANCE.
-                G = abs(G)  # May happen close to machine epsilon.
+                Gamma = function.gap(beta, eps=eps,
+                                     max_iter=self.max_iter - self.num_iter)
+                # TODO: Warn if Gamma < -consts.TOLERANCE.
+                Gamma = abs(Gamma)  # May be negative close to machine epsilon.
 
                 # Time the gap computation.
                 if self.info_requested(Info.time):
                     gap_time = utils.time_cpu() - gap_time
 
-                if G < self.eps:
+                if Gamma < self.eps:
 
                     if self.info_requested(Info.converged):
                         self.info_set(Info.converged, True)
 
                     stop = True
 
-            print G, eps, mu[-1], self.num_iter
+            print Gamma, eps, mu[-1], self.num_iter
 
-            if stop or (G < consts.TOLERANCE and mu[-1] < consts.TOLERANCE):
+            if stop or (Gamma < consts.TOLERANCE \
+                            and mu[-1] < consts.TOLERANCE):
                 break
 
             # Update info.
@@ -373,18 +377,24 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
             eps = self.tau * eps
 
             # Compute and update mu.
-            mu_new = self.tau * mu[-1]
+            mu_new = max(self.mu_min, self.tau * mu[-1])
+
+#            gM_ = function.eps_max(1.0)
+#            mu_ = 0.5 * eps / gM_
+#            print "mu diff:", abs(mu_new - mu_)
+
             if self.info_requested(Info.mu):
-                mu = mu + [max(self.mu_min, mu_new)] * len(fval)
+                mu = mu + [mu_new] * len(fval)
             else:
-                mu.append(max(self.mu_min, mu_new))
+                mu.append(mu_new)
             function.set_mu(mu_new)
 
             i = i + 1
 
         if self.info_requested(Info.num_iter):
-#            self.info_set(Info.num_iter, i + 1)
             self.info_set(Info.num_iter, self.num_iter)
+        if self.info_requested(Info.continuations):
+            self.info_set(Info.continuations, i + 1)
         if self.info_requested(Info.time):
             self.info_set(Info.time, t)
         if self.info_requested(Info.fvalue):

@@ -92,8 +92,10 @@ print "=== CONESTA ==="
 print "==============="
 
 #alg = proximal.FISTA(eps=eps, max_iter=max_iter)
-#alg = primaldual.CONESTA(eps=eps, max_iter=max_iter, mu_min=mu, tau=0.5)
-alg = primaldual.StaticCONESTA(eps=eps, max_iter=max_iter, mu_min=mu, tau=0.5)
+alg = primaldual.CONESTA(eps=eps, max_iter=max_iter, mu_min=mu, tau=0.5,
+                         info=[Info.continuations])
+#alg = primaldual.StaticCONESTA(eps=eps, max_iter=max_iter, mu_min=mu, tau=0.5,
+#                               info=[Info.continuations])
 
 #function = CombinedFunction()
 #function.add_function(functions.losses.LinearRegression(X, y,
@@ -122,6 +124,7 @@ ferr = abs(f_parsimony - f_star)
 print "ferr:", ferr
 #assert ferr < 5e-4
 
+print "continuations:", alg.info_get(Info.continuations)
 
 
 
