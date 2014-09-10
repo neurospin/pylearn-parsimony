@@ -27,7 +27,6 @@ import parsimony.algorithms.bases as bases
 import parsimony.algorithms.gradient as gradient
 import parsimony.algorithms.proximal as proximal
 import parsimony.algorithms.primaldual as primaldual
-import parsimony.algorithms.multiblock as multiblock
 import parsimony.algorithms.nipals as nipals
 import parsimony.algorithms.deflation as deflation
 from parsimony.utils import check_arrays
@@ -700,7 +699,6 @@ class LinearRegressionL1L2TV(RegressionEstimator):
     --------
     >>> import numpy as np
     >>> import parsimony.estimators as estimators
-    >>> import parsimony.algorithms.primaldual as primaldual
     >>> import parsimony.algorithms.proximal as proximal
     >>> import parsimony.functions.nesterov.tv as total_variation
     >>> shape = (1, 4, 4)
@@ -715,18 +713,18 @@ class LinearRegressionL1L2TV(RegressionEstimator):
     >>> tv = 1.0  # TV coefficient
     >>> A, n_compacts = total_variation.A_from_shape(shape)
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
-    ...                      algorithm=primaldual.StaticCONESTA(max_iter=1000),
+    ...                      algorithm=proximal.StaticCONESTA(max_iter=1000),
     ...                      mean=False)
     >>> res = lr.fit(X, y)
     >>> round(lr.score(X, y), 15)
-    0.064175916917122
+    0.060109008996134
     >>>
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
-    ...                     algorithm=primaldual.DynamicCONESTA(max_iter=1000),
+    ...                     algorithm=proximal.CONESTA(max_iter=1000),
     ...                     mean=False)
     >>> res = lr.fit(X, y)
     >>> round(lr.score(X, y), 15)
-    0.064329662049028
+    0.064013190758587
     >>>
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                                algorithm=proximal.FISTA(max_iter=1000),
@@ -760,7 +758,7 @@ class LinearRegressionL1L2TV(RegressionEstimator):
                  rho=1.0):
 
         if algorithm is None:
-            algorithm = primaldual.StaticCONESTA(**algorithm_params)
+            algorithm = proximal.StaticCONESTA(**algorithm_params)
         else:
             algorithm.set_params(**algorithm_params)
 
@@ -912,7 +910,6 @@ class LinearRegressionL1L2GL(RegressionEstimator):
     --------
     >>> import numpy as np
     >>> import parsimony.estimators as estimators
-    >>> import parsimony.algorithms.primaldual as primaldual
     >>> import parsimony.algorithms.proximal as proximal
     >>> import parsimony.functions.nesterov.gl as group_lasso
     >>> n = 10
@@ -927,20 +924,20 @@ class LinearRegressionL1L2GL(RegressionEstimator):
     >>> groups = [range(0, 10), range(5, 15)]
     >>> A = group_lasso.A_from_groups(p, groups, weights=None, penalty_start=0)
     >>> lr = estimators.LinearRegressionL1L2GL(l1, l2, gl, A,
-    ...                                   algorithm=primaldual.StaticCONESTA(),
+    ...                                   algorithm=proximal.StaticCONESTA(),
     ...                                   algorithm_params=dict(max_iter=1000),
     ...                                   mean=False)
     >>> res = lr.fit(X, y)
     >>> round(lr.score(X, y), 15)
-    0.611470339231968
+    0.610308082400372
     >>>
     >>> lr = estimators.LinearRegressionL1L2GL(l1, l2, gl, A,
-    ...                                  algorithm=primaldual.DynamicCONESTA(),
+    ...                                  algorithm=proximal.CONESTA(),
     ...                                  algorithm_params=dict(max_iter=1000),
     ...                                  mean=False)
     >>> res = lr.fit(X, y)
     >>> round(lr.score(X, y), 15)
-    0.611894524406951
+    0.611826351426007
     >>>
     >>> lr = estimators.LinearRegressionL1L2GL(l1, l2, gl, A,
     ...                                   algorithm=proximal.FISTA(),
@@ -965,7 +962,7 @@ class LinearRegressionL1L2GL(RegressionEstimator):
                  mean=True):
 
         if algorithm is None:
-            algorithm = primaldual.StaticCONESTA(**algorithm_params)
+            algorithm = proximal.StaticCONESTA(**algorithm_params)
         else:
             algorithm.set_params(**algorithm_params)
 
@@ -1066,7 +1063,6 @@ class LinearRegressionL1L2GL(RegressionEstimator):
 #    --------
 ##    >>> import numpy as np
 ##    >>> import parsimony.estimators as estimators
-##    >>> import parsimony.algorithms.primaldual as primaldual
 ##    >>> import parsimony.algorithms.proximal as proximal
 ##    >>> import parsimony.functions.nesterov.tv as tv
 ##    >>> shape = (1, 4, 4)
@@ -1080,13 +1076,13 @@ class LinearRegressionL1L2GL(RegressionEstimator):
 ##    >>> g = 1.0  # tv coefficient
 ##    >>> A, n_compacts = tv.A_from_shape(shape)
 ##    >>> ridge_l1_tv = estimators.RidgeRegression_L1_TV(k, l, g, A,
-##    ...                     algorithm=primaldual.StaticCONESTA(max_iter=1000))
+##    ...                     algorithm=proximal.StaticCONESTA(max_iter=1000))
 ##    >>> res = ridge_l1_tv.fit(X, y)
 ##    >>> error = np.sum(np.abs(np.dot(X, ridge_l1_tv.beta) - y))
 ##    >>> print "error = ", error
 ##    error =  4.70079220678
 ##    >>> ridge_l1_tv = estimators.RidgeRegression_L1_TV(k, l, g, A,
-##    ...                     algorithm=primaldual.DynamicCONESTA(max_iter=1000))
+##    ...                     algorithm=proximal.DynamicCONESTA(max_iter=1000))
 ##    >>> res = ridge_l1_tv.fit(X, y)
 ##    >>> error = np.sum(np.abs(np.dot(X, ridge_l1_tv.beta) - y))
 ##    >>> print "error = ", error
@@ -1204,7 +1200,6 @@ class LogisticRegression(LogisticRegressionEstimator):
     --------
     >>> import numpy as np
     >>> import parsimony.estimators as estimators
-    >>> import parsimony.algorithms.primaldual as primaldual
     >>> import parsimony.algorithms.gradient as gradient
     >>> import parsimony.functions.nesterov.tv as total_variation
     >>> shape = (1, 4, 4)
@@ -1342,7 +1337,7 @@ class RidgeLogisticRegression(LogisticRegressionEstimator):
         self.l = max(0.0, float(l))
 
         if algorithm is None:
-            algorithm = primaldual.GradientDescent(**algorithm_params)
+            algorithm = proximal.GradientDescent(**algorithm_params)
         else:
             algorithm.set_params(**algorithm_params)
 
@@ -1452,7 +1447,6 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
     --------
     >>> import numpy as np
     >>> import parsimony.estimators as estimators
-    >>> import parsimony.algorithms.primaldual as primaldual
     >>> import parsimony.algorithms.proximal as proximal
     >>> import parsimony.functions.nesterov.tv as total_variation
     >>> shape = (1, 4, 4)
@@ -1467,7 +1461,7 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
     >>> tv = 1.0  # TV coefficient
     >>> A, n_compacts = total_variation.A_from_shape(shape)
     >>> lr = estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
-    ...                      algorithm=primaldual.StaticCONESTA(max_iter=1000),
+    ...                      algorithm=proximal.StaticCONESTA(max_iter=1000),
     ...                      mean=False)
     >>> res = lr.fit(X, y)
     >>> error = lr.score(X, y)
@@ -1496,7 +1490,7 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
                  mean=True):
 
         if algorithm is None:
-            algorithm = primaldual.StaticCONESTA(**algorithm_params)
+            algorithm = proximal.StaticCONESTA(**algorithm_params)
         else:
             algorithm.set_params(**algorithm_params)
 
@@ -1507,7 +1501,7 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
         self.l2 = float(l2)
         self.tv = float(tv)
 
-        if isinstance(algorithm, primaldual.CONESTA) \
+        if isinstance(algorithm, proximal.CONESTA) \
                 and self.tv < consts.TOLERANCE:
             warnings.warn("The TV parameter should be positive.")
 
@@ -1627,7 +1621,6 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
     --------
     >>> import numpy as np
     >>> import parsimony.estimators as estimators
-    >>> import parsimony.algorithms.primaldual as primaldual
     >>> import parsimony.algorithms.proximal as proximal
     >>> import parsimony.functions.nesterov.gl as group_lasso
     >>>
@@ -1644,7 +1637,7 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
     >>> l2 = 0.9  # Ridge coefficient
     >>> gl = 1.0  # TV coefficient
     >>> lr = estimators.LogisticRegressionL1L2GL(l1, l2, gl, A=A,
-    ...                      algorithm=primaldual.StaticCONESTA(max_iter=1000),
+    ...                      algorithm=proximal.StaticCONESTA(max_iter=1000),
     ...                      mean=False)
     >>> res = lr.fit(X, y)
     >>> error = lr.score(X, y)
@@ -1674,7 +1667,7 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
                  mean=True):
 
         if algorithm is None:
-            algorithm = primaldual.StaticCONESTA(**algorithm_params)
+            algorithm = proximal.StaticCONESTA(**algorithm_params)
         else:
             algorithm.set_params(**algorithm_params)
 
@@ -1685,7 +1678,7 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
         self.l2 = float(l2)
         self.gl = float(gl)
 
-        if isinstance(algorithm, primaldual.CONESTA) \
+        if isinstance(algorithm, proximal.CONESTA) \
                 and self.gl < consts.TOLERANCE:
             warnings.warn("The GL parameter should be positive.")
 

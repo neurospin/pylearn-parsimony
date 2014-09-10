@@ -28,10 +28,9 @@ import parsimony.utils.consts as consts
 from parsimony.algorithms.utils import Info
 import parsimony.functions.properties as properties
 
-__all__ = ["ISTA", "FISTA",
+__all__ = ["ISTA", "FISTA", "CONESTA", "StaticCONESTA",
            "ADMM",
 
-#           "ProjectionADMM",
            "DykstrasProjectionAlgorithm",
            "ParallelDykstrasProjectionAlgorithm"]
 
@@ -330,6 +329,8 @@ class FISTA(bases.ExplicitAlgorithm,
                 # TODO: Warn if G_new < -consts.TOLERANCE.
                 gap = abs(gap)  # May happen close to machine epsilon.
 
+#                print "FISTA gap:", gap, ", eps:", self.eps, ", f:", function.fmu(betanew)
+
                 if gap < self.eps:
                     if self.info_requested(Info.converged):
                         self.info_set(Info.converged, True)
@@ -368,6 +369,368 @@ class FISTA(bases.ExplicitAlgorithm,
             self.info_set(Info.ok, True)
 
         return betanew
+
+
+class CONESTA(bases.ExplicitAlgorithm,
+              bases.IterativeAlgorithm,
+              bases.InformationAlgorithm):
+    """COntinuation with NEsterov smoothing in a Soft-Thresholding Algorithm,
+    or CONESTA for short.
+
+    Parameters
+    ----------
+    mu_min : Non-negative float. A "very small" mu to use as a lower bound for
+            mu.
+
+    tau : Float, 0 < tau < 1. The rate at which eps is decreasing. Default
+            is 0.5.
+
+    eps : Positive float. Tolerance for the stopping criterion.
+
+    info : List or tuple of utils.Info. What, if any, extra run information
+            should be stored. Default is an empty list, which means that no
+            run information is computed nor returned.
+
+    max_iter : Non-negative integer. Maximum allowed number of iterations.
+
+    min_iter : Non-negative integer less than or equal to max_iter. Minimum
+            number of iterations that must be performed. Default is 1.
+    """
+    INTERFACES = [properties.NesterovFunction,
+                  properties.StepSize,
+                  properties.ProximalOperator,
+                  properties.Continuation,
+                  properties.DualFunction]
+
+    INFO_PROVIDED = [Info.ok,
+                     Info.converged,
+                     Info.num_iter,
+                     Info.continuations,
+                     Info.time,
+                     Info.fvalue,
+                     Info.gap,
+                     Info.mu]
+
+    def __init__(self, mu_min=consts.TOLERANCE, tau=0.5,
+                 info=[], eps=consts.TOLERANCE, max_iter=10000, min_iter=1):
+
+        super(CONESTA, self).__init__(info=info,
+                                      max_iter=max_iter, min_iter=min_iter)
+
+        self.mu_min = max(consts.TOLERANCE, float(mu_min))
+        self.tau = max(consts.TOLERANCE,
+                       min(float(tau), 1.0 - consts.TOLERANCE))
+        self.eps = max(consts.TOLERANCE, float(eps))
+
+    @bases.force_reset
+    @bases.check_compatibility
+    def run(self, function, beta):
+
+        # Copy the allowed info keys for FISTA.
+        fista_info = list()
+        for nfo in self.info_copy():
+            if nfo in FISTA.INFO_PROVIDED:
+                fista_info.append(nfo)
+
+        # Create the inner algorithm.
+        algorithm = FISTA(use_gap=True, info=fista_info, eps=self.eps,
+                          max_iter=self.max_iter, min_iter=self.min_iter)
+
+        # Not ok until the end.
+        if self.info_requested(Info.ok):
+            self.info_set(Info.ok, False)
+
+        # Compute current gap and decrease by tau.
+        Gamma = function.gap(beta, eps=self.eps, max_iter=self.max_iter)
+        eps = self.tau * Gamma
+
+        # Compute the upper bound on the smoothed gap and apply it.
+#        max_eps = function.eps_max(function.mu_opt(eps))
+#        eps = min(max_eps, eps)
+
+        # Compute and set mu.
+        mu = [function.mu_opt(eps)]
+        function.set_mu(mu[0])
+
+        # Initialise info variables.
+        if self.info_requested(Info.time):
+            t = []
+        if self.info_requested(Info.fvalue):
+            f = []
+        if self.info_requested(Info.gap):
+            gap = []
+        if self.info_requested(Info.converged):
+            self.info_set(Info.converged, False)
+
+        i = 0  # Iteration counter.
+        while True:
+            stop = False
+
+            # Current precision.
+#            eps = function.eps_opt(mu[-1])
+            # Set current parameters to algorithm.
+            algorithm.set_params(eps=eps,
+                                 max_iter=self.max_iter - self.num_iter)
+            beta = algorithm.run(function, beta)
+
+            # Get info from algorithm.
+            if Info.time in algorithm.info:
+                tval = algorithm.info_get(Info.time)
+            if Info.fvalue in algorithm.info:
+                fval = algorithm.info_get(Info.fvalue)
+
+            # Update iteration counter.
+            self.num_iter += algorithm.num_iter
+
+            if self.num_iter >= self.max_iter:
+                stop = True
+
+            # Time the gap computation.
+            if self.info_requested(Info.time):
+                gap_time = utils.time_cpu()
+
+            # Compute current gap. May be small and negative close to machine
+            # epsilon.
+            Gamma = abs(function.gap(beta, eps=eps,
+                                     max_iter=self.max_iter - self.num_iter))
+            # TODO: Warn if Gamma < -consts.TOLERANCE.
+
+            # Time the gap computation.
+            if self.info_requested(Info.time):
+                gap_time = utils.time_cpu() - gap_time
+
+            if Gamma < self.eps:
+                if self.info_requested(Info.converged):
+                    self.info_set(Info.converged, True)
+                stop = True
+
+            # Update info.
+            if self.info_requested(Info.time):
+                tval[-1] += gap_time
+                t = t + tval
+            if self.info_requested(Info.fvalue):
+                f = f + fval
+            if self.info_requested(Info.gap):
+                gap.append(Gamma)
+
+            print Gamma, eps, mu[-1], self.num_iter
+
+            if stop or (Gamma < consts.TOLERANCE \
+                            and mu[-1] < consts.TOLERANCE):
+                break
+
+            # Update the precision eps.
+            eps = self.tau * Gamma
+
+            # Compute and update mu.
+            mu_new = max(self.mu_min, min(function.mu_opt(eps), mu[-1]))
+            if self.info_requested(Info.mu):
+                mu = mu + [mu_new] * len(fval)
+            else:
+                mu.append(mu_new)
+            function.set_mu(mu_new)
+
+            i = i + 1
+
+        if self.info_requested(Info.num_iter):
+            self.info_set(Info.num_iter, self.num_iter)
+        if self.info_requested(Info.continuations):
+            self.info_set(Info.continuations, i + 1)
+        if self.info_requested(Info.time):
+            self.info_set(Info.time, t)
+        if self.info_requested(Info.fvalue):
+            self.info_set(Info.fvalue, f)
+        if self.info_requested(Info.gap):
+            self.info_set(Info.gap, gap)
+        if self.info_requested(Info.mu):
+            self.info_set(Info.mu, mu)
+        if self.info_requested(Info.ok):
+            self.info_set(Info.ok, True)
+
+        return beta
+
+
+class StaticCONESTA(bases.ExplicitAlgorithm,
+                    bases.IterativeAlgorithm,
+                    bases.InformationAlgorithm):
+    """COntinuation with NEsterov smoothing in a Soft-Thresholding Algorithm,
+    or CONESTA for short, with a statically decreasing sequence of eps and mu.
+
+    Parameters
+    ----------
+    mu_min : Non-negative float. A "very small" mu to use as a lower bound for
+            mu.
+
+    tau : Float, 0 < tau < 1. The rate at which eps is decreasing. Default
+            is 0.5.
+
+    eps : Positive float. Tolerance for the stopping criterion.
+
+    info : List or tuple of utils.Info. What, if any, extra run information
+            should be stored. Default is an empty list, which means that no
+            run information is computed nor returned.
+
+    max_iter : Non-negative integer. Maximum allowed number of iterations.
+
+    min_iter : Non-negative integer less than or equal to max_iter. Minimum
+            number of iterations that must be performed. Default is 1.
+    """
+    INTERFACES = [properties.NesterovFunction,
+                  properties.StepSize,
+                  properties.ProximalOperator,
+                  properties.Continuation,
+                  properties.DualFunction]
+
+    INFO_PROVIDED = [Info.ok,
+                     Info.converged,
+                     Info.num_iter,
+                     Info.continuations,
+                     Info.time,
+                     Info.fvalue,
+                     Info.mu]
+
+    def __init__(self, mu_min=consts.TOLERANCE, tau=0.5,
+                 info=[], eps=consts.TOLERANCE, max_iter=10000, min_iter=1):
+
+        super(StaticCONESTA, self).__init__(info=info,
+                                            max_iter=max_iter,
+                                            min_iter=min_iter)
+
+        self.mu_min = max(consts.TOLERANCE, float(mu_min))
+        self.tau = max(consts.TOLERANCE,
+                       min(float(tau), 1.0 - consts.TOLERANCE))
+        self.eps = max(consts.TOLERANCE, float(eps))
+
+    @bases.force_reset
+    @bases.check_compatibility
+    def run(self, function, beta):
+
+        # Copy the allowed info keys for FISTA.
+        fista_info = list()
+        for nfo in self.info_copy():
+            if nfo in FISTA.INFO_PROVIDED:
+                fista_info.append(nfo)
+
+        # Create the inner algorithm.
+        algorithm = FISTA(use_gap=True, info=fista_info, eps=self.eps,
+                          max_iter=self.max_iter, min_iter=self.min_iter)
+
+        # Not ok until the end.
+        if self.info_requested(Info.ok):
+            self.info_set(Info.ok, False)
+
+        # Compute current gap and decrease by tau.
+        Gamma = function.gap(beta, eps=self.eps, max_iter=self.max_iter)
+        eps = self.tau * Gamma
+
+        # Compute the upper bound on the gap and apply it.
+#        max_eps = function.eps_max(0.5 * eps / function.eps_max(1.0))
+#        max_eps = function.eps_max(function.mu_opt(eps))
+#        eps = min(max_eps, eps)*
+
+        # Compute and set mu. We use 1/2 as in Chen et al. (2012).
+        gM = function.eps_max(1.0)
+        mu = [0.5 * eps / gM]
+        function.set_mu(mu[0])
+
+        # Initialise info variables.
+        if self.info_requested(Info.time):
+            t = []
+        if self.info_requested(Info.fvalue):
+            f = []
+        if self.info_requested(Info.gap):
+            gap = []
+        if self.info_requested(Info.converged):
+            self.info_set(Info.converged, False)
+
+        i = 0  # Iteration counter.
+        while True:
+            stop = False
+
+            # Set current parameters to algorithm.
+            algorithm.set_params(eps=eps,
+                                 max_iter=self.max_iter - self.num_iter)
+            if Gamma < 4500:
+                pass
+            beta = algorithm.run(function, beta)
+
+            # Get info from algorithm.
+            if Info.time in algorithm.info:
+                tval = algorithm.info_get(Info.time)
+            if Info.fvalue in algorithm.info:
+                fval = algorithm.info_get(Info.fvalue)
+
+            # Update iteration counter.
+            self.num_iter += algorithm.num_iter
+
+            if self.num_iter >= self.max_iter:
+                stop = True
+
+            # Time the gap computation.
+            if self.info_requested(Info.time):
+                gap_time = utils.time_cpu()
+
+            # Compute current gap. May be small and negative close to machine
+            # epsilon.
+            Gamma = abs(function.gap(beta, eps=eps,
+                                     max_iter=self.max_iter - self.num_iter))
+            # TODO: Warn if Gamma < -consts.TOLERANCE.
+
+            # Time the gap computation.
+            if self.info_requested(Info.time):
+                gap_time = utils.time_cpu() - gap_time
+
+            if Gamma < self.eps:
+                if self.info_requested(Info.converged):
+                    self.info_set(Info.converged, True)
+                stop = True
+
+            # Update info.
+            if self.info_requested(Info.time):
+                tval[-1] += gap_time
+                t = t + tval
+            if self.info_requested(Info.fvalue):
+                f = f + fval
+
+            print Gamma, eps, mu[-1], self.num_iter
+
+            if stop or (Gamma < consts.TOLERANCE \
+                            and mu[-1] < consts.TOLERANCE):
+                break
+
+            # Update the precision eps.
+            eps = self.tau * eps
+
+            # Compute and update mu.
+#            mu_new = max(self.mu_min, self.tau * mu[-1])
+            mu_new = max(self.mu_min, 0.5 * eps / gM)
+            if self.info_requested(Info.mu):
+                mu = mu + [mu_new] * len(fval)
+            else:
+                mu.append(mu_new)
+            function.set_mu(mu_new)
+
+            gM = function.eps_max(1.0)
+            assert(mu[-1] < eps / gM)
+
+            i = i + 1
+
+        if self.info_requested(Info.num_iter):
+            self.info_set(Info.num_iter, self.num_iter)
+        if self.info_requested(Info.continuations):
+            self.info_set(Info.continuations, i + 1)
+        if self.info_requested(Info.time):
+            self.info_set(Info.time, t)
+        if self.info_requested(Info.fvalue):
+            self.info_set(Info.fvalue, f)
+        if self.info_requested(Info.gap):
+            self.info_set(Info.gap, gap)
+        if self.info_requested(Info.mu):
+            self.info_set(Info.mu, mu)
+        if self.info_requested(Info.ok):
+            self.info_set(Info.ok, True)
+
+        return beta
 
 
 #class ProjectionADMM(bases.ExplicitAlgorithm):

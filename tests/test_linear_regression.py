@@ -12,7 +12,7 @@ from nose.tools import assert_less, assert_almost_equal
 
 import numpy as np
 
-from parsimony.algorithms.proximal import FISTA, ISTA
+import parsimony.algorithms.proximal as proximal
 import parsimony.utils.consts as consts
 from tests import TestCase
 
@@ -445,7 +445,7 @@ class TestLinearRegression(TestCase):
 
         eps = 1e-8
         max_iter = 3800
-        fista = FISTA(eps=eps, max_iter=max_iter)
+        fista = proximal.FISTA(eps=eps, max_iter=max_iter)
         linear_regression = LinearRegression(X, y, mean=False)
         l1 = L1(l=l)
         function = CombinedFunction()
@@ -459,7 +459,7 @@ class TestLinearRegression(TestCase):
         mu = consts.TOLERANCE
         reg_est = estimators.LinearRegressionL1L2TV(
                                       l, k, g, A, mu=mu,
-                                      algorithm=FISTA(),
+                                      algorithm=proximal.FISTA(),
                                       algorithm_params=dict(eps=eps,
                                                             max_iter=max_iter),
                                       mean=False)
@@ -474,13 +474,13 @@ class TestLinearRegression(TestCase):
 #        rreg_est.fit(X, y)
 
         rreg_est_2 = estimators.LinearRegressionL1L2GL(l, k, g, A=A, mu=mu,
-                                      algorithm=FISTA(),
+                                      algorithm=proximal.FISTA(),
                                       algorithm_params=dict(eps=eps,
                                                             max_iter=max_iter),
                                       mean=False)
         rreg_est_2.fit(X, y)
 
-        lasso = estimators.Lasso(l, algorithm=FISTA(),
+        lasso = estimators.Lasso(l, algorithm=proximal.FISTA(),
                                     algorithm_params=dict(eps=eps,
                                                           max_iter=max_iter),
                                     mean=False)
@@ -576,7 +576,7 @@ class TestLinearRegression(TestCase):
 
         eps = 1e-8
         max_iter = 3800
-        fista = FISTA(eps=eps, max_iter=max_iter)
+        fista = proximal.FISTA(eps=eps, max_iter=max_iter)
         function = CombinedFunction()
         function.add_function(LinearRegression(X, y, mean=False))
         function.add_prox(L1(l=l, penalty_start=1))
@@ -588,7 +588,7 @@ class TestLinearRegression(TestCase):
         mu = consts.TOLERANCE
         reg_est = estimators.LinearRegressionL1L2TV(
                                       l, k, g, A, mu=mu,
-                                      algorithm=FISTA(),
+                                      algorithm=proximal.FISTA(),
                                       algorithm_params=dict(eps=eps,
                                                             max_iter=max_iter),
                                       penalty_start=1,
@@ -604,14 +604,14 @@ class TestLinearRegression(TestCase):
 #        rreg_est.fit(X, y)
 
         rreg_est_2 = estimators.LinearRegressionL1L2GL(l, k, g, A=A, mu=mu,
-                                      algorithm=FISTA(),
+                                      algorithm=proximal.FISTA(),
                                       algorithm_params=dict(eps=eps,
                                                             max_iter=max_iter),
                                       penalty_start=1,
                                       mean=False)
         rreg_est_2.fit(X, y)
 
-        lasso = estimators.Lasso(l, algorithm=FISTA(),
+        lasso = estimators.Lasso(l, algorithm=proximal.FISTA(),
                                     algorithm_params=dict(eps=eps,
                                                           max_iter=max_iter),
                                     penalty_start=1,
@@ -707,7 +707,7 @@ class TestLinearRegression(TestCase):
         eps = 1e-8
         max_iter = 6000
 
-        fista = FISTA(eps=eps, max_iter=max_iter)
+        fista = proximal.FISTA(eps=eps, max_iter=max_iter)
         beta_start = start_vector.get_vector(p)
 
         function = CombinedFunction()
@@ -800,7 +800,7 @@ class TestLinearRegression(TestCase):
         eps = 1e-8
         max_iter = 1500
 
-        fista = FISTA(eps=eps, max_iter=max_iter)
+        fista = proximal.FISTA(eps=eps, max_iter=max_iter)
         beta_start = start_vector.get_vector(p)
 
         function = CombinedFunction()
@@ -857,7 +857,7 @@ class TestLinearRegression(TestCase):
         mu = consts.TOLERANCE
         reg_est = estimators.LinearRegressionL1L2TV(
                                       l, k, g, A, mu=mu,
-                                      algorithm=FISTA(),
+                                      algorithm=proximal.FISTA(),
                                       algorithm_params=dict(eps=eps,
                                                             max_iter=max_iter),
                                       penalty_start=1,
@@ -897,7 +897,7 @@ class TestLinearRegression(TestCase):
 #                               "the correct function value.")
 
         rreg_est_2 = estimators.LinearRegressionL1L2GL(l, k, g, A=A, mu=mu,
-                                      algorithm=FISTA(),
+                                      algorithm=proximal.FISTA(),
                                       algorithm_params=dict(eps=eps,
                                                             max_iter=max_iter),
                                       penalty_start=1,
@@ -962,7 +962,7 @@ class TestLinearRegression(TestCase):
                                         A=A, snr=snr)
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
-        fista = FISTA(eps=eps, max_iter=max_iter / len(mus))
+        fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
         beta_start = start_vector.get_vector(p)
 
         beta_nonsmooth = beta_start
@@ -1016,7 +1016,6 @@ class TestLinearRegression(TestCase):
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
         import parsimony.datasets.simulate.l1_l2_tvmu as l1_l2_tvmu
         import parsimony.utils.start_vectors as start_vectors
-        import parsimony.algorithms.primaldual as primaldual
         import parsimony.estimators as estimators
 
         start_vector = start_vectors.RandomStartVector(normalise=True)
@@ -1054,7 +1053,7 @@ class TestLinearRegression(TestCase):
                                         A=A, snr=snr, intercept=True)
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
-        fista = FISTA(eps=eps, max_iter=max_iter / len(mus))
+        fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
         beta_start = start_vector.get_vector(p)
 
         beta_nonsmooth = beta_start
@@ -1105,7 +1104,7 @@ class TestLinearRegression(TestCase):
         mu = mu_min
         reg_est = estimators.LinearRegressionL1L2TV(
                                       l, k, g, A, mu=mu,
-                                      algorithm=primaldual.StaticCONESTA(),
+                                      algorithm=proximal.StaticCONESTA(),
                                       algorithm_params=dict(eps=eps,
                                                             max_iter=max_iter),
                                       penalty_start=1,
@@ -1125,7 +1124,7 @@ class TestLinearRegression(TestCase):
                                "the correct function value.")
 
         rreg_est = estimators.LinearRegressionL1L2TV(l, k, g, A=A, mu=mu,
-                                      algorithm=primaldual.StaticCONESTA(),
+                                      algorithm=proximal.StaticCONESTA(),
                                       algorithm_params=dict(eps=eps,
                                                             max_iter=max_iter),
                                       penalty_start=1,
@@ -1153,7 +1152,6 @@ class TestLinearRegression(TestCase):
         import parsimony.datasets.simulate.l1_l2_glmu as l1_l2_glmu
         import parsimony.utils.start_vectors as start_vectors
         import parsimony.estimators as estimators
-        import parsimony.algorithms.primaldual as primaldual
 
         start_vector = start_vectors.RandomStartVector(normalise=True)
 
@@ -1188,7 +1186,7 @@ class TestLinearRegression(TestCase):
                                         A=A, snr=snr)
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
-        fista = FISTA(eps=eps, max_iter=max_iter / len(mus))
+        fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
         beta_start = start_vector.get_vector(p)
 
         beta_nonsmooth = beta_start
@@ -1236,7 +1234,7 @@ class TestLinearRegression(TestCase):
 
         max_iter = 7000
         est = estimators.LinearRegressionL1L2GL(l, k, g, A=A, mu=mu,
-                                      algorithm=primaldual.StaticCONESTA(),
+                                      algorithm=proximal.StaticCONESTA(),
                                       algorithm_params=dict(eps=eps,
                                                             max_iter=max_iter),
                                       penalty_start=0,
@@ -1264,7 +1262,6 @@ class TestLinearRegression(TestCase):
         import parsimony.datasets.simulate.l1_l2_glmu as l1_l2_glmu
         import parsimony.utils.start_vectors as start_vectors
         import parsimony.estimators as estimators
-        import parsimony.algorithms.primaldual as primaldual
 
         start_vector = start_vectors.RandomStartVector(normalise=True)
 
@@ -1301,7 +1298,7 @@ class TestLinearRegression(TestCase):
                                         A=A, snr=snr, intercept=True)
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
-        fista = FISTA(eps=eps, max_iter=max_iter / len(mus))
+        fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
         beta_start = start_vector.get_vector(p)
 
         beta_nonsmooth = beta_start
@@ -1351,7 +1348,7 @@ class TestLinearRegression(TestCase):
         max_iter = 5000
         rreg_est = estimators.LinearRegressionL1L2GL(l, k, g,
                                       A=A, mu=mu,
-                                      algorithm=primaldual.StaticCONESTA(),
+                                      algorithm=proximal.StaticCONESTA(),
                                       algorithm_params=dict(eps=eps,
                                                             max_iter=max_iter),
                                       penalty_start=1,
@@ -1378,7 +1375,6 @@ class TestLinearRegression(TestCase):
         from parsimony.functions.penalties import L2Squared
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
-        import parsimony.algorithms.primaldual as primaldual
         import parsimony.utils.start_vectors as start_vectors
         import parsimony.estimators as estimators
 
@@ -1410,7 +1406,7 @@ class TestLinearRegression(TestCase):
         eps = 1e-8
         max_iter = 400
 
-        fista = FISTA(eps=eps, max_iter=max_iter)
+        fista = proximal.FISTA(eps=eps, max_iter=max_iter)
         beta_start = start_vector.get_vector(p)
 
         function = CombinedFunction()
@@ -1449,7 +1445,7 @@ class TestLinearRegression(TestCase):
                                "the correct function value.")
 
         lasso = estimators.ElasticNet(l,
-                                      algorithm=primaldual.FISTA(),
+                                      algorithm=proximal.FISTA(),
                                       algorithm_params=dict(eps=eps,
                                                             max_iter=max_iter),
                                       mean=False)
@@ -1508,7 +1504,7 @@ class TestLinearRegression(TestCase):
                                         A=A, snr=snr)
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
-        fista = FISTA(eps=eps, max_iter=max_iter / len(mus))
+        fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
         beta_start = start_vector.get_vector(p)
 
         beta_nonsmooth_penalty = beta_start
@@ -1535,7 +1531,7 @@ class TestLinearRegression(TestCase):
                                "the correct function value.")
 
         max_iter = 2700
-        fista = FISTA(eps=eps, max_iter=max_iter / len(mus))
+        fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
         mu_min = mus[-1]
         X, y, beta_star = l1_l2_tvmu.load(l=l, k=k, g=g, beta=beta, M=M, e=e,
                                           A=A, mu=mu_min, snr=snr)
@@ -1571,7 +1567,6 @@ class TestLinearRegression(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
         import parsimony.datasets.simulate.l1_l2_glmu as l1_l2_glmu
-        import parsimony.algorithms.primaldual as primaldual
         import parsimony.utils.start_vectors as start_vectors
         import parsimony.estimators as estimators
 
@@ -1608,7 +1603,7 @@ class TestLinearRegression(TestCase):
                                         A=A, snr=snr)
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
-        fista = FISTA(eps=eps, max_iter=max_iter / len(mus))
+        fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
         beta_start = start_vector.get_vector(p)
 
         beta_nonsmooth = beta_start
@@ -1658,7 +1653,7 @@ class TestLinearRegression(TestCase):
 
         max_iter = 2600
         est = estimators.LinearRegressionL1L2GL(l, k, g, A=A, mu=mu,
-                                      algorithm=primaldual.StaticCONESTA(),
+                                      algorithm=proximal.StaticCONESTA(),
                                       algorithm_params=dict(eps=eps,
                                                             max_iter=max_iter),
                                       penalty_start=0,
@@ -1723,7 +1718,7 @@ class TestLinearRegression(TestCase):
                                         A=A, snr=snr)
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
-        fista = FISTA(eps=eps, max_iter=max_iter / len(mus))
+        fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
         beta_start = start_vector.get_vector(p)
 
         beta_nonsmooth_penalty = beta_start
@@ -1865,7 +1860,6 @@ class TestLinearRegression(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
         import parsimony.datasets.simulate.l1_l2_glmu as l1_l2_glmu
-        import parsimony.algorithms.primaldual as primaldual
         import parsimony.utils.start_vectors as start_vectors
         import parsimony.estimators as estimators
 
@@ -1902,7 +1896,7 @@ class TestLinearRegression(TestCase):
                                         A=A, snr=snr)
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
-        fista = FISTA(eps=eps, max_iter=max_iter / len(mus))
+        fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
         beta_start = start_vector.get_vector(p)
 
         beta_nonsmooth_penalty = beta_start
@@ -2036,7 +2030,7 @@ class TestLinearRegression(TestCase):
 
         max_iter = 1700
         est = estimators.LinearRegressionL1L2GL(l, k, g, A=A, mu=mu,
-                                      algorithm=primaldual.StaticCONESTA(),
+                                      algorithm=proximal.StaticCONESTA(),
                                       algorithm_params=dict(eps=eps,
                                                             max_iter=max_iter),
                                       penalty_start=0,
@@ -2101,7 +2095,7 @@ class TestLinearRegression(TestCase):
                                         A=A, snr=snr)
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
-        fista = FISTA(eps=eps, max_iter=max_iter / len(mus))
+        fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
         beta_start = start_vector.get_vector(p)
 
         beta_nonsmooth_penalty = beta_start
@@ -2206,7 +2200,6 @@ class TestLinearRegression(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
         import parsimony.datasets.simulate.l1_l2_glmu as l1_l2_glmu
-        import parsimony.algorithms.primaldual as primaldual
         import parsimony.utils.start_vectors as start_vectors
         import parsimony.estimators as estimators
 
@@ -2243,7 +2236,7 @@ class TestLinearRegression(TestCase):
                                         A=A, snr=snr)
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
-        fista = FISTA(eps=eps, max_iter=max_iter / len(mus))
+        fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
         beta_start = start_vector.get_vector(p)
 
         beta_nonsmooth_penalty = beta_start
@@ -2338,7 +2331,7 @@ class TestLinearRegression(TestCase):
 
         max_iter = 1400
         est = estimators.LinearRegressionL1L2GL(l, k, g, A=A, mu=mu,
-                                      algorithm=primaldual.StaticCONESTA(),
+                                      algorithm=proximal.StaticCONESTA(),
                                       algorithm_params=dict(eps=eps,
                                                             max_iter=max_iter),
                                       penalty_start=0,
@@ -2362,7 +2355,6 @@ class TestLinearRegression(TestCase):
         import numpy as np
         import parsimony.estimators as estimators
         import parsimony.algorithms.gradient as gradient
-        import parsimony.algorithms.primaldual as primaldual
         import parsimony.functions.nesterov.tv as tv
         import parsimony.functions.nesterov.gl as gl
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
@@ -2373,272 +2365,272 @@ class TestLinearRegression(TestCase):
         from parsimony.functions.losses import LinearRegression
         from parsimony.functions.penalties import L1, L2Squared
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
-
-        np.random.seed(42)
-
-        shape = (4, 4, 4)
-        A, n_compacts = tv.A_from_shape(shape)
-
-        n, p = 64, np.prod(shape)
-
-        alpha = 0.9
-        Sigma = alpha * np.eye(p, p) \
-              + (1.0 - alpha) * np.random.randn(p, p)
-        mean = np.zeros(p)
-        M = np.random.multivariate_normal(mean, Sigma, n)
-        e = np.random.randn(n, 1)
-        beta = np.random.rand(p, 1)
-        snr = 100.0
-
-        l = 0.0  # L1 coefficient
-        k = 0.1  # Ridge coefficient
-        g = 0.0  # TV coefficient
-        np.random.seed(42)
-        X, y, beta_star = l1_l2_tv.load(l=l, k=k, g=g, beta=beta, M=M, e=e,
-                                        A=A, snr=snr)
-
-        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
-                                          algorithm=FISTA(),
-                                          algorithm_params=dict(max_iter=1000),
-                                          mean=False)
-        lr.fit(X, y)
-        score = lr.score(X, y)
-#        print "score:", score
-        assert_almost_equal(score, 1.299125,
-                            msg="The found regression vector does not give " \
-                                "a low enough score value.",
-                            places=5)
-
-        n, p = 50, np.prod(shape)
-
-        alpha = 0.9
-        Sigma = alpha * np.eye(p, p) \
-              + (1.0 - alpha) * np.random.randn(p, p)
-        mean = np.zeros(p)
-        M = np.random.multivariate_normal(mean, Sigma, n)
-        e = np.random.randn(n, 1)
-        beta = np.random.rand(p, 1)
-        snr = 100.0
-
-        l = 0.0  # L1 coefficient
-        k = 0.1  # Ridge coefficient
-        g = 0.0  # TV coefficient
-        np.random.seed(42)
-        X, y, beta_star = l1_l2_tv.load(l=l, k=k, g=g, beta=beta, M=M, e=e,
-                                        A=A, snr=snr)
-
-        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
-                                          algorithm=FISTA(),
-                                          algorithm_params=dict(max_iter=1000),
-                                          mean=False)
-        lr.fit(X, y)
-        score = lr.score(X, y)
-#        print "score:", score
-        assert_almost_equal(score, 0.969570,
-                            msg="The found regression vector does not give " \
-                                "a low enough score value.",
-                            places=5)
-
-        n, p = 100, np.prod(shape)
-
-        alpha = 0.9
-        Sigma = alpha * np.eye(p, p) \
-              + (1.0 - alpha) * np.random.randn(p, p)
-        mean = np.zeros(p)
-        M = np.random.multivariate_normal(mean, Sigma, n)
-        e = np.random.randn(n, 1)
-        beta = np.random.rand(p, 1)
-        snr = 100.0
-
-        l = 0.0  # L1 coefficient
-        k = 0.1  # Ridge coefficient
-        g = 0.0  # TV coefficient
-        np.random.seed(42)
-        X, y, beta_star = l1_l2_tv.load(l=l, k=k, g=g, beta=beta, M=M, e=e,
-                                        A=A, snr=snr)
-
-        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
-                                          algorithm=FISTA(),
-                                          algorithm_params=dict(max_iter=1000),
-                                          mean=False)
-        lr.fit(X, y)
-        score = lr.score(X, y)
-#        print "score:", score
-        assert_almost_equal(score, 1.154561,
-                            msg="The found regression vector does not give " \
-                                "a low enough score value.",
-                            places=5)
-
-        n, p = 100, np.prod(shape)
-
-        alpha = 0.9
-        Sigma = alpha * np.eye(p, p) \
-              + (1.0 - alpha) * np.random.randn(p, p)
-        mean = np.zeros(p)
-        M = np.random.multivariate_normal(mean, Sigma, n)
-        e = np.random.randn(n, 1)
-        beta = np.random.rand(p, 1)
-        beta = np.sort(beta, axis=0)
-        beta[:10, :] = 0.0
-        snr = 100.0
-
-        l = 0.618  # L1 coefficient
-        k = 1.0 - l  # Ridge coefficient
-        g = 2.718  # TV coefficient
-        np.random.seed(42)
-        X, y, beta_star = l1_l2_tv.load(l=l, k=k, g=g, beta=beta, M=M, e=e,
-                                        A=A, snr=snr)
-
-        l = 0.0
-        k = 0.0
-        g = 0.0
-        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
-                                          algorithm=FISTA(),
-                                          algorithm_params=dict(max_iter=1000))
-        lr.fit(X, y)
-        score = lr.score(X, y)
-#        print "score:", score
-        assert_almost_equal(score, 1.019992,
-                            msg="The found regression vector does not give " \
-                                "a low enough score value.",
-                            places=5)
-
-        np.random.seed(42)
-        lr = estimators.LinearRegression(algorithm=gradient.GradientDescent(),
-                                      algorithm_params=dict(max_iter=10000))
-        lr.fit(X, y)
-        score = lr.score(X, y)
-#        print "score:", score
-        assert_almost_equal(score, 2.963832,
-                            msg="The found regression vector does not give " \
-                                "the correct score value.",
-                            places=5)
-
-        l = 0.618
-        k = 0.0
-        g = 0.0
-        np.random.seed(42)
-        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
-                                          algorithm=FISTA(),
-                                          algorithm_params=dict(max_iter=1000),
-                                          mean=False)
-        lr.fit(X, y)
-        score = lr.score(X, y)
-#        print "score:", score
-        assert_almost_equal(score, 1.070911,
-                            msg="The found regression vector does not give " \
-                                "a low enough score value.",
-                            places=5)
-
-        l = 0.0
-        k = 1.0 - 0.618
-        g = 0.0
-        np.random.seed(42)
-        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
-                                          algorithm=FISTA(),
-                                          algorithm_params=dict(max_iter=1000),
-                                          mean=False)
-        lr.fit(X, y)
-        score = lr.score(X, y)
-#        print "score:", score
-        assert_almost_equal(score, 1.022994,
-                            msg="The found regression vector does not give " \
-                                "a low enough score value.",
-                            places=5)
-
-        l = 0.0
-        k = 0.0
-        g = 2.718
-        np.random.seed(42)
-        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
-                                          algorithm=FISTA(),
-                                          algorithm_params=dict(max_iter=1000),
-                                          mean=False)
-        lr.fit(X, y)
-        score = lr.score(X, y)
-#        print "score:", score
-        assert_almost_equal(score, 13.029070,
-                            msg="The found regression vector does not give " \
-                                "a low enough score value.",
-                            places=5)
-
-        l = 0.618
-        k = 1.0 - l
-        g = 0.0
-        np.random.seed(42)
-        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
-                                          algorithm=FISTA(),
-                                          algorithm_params=dict(max_iter=1000),
-                                          mean=False)
-        lr.fit(X, y)
-        score = lr.score(X, y)
-#        print "score:", score
-        assert_almost_equal(score, 1.078159,
-                            msg="The found regression vector does not give " \
-                                "a low enough score value.",
-                            places=5)
-
-        l = 0.618
-        k = 0.0
-        g = 2.718
-        np.random.seed(42)
-        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
-                                          algorithm=FISTA(),
-                                          algorithm_params=dict(max_iter=1000),
-                                          mean=False)
-        lr.fit(X, y)
-        score = lr.score(X, y)
-#        print "score:", score
-        assert_almost_equal(score, 13.032333,
-                            msg="The found regression vector does not give " \
-                                "a low enough score value.",
-                            places=5)
-
-        l = 0.0
-        k = 1.0 - 0.618
-        g = 2.718
-        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
-                                          algorithm=FISTA(),
-                                          algorithm_params=dict(max_iter=1000),
-                                          mean=False)
-        lr.fit(X, y)
-        score = lr.score(X, y)
-#        print "score:", score
-        assert_almost_equal(score, 13.500662,
-                            msg="The found regression vector does not give " \
-                                "a low enough score value.",
-                            places=5)
-
-        l = 0.618
-        k = 1.0 - l
-        g = 2.718
-        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
-                                          algorithm=ISTA(),
-                                          algorithm_params=dict(max_iter=1000),
-                                          mean=False)
-        lr.fit(X, y)
-        score = lr.score(X, y)
-#        print "score:", score
-        assert_almost_equal(score, 1114.724489,
-                            msg="The found regression vector does not give " \
-                                "the correct score value.",
-                            places=5)
-
-        l = 0.618
-        k = 1.0 - l
-        g = 2.718
-        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
-                                       algorithm=FISTA(),
-                                       algorithm_params=dict(max_iter=1000),
-                                       mean=False)
-        lr.fit(X, y)
-        score = lr.score(X, y)
-#        print "score:", score
-        assert_almost_equal(score, 14.142333,
-                            msg="The found regression vector does not give " \
-                                "the correct score value.",
-                            places=5)
+#        start_vector = start_vectors.RandomStartVector(normalise=True)
+#
+#        np.random.seed(42)
+#
+#        shape = (4, 4, 4)
+#        A, n_compacts = tv.A_from_shape(shape)
+#
+#        n, p = 64, np.prod(shape)
+#
+#        alpha = 0.9
+#        Sigma = alpha * np.eye(p, p) \
+#              + (1.0 - alpha) * np.random.randn(p, p)
+#        mean = np.zeros(p)
+#        M = np.random.multivariate_normal(mean, Sigma, n)
+#        e = np.random.randn(n, 1)
+#        beta = np.random.rand(p, 1)
+#        snr = 100.0
+#
+#        l = 0.0  # L1 coefficient
+#        k = 0.1  # Ridge coefficient
+#        g = 0.0  # TV coefficient
+#        np.random.seed(42)
+#        X, y, beta_star = l1_l2_tv.load(l=l, k=k, g=g, beta=beta, M=M, e=e,
+#                                        A=A, snr=snr)
+#
+#        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
+#                                          algorithm=proximal.FISTA(),
+#                                          algorithm_params=dict(max_iter=1000),
+#                                          mean=False)
+#        lr.fit(X, y)
+#        score = lr.score(X, y)
+##        print "score:", score
+#        assert_almost_equal(score, 1.299125,
+#                            msg="The found regression vector does not give " \
+#                                "a low enough score value.",
+#                            places=5)
+#
+#        n, p = 50, np.prod(shape)
+#
+#        alpha = 0.9
+#        Sigma = alpha * np.eye(p, p) \
+#              + (1.0 - alpha) * np.random.randn(p, p)
+#        mean = np.zeros(p)
+#        M = np.random.multivariate_normal(mean, Sigma, n)
+#        e = np.random.randn(n, 1)
+#        beta = np.random.rand(p, 1)
+#        snr = 100.0
+#
+#        l = 0.0  # L1 coefficient
+#        k = 0.1  # Ridge coefficient
+#        g = 0.0  # TV coefficient
+#        np.random.seed(42)
+#        X, y, beta_star = l1_l2_tv.load(l=l, k=k, g=g, beta=beta, M=M, e=e,
+#                                        A=A, snr=snr)
+#
+#        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
+#                                          algorithm=proximal.FISTA(),
+#                                          algorithm_params=dict(max_iter=1000),
+#                                          mean=False)
+#        lr.fit(X, y)
+#        score = lr.score(X, y)
+##        print "score:", score
+#        assert_almost_equal(score, 0.969570,
+#                            msg="The found regression vector does not give " \
+#                                "a low enough score value.",
+#                            places=5)
+#
+#        n, p = 100, np.prod(shape)
+#
+#        alpha = 0.9
+#        Sigma = alpha * np.eye(p, p) \
+#              + (1.0 - alpha) * np.random.randn(p, p)
+#        mean = np.zeros(p)
+#        M = np.random.multivariate_normal(mean, Sigma, n)
+#        e = np.random.randn(n, 1)
+#        beta = np.random.rand(p, 1)
+#        snr = 100.0
+#
+#        l = 0.0  # L1 coefficient
+#        k = 0.1  # Ridge coefficient
+#        g = 0.0  # TV coefficient
+#        np.random.seed(42)
+#        X, y, beta_star = l1_l2_tv.load(l=l, k=k, g=g, beta=beta, M=M, e=e,
+#                                        A=A, snr=snr)
+#
+#        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
+#                                          algorithm=proximal.FISTA(),
+#                                          algorithm_params=dict(max_iter=1000),
+#                                          mean=False)
+#        lr.fit(X, y)
+#        score = lr.score(X, y)
+##        print "score:", score
+#        assert_almost_equal(score, 1.154561,
+#                            msg="The found regression vector does not give " \
+#                                "a low enough score value.",
+#                            places=5)
+#
+#        n, p = 100, np.prod(shape)
+#
+#        alpha = 0.9
+#        Sigma = alpha * np.eye(p, p) \
+#              + (1.0 - alpha) * np.random.randn(p, p)
+#        mean = np.zeros(p)
+#        M = np.random.multivariate_normal(mean, Sigma, n)
+#        e = np.random.randn(n, 1)
+#        beta = np.random.rand(p, 1)
+#        beta = np.sort(beta, axis=0)
+#        beta[:10, :] = 0.0
+#        snr = 100.0
+#
+#        l = 0.618  # L1 coefficient
+#        k = 1.0 - l  # Ridge coefficient
+#        g = 2.718  # TV coefficient
+#        np.random.seed(42)
+#        X, y, beta_star = l1_l2_tv.load(l=l, k=k, g=g, beta=beta, M=M, e=e,
+#                                        A=A, snr=snr)
+#
+#        l = 0.0
+#        k = 0.0
+#        g = 0.0
+#        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
+#                                          algorithm=proximal.FISTA(),
+#                                          algorithm_params=dict(max_iter=1000))
+#        lr.fit(X, y)
+#        score = lr.score(X, y)
+##        print "score:", score
+#        assert_almost_equal(score, 1.019992,
+#                            msg="The found regression vector does not give " \
+#                                "a low enough score value.",
+#                            places=5)
+#
+#        np.random.seed(42)
+#        lr = estimators.LinearRegression(algorithm=gradient.GradientDescent(),
+#                                      algorithm_params=dict(max_iter=10000))
+#        lr.fit(X, y)
+#        score = lr.score(X, y)
+##        print "score:", score
+#        assert_almost_equal(score, 2.963832,
+#                            msg="The found regression vector does not give " \
+#                                "the correct score value.",
+#                            places=5)
+#
+#        l = 0.618
+#        k = 0.0
+#        g = 0.0
+#        np.random.seed(42)
+#        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
+#                                          algorithm=proximal.FISTA(),
+#                                          algorithm_params=dict(max_iter=1000),
+#                                          mean=False)
+#        lr.fit(X, y)
+#        score = lr.score(X, y)
+##        print "score:", score
+#        assert_almost_equal(score, 1.070911,
+#                            msg="The found regression vector does not give " \
+#                                "a low enough score value.",
+#                            places=5)
+#
+#        l = 0.0
+#        k = 1.0 - 0.618
+#        g = 0.0
+#        np.random.seed(42)
+#        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
+#                                          algorithm=proximal.FISTA(),
+#                                          algorithm_params=dict(max_iter=1000),
+#                                          mean=False)
+#        lr.fit(X, y)
+#        score = lr.score(X, y)
+##        print "score:", score
+#        assert_almost_equal(score, 1.022994,
+#                            msg="The found regression vector does not give " \
+#                                "a low enough score value.",
+#                            places=5)
+#
+#        l = 0.0
+#        k = 0.0
+#        g = 2.718
+#        np.random.seed(42)
+#        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
+#                                          algorithm=proximal.FISTA(),
+#                                          algorithm_params=dict(max_iter=1000),
+#                                          mean=False)
+#        lr.fit(X, y)
+#        score = lr.score(X, y)
+##        print "score:", score
+#        assert_almost_equal(score, 13.029070,
+#                            msg="The found regression vector does not give " \
+#                                "a low enough score value.",
+#                            places=5)
+#
+#        l = 0.618
+#        k = 1.0 - l
+#        g = 0.0
+#        np.random.seed(42)
+#        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
+#                                          algorithm=proximal.FISTA(),
+#                                          algorithm_params=dict(max_iter=1000),
+#                                          mean=False)
+#        lr.fit(X, y)
+#        score = lr.score(X, y)
+##        print "score:", score
+#        assert_almost_equal(score, 1.078159,
+#                            msg="The found regression vector does not give " \
+#                                "a low enough score value.",
+#                            places=5)
+#
+#        l = 0.618
+#        k = 0.0
+#        g = 2.718
+#        np.random.seed(42)
+#        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
+#                                          algorithm=proximal.FISTA(),
+#                                          algorithm_params=dict(max_iter=1000),
+#                                          mean=False)
+#        lr.fit(X, y)
+#        score = lr.score(X, y)
+##        print "score:", score
+#        assert_almost_equal(score, 13.032333,
+#                            msg="The found regression vector does not give " \
+#                                "a low enough score value.",
+#                            places=5)
+#
+#        l = 0.0
+#        k = 1.0 - 0.618
+#        g = 2.718
+#        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
+#                                          algorithm=proximal.FISTA(),
+#                                          algorithm_params=dict(max_iter=1000),
+#                                          mean=False)
+#        lr.fit(X, y)
+#        score = lr.score(X, y)
+##        print "score:", score
+#        assert_almost_equal(score, 13.500662,
+#                            msg="The found regression vector does not give " \
+#                                "a low enough score value.",
+#                            places=5)
+#
+#        l = 0.618
+#        k = 1.0 - l
+#        g = 2.718
+#        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
+#                                          algorithm=proximal.ISTA(),
+#                                          algorithm_params=dict(max_iter=1000),
+#                                          mean=False)
+#        lr.fit(X, y)
+#        score = lr.score(X, y)
+##        print "score:", score
+#        assert_almost_equal(score, 1114.724489,
+#                            msg="The found regression vector does not give " \
+#                                "the correct score value.",
+#                            places=5)
+#
+#        l = 0.618
+#        k = 1.0 - l
+#        g = 2.718
+#        lr = estimators.LinearRegressionL1L2TV(l, k, g, A,
+#                                       algorithm=proximal.FISTA(),
+#                                       algorithm_params=dict(max_iter=1000),
+#                                       mean=False)
+#        lr.fit(X, y)
+#        score = lr.score(X, y)
+##        print "score:", score
+#        assert_almost_equal(score, 14.142333,
+#                            msg="The found regression vector does not give " \
+#                                "the correct score value.",
+#                            places=5)
 
         # Test group lasso
         # ----------------
@@ -2674,16 +2666,17 @@ class TestLinearRegression(TestCase):
                                         A=A, snr=snr)
 
         est = estimators.LinearRegressionL1L2GL(l, k, g, A=A, mu=None,
-                                      algorithm=primaldual.StaticCONESTA(),
+                                      algorithm=proximal.StaticCONESTA(),
                                       algorithm_params=dict(eps=eps,
-                                                            max_iter=6800),
+                                                            max_iter=10000,
+                                                            tau=0.9),
                                       penalty_start=0,
                                       mean=False)
         est.fit(X, y)
 
         re = np.linalg.norm(est.beta - beta_star) \
                 / np.linalg.norm(beta_star)
-#        print "re:", re
+        print "re:", re
         assert_less(re, 5e-3, "The found regression vector is not correct.")
 
         function = CombinedFunction()
@@ -2694,7 +2687,7 @@ class TestLinearRegression(TestCase):
         f_star = function.f(beta_star)
         f_rr = function.f(est.beta)
         err = abs(f_rr - f_star) / f_star
-#        print "err:", err
+        print "err:", err
         assert_less(err, 5e-5, "The found regression vector does not give " \
                                "the correct function value.")
 
@@ -2702,11 +2695,13 @@ class TestLinearRegression(TestCase):
         k = 0.001  # May not be zero.
         g = 1.618
 
+#        np.random.seed(42)
+
         X, y, beta_star = l1_l2_gl.load(l=l, k=k, g=g, beta=beta, M=M, e=e,
                                         A=A, snr=snr)
 
         est = estimators.LinearRegressionL1L2GL(l, k, g, A=A, mu=None,
-                                      algorithm=primaldual.StaticCONESTA(),
+                                      algorithm=proximal.StaticCONESTA(),
                                       algorithm_params=dict(eps=eps,
                                                             max_iter=5000),
                                       penalty_start=0,
@@ -2715,7 +2710,7 @@ class TestLinearRegression(TestCase):
 
         re = np.linalg.norm(est.beta - beta_star) \
                 / np.linalg.norm(beta_star)
-#        print "re:", re
+        print "re:", re
         assert_less(re, 5e-2, "The found regression vector is not correct.")
 
         function = CombinedFunction()
@@ -2727,7 +2722,7 @@ class TestLinearRegression(TestCase):
         f_star = function.f(beta_star)
         f_rr = function.f(est.beta)
         err = abs(f_rr - f_star) / f_star
-#        print "err:", err
+        print "err:", err
         assert_less(err, 5e-5, "The found regression vector does not give " \
                                "the correct function value.")
 
@@ -2739,7 +2734,7 @@ class TestLinearRegression(TestCase):
                                         A=A, snr=snr)
 
         est = estimators.LinearRegressionL1L2GL(l, k, g, A=A, mu=None,
-                                      algorithm=primaldual.StaticCONESTA(),
+                                      algorithm=proximal.StaticCONESTA(),
                                       algorithm_params=dict(eps=eps,
                                                             max_iter=900),
                                       penalty_start=0,
@@ -2748,7 +2743,7 @@ class TestLinearRegression(TestCase):
 
         re = np.linalg.norm(est.beta - beta_star) \
                 / np.linalg.norm(beta_star)
-#        print "re:", re
+        print "re:", re
         assert_less(re, 5e-2, "The found regression vector is not correct.")
 
         function = CombinedFunction()
@@ -2760,7 +2755,7 @@ class TestLinearRegression(TestCase):
         f_star = function.f(beta_star)
         f_rr = function.f(est.beta)
         err = abs(f_rr - f_star) / f_star
-#        print "err:", err
+        print "err:", err
         assert_less(err, 5e-2, "The found regression vector does not give " \
                                "the correct function value.")
 
@@ -2772,7 +2767,7 @@ class TestLinearRegression(TestCase):
                                         A=A, snr=snr)
 
         est = estimators.LinearRegressionL1L2GL(l, k, g, A=A, mu=None,
-                                      algorithm=primaldual.StaticCONESTA(),
+                                      algorithm=proximal.StaticCONESTA(),
                                       algorithm_params=dict(eps=eps,
                                                             max_iter=1500),
                                       penalty_start=0,
@@ -2781,7 +2776,7 @@ class TestLinearRegression(TestCase):
 
         re = np.linalg.norm(est.beta - beta_star) \
                 / np.linalg.norm(beta_star)
-#        print "re:", re
+        print "re:", re
         assert_less(re, 5e-2, "The found regression vector is not correct.")
 
         function = CombinedFunction()
@@ -2794,14 +2789,12 @@ class TestLinearRegression(TestCase):
         f_star = function.f(beta_star)
         f_rr = function.f(est.beta)
         err = abs(f_rr - f_star) / f_star
-#        print "err:", err
+        print "err:", err
         assert_less(err, 5e-4, "The found regression vector does not give " \
                                "the correct function value.")
 
     def test_large(self):
 
-        import parsimony.algorithms.primaldual as primaldual
-        import parsimony.algorithms.proximal as proximal
         import parsimony.algorithms.gradient as gradient
         import parsimony.estimators as estimators
         import parsimony.functions.nesterov.tv as tv
@@ -2837,7 +2830,7 @@ class TestLinearRegression(TestCase):
 
         mu = None
         logreg_static = estimators.LinearRegressionL1L2TV(l, k, g, A, mu=mu,
-                                      algorithm=primaldual.StaticCONESTA(),
+                                      algorithm=proximal.StaticCONESTA(),
                                       algorithm_params=dict(eps=eps,
                                                             max_iter=max_iter),
                                       mean=False)
@@ -2849,7 +2842,7 @@ class TestLinearRegression(TestCase):
 
         mu = None
         logreg_dynamic = estimators.LinearRegressionL1L2TV(l, k, g, A, mu=mu,
-                                      algorithm=primaldual.DynamicCONESTA(),
+                                      algorithm=proximal.CONESTA(),
                                       algorithm_params=dict(eps=eps,
                                                             max_iter=max_iter),
                                       mean=False)

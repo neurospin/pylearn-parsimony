@@ -16,7 +16,6 @@ import cProfile as prof
 from parsimony.functions import CombinedFunction
 import parsimony.functions.combinedfunctions as combinedfunctions
 import parsimony.algorithms.proximal as proximal
-import parsimony.algorithms.primaldual as primaldual
 import parsimony.algorithms.coordinate as coordinate
 from parsimony.algorithms.utils import Info
 import parsimony.functions as functions
@@ -33,11 +32,11 @@ import simulate
 
 np.random.seed(42)
 
-px = 1000
+px = 300
 py = 1
 pz = 1
 shape = (pz, py, px)
-n, p = 500, np.prod(shape)
+n, p = 100, np.prod(shape)
 
 l = 0.618
 k = 1.01
@@ -63,70 +62,124 @@ mu = 5e-8
 #A, _ = tv.A_from_shape(shape)
 #X, y, beta_star = l1_l2_tvmu.load(l, k, g, beta, M, e, A, mu, snr=snr)
 
-A = simulate.functions.TotalVariation.A_from_shape(shape)
-funcs = [simulate.functions.L1(l),
-         simulate.functions.L2Squared(k),
-         simulate.functions.SmoothedTotalVariation(g, A, mu=mu)]
-#funcs = [simulate.functions.L1(l)]
-simulator = simulate.LinearRegressionData(funcs, M, e, snr=snr,
-                                          intercept=False)
-X, y, beta_star = simulator.load(beta)
-
-eps = 1e-8
-max_iter = 10000
-penalty_start = 0
-
-beta_start = start_vector.get_vector(p)
+#A = simulate.functions.TotalVariation.A_from_shape(shape)
+#funcs = [simulate.functions.L1(l),
+#         simulate.functions.L2Squared(k),
+#         simulate.functions.SmoothedTotalVariation(g, A, mu=mu)]
+##funcs = [simulate.functions.L1(l)]
+#simulator = simulate.LinearRegressionData(funcs, M, e, snr=snr,
+#                                          intercept=False)
+#X, y, beta_star = simulator.load(beta)
+#
+#eps = 1e-8
+#max_iter = 20000
+#penalty_start = 0
+#
+#beta_start = start_vector.get_vector(p)
 
 #from parsimony.functions.combinedfunctions \
 #    import PrincipalComponentAnalysisL1TV
 #
 #pca = PrincipalComponentAnalysisL1TV(X, l, g, A=A, mu=0.01, penalty_start=0)
 
+import parsimony.functions.nesterov.gl as gl
+import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
 
+n, p = 60, 90
+groups = [range(0, 2 * p / 3), range(p / 3, p)]
+weights = [1.5, 0.5]
 
+A = gl.A_from_groups(p, groups=groups, weights=weights)
 
+alpha = 0.9
+Sigma = alpha * np.eye(p, p) \
+      + (1.0 - alpha) * np.random.randn(p, p)
+mean = np.zeros(p)
+M = np.random.multivariate_normal(mean, Sigma, n)
+e = np.random.randn(n, 1)
 
-print "==============="
-print "=== CONESTA ==="
-print "==============="
+beta = start_vector.get_vector(p)
+beta = np.sort(beta, axis=0)
+beta[:10, :] = 0.0
 
-#alg = proximal.FISTA(eps=eps, max_iter=max_iter)
-alg = primaldual.CONESTA(eps=eps, max_iter=max_iter, mu_min=mu, tau=0.5,
-                         info=[Info.continuations])
-#alg = primaldual.StaticCONESTA(eps=eps, max_iter=max_iter, mu_min=mu, tau=0.5,
-#                               info=[Info.continuations])
+snr = 20.0
+eps = 1e-8
 
-#function = CombinedFunction()
-#function.add_function(functions.losses.LinearRegression(X, y,
-#                                                       mean=False))
-#function.add_penalty(penalties.L2Squared(l=k))
-#A = l1tv.A_from_shape(shape, p)
-#function.add_prox(l1tv.L1TV(l, g, A=A, mu=mu, penalty_start=0))
-##function.add_prox(tv.TotalVariation(l=g, A=A, mu=mu, penalty_start=0))
+l = 0.0
+k = 0.001  # Cannot be zero.
+g = 1.618
 
-func = functions.LinearRegressionL1L2TV(X, y, l, k, g, A=A,
-                                        penalty_start=penalty_start,
-                                        mean=False)
+X, y, beta_star = l1_l2_gl.load(l=l, k=k, g=g, beta=beta, M=M, e=e,
+                                A=A, snr=snr)
 
-t = time.time()
-beta = alg.run(func, beta_start)
-elapsed_time = time.time() - t
-print "Time:", elapsed_time
+est = estimators.LinearRegressionL1L2GL(l, k, g, A=A, mu=None,
+                              algorithm=proximal.StaticCONESTA(),
+                              algorithm_params=dict(eps=eps,
+                                                    max_iter=10000,
+                                                    tau=0.5,
+                                                    info=[Info.continuations]),
+                              penalty_start=0,
+                              mean=False)
+est.fit(X, y)
+beta = est.beta
+
+func = functions.LinearRegressionL1L2GL(X, y, l, k, g, A=A,
+                                        penalty_start=0, mean=False)
+alg = est.algorithm
 
 berr = np.linalg.norm(beta - beta_star)
-print "berr:", berr
-#assert berr < 5e-2
+print "||betak - beta*||²_2:", berr
 
 f_parsimony = func.f(beta)
 f_star = func.f(beta_star)
 ferr = abs(f_parsimony - f_star)
-print "ferr:", ferr
-#assert ferr < 5e-4
+print "f(betak) - f(beta*) :", ferr
+print "gap(betak)          :", func.gap(beta)
+assert(ferr < func.gap(beta))
+print "gap(beta*)          :", abs(func.gap(beta_star))
+print "# continuations     :", alg.info_get(Info.continuations)
 
-print "continuations:", alg.info_get(Info.continuations)
+print "eps_max:", func.eps_max(1.0)
+print "lambda:", g
 
 
+#print "==============="
+#print "=== CONESTA ==="
+#print "==============="
+#
+##alg = proximal.FISTA(eps=eps, max_iter=max_iter)
+##alg = proximal.CONESTA(eps=eps, max_iter=max_iter, mu_min=mu, tau=0.5,
+##                         info=[Info.continuations])
+#alg = proximal.StaticCONESTA(eps=eps, max_iter=max_iter, mu_min=mu, tau=0.5,
+#                             info=[Info.continuations])
+#
+##function = CombinedFunction()
+##function.add_function(functions.losses.LinearRegression(X, y,
+##                                                       mean=False))
+##function.add_penalty(penalties.L2Squared(l=k))
+##A = l1tv.A_from_shape(shape, p)
+##function.add_prox(l1tv.L1TV(l, g, A=A, mu=mu, penalty_start=0))
+###function.add_prox(tv.TotalVariation(l=g, A=A, mu=mu, penalty_start=0))
+#
+#func = functions.LinearRegressionL1L2TV(X, y, l, k, g, A=A,
+#                                        penalty_start=penalty_start,
+#                                        mean=False)
+#
+#t = time.time()
+#beta = alg.run(func, beta_start)
+#elapsed_time = time.time() - t
+#print "Time:", elapsed_time
+#
+#berr = np.linalg.norm(beta - beta_star)
+#print "berr:", berr
+#
+#f_parsimony = func.f(beta)
+#f_star = func.f(beta_star)
+#ferr = abs(f_parsimony - f_star)
+#print "ferr:", ferr
+#print "gap:", func.gap(beta)
+#assert(ferr < func.gap(beta))
+#print "continuations:", alg.info_get(Info.continuations)
 
 
 #print "============"
