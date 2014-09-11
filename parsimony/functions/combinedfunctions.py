@@ -529,26 +529,24 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
         else:
             beta_ = beta
 
-#        alpha = self.tv.alpha(beta)
-        A = self.A()
-        alpha = [0] * len(A)
-        anorm = 0.0
-        for j in xrange(len(alpha)):
-            alpha[j] = A[j].dot(beta_)
-            anorm += alpha[j] ** 2.0
-        anorm **= 0.5
-        i = anorm >= consts.TOLERANCE
-        anorm_i = anorm[i]
-        for j in xrange(len(alpha)):
-            alpha[j][i] = np.divide(alpha[j][i], anorm_i)
-        i = anorm < consts.TOLERANCE
-        for j in xrange(len(alpha)):
-            alpha[j][i] = 0.0
+        alpha = self.tv.alpha(beta_)
 
-#        print "l.b'Aa :", self.tv.l * np.dot(beta.T, self.Aa(alpha))[0, 0]
-#        print "l.tv(b):", self.tv.f(beta)
-#        g = self.rr.f(beta) + self.l1.f(beta) + self.tv.f(beta)
-        g = self.f(beta)
+#        A = self.A()
+#        alpha = [0] * len(A)
+#        anorm = 0.0
+#        for j in xrange(len(alpha)):
+#            alpha[j] = A[j].dot(beta_)
+#            anorm += alpha[j] ** 2.0
+#        anorm **= 0.5
+#        i = anorm >= consts.TOLERANCE
+#        anorm_i = anorm[i]
+#        for j in xrange(len(alpha)):
+#            alpha[j][i] = np.divide(alpha[j][i], anorm_i)
+#        i = anorm < consts.TOLERANCE
+#        for j in xrange(len(alpha)):
+#            alpha[j][i] = 0.0
+
+        g = self.fmu(beta)
 
         n = float(self.X.shape[0])
 
@@ -942,21 +940,23 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
         else:
             beta_ = beta
 
-        A = self.A()
-        alpha = [0] * len(A)
-        for j in xrange(len(alpha)):
-            astar = A[j].dot(beta_)
-            normas = np.sqrt(np.sum(astar ** 2.0))
-            if normas > consts.TOLERANCE:
-                astar /= normas
-            else:
-                astar *= 0.0
-            alpha[j] = astar
+#        A = self.A()
+#        alpha = [0] * len(A)
+#        for j in xrange(len(alpha)):
+#            astar = A[j].dot(beta_)
+#
+#            normas = np.sqrt(np.sum(astar ** 2.0))
+#            if normas > consts.TOLERANCE:
+#                astar /= normas
+#            else:
+#                astar *= 0.0
+#
+#            alpha[j] = astar
+#
+#        g = self.f(beta)
 
-#        print "l.b'Aa :", self.tv.l * np.dot(beta.T, self.Aa(alpha))[0, 0]
-#        print "l.tv(b):", self.tv.f(beta)
-#        g = self.rr.f(beta) + self.l1.f(beta) + self.tv.f(beta)
-        g = self.f(beta)
+        alpha = self.gl.alpha(beta_)
+        g = self.fmu(beta)
 
         n = float(self.X.shape[0])
 

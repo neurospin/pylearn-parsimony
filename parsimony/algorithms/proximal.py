@@ -590,7 +590,8 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
                      Info.mu]
 
     def __init__(self, mu_min=consts.TOLERANCE, tau=0.5,
-                 info=[], eps=consts.TOLERANCE, max_iter=10000, min_iter=1):
+                 info=[], eps=consts.TOLERANCE, max_iter=10000, min_iter=1,
+                 beta_star=None):
 
         super(StaticCONESTA, self).__init__(info=info,
                                             max_iter=max_iter,
@@ -600,6 +601,7 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
         self.tau = max(consts.TOLERANCE,
                        min(float(tau), 1.0 - consts.TOLERANCE))
         self.eps = max(consts.TOLERANCE, float(eps))
+        self.beta_star = beta_star
 
     @bases.force_reset
     @bases.check_compatibility
@@ -643,15 +645,28 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
 
+        beta0 = beta
+
         i = 0  # Iteration counter.
         while True:
             stop = False
 
+#            allowed_iter = self.max_iter - self.num_iter
+#            if i > 0:
+#                L = function.L()
+##                bs_bk_2_ = maths.norm(beta0 - self.beta_star) ** 2.0
+#                bs_bk_2 = maths.norm(beta0 - beta) ** 2.0
+##                print "bs_bk_2:", bs_bk_2, ", bs_bk_2_:", bs_bk_2_
+#                max_iter = np.sqrt(L * (2.0 * bs_bk_2) / eps)
+#                max_iter = max(1, int(round(max_iter + 0.5)))
+##                print "max_iter:", max_iter, ", allowed_iter:", allowed_iter
+#                allowed_iter = min(allowed_iter, max_iter)
+#            else:
+#                max_iter = 1
+
             # Set current parameters to algorithm.
             algorithm.set_params(eps=eps,
                                  max_iter=self.max_iter - self.num_iter)
-            if Gamma < 4500:
-                pass
             beta = algorithm.run(function, beta)
 
             # Get info from algorithm.
@@ -692,7 +707,12 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
             if self.info_requested(Info.fvalue):
                 f = f + fval
 
-            print Gamma, eps, mu[-1], self.num_iter
+            if self.beta_star is not None:
+                print function.f(beta) - function.f(self.beta_star), \
+                        Gamma, eps, mu[-1], self.num_iter#, max_iter, allowed_iter
+            else:
+                print function.f(beta0) - function.f(beta), \
+                        Gamma, eps, mu[-1], self.num_iter#, max_iter, allowed_iter
 
             if stop or (Gamma < consts.TOLERANCE \
                             and mu[-1] < consts.TOLERANCE):
@@ -704,14 +724,14 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
             # Compute and update mu.
 #            mu_new = max(self.mu_min, self.tau * mu[-1])
             mu_new = max(self.mu_min, 0.5 * eps / gM)
-            if self.info_requested(Info.mu):
-                mu = mu + [mu_new] * len(fval)
-            else:
-                mu.append(mu_new)
             function.set_mu(mu_new)
 
-            gM = function.eps_max(1.0)
-            assert(mu[-1] < eps / gM)
+            if self.info_requested(Info.mu):
+                mu.append(mu_new)
+            else:
+                mu[0] = mu_new
+
+            assert(mu_new < eps / gM)
 
             i = i + 1
 
