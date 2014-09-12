@@ -1437,31 +1437,32 @@ class TestLogisticRegression(TestCase):
         l = 1.0 - k
         g = 1.618
 
-        mu = None
-        logreg_static = estimators.LogisticRegressionL1L2TV(l, k, g,
-                                      A=A, mu=mu,
-                                      algorithm=primaldual.StaticCONESTA(),
-                                      algorithm_params=dict(eps=eps,
-                                                            max_iter=max_iter),
-                                      class_weight=None)
-        logreg_static.fit(X, y)
-        err = logreg_static.score(X, y)
-#        print err
-        assert_equal(err, 0.49,
-                     msg="The found regression vector is not correct.")
-
-        mu = None
-        logreg_dynamic = estimators.LogisticRegressionL1L2TV(l, k, g,
-                                      A=A, mu=mu,
-                                      algorithm=primaldual.DynamicCONESTA(),
-                                      algorithm_params=dict(eps=eps,
-                                                            max_iter=max_iter),
-                                      class_weight=None)
-        logreg_dynamic.fit(X, y)
-        err = logreg_dynamic.score(X, y)
-#        print err
-        assert_equal(err, 0.49,
-                     msg="The found regression vector is not correct.")
+        # Logistic regression isn't currently supported for CONESTA.
+#        mu = None
+#        logreg_static = estimators.LogisticRegressionL1L2TV(l, k, g,
+#                                      A=A, mu=mu,
+#                                      algorithm=primaldual.StaticCONESTA(),
+#                                      algorithm_params=dict(eps=eps,
+#                                                            max_iter=max_iter),
+#                                      class_weight=None)
+#        logreg_static.fit(X, y)
+#        err = logreg_static.score(X, y)
+##        print err
+#        assert_equal(err, 0.49,
+#                     msg="The found regression vector is not correct.")
+#
+#        mu = None
+#        logreg_dynamic = estimators.LogisticRegressionL1L2TV(l, k, g,
+#                                      A=A, mu=mu,
+#                                      algorithm=primaldual.DynamicCONESTA(),
+#                                      algorithm_params=dict(eps=eps,
+#                                                            max_iter=max_iter),
+#                                      class_weight=None)
+#        logreg_dynamic.fit(X, y)
+#        err = logreg_dynamic.score(X, y)
+##        print err
+#        assert_equal(err, 0.49,
+#                     msg="The found regression vector is not correct.")
 
         mu = 5e-4
         logreg_fista = estimators.LogisticRegressionL1L2TV(l, k, g,
