@@ -11,6 +11,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 import numpy as np
 
 from . import consts
+from . import deprecated
 
 __all__ = ["multivariate_normal", "sensitivity", "precision", "specificity",
            "npv", "F_score", "fleiss_kappa"]
@@ -89,6 +90,25 @@ def sensitivity(cond, test):
     cond : Numpy array, boolean or 0/1 integer. The "true", known condition.
 
     test : Numpy array, boolean or 0/1 integer. The estimated outcome.
+
+    Example
+    -------
+    >>> import parsimony.utils.stats as stats
+    >>> import numpy as np
+    >>> np.random.seed(42)
+    >>> p = 2030
+    >>> cond = np.zeros((p, 1))
+    >>> test = np.zeros((p, 1))
+    >>> stats.sensitivity(cond, test)
+    1.0
+    >>> stats.sensitivity(cond, np.logical_not(test))
+    1.0
+    >>> cond[:30] = 1.0
+    >>> test[:30] = 1.0
+    >>> test[:10] = 0.0
+    >>> test[-180:] = 1.0
+    >>> round(stats.sensitivity(cond, test), 2)
+    0.67
     """
     true_pos = np.logical_and((cond == 1), (test == 1))
     false_neg = np.logical_and((cond == 1), (test == 0))
@@ -99,32 +119,7 @@ def sensitivity(cond, test):
     if FN > 0:
         value = TP / (TP + FN)
     else:
-        value = 1.0
-
-    return value
-
-
-def precision(cond, test):
-    """A test's ability to correctly identify positive outcomes.
-
-    Also called positive predictive value, PPV.
-
-    Parameters
-    ----------
-    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.
-
-    test : Numpy array, boolean or 0/1 integer. The estimated outcome.
-    """
-    true_pos = np.logical_and((cond == 1), (test == 1))
-    false_pos = np.logical_and((cond == 0), (test == 1))
-
-    TP = float(true_pos.sum())
-    FP = float(false_pos.sum())
-
-    if FP > 0:
-        value = TP / (TP + FP)
-    else:
-        value = 1.0
+        value = 1.0  # TODO: Is this really correct?
 
     return value
 
@@ -139,6 +134,25 @@ def specificity(cond, test):
     cond : Numpy array, boolean or 0/1 integer. The "true", known condition.
 
     test : Numpy array, boolean or 0/1 integer. The estimated outcome.
+
+    Example
+    -------
+    >>> import parsimony.utils.stats as stats
+    >>> import numpy as np
+    >>> np.random.seed(42)
+    >>> p = 2030
+    >>> cond = np.zeros((p, 1))
+    >>> test = np.zeros((p, 1))
+    >>> stats.specificity(cond, test)
+    1.0
+    >>> stats.specificity(cond, np.logical_not(test))
+    0.0
+    >>> cond[:30] = 1.0
+    >>> test[:30] = 1.0
+    >>> test[:10] = 0.0
+    >>> test[-180:] = 1.0
+    >>> round(stats.specificity(cond, test), 2)
+    0.91
     """
     true_neg = np.logical_and((cond == 0), (test == 0))
     false_pos = np.logical_and((cond == 0), (test == 1))
@@ -154,6 +168,55 @@ def specificity(cond, test):
     return value
 
 
+def ppv(cond, test):
+    """A test's ability to correctly identify positive outcomes.
+
+    Short for positive predictive value. Also called precision.
+
+    Parameters
+    ----------
+    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.
+
+    test : Numpy array, boolean or 0/1 integer. The estimated outcome.
+
+    Example
+    -------
+    >>> import parsimony.utils.stats as stats
+    >>> import numpy as np
+    >>> np.random.seed(42)
+    >>> p = 2030
+    >>> cond = np.zeros((p, 1))
+    >>> test = np.zeros((p, 1))
+    >>> stats.ppv(cond, test)
+    1.0
+    >>> stats.ppv(cond, np.logical_not(test))
+    0.0
+    >>> cond[:30] = 1.0
+    >>> test[:30] = 1.0
+    >>> test[:10] = 0.0
+    >>> test[-180:] = 1.0
+    >>> round(stats.ppv(cond, test), 2)
+    0.1
+    """
+    true_pos = np.logical_and((cond == 1), (test == 1))
+    false_pos = np.logical_and((cond == 0), (test == 1))
+
+    TP = float(true_pos.sum())
+    FP = float(false_pos.sum())
+
+    if FP > 0:
+        value = TP / (TP + FP)
+    else:
+        value = 1.0
+
+    return value
+
+
+@deprecated("ppv")
+def precision(cond, test):
+    return ppv(cond, test)
+
+
 def npv(cond, test):
     """A test's ability to correctly identify negative outcomes.
 
@@ -164,6 +227,25 @@ def npv(cond, test):
     cond : Numpy array, boolean or 0/1 integer. The "true", known condition.
 
     test : Numpy array, boolean or 0/1 integer. The estimated outcome.
+
+    Example
+    -------
+    >>> import parsimony.utils.stats as stats
+    >>> import numpy as np
+    >>> np.random.seed(42)
+    >>> p = 2030
+    >>> cond = np.zeros((p, 1))
+    >>> test = np.zeros((p, 1))
+    >>> stats.npv(cond, test)
+    1.0
+    >>> stats.npv(cond, np.logical_not(test))
+    1.0
+    >>> cond[:30] = 1.0
+    >>> test[:30] = 1.0
+    >>> test[:10] = 0.0
+    >>> test[-180:] = 1.0
+    >>> round(stats.npv(cond, test), 3)
+    0.995
     """
     true_neg = np.logical_and((cond == 0), (test == 0))
     false_neg = np.logical_and((cond == 1), (test == 0))
@@ -187,6 +269,25 @@ def accuracy(cond, test):
     cond : Numpy array, boolean or 0/1 integer. The "true", known condition.
 
     test : Numpy array, boolean or 0/1 integer. The estimated outcome.
+
+    Example
+    -------
+    >>> import parsimony.utils.stats as stats
+    >>> import numpy as np
+    >>> np.random.seed(42)
+    >>> p = 2030
+    >>> cond = np.zeros((p, 1))
+    >>> test = np.zeros((p, 1))
+    >>> stats.accuracy(cond, test)
+    1.0
+    >>> stats.accuracy(cond, np.logical_not(test))
+    0.0
+    >>> cond[:30] = 1.0
+    >>> test[:30] = 1.0
+    >>> test[:10] = 0.0
+    >>> test[-180:] = 1.0
+    >>> round(stats.accuracy(cond, test), 2)
+    0.91
     """
     true_pos = np.logical_and((cond == 1), (test == 1))
     true_neg = np.logical_and((cond == 0), (test == 0))
@@ -212,6 +313,25 @@ def F_score(cond, test):
     cond : Numpy array, boolean or 0/1 integer. The "true", known condition.
 
     test : Numpy array, boolean or 0/1 integer. The estimated outcome.
+
+    Example
+    -------
+    >>> import parsimony.utils.stats as stats
+    >>> import numpy as np
+    >>> np.random.seed(42)
+    >>> p = 2030
+    >>> cond = np.zeros((p, 1))
+    >>> test = np.zeros((p, 1))
+    >>> stats.F_score(cond, test)
+    1.0
+    >>> stats.F_score(cond, np.logical_not(test))
+    0.0
+    >>> cond[:30] = 1.0
+    >>> test[:30] = 1.0
+    >>> test[:10] = 0.0
+    >>> test[-180:] = 1.0
+    >>> round(stats.F_score(cond, test), 2)
+    0.17
     """
     PR = precision(cond, test)
     RE = sensitivity(cond, test)
@@ -219,6 +339,176 @@ def F_score(cond, test):
     value = 2.0 * PR * RE / (PR + RE)
 
     return value
+
+
+def alpha(cond, test):
+    """False positive rate or type I error.
+
+    Parameters
+    ----------
+    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.
+
+    test : Numpy array, boolean or 0/1 integer. The estimated outcome.
+
+    Example
+    -------
+    >>> import parsimony.utils.stats as stats
+    >>> import numpy as np
+    >>> np.random.seed(42)
+    >>> p = 2030
+    >>> cond = np.zeros((p, 1))
+    >>> test = np.zeros((p, 1))
+    >>> stats.alpha(cond, test)
+    0.0
+    >>> stats.alpha(cond, np.logical_not(test))
+    1.0
+    >>> cond[:30] = 1.0
+    >>> test[:30] = 1.0
+    >>> test[:10] = 0.0
+    >>> test[-180:] = 1.0
+    >>> round(stats.alpha(cond, test), 2)
+    0.09
+    """
+    return 1.0 - specificity(cond, test)
+
+
+def beta(cond, test):
+    """False negative rate or type II error.
+
+    Parameters
+    ----------
+    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.
+
+    test : Numpy array, boolean or 0/1 integer. The estimated outcome.
+
+    Example
+    -------
+    >>> import parsimony.utils.stats as stats
+    >>> import numpy as np
+    >>> np.random.seed(42)
+    >>> p = 2030
+    >>> cond = np.zeros((p, 1))
+    >>> test = np.zeros((p, 1))
+    >>> stats.beta(cond, test)
+    0.0
+    >>> stats.beta(cond, np.logical_not(test))
+    0.0
+    >>> cond[:30] = 1.0
+    >>> test[:30] = 1.0
+    >>> test[:10] = 0.0
+    >>> test[-180:] = 1.0
+    >>> round(stats.beta(cond, test), 2)
+    0.33
+    """
+    return 1.0 - sensitivity(cond, test)
+
+
+def power(cond, test):
+    """Statistical power for a test. The probability that it correctly rejects
+    the null hypothesis when the null hypothesis is false.
+
+    Parameters
+    ----------
+    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.
+
+    test : Numpy array, boolean or 0/1 integer. The estimated outcome.
+
+    Example
+    -------
+    >>> import parsimony.utils.stats as stats
+    >>> import numpy as np
+    >>> np.random.seed(42)
+    >>> p = 2030
+    >>> cond = np.zeros((p, 1))
+    >>> test = np.zeros((p, 1))
+    >>> stats.power(cond, test)
+    1.0
+    >>> stats.power(cond, np.logical_not(test))
+    1.0
+    >>> cond[:30] = 1.0
+    >>> test[:30] = 1.0
+    >>> test[:10] = 0.0
+    >>> test[-180:] = 1.0
+    >>> round(stats.power(cond, test), 2)
+    0.67
+    """
+    return 1.0 - beta(cond, test)
+
+
+def likelihood_ratio_positive(cond, test):
+    """Assesses the value of performing a diagnostic test for the positive
+    outcome.
+
+    Parameters
+    ----------
+    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.
+
+    test : Numpy array, boolean or 0/1 integer. The estimated outcome.
+
+    Example
+    -------
+    >>> import parsimony.utils.stats as stats
+    >>> import numpy as np
+    >>> np.random.seed(42)
+    >>> p = 2030
+    >>> cond = np.zeros((p, 1))
+    >>> test = np.zeros((p, 1))
+    >>> stats.likelihood_ratio_positive(cond, test)
+    inf
+    >>> stats.likelihood_ratio_positive(cond, np.logical_not(test))
+    1.0
+    >>> cond[:30] = 1.0
+    >>> test[:30] = 1.0
+    >>> test[:10] = 0.0
+    >>> test[-180:] = 1.0
+    >>> round(stats.likelihood_ratio_positive(cond, test), 1)
+    7.4
+    """
+    sens = sensitivity(cond, test)
+    spec = specificity(cond, test)
+
+    if spec == 1.0:
+        return np.inf
+    else:
+        return sens / (1.0 - spec)
+
+
+def likelihood_ratio_negative(cond, test):
+    """Assesses the value of performing a diagnostic test for the negative
+    outcome.
+
+    Parameters
+    ----------
+    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.
+
+    test : Numpy array, boolean or 0/1 integer. The estimated outcome.
+
+    Example
+    -------
+    >>> import parsimony.utils.stats as stats
+    >>> import numpy as np
+    >>> np.random.seed(42)
+    >>> p = 2030
+    >>> cond = np.zeros((p, 1))
+    >>> test = np.zeros((p, 1))
+    >>> stats.likelihood_ratio_negative(cond, test)
+    0.0
+    >>> stats.likelihood_ratio_negative(cond, np.logical_not(test))
+    inf
+    >>> cond[:30] = 1.0
+    >>> test[:30] = 1.0
+    >>> test[:10] = 0.0
+    >>> test[-180:] = 1.0
+    >>> round(stats.likelihood_ratio_negative(cond, test), 2)
+    0.37
+    """
+    sens = sensitivity(cond, test)
+    spec = specificity(cond, test)
+
+    if spec == 0.0:
+        return np.inf
+    else:
+        return (1.0 - sens) / spec
 
 
 def fleiss_kappa(W, k):
