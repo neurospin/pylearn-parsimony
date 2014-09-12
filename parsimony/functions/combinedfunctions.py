@@ -544,7 +544,7 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
 #        for j in xrange(len(alpha)):
 #            alpha[j][i] = 0.0
 
-        alpha = self.tv.alpha(beta_)
+        alpha = self.tv.alpha(beta)
         g = self.fmu(beta)
 
         n = float(self.X.shape[0])
@@ -960,7 +960,7 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
 #
 #        g = self.f(beta)
 
-        alpha = self.gl.alpha(beta_)
+        alpha = self.gl.alpha(beta)
         g = self.fmu(beta)
 
         n = float(self.X.shape[0])
