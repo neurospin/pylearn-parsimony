@@ -15,7 +15,6 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 import numpy as np
 import scipy.sparse as sparse
 
-#from .properties import NesterovFunction
 from .. import properties
 import parsimony.utils.consts as consts
 import parsimony.utils.maths as maths

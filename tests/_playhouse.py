@@ -31,9 +31,9 @@ import parsimony.estimators as estimators
 import parsimony.utils.consts as consts
 
 import simulate
-#
-#np.random.seed(42)
-#
+
+np.random.seed(42)
+
 #px = 100
 #py = 1
 #pz = 1
@@ -57,12 +57,12 @@ import simulate
 #
 #snr = 100.0
 #
-#mu = 0.001  # consts.TOLERANCE
-
-#A, _ = tv.A_from_shape(shape)
-#X, y, beta_star = l1_l2_tvmu.load(l, k, g, beta, M, e, A, mu, snr=snr)
-
-##A = simulate.functions.TotalVariation.A_from_shape(shape)
+#mu = consts.TOLERANCE
+#
+##A, _ = tv.A_from_shape(shape)
+##X, y, beta_star = l1_l2_tvmu.load(l, k, g, beta, M, e, A, mu, snr=snr)
+#
+#A = simulate.functions.TotalVariation.A_from_shape(shape)
 #funcs = [simulate.functions.L1(l),
 #         simulate.functions.L2Squared(k),
 #         simulate.functions.SmoothedTotalVariation(g, A, mu=mu)]
@@ -70,33 +70,82 @@ import simulate
 #simulator = simulate.LinearRegressionData(funcs, M, e, snr=snr,
 #                                          intercept=False)
 #X, y, beta_star = simulator.load(beta)
-
+#
 #eps = 1e-8
 #max_iter = 20000
 #penalty_start = 0
 #
 #beta_start = start_vector.get_vector(p)
 #
-#func = functions.LinearRegressionL1L2TV(X, y, l, k, g, A=A, mu=mu,
-#                                        penalty_start=penalty_start,
-#                                        mean=False)
+##func = functions.LinearRegressionL1L2TV(X, y, l, k, g, A=A, mu=mu,
+##                                        penalty_start=penalty_start,
+##                                        mean=False)
+##print func.f(beta)
+##print func.f(beta_start)
+##print func.f(beta_star)
+##print func.fmu(beta)
+##print func.fmu(beta_start)
+##print func.fmu(beta_star)
+##print func.gap(beta)
+##print func.gap(beta_start)
+##print func.gap(beta_star)
+##
+##sys.exit(0)
 #
-#print func.f(beta)
-#print func.f(beta_start)
-#print func.f(beta_star)
-#print func.fmu(beta)
-#print func.fmu(beta_start)
-#print func.fmu(beta_star)
-#print func.gap(beta)
-#print func.gap(beta_start)
-#print func.gap(beta_star)
+#est = estimators.LinearRegressionL1L2TV(l, k, g, A=A, mu=mu,
+#                              algorithm=proximal.CONESTA(),
+#                              algorithm_params=dict(eps=eps,
+#                                                    mu_min=mu,
+#                                                    max_iter=10000,
+#                                                    tau=0.5,
+#                                                    info=[Info.continuations]),
+#                              penalty_start=0,
+#                              mean=False)
+#t_ = time.time()
+#est.fit(X, y)
+#beta = est.beta
+#elapsed_time = time.time() - t_
+#print "Time                 :", elapsed_time
+#
+#func = functions.LinearRegressionL1L2TV(X, y, l, k, g,
+#                                        A=A, mu=mu,
+#                                        penalty_start=0, mean=False)
+#alg = est.algorithm
+#
+#berr = np.linalg.norm(beta - beta_star)
+#print "||betak - beta*||²_2 :", berr
+#
+#f_parsimony = func.fmu(beta)
+#f_star = func.fmu(beta_star)
+#ferr = abs(f_parsimony - f_star)
+#print "f(betak) - f(beta*)  :", ferr
+#print "gap(betak)           :", func.gap(beta)
+#assert(ferr <= func.gap(beta))
+#print "ferr < func.gap(beta):", ferr <= func.gap(beta)
+#print "gap(beta*)           :", abs(func.gap(beta_star))
+#print "# continuations      :", alg.info_get(Info.continuations)
 
-#sys.exit(0)
+
+
+
+
+
+
+
+
 
 #from parsimony.functions.combinedfunctions \
 #    import PrincipalComponentAnalysisL1TV
 #
 #pca = PrincipalComponentAnalysisL1TV(X, l, g, A=A, mu=0.01, penalty_start=0)
+
+
+
+
+
+
+
+
 
 
 import parsimony.functions.nesterov.gl as gl
@@ -132,30 +181,29 @@ g = 1.618
 X, y, beta_star = l1_l2_glmu.load(l=l, k=k, g=g, beta=beta, M=M, e=e,
                                 A=A, mu=mu, snr=snr)
 
-func = functions.LinearRegressionL1L2GL(X, y, l, k, g,
-                                        A=A, mu=mu,
-                                        penalty_start=0, mean=False)
-
-print func.f(beta)
-#print func.f(beta_start)
-print func.f(beta_star)
-print func.fmu(beta)
-#print func.fmu(beta_start)
-print func.fmu(beta_star)
-print func.gap(beta)
-#print func.gap(beta_start)
-print func.gap(beta_star)
-
-sys.exit(0)
+#func = functions.LinearRegressionL1L2GL(X, y, l, k, g,
+#                                        A=A, mu=mu,
+#                                        penalty_start=0, mean=False)
+#
+#print "f(beta)     :", func.f(beta)
+##print func.f(beta_start)
+#print "f(beta*)    :", func.f(beta_star)
+#print "f(mu, beta) :", func.fmu(beta)
+##print func.fmu(beta_start)
+#print "f(mu, beta*):", func.fmu(beta_star)
+#print "gap(beta)   :", func.gap(beta)
+##print func.gap(beta_start)
+#print "gap(beta*)  :", func.gap(beta_star)
+#
+#sys.exit(0)
 
 est = estimators.LinearRegressionL1L2GL(l, k, g, A=A, mu=mu,
-                              algorithm=proximal.StaticCONESTA(),
+                              algorithm=proximal.CONESTA(),
                               algorithm_params=dict(eps=eps,
                                                     mu_min=mu,
-                                                    max_iter=30000,
+                                                    max_iter=10000,
                                                     tau=0.5,
-                                                    info=[Info.continuations],
-                                                    beta_star=beta_star),
+                                                    info=[Info.continuations]),
                               penalty_start=0,
                               mean=False)
 t_ = time.time()

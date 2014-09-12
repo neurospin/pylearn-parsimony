@@ -2668,7 +2668,7 @@ class TestLinearRegression(TestCase):
         est = estimators.LinearRegressionL1L2GL(l, k, g, A=A, mu=None,
                                       algorithm=proximal.StaticCONESTA(),
                                       algorithm_params=dict(eps=eps,
-                                                            max_iter=10000,
+                                                            max_iter=15000,
                                                             tau=0.9),
                                       penalty_start=0,
                                       mean=False)
