@@ -49,7 +49,7 @@ def multivariate_normal(mu, Sigma, n=1):
     >>> Sigma = alpha * np.random.rand(p, p) + (1 - alpha) * np.eye(p, p)
     >>> M = stats.multivariate_normal(mu, Sigma, n)
     >>> mean = np.mean(M, axis=0)
-    >>> S = np.dot((M - mean).T, (M - mean)) / float(n - 1)
+    >>> S = np.dot((M - mean).T, (M - mean)) * (1.0 / float(n - 1))
     >>> round(np.linalg.norm(Sigma - S), 14)
     0.51886218849785
     """

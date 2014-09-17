@@ -84,8 +84,8 @@ class FastSVD(bases.ImplicitAlgorithm):
         >>> v = fast_svd.run(X)
         >>> us = np.linalg.norm(np.dot(X, v))
         >>> s = np.linalg.svd(X, full_matrices=False, compute_uv=False)
-        >>> abs(np.sum(us ** 2.0) - np.max(s) ** 2.0)
-        9.0949470177292824e-13
+        >>> abs(np.sum(us ** 2.0) - np.max(s) ** 2.0) < 5e-13
+        True
         >>>
         >>> np.random.seed(0)
         >>> X = np.random.random((100, 50))
@@ -108,13 +108,13 @@ class FastSVD(bases.ImplicitAlgorithm):
             for it in xrange(max_iter):
                 t_ = t
                 t = np.dot(K, t_)
-                t /= np.sqrt(np.sum(t ** 2.0))
+                t *= 1.0 / np.sqrt(np.sum(t ** 2.0))
 
                 if maths.norm(t_ - t) / maths.norm(t) < eps:
                     break
 
             v = np.dot(X.T, t)
-            v /= np.sqrt(np.sum(v ** 2.0))
+            v *= 1.0 / np.sqrt(np.sum(v ** 2.0))
 
         else:
             K = np.dot(X.T, X)
@@ -122,7 +122,7 @@ class FastSVD(bases.ImplicitAlgorithm):
             for it in xrange(max_iter):
                 v_ = v
                 v = np.dot(K, v_)
-                v /= np.sqrt(np.sum(v ** 2.0))
+                v *= 1.0 / np.sqrt(np.sum(v ** 2.0))
 
                 if maths.norm(v_ - v) / maths.norm(v) < eps:
                     break
@@ -183,14 +183,14 @@ class FastSparseSVD(bases.ImplicitAlgorithm):
             for it in xrange(max_iter):
                 t_ = t
                 t = K.dot(t_)
-                t /= np.sqrt(np.sum(t ** 2.0))
+                t *= 1.0 / np.sqrt(np.sum(t ** 2.0))
 
                 a = float(np.sqrt(np.sum((t_ - t) ** 2.0)))
                 if a < consts.TOLERANCE:
                     break
 
             v = X.T.dot(t)
-            v /= np.sqrt(np.sum(v ** 2.0))
+            v *= 1.0 / np.sqrt(np.sum(v ** 2.0))
 
         else:
             K = X.T.dot(X)
@@ -198,7 +198,7 @@ class FastSparseSVD(bases.ImplicitAlgorithm):
             for it in xrange(max_iter):
                 v_ = v
                 v = K.dot(v_)
-                v /= np.sqrt(np.sum(v ** 2.0))
+                v *= 1.0 / np.sqrt(np.sum(v ** 2.0))
 
                 a = float(np.sqrt(np.sum((v_ - v) ** 2.0)))
                 if a < consts.TOLERANCE:
@@ -262,7 +262,7 @@ class FastSVDProduct(bases.ImplicitAlgorithm):
             v_ = v
             v = np.dot(X, np.dot(Y, v_))
             v = np.dot(Y.T, np.dot(X.T, v))
-            v /= np.sqrt(np.sum(v ** 2.0))
+            v *= 1.0 / np.sqrt(np.sum(v ** 2.0))
 
             if np.sqrt(np.sum((v_ - v) ** 2.0)) < eps \
                     and it >= min_iter:
@@ -354,7 +354,7 @@ class PLSR(bases.ImplicitAlgorithm,
             maxi = np.argmax(np.sum(Y ** 2.0, axis=0))
             u = Y[:, [maxi]]
             w_new = np.dot(X.T, u)
-            w_new /= maths.norm(w_new)
+            w_new *= 1.0 / maths.norm(w_new)
 
         for i in range(self.max_iter):
             w = w_new
@@ -363,7 +363,7 @@ class PLSR(bases.ImplicitAlgorithm,
             w_new = np.dot(X.T, np.dot(Y, c))
             normw = maths.norm(w_new)
             if normw > 10.0 * consts.FLOAT_EPSILON:
-                w_new /= normw
+                w_new *= 1.0 / normw
 
             if maths.norm(w_new - w) < maths.norm(w) * self.eps:
                 break
@@ -374,7 +374,7 @@ class PLSR(bases.ImplicitAlgorithm,
         tt = np.dot(t.T, t)[0, 0]
         c = np.dot(Y.T, t)
         if tt > consts.TOLERANCE:
-            c /= tt
+            c *= 1.0 / tt
 
         return w_new, c
 
@@ -467,7 +467,7 @@ class SparsePLSR(bases.ImplicitAlgorithm,
             maxi = np.argmax(np.sum(Y ** 2.0, axis=0))
             u = Y[:, [maxi]]
             w_new = np.dot(X.T, u)
-            w_new /= maths.norm(w_new)
+            w_new *= 1.0 / maths.norm(w_new)
 
         for i in range(self.max_iter):
             w = w_new
@@ -477,13 +477,13 @@ class SparsePLSR(bases.ImplicitAlgorithm,
                 c = l1_2.prox(c)
                 normc = maths.norm(c)
                 if normc > consts.TOLERANCE:
-                    c /= normc
+                    c *= 1.0 / normc
 
             w_new = np.dot(X.T, np.dot(Y, c))
             w_new = l1_1.prox(w_new)
             normw = maths.norm(w_new)
             if normw > consts.TOLERANCE:
-                w_new /= normw
+                w_new *= 1.0 / normw
 
             if maths.norm(w_new - w) / maths.norm(w) < self.eps:
                 break

@@ -90,7 +90,8 @@ class ObjImage(object):
             labels_im[mask_o] = o.label
             obj_latent = np.random.normal(0, sigma_o, Xim.shape[0])
             obj_latent -= obj_latent.mean()  # - 0
-            obj_latent /= obj_latent.std() * sigma_o
+#            obj_latent /= obj_latent.std() * sigma_o
+            obj_latent *= 1.0 / (obj_latent.std() * sigma_o)
             std = o.get_std()
             Xim[:, mask_o] = (std * obj_latent + Xim[:, mask_o].T).T
         return Xim, labels_im
@@ -106,7 +107,7 @@ class Square(ObjImage):
                                                          0:shape[2]]
 
     def get_mask(self):
-        hs = self.size / 2.
+        hs = self.size / 2.0
         mask = (np.abs(self.x_grid - self.center[0]) <= hs) & \
         (np.abs(self.y_grid - self.center[1]) <= hs)
         (np.abs(self.z_grid - self.center[2]) <= hs)
@@ -152,8 +153,6 @@ def get_objects_edges(objects):
             m += o.get_mask()
     md = ndimage.binary_dilation(m)
     return md - m
-
-
 
 
 ############################################################################

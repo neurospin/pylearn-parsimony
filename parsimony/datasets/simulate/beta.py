@@ -54,7 +54,7 @@ def random(shape, density=1.0, rng=utils.RandomUniform(0, 1).rand,
     beta = np.reshape(beta, (p, 1))
 
     if normalise:
-        beta /= utils.norm2(beta)
+        beta *= 1.0 / utils.norm2(beta)
 
     return beta
 

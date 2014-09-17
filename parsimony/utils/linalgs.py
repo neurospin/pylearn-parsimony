@@ -70,7 +70,7 @@ class MultipartArray(object):
                 elif op == self.__ops.mul:
                     self.parts[i] *= other
                 elif op == self.__ops.div:
-                    self.parts[i] /= other
+                    self.parts[i] *= 1.0 / other
                 else:
                     raise ValueError("Operator not yet implemented!")
         elif isinstance(other, MultipartArray):
@@ -146,7 +146,7 @@ class MultipartArray(object):
                 elif op == self.__ops.mul:
                     new_parts[i] = self.parts[i] * other
                 elif op == self.__ops.div:
-                    new_parts[i] = self.parts[i] / other
+                    new_parts[i] = self.parts[i] * (1.0 / other)
                 else:
                     raise ValueError("Operator not yet implemented!")
         elif isinstance(other, MultipartArray):

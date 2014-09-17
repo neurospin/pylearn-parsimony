@@ -281,7 +281,7 @@ def load(n_samples=100, shape=(30, 30, 1),
         X = X3d.reshape((n_samples, nx * ny))
         Xc = (X - X.mean(axis=0)) / X.std(axis=0)
         yc = (y - y.mean()) / y.std()
-        cor = np.dot(Xc.T, yc).reshape(nx, ny) / y.shape[0]
+        cor = np.dot(Xc.T, yc).reshape(nx, ny) * (1.0 / y.shape[0])
         cax = plt.matshow(cor, cmap=plt.cm.coolwarm)
         plt.colorbar(cax)
         plt.show()

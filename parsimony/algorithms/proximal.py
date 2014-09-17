@@ -69,8 +69,8 @@ class ISTA(bases.ExplicitAlgorithm,
     >>> ista = ISTA(max_iter=10000)
     >>> beta1 = ista.run(function, np.random.rand(50, 1))
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
-    >>> round(np.linalg.norm(beta1 - beta2), 15)
-    0.000312155763256
+    >>> round(np.linalg.norm(beta1 - beta2), 14)
+    0.00031215576326
     >>>
     >>> np.random.seed(42)
     >>> X = np.random.rand(100, 50)
@@ -922,7 +922,7 @@ class ADMM(bases.ExplicitAlgorithm,
 
                 if norm_r > self.mu * norm_s:
                     self.rho *= self.tau
-                    u_new /= self.tau  # Rescale dual variable.
+                    u_new *= 1.0 / self.tau  # Rescale dual variable.
                 elif norm_s > self.mu * norm_r:
                     self.rho /= self.tau
                     u_new *= self.tau  # Rescale dual variable.

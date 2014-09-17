@@ -126,7 +126,7 @@ class L2(Function):
         """
         norm_beta = norm2(x)
         if norm_beta > TOLERANCE:
-            return x / norm_beta
+            return x * (1.0 / norm_beta)
         else:
             D = x.shape[0]
             u = (self.rng(D, 1) * 2.0) - 1.0  # [-1, 1]^D
@@ -145,8 +145,7 @@ def grad_l2(beta, rng=RandomUniform(0, 1)):
     """
     norm_beta = norm2(beta)
     if norm_beta > TOLERANCE:
-
-        return beta / norm_beta
+        return beta * (1.0 / norm_beta)
     else:
         D = beta.shape[0]
         u = (rng(D, 1) * 2.0) - 1.0  # [-1, 1]^D
@@ -219,7 +218,7 @@ class NesterovFunction(Function):
         """
         alpha = [0] * len(self.A)
         for i in xrange(len(self.A)):
-            alpha[i] = self.A[i].dot(x) / self.mu
+            alpha[i] = self.A[i].dot(x) * (1.0 / self.mu)
 
         # Apply projection
         alpha = self.project(alpha)
@@ -232,7 +231,7 @@ class NesterovFunction(Function):
             astar = alpha[i]
             normas = np.sqrt(np.sum(astar ** 2.0))
             if normas > 1.0:
-                astar /= normas
+                astar *= 1.0 / normas
             alpha[i] = astar
 
         return alpha
@@ -470,9 +469,9 @@ def _Nestetov_alpha(beta, A, mu, proj):
     """
     alpha = [0] * len(A)
     for i in xrange(len(A)):
-        alpha[i] = A[i].dot(beta) / mu
+        alpha[i] = A[i].dot(beta) * (1.0 / mu)
 
-    # Apply projection
+    # Apply projection.
     alpha = proj(alpha)
 
     return alpha
@@ -484,7 +483,7 @@ def _Nesterov_project(alpha):
         astar = alpha[i]
         normas = np.sqrt(np.sum(astar ** 2.0))
         if normas > 1.0:
-            astar /= normas
+            astar *= 1.0 / normas
         alpha[i] = astar
 
     return alpha

@@ -812,7 +812,8 @@ class LatentVariableCovariance(mb_properties.MultiblockFunction,
         """
         index = int(index)
         grad = -np.dot(self.X[index].T,
-                       np.dot(self.X[1 - index], w[1 - index])) / float(self.n)
+                       np.dot(self.X[1 - index], w[1 - index])) \
+             * (1.0 / float(self.n))
 
 #        def fun(x):
 #            w_ = [0, 0]

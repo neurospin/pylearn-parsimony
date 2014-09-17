@@ -86,8 +86,8 @@ class LassoCoordinateDescent(bases.ImplicitAlgorithm,
     ...                                                         mean=False))
     >>> function.add_prox(penalties.L1(l=l))
     >>> beta = alg.run(X, y)
-    >>> round(np.linalg.norm(beta_star - beta), 15)
-    0.346551814695951
+    >>> round(np.linalg.norm(beta_star - beta), 14)
+    0.34655181469595
     """
     INFO_PROVIDED = [Info.ok,
                      Info.num_iter,
@@ -167,7 +167,7 @@ class LassoCoordinateDescent(bases.ImplicitAlgorithm,
 
         xTx = np.sum(X ** 2.0, axis=0)
         if self.mean:
-            xTx /= float(n)
+            xTx *= 1.0 / float(n)
 
         for i in xrange(1, self.max_iter + 1):
 
@@ -277,8 +277,8 @@ class ShootingAlgorithm(bases.ImplicitAlgorithm,
     ...                                                         mean=False))
     >>> function.add_prox(penalties.L1(l=l))
     >>> beta = alg.run(X, y)
-    >>> round(np.linalg.norm(beta_star - beta), 15)
-    0.346551814695951
+    >>> round(np.linalg.norm(beta_star - beta), 14)
+    0.34655181469595
     """
     INFO_PROVIDED = [Info.ok,
                      Info.num_iter,
@@ -353,7 +353,7 @@ class ShootingAlgorithm(bases.ImplicitAlgorithm,
 
         xTx = np.sum(X ** 2.0, axis=0)
         if self.mean:
-            xTx /= float(n)
+            xTx *= 1.0 / float(n)
 
         for i in xrange(1, self.max_iter + 1):
 

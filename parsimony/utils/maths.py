@@ -162,8 +162,8 @@ def corr(a, b):
     norma[norma < TOLERANCE] = 1.0
     normb[normb < TOLERANCE] = 1.0
 
-    a_ /= norma
-    b_ /= normb
+    a_ *= 1.0 / norma
+    b_ *= 1.0 / normb
 
     ip = np.dot(a_.T, b_)
 
@@ -192,7 +192,7 @@ def cov(a, b):
     a_ = a - ma
     b_ = b - mb
 
-    ip = np.dot(a_.T, b_) / (a_.shape[0] - 1.0)
+    ip = np.dot(a_.T, b_) * (1.0 / (a_.shape[0] - 1.0))
 
     if ip.shape == (1, 1):
         return ip[0, 0]

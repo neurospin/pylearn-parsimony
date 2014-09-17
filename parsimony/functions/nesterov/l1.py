@@ -142,7 +142,7 @@ class L1(properties.NesterovFunction,
         else:
             beta_ = beta
 
-        alpha = self.project([beta_ / self.mu])
+        alpha = self.project([beta_ * (1.0 / self.mu)])
 
         return alpha
 

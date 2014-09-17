@@ -191,7 +191,8 @@ class LogisticRegressionEstimator(BaseEstimator):
     def predict_probability(self, X):
         X = check_arrays(X)
         logit = np.dot(X, self.beta)
-        prob = 1.0 / (1.0 + np.exp(-logit))
+#        prob = 1.0 / (1.0 + np.exp(-logit))
+        prob = np.reciprocal(1.0 + np.exp(-logit))
 
         return prob
 
@@ -860,6 +861,7 @@ class LinearRegressionL1L2TV(RegressionEstimator):
         X, y = check_arrays(X, y)
         n, p = X.shape
         y_hat = np.dot(X, self.beta)
+
         return np.sum((y_hat - y) ** 2.0) / float(n)
 
 
@@ -944,8 +946,8 @@ class LinearRegressionL1L2GL(RegressionEstimator):
     ...                                   algorithm_params=dict(max_iter=1000),
     ...                                   mean=False)
     >>> lr = lr.fit(X, y)
-    >>> round(lr.score(X, y), 14)
-    10.74652493929971
+    >>> round(lr.score(X, y), 12)
+    10.7465249393
     >>>
     >>> lr = estimators.LinearRegressionL1L2GL(l1, l2, gl, A,
     ...                                   algorithm=proximal.ISTA(),
@@ -1159,7 +1161,7 @@ class LinearRegressionL1L2GL(RegressionEstimator):
 class LogisticRegression(LogisticRegressionEstimator):
     """Logistic regression (re-weighted log-likelihood aka. cross-entropy):
 
-        f(beta) = - loglik/n_samples
+        f(beta) = -loglik / n_samples
 
     where
 
@@ -1268,7 +1270,7 @@ class RidgeLogisticRegression(LogisticRegressionEstimator):
     """Logistic regression (re-weighted log-likelihood aka. cross-entropy) with
     an L2 penalty:
 
-        f(beta) = -loglik/n_samples + (l / 2) * ||beta||²_2,
+        f(beta) = -loglik / n_samples + (l / 2) * ||beta||²_2,
 
     where
 
@@ -1389,7 +1391,7 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
     """Logistic regression (re-weighted log-likelihood aka. cross-entropy)
     with L1, L2 and TV penalties:
 
-        f(beta) = - loglik/n_samples
+        f(beta) = -loglik / n_samples
                   + l1 * ||beta||_1
                   + (l2 / (2 * n)) * ||beta||²_2
                   + tv * TV(beta)
@@ -1562,7 +1564,7 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
     """Logistic regression (re-weighted log-likelihood aka. cross-entropy)
     with L1, L2 and Group Lasso penalties:
 
-        f(beta) = - loglik/n_samples
+        f(beta) = -loglik / n_samples
                   + l1 * ||beta||_1
                   + (l2 / (2 * n)) * ||beta||²_2
                   + gl * GL(beta)
@@ -1861,6 +1863,7 @@ class LinearRegressionL2SmoothedL1TV(RegressionEstimator):
         """
         n, p = X.shape
         y_hat = np.dot(X, self.beta)
+
         return np.sum((y_hat - y) ** 2.0) / float(n)
 
 
@@ -1999,16 +2002,16 @@ class PLSRegression(RegressionEstimator):
             tt = np.dot(t.T, t)[0, 0]
             c = np.dot(Y.T, t)
             if tt > consts.TOLERANCE:
-                c /= tt
+                c *= 1.0 / tt
 
             cc = np.dot(c.T, c)[0, 0]
             u = np.dot(Y, c)
             if cc > consts.TOLERANCE:
-                u /= cc
+                u *= 1.0 / cc
 
             p = np.dot(X.T, t)
             if tt > consts.TOLERANCE:
-                p /= tt
+                p *= 1.0 / tt
 
             self.W[:, [k]] = w
             self.T[:, [k]] = t
@@ -2032,7 +2035,6 @@ class PLSRegression(RegressionEstimator):
         X, Y = check_arrays(X, Y)
 
         Yhat = np.dot(X, self.beta)
-
         err = maths.normFro(Yhat - Y) ** 2.0
 
         if self.mean:
@@ -2219,16 +2221,16 @@ class SparsePLSRegression(RegressionEstimator):
             tt = np.dot(t.T, t)[0, 0]
             c = np.dot(Y.T, t)
             if tt > consts.TOLERANCE:
-                c /= tt
+                c *= 1.0 / tt
 
             cc = np.dot(c.T, c)[0, 0]
             u = np.dot(Y, c)
             if cc > consts.TOLERANCE:
-                u /= cc
+                u *= 1.0 / cc
 
             p = np.dot(X.T, t)
             if tt > consts.TOLERANCE:
-                p /= tt
+                p *= 1.0 / tt
 
             self.W[:, [k]] = w
             self.T[:, [k]] = t
@@ -2252,7 +2254,6 @@ class SparsePLSRegression(RegressionEstimator):
         X, Y = check_arrays(X, Y)
 
         Yhat = np.dot(X, self.beta)
-
         err = maths.normFro(Yhat - Y) ** 2.0
 
         if self.mean:

@@ -35,14 +35,15 @@ def load(n_samples=100, shape=(30, 30, 1),
 
     Returns
     -------
-    X3d: Numpy array of shape [n_sample, shape]. The input features.
+    X3d : Numpy array of shape [n_sample, shape]. The input features.
 
-    y: Numpy array of shape [n_sample, 1]. The target variable.
+    y : Numpy array of shape [n_sample, 1]. The target variable.
 
-    beta3d: Float array of shape [shape]. It is the beta such that
-    y = 1. / (1 + exp(-(X * beta + noise)).
+    beta3d : Float array of shape [shape]. It is the beta such that
+            y = 1. / (1 + exp(-(X * beta + noise)).
 
-    proba: Numpy array of shape [n_sample, 1]. Samples posterior probabilities.
+    proba : Numpy array of shape [n_sample, 1]. Samples posterior
+            probabilities.
 
     See also
     --------
@@ -83,7 +84,8 @@ def load(n_samples=100, shape=(30, 30, 1),
     logit = np.dot(X, beta) + noise
     #np.std(np.dot(X, beta)) / np.std(noise)
     #np.std(logit)
-    proba = 1.0 / (1.0 + np.exp(-logit))
+#    proba = 1.0 / (1.0 + np.exp(-logit))
+    proba = np.reciprocal(1.0 + np.exp(-logit))
     y = np.ones(y.shape)
     y[proba < 0.5] = 0
 

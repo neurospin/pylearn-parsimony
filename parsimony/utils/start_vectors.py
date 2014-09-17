@@ -180,7 +180,7 @@ class RandomStartVector(BaseStartVector):
         vector = np.random.rand(size, 1) * (u - l) + l  # Random vector.
 
         if self.normalise:
-            return vector / maths.norm(vector)
+            return vector * (1.0 / maths.norm(vector))
         else:
             return vector
 
@@ -243,7 +243,7 @@ class OnesStartVector(BaseStartVector):
         vector = np.ones((size, 1))  # Using a vector of ones.
 
         if self.normalise:
-            return vector / maths.norm(vector)
+            return vector * (1.0 / maths.norm(vector))
         else:
             return vector
 
@@ -311,7 +311,7 @@ class ZerosStartVector(BaseStartVector):
 #            w = X[[idx], :].T  # Using row with largest sum of squares
 #
 #        if self.normalise:
-#            return w / norm(w)
+#            return w * (1.0 / norm(w))
 #        else:
 #            return w
 
@@ -388,7 +388,7 @@ class ZerosStartVector(BaseStartVector):
 #            X[i] = v[0, 0]
 #
 #        X = np.exp(-0.5 * X)
-#        X /= np.sum(X)
+#        X *= (1.0 / np.sum(X))
 #
 ##        s = []
 ##        X = 0
@@ -401,7 +401,7 @@ class ZerosStartVector(BaseStartVector):
 #        w = np.reshape(X, (p, 1))
 #
 #        if self.normalise:
-#            return w / norm(w)
+#            return w * (1.0 / norm(w))
 #        else:
 #            return w
 #
@@ -485,12 +485,12 @@ class ZerosStartVector(BaseStartVector):
 #            S1 = np.diag((np.abs(np.diag(np.random.rand(2, 2))) * 0.5) + 0.5)
 #
 #            S2 = np.random.rand(2, 2)
-#            S2 = (((S2 + S2.T) / 2.0) - 0.5) * 0.9  # [0, 0.45]
+#            S2 = (((S2 + S2.T) * 0.5) - 0.5) * 0.9  # [0, 0.45]
 #            S2 = S2 - np.diag(np.diag(S2))
 #
 #            S = S1 + S2
 #
-#            S /= np.max(S)
+#            S *= 1.0 / np.max(S)
 #
 #            S *= float(min(size))
 #
@@ -506,7 +506,7 @@ class ZerosStartVector(BaseStartVector):
 #        w = np.reshape(X, size)
 #
 #        if self.normalise:
-#            return w / norm(w)
+#            return w * (1.0 / norm(w))
 #        else:
 #            return w
 

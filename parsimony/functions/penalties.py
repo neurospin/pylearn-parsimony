@@ -899,9 +899,9 @@ class L2Squared(properties.AtomicFunction,
 
         if self.penalty_start > 0:
             prox = np.vstack((beta[:self.penalty_start, :],
-                              beta_ / (1.0 + l)))
+                              beta_ * (1.0 / (1.0 + l))))
         else:
-            prox = beta_ / (1.0 + l)
+            prox = beta_ * (1.0 / (1.0 + l))
 
         return prox
 
@@ -1345,14 +1345,14 @@ class RGCCAConstraint(QuadraticConstraint,
                     term1 = (self.tau \
                             / ((1.0 + 2.0 * mu * self.tau) ** 2.0)) * ssdiff
                     term2 = np.sum(atilde2lambdas \
-                            / ((1.0 + (2.0 * mu) * self.S) ** 2.0))
+                                * (1.0 / ((1.0 + (2.0 * mu) * self.S) ** 2.0)))
                     return term1 + term2 - self.c
 
                 def grad(self, mu):
                     term1 = -4.0 * tau2 \
                                 / ((1.0 + 2.0 * mu * self.tau) ** 3.0) * ssdiff
                     term2 = -4.0 * np.sum(atilde2lambdas2 \
-                                / ((1.0 + (2.0 * mu) * self.S) ** 3.0))
+                                * (1.0 / ((1.0 + (2.0 * mu) * self.S) ** 3.0)))
                     return term1 + term2
 
 #            if max(n, p) >= 1000:
@@ -1370,18 +1370,18 @@ class RGCCAConstraint(QuadraticConstraint,
 
             if p > n:
                 l2 = ((self._S - self.tau) \
-                        / ((1.0 - self.tau) / n_)).reshape((n,))
+                               * (1.0 / ((1.0 - self.tau) / n_))).reshape((n,))
 
                 a = 1.0 + 2.0 * mu * self.tau
                 b = 2.0 * mu * (1.0 - self.tau) / n_
                 y = (beta_ - np.dot(self.X.T, np.dot(self._U,
                              (np.reciprocal(l2 + (a / b)) \
                              * np.dot(self._U.T,
-                                      np.dot(self.X, beta_)).T).T))) / a
+                                      np.dot(self.X, beta_)).T).T))) * (1. / a)
 
             else:  # The case when n >= p
                 l2 = ((self._S - self.tau) \
-                        / ((1.0 - self.tau) / n_)).reshape((p,))
+                               * (1.0 / ((1.0 - self.tau) / n_))).reshape((p,))
 
                 a = 1.0 + 2.0 * mu * self.tau
                 b = 2.0 * mu * (1.0 - self.tau) / n_
@@ -1525,7 +1525,7 @@ class RidgeSquaredError(properties.CompositeFunction,
             grad = np.dot((np.dot(self.X, x_) - self.y).T, self.X).T
 
         if self.mean:
-            grad /= float(self.X.shape[0])
+            grad *= 1.0 / float(self.X.shape[0])
 
         grad += self.k * x_
 
@@ -1640,7 +1640,8 @@ class RidgeSquaredError(properties.CompositeFunction,
             Xv = np.dot(self.X, v)
             y = (v - np.dot(self.X.T, np.dot(self._V,
                                              np.reciprocal(c + self._s2) \
-                                                 * np.dot(self._V.T, Xv)))) / c
+                                                 * np.dot(self._V.T, Xv)))) \
+                                                     * (1.0 / c)
 
         return y
 

@@ -550,7 +550,7 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
         n = float(self.X.shape[0])
 
         if self.mean:
-            a = (np.dot(self.X, beta) - self.y) / n
+            a = (np.dot(self.X, beta) - self.y) * (1.0 / n)
             f_ = (n / 2.0) * maths.norm(a) ** 2.0 + np.dot(self.y.T, a)[0, 0]
         else:
             a = np.dot(self.X, beta) - self.y
@@ -966,7 +966,7 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
         n = float(self.X.shape[0])
 
         if self.mean:
-            a = (np.dot(self.X, beta) - self.y) / n
+            a = (np.dot(self.X, beta) - self.y) * (1.0 / n)
             f_ = (n / 2.0) * maths.norm(a) ** 2.0 + np.dot(self.y.T, a)[0, 0]
         else:
             a = np.dot(self.X, beta) - self.y
@@ -1356,11 +1356,11 @@ class LinearRegressionL2SmoothedL1TV(properties.CompositeFunction,
 
         if self._Xy is None:
             if self.mean:
-                self._Xy = np.dot(self.X.T, self.y) / n
+                self._Xy = np.dot(self.X.T, self.y) * (1.0 / n)
             else:
                 self._Xy = np.dot(self.X.T, self.y)
 
-        Xty_lAta = (self._Xy - lAta) / self.g.k
+        Xty_lAta = (self._Xy - lAta) * (1.0 / self.g.k)
 
 #        t = time()
 #        XXkI = np.dot(X.T, X)

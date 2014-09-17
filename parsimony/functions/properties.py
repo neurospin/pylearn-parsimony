@@ -712,7 +712,7 @@ class NesterovFunction(Gradient,
         mu = self.get_mu()
         alpha = [0] * len(A)
         for i in xrange(len(A)):
-            alpha[i] = A[i].dot(beta_) / mu
+            alpha[i] = A[i].dot(beta_) * (1.0 / mu)
 
         # Apply projection.
         alpha = self.project(alpha)

@@ -110,7 +110,7 @@ class LinearRegression(properties.CompositeFunction,
         grad = np.dot(self.X.T, np.dot(self.X, beta) - self.y)
 
         if self.mean:
-            grad /= float(self.X.shape[0])
+            grad *= 1.0 / float(self.X.shape[0])
 
         return grad
 
@@ -272,7 +272,7 @@ class RidgeRegression(properties.CompositeFunction,
         gradOLS = np.dot((np.dot(self.X, beta) - self.y).T, self.X).T
 
         if self.mean:
-            gradOLS /= float(self.X.shape[0])
+            gradOLS *= 1.0 / float(self.X.shape[0])
 
         if self.penalty_start > 0:
             gradL2 = np.vstack((np.zeros((self.penalty_start, 1)),
@@ -434,12 +434,13 @@ class LogisticRegression(properties.AtomicFunction,
         3.9e-08
         """
         Xbeta = np.dot(self.X, beta)
-        pi = 1.0 / (1.0 + np.exp(-Xbeta))
+#        pi = 1.0 / (1.0 + np.exp(-Xbeta))
+        pi = np.reciprocal(1.0 + np.exp(-Xbeta))
 
         grad = -np.dot(self.X.T, self.weights * (self.y - pi))
 
         if self.mean:
-            grad /= float(self.X.shape[0])
+            grad *= 1.0 / float(self.X.shape[0])
 
         return grad
 
@@ -566,7 +567,7 @@ class RidgeLogisticRegression(properties.CompositeFunction,
                              ((self.y * Xbeta) - np.log(1 + np.exp(Xbeta))))
 
         if self.mean:
-            negloglike /= float(self.X.shape[0])
+            negloglike *= 1.0 / float(self.X.shape[0])
 
         if self.penalty_start > 0:
             beta_ = beta[self.penalty_start:, :]
@@ -597,8 +598,8 @@ class RidgeLogisticRegression(properties.CompositeFunction,
         >>> rr = RidgeLogisticRegression(X=X, y=y, k=2.71828182, mean=True)
         >>> beta = np.random.rand(150, 1)
         >>> round(np.linalg.norm(rr.grad(beta)
-        ...       - rr.approx_grad(beta, eps=1e-4)), 11)
-        7.3e-10
+        ...       - rr.approx_grad(beta, eps=1e-4)), 11) < 1e-9
+        True
         >>>
         >>> np.random.seed(42)
         >>> X = np.random.rand(100, 150)
@@ -612,11 +613,12 @@ class RidgeLogisticRegression(properties.CompositeFunction,
         True
         """
         Xbeta = np.dot(self.X, beta)
-        pi = 1.0 / (1.0 + np.exp(-Xbeta))
+#        pi = 1.0 / (1.0 + np.exp(-Xbeta))
+        pi = np.reciprocal(1.0 + np.exp(-Xbeta))
 
         grad = -np.dot(self.X.T, self.weights * (self.y - pi))
         if self.mean:
-            grad /= float(self.X.shape[0])
+            grad *= 1.0 / float(self.X.shape[0])
 
         if self.penalty_start > 0:
             gradL2 = np.vstack((np.zeros((self.penalty_start, 1)),

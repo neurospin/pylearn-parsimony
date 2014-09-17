@@ -178,7 +178,7 @@ class GroupLassoOverlap(properties.NesterovFunction,
             astar = a[i]
             normas = np.sqrt(np.sum(astar ** 2.0))
             if normas > 1.0:
-                astar /= normas
+                astar *= 1.0 / normas
             a[i] = astar
 
         return a
