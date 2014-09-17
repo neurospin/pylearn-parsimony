@@ -723,22 +723,22 @@ class LinearRegressionL1L2TV(RegressionEstimator):
     ...                     algorithm=proximal.CONESTA(max_iter=1000),
     ...                     mean=False)
     >>> res = lr.fit(X, y)
-    >>> round(lr.score(X, y), 15)
-    0.06835858955593
+    >>> round(lr.score(X, y), 13)
+    0.0683585895559
     >>>
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                                algorithm=proximal.FISTA(max_iter=1000),
     ...                                mean=False)
     >>> lr = lr.fit(X, y)
-    >>> round(lr.score(X, y), 15)
-    1.581757712718387
+    >>> round(lr.score(X, y), 13)
+    1.5817577127184
     >>>
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                                 algorithm=proximal.ISTA(max_iter=1000),
     ...                                 mean=False)
     >>> lr = lr.fit(X, y)
-    >>> round(lr.score(X, y), 15)
-    2.075830688996743
+    >>> round(lr.score(X, y), 14)
+    2.07583068899674
     >>>
     >>> import parsimony.functions.nesterov.l1tv as l1tv
     >>> np.random.seed(1337)
@@ -747,8 +747,8 @@ class LinearRegressionL1L2TV(RegressionEstimator):
     ...                                 algorithm=proximal.ADMM(max_iter=1000),
     ...                                 mean=False)
     >>> lr = lr.fit(X, y)
-    >>> round(lr.score(X, y), 15)
-    0.06235524125433
+    >>> round(lr.score(X, y), 13)
+    0.0623552412543
     """
     def __init__(self, l1, l2, tv,
                  A=None, mu=consts.TOLERANCE,
@@ -928,16 +928,16 @@ class LinearRegressionL1L2GL(RegressionEstimator):
     ...                                   algorithm_params=dict(max_iter=1000),
     ...                                   mean=False)
     >>> res = lr.fit(X, y)
-    >>> round(lr.score(X, y), 15)
-    0.610518856648893
+    >>> round(lr.score(X, y), 14)
+    0.61051885664889
     >>>
     >>> lr = estimators.LinearRegressionL1L2GL(l1, l2, gl, A,
     ...                                  algorithm=proximal.CONESTA(),
     ...                                  algorithm_params=dict(max_iter=1000),
     ...                                  mean=False)
     >>> res = lr.fit(X, y)
-    >>> round(lr.score(X, y), 15)
-    0.611104593476196
+    >>> round(lr.score(X, y), 11)
+    0.61110459348
     >>>
     >>> lr = estimators.LinearRegressionL1L2GL(l1, l2, gl, A,
     ...                                   algorithm=proximal.FISTA(),
@@ -1798,11 +1798,12 @@ class LinearRegressionL2SmoothedL1TV(RegressionEstimator):
     >>> A = l1tv.A_from_shape(shape, p, penalty_start=0)
     >>> lr = estimators.LinearRegressionL2SmoothedL1TV(l2, l1, tv, A,
     ...                 algorithm=primaldual.ExcessiveGapMethod(),
-    ...                 algorithm_params=dict(max_iter=1000))
+    ...                 algorithm_params=dict(max_iter=1000),
+    ...                 mean=False)
     >>> res = lr.fit(X, y)
     >>> error = lr.score(X, y)
-    >>> print "error = ", error
-    error =  0.0683730496916
+    >>> round(error, 14)
+    0.06837304969156
     """
     def __init__(self, l2, l1, tv,
                  A=None,
