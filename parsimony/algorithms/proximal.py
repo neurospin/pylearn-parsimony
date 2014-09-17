@@ -338,6 +338,7 @@ class FISTA(bases.ExplicitAlgorithm,
 #                    print "FISTA: Gap < eps!"
 
                     break
+#                    pass
             else:
                 if step > 0.0:
                     if (1.0 / step) * maths.norm(betanew - z) < self.eps \

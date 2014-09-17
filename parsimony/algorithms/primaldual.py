@@ -54,7 +54,6 @@ class ExcessiveGapMethod(bases.ExplicitAlgorithm,
             number of iterations that must be performed. Default is 1.
     """
     INTERFACES = [properties.NesterovFunction,
-#                  properties.LipschitzContinuousGradient,
                   properties.GradientMap,
                   properties.DualFunction,
                   properties.StronglyConvex]
@@ -66,6 +65,7 @@ class ExcessiveGapMethod(bases.ExplicitAlgorithm,
                      Info.fvalue,
                      Info.mu,
                      Info.bound,
+                     Info.gap,
                      Info.beta]
 
     def __init__(self, eps=consts.TOLERANCE,
@@ -119,6 +119,8 @@ class ExcessiveGapMethod(bases.ExplicitAlgorithm,
             f = []
         if self.info_requested(Info.bound):
             bound = []
+        if self.info_requested(Info.gap):
+            gap = []
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
 
@@ -139,7 +141,8 @@ class ExcessiveGapMethod(bases.ExplicitAlgorithm,
             beta = (1.0 - tau) * beta + tau * betahat
             alpha = function.V(u, betahat, L)
 
-            upper_limit = mu[k + 1] * function.M()
+#            Gamma = mu[k + 1] * function.M()
+            Gamma = (4.0 * function.M() * mu[0]) / ((k + 1.0) * (k + 2.0))
 
             if self.info_requested(Info.time):
                 t.append(utils.time_cpu() - tm)
@@ -151,14 +154,19 @@ class ExcessiveGapMethod(bases.ExplicitAlgorithm,
             if self.info_requested(Info.bound):
 #                bound.append(2.0 * function.M() * mu[0] \
 #                        / ((float(k) + 1.0) * (float(k) + 2.0)))
-                bound.append(upper_limit)
+#                bound[-1] += function.phi(alpha, beta)
+#                bound.append(function.phi(alpha, beta))
+                bound.append(Gamma + function.phi(alpha, beta))
+            if self.info_requested(Info.gap):
+                gap.append(Gamma)
 
-            if upper_limit < self.eps and k >= self.min_iter - 1:
+            if Gamma < self.eps and k >= self.min_iter - 1:
 
                 if self.info_requested(Info.converged):
                     self.info_set(Info.converged, True)
 
                 break
+#                pass
 
             if k >= self.max_iter - 1 and k >= self.min_iter - 1:
                 break
@@ -175,6 +183,8 @@ class ExcessiveGapMethod(bases.ExplicitAlgorithm,
             self.info_set(Info.mu, mu)
         if self.info_requested(Info.bound):
             self.info_set(Info.bound, bound)
+        if self.info_requested(Info.gap):
+            self.info_set(Info.gap, gap)
         if self.info_requested(Info.beta):
             self.info_set(Info.beta, beta0)
         if self.info_requested(Info.ok):

@@ -1156,7 +1156,6 @@ class LogisticRegressionL1L2GL(LinearRegressionL1L2GL):
 
 
 class LinearRegressionL2SmoothedL1TV(properties.CompositeFunction,
-#                                     properties.LipschitzContinuousGradient,
                                      properties.NesterovFunction,
                                      properties.GradientMap,
                                      properties.DualFunction,
@@ -1211,7 +1210,7 @@ class LinearRegressionL2SmoothedL1TV(properties.CompositeFunction,
 
         self.mu = float(mu)
 
-        self.penalty_start = int(penalty_start)
+        self.penalty_start = max(0, int(penalty_start))
         self.mean = bool(mean)
 
         self.reset()
@@ -1290,7 +1289,7 @@ class LinearRegressionL2SmoothedL1TV(properties.CompositeFunction,
         """
         return self.g.parameter()
 
-    def V(self, u, beta, L):
+    def V(self, alpha, beta, L):
         """The gradient map associated to the function.
 
         From the interface "GradientMap".
@@ -1310,9 +1309,9 @@ class LinearRegressionL2SmoothedL1TV(properties.CompositeFunction,
         a[2] = (1.0 / L) * A[2].dot(beta_)
         a[3] = (1.0 / L) * A[3].dot(beta_)
 
-        u_new = [0] * len(u)
-        for i in xrange(len(u)):
-            u_new[i] = u[i] + a[i]
+        u_new = [0] * len(alpha)
+        for i in xrange(len(alpha)):
+            u_new[i] = alpha[i] + a[i]
 
         return self.h.project(u_new)
 
@@ -1332,20 +1331,26 @@ class LinearRegressionL2SmoothedL1TV(properties.CompositeFunction,
         # LinearRegressionL1L2TV._beta_hat.
 
         A = self.h.A()
-        grad = A[0].T.dot(alpha[0])  # L1
-        grad += A[1].T.dot(alpha[1])  # TV X
-        grad += A[2].T.dot(alpha[2])  # TV Y
-        grad += A[3].T.dot(alpha[3])  # TV Z
+        lAta = A[0].T.dot(alpha[0])  # L1
+        lAta += A[1].T.dot(alpha[1])  # TV X
+        lAta += A[2].T.dot(alpha[2])  # TV Y
+        lAta += A[3].T.dot(alpha[3])  # TV Z
 
         if self.penalty_start > 0:
-            grad = np.vstack((np.zeros((self.penalty_start, 1)), grad))
+            lAta = np.vstack((np.zeros((self.penalty_start, 1)),
+                              lAta))
 
 #        XXkI = np.dot(X.T, X) + self.g.k * np.eye(X.shape[1])
 
-        if self._Xy is None:
-            self._Xy = np.dot(self.X.T, self.y)
+        n = float(self.X.shape[0])
 
-        Xty_grad = (self._Xy - grad) / self.g.k
+        if self._Xy is None:
+            if self.mean:
+                self._Xy = np.dot(self.X.T, self.y) / n
+            else:
+                self._Xy = np.dot(self.X.T, self.y)
+
+        Xty_lAta = (self._Xy - lAta) / self.g.k
 
 #        t = time()
 #        XXkI = np.dot(X.T, X)
@@ -1353,16 +1358,19 @@ class LinearRegressionL2SmoothedL1TV(properties.CompositeFunction,
 #        XXkI[index, index] += self.g.k
 #        invXXkI = np.linalg.inv(XXkI)
 #        print "t:", time() - t
-#        beta = np.dot(invXXkI, Xty_grad)
+#        beta = np.dot(invXXkI, Xty_lAta)
 
         if self._XtinvXXtkI is None:
             XXtkI = np.dot(self.X, self.X.T)
             index = np.arange(min(XXtkI.shape))
-            XXtkI[index, index] += self.g.k
+            if self.mean:
+                XXtkI[index, index] += self.g.k * n
+            else:
+                XXtkI[index, index] += self.g.k
             invXXtkI = np.linalg.inv(XXtkI)
             self._XtinvXXtkI = np.dot(self.X.T, invXXtkI)
 
-        beta = (Xty_grad - np.dot(self._XtinvXXtkI, np.dot(self.X, Xty_grad)))
+        beta = (Xty_lAta - np.dot(self._XtinvXXtkI, np.dot(self.X, Xty_lAta)))
 
         return beta
 
@@ -1375,7 +1383,7 @@ class LinearRegressionL2SmoothedL1TV(properties.CompositeFunction,
         raise NotImplementedError("We cannot currently do this!")
 
     def estimate_mu(self, beta):
-        """Computes a "good" value of \mu with respect to the given \beta.
+        """Computes a "good" value of mu with respect to the given beta.
 
         From the interface "NesterovFunction".
         """
@@ -1385,7 +1393,7 @@ class LinearRegressionL2SmoothedL1TV(properties.CompositeFunction,
         """ The maximum value of the regularisation of the dual variable. We
         have
 
-            M = max_{\alpha \in K} 0.5*|\alpha|²_2.
+            M = max_{alpha in K} 0.5*|alpha|²_2.
 
         From the interface "NesterovFunction".
         """

@@ -10,9 +10,11 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 import sys
 import time
+import hashlib
 
 import numpy as np
 import cProfile as prof
+import matplotlib.pyplot as plot
 
 from parsimony.functions import CombinedFunction
 import parsimony.functions.combinedfunctions as combinedfunctions
@@ -30,10 +32,205 @@ import parsimony.utils.linalgs as linalgs
 import parsimony.estimators as estimators
 import parsimony.utils.consts as consts
 
+import parsimony.estimators as estimators
+import parsimony.algorithms.primaldual as primaldual
+import parsimony.functions.nesterov.l1tv as l1tv
+
 import simulate
+
+np.random.seed(42)
+
+data = np.load("/home/tommy/Jobb/NeuroSpin/dataset.npz")
+
+X = data["X"]
+y = data["y"]
+l = data["l"]
+k = data["k"]
+g = data["g"]
+penalty_start = data["penalty_start"]
+
+shape = (300, 300, 1)
+p = np.prod(shape)
+Atv = simulate.functions.TotalVariation.A_from_shape(shape)
+#                                                   penalty_start=penalty_start)
+Al1tv = l1tv.A_from_shape(shape, p, penalty_start=penalty_start)
+mu = consts.TOLERANCE
+mean=True
+
+func = functions.LinearRegressionL1L2TV(X, y, l, k, g, A=Atv, mu=mu,
+                                        penalty_start=0, mean=mean)
+
+max_iter = 30000
+skip = 10
+
+#####################
+### Excessive gap ###
+#####################
+print("Excessive gap")
+algorithm_params = dict(max_iter=max_iter,
+                        eps=consts.FLOAT_EPSILON,
+                        info=[Info.fvalue,
+                              Info.time,
+                              Info.bound,
+                              Info.beta])
+lr = estimators.LinearRegressionL2SmoothedL1TV(k, l, g, Al1tv,
+                algorithm=primaldual.ExcessiveGapMethod(),
+                algorithm_params=algorithm_params,
+                mean=mean)
+
+print "egm algorithm_params:", algorithm_params, "k, l, g", k, l, g
+print "algorithms.primaldual.__file__", primaldual.__file__
+print "hashlib.sha1(X).hexdigest():", hashlib.sha1(X).hexdigest()
+print "hashlib.sha1(y).hexdigest():", hashlib.sha1(y).hexdigest()
+
+res = lr.fit(X, y)
+error = lr.score(X, y)
+print "error = ", error
+info = lr.get_info()
+beta_start = info[Info.beta]
+
+f = info[Info.fvalue]
+t = np.cumsum(info[Info.time])
+bound = info[Info.bound]
+
+plot.plot(t[skip:], f[skip:], 'r', linewidth=3)
+plot.plot(t[skip:], bound[skip:], 'g', linewidth=3)
+
+######################
+### FISTA small mu ###
+######################
+print("FISTA small mu")
+A = simulate.functions.TotalVariation.A_from_shape(shape)
+lr_ = estimators.LinearRegressionL1L2TV(l, k, g,
+                 A=A, mu=consts.TOLERANCE,
+                 algorithm=proximal.FISTA(),
+                 algorithm_params=dict(max_iter=int(max_iter * 1.1),
+                                       info=[Info.fvalue,
+                                             Info.time],
+                                       tau=0.99,
+                                       mu=mu,
+                                       use_gap=True),
+                 penalty_start=0,
+                 mean=mean,
+                 rho=1.0)
+res = lr_.fit(X, y, beta_start)
+error = lr_.score(X, y)
+print "error = ", error
+info_ = lr_.get_info()
+
+y_ = info_[Info.fvalue]
+t_ = np.cumsum(info_[Info.time])
+
+plot.plot(t_[skip:], y_[skip:], 'b', linewidth=3)
+
+#plot.plot([0, np.max(t_)], [np.min(y), np.min(y)], 'r:')
+
+#print "f(beta*) :", func.f(beta_star)
+print "f(betak) :", func.f(lr.beta)
+print "f(betak_):", func.f(lr_.beta)
+
+plot.ylabel(r"$\log\left(f(\beta^{(k)})\right)$")
+plot.xlabel(r"$\mathrm{Time}\,[s]$")
+plot.yscale('log')
+plot.legend(["Excessive gap", "EG upper bound", "FISTA small mu"])
+plot.show()
+
+
+
+
+
+#shape = (1, 4, 4)
+#n = 10
+#p = shape[0] * shape[1] * shape[2]
 #
 #np.random.seed(42)
+##X = np.random.rand(n, p)
+##y = np.random.rand(n, 1)
+#l1 = 0.1  # L1 coefficient
+#l2 = 0.9  # Ridge coefficient
+#tv = 10.0  # TV coefficient
 #
+#start_vector = start_vectors.RandomStartVector(normalise=True)
+#beta = start_vector.get_vector(p)
+#beta[beta < 0.01] = 0.0
+#
+#alpha = 0.9
+#Sigma = alpha * np.eye(p, p) \
+#      + (1.0 - alpha) * np.random.randn(p, p)
+#mean = np.zeros(p)
+#M = np.random.multivariate_normal(mean, Sigma, n)
+#e = np.random.randn(n, 1)
+#
+#snr = 100.0
+#
+#mu = consts.TOLERANCE
+#
+#A = simulate.functions.TotalVariation.A_from_shape(shape)
+#funcs = [simulate.functions.L1(l1),
+#         simulate.functions.L2Squared(l2),
+#         simulate.functions.SmoothedTotalVariation(tv, A, mu=mu)]
+#simulator = simulate.LinearRegressionData(funcs, M, e, snr=snr,
+#                                          intercept=False)
+#X, y, beta_star = simulator.load(beta)
+#
+#func = functions.LinearRegressionL1L2TV(X, y, l1, l2, tv, A=A, mu=mu,
+#                                        penalty_start=0, mean=False)
+#
+#A = l1tv.A_from_shape(shape, p, penalty_start=0)
+#lr = estimators.LinearRegressionL2SmoothedL1TV(l2, l1, tv, A,
+#                algorithm=primaldual.ExcessiveGapMethod(),
+#                algorithm_params=dict(max_iter=10000,
+#                                      eps=consts.FLOAT_EPSILON,
+#                                      info=[Info.fvalue,
+#                                            Info.time,
+#                                            Info.bound,
+#                                            Info.beta]),
+#                mean=False)
+#res = lr.fit(X, y)
+#error = lr.score(X, y)
+#print "error = ", error
+#info = lr.get_info()
+#beta_start = info[Info.beta]
+#
+#A = simulate.functions.TotalVariation.A_from_shape(shape)
+#lr_ = estimators.LinearRegressionL1L2TV(l1, l2, tv,
+#                 A=A, mu=consts.TOLERANCE,
+#                 algorithm=proximal.FISTA(),
+#                 algorithm_params=dict(max_iter=20000,
+#                                       info=[Info.fvalue,
+#                                             Info.time],
+#                                       tau=0.99,
+#                                       mu=mu),
+#                 penalty_start=0,
+#                 mean=False,
+#                 rho=1.0)
+#res = lr_.fit(X, y, beta_start)
+#error = lr_.score(X, y)
+#print "error = ", error
+#info_ = lr_.get_info()
+#
+#y = info[Info.fvalue]
+#t = np.cumsum(info[Info.time])
+#bound = info[Info.bound]
+#plot.plot(t, y, 'r')
+#plot.plot(t, bound, 'g')
+#
+#y_ = info_[Info.fvalue]
+#t_ = np.cumsum(info_[Info.time])
+#plot.plot(t_, y_, 'b')
+#
+#plot.plot([0, np.max(t_)], [np.min(y), np.min(y)], 'r:')
+#
+#print "f(beta*) :", func.f(beta_star)
+#print "f(betak) :", func.f(lr.beta)
+#print "f(betak_):", func.f(lr_.beta)
+#
+#plot.show()
+
+
+
+
+
 #px = 100
 #py = 1
 #pz = 1
@@ -99,88 +296,88 @@ import simulate
 #pca = PrincipalComponentAnalysisL1TV(X, l, g, A=A, mu=0.01, penalty_start=0)
 
 
-import parsimony.functions.nesterov.gl as gl
-import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
-import parsimony.datasets.simulate.l1_l2_glmu as l1_l2_glmu
-
-n, p = 60, 90
-groups = [range(0, 2 * p / 3), range(p / 3, p)]
-weights = [1.5, 0.5]
-
-A = gl.A_from_groups(p, groups=groups, weights=weights)
-
-alpha = 0.9
-Sigma = alpha * np.eye(p, p) \
-      + (1.0 - alpha) * np.random.randn(p, p)
-mean = np.zeros(p)
-M = np.random.multivariate_normal(mean, Sigma, n)
-e = np.random.randn(n, 1)
-
-start_vector = start_vectors.RandomStartVector(normalise=True)
-beta = start_vector.get_vector(p)
-beta = np.sort(beta, axis=0)
-beta[:10, :] = 0.0
-
-snr = 20.0
-eps = 1e-8
-mu = consts.TOLERANCE
-
-l = 0.618
-k = 1.0 - l
-g = 1.618
-
-X, y, beta_star = l1_l2_glmu.load(l=l, k=k, g=g, beta=beta, M=M, e=e,
-                                A=A, mu=mu, snr=snr)
-
-func = functions.LinearRegressionL1L2GL(X, y, l, k, g,
-                                        A=A, mu=mu,
-                                        penalty_start=0, mean=False)
-
-print func.f(beta)
-#print func.f(beta_start)
-print func.f(beta_star)
-print func.fmu(beta)
-#print func.fmu(beta_start)
-print func.fmu(beta_star)
-print func.gap(beta)
-#print func.gap(beta_start)
-print func.gap(beta_star)
-
-sys.exit(0)
-
-est = estimators.LinearRegressionL1L2GL(l, k, g, A=A, mu=mu,
-                              algorithm=proximal.StaticCONESTA(),
-                              algorithm_params=dict(eps=eps,
-                                                    mu_min=mu,
-                                                    max_iter=30000,
-                                                    tau=0.5,
-                                                    info=[Info.continuations],
-                                                    beta_star=beta_star),
-                              penalty_start=0,
-                              mean=False)
-t_ = time.time()
-est.fit(X, y)
-beta = est.beta
-elapsed_time = time.time() - t_
-print "Time                 :", elapsed_time
-
-func = functions.LinearRegressionL1L2GL(X, y, l, k, g,
-                                        A=A, mu=mu,
-                                        penalty_start=0, mean=False)
-alg = est.algorithm
-
-berr = np.linalg.norm(beta - beta_star)
-print "||betak - beta*||²_2 :", berr
-
-f_parsimony = func.fmu(beta)
-f_star = func.fmu(beta_star)
-ferr = abs(f_parsimony - f_star)
-print "f(betak) - f(beta*)  :", ferr
-print "gap(betak)           :", func.gap(beta)
-assert(ferr < func.gap(beta))
-print "ferr < func.gap(beta):", ferr < func.gap(beta)
-print "gap(beta*)           :", abs(func.gap(beta_star))
-print "# continuations      :", alg.info_get(Info.continuations)
+#import parsimony.functions.nesterov.gl as gl
+#import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
+#import parsimony.datasets.simulate.l1_l2_glmu as l1_l2_glmu
+#
+#n, p = 60, 90
+#groups = [range(0, 2 * p / 3), range(p / 3, p)]
+#weights = [1.5, 0.5]
+#
+#A = gl.A_from_groups(p, groups=groups, weights=weights)
+#
+#alpha = 0.9
+#Sigma = alpha * np.eye(p, p) \
+#      + (1.0 - alpha) * np.random.randn(p, p)
+#mean = np.zeros(p)
+#M = np.random.multivariate_normal(mean, Sigma, n)
+#e = np.random.randn(n, 1)
+#
+#start_vector = start_vectors.RandomStartVector(normalise=True)
+#beta = start_vector.get_vector(p)
+#beta = np.sort(beta, axis=0)
+#beta[:10, :] = 0.0
+#
+#snr = 20.0
+#eps = 1e-8
+#mu = consts.TOLERANCE
+#
+#l = 0.618
+#k = 1.0 - l
+#g = 1.618
+#
+#X, y, beta_star = l1_l2_glmu.load(l=l, k=k, g=g, beta=beta, M=M, e=e,
+#                                A=A, mu=mu, snr=snr)
+#
+#func = functions.LinearRegressionL1L2GL(X, y, l, k, g,
+#                                        A=A, mu=mu,
+#                                        penalty_start=0, mean=False)
+#
+#print func.f(beta)
+##print func.f(beta_start)
+#print func.f(beta_star)
+#print func.fmu(beta)
+##print func.fmu(beta_start)
+#print func.fmu(beta_star)
+#print func.gap(beta)
+##print func.gap(beta_start)
+#print func.gap(beta_star)
+#
+#sys.exit(0)
+#
+#est = estimators.LinearRegressionL1L2GL(l, k, g, A=A, mu=mu,
+#                              algorithm=proximal.StaticCONESTA(),
+#                              algorithm_params=dict(eps=eps,
+#                                                    mu_min=mu,
+#                                                    max_iter=30000,
+#                                                    tau=0.5,
+#                                                    info=[Info.continuations],
+#                                                    beta_star=beta_star),
+#                              penalty_start=0,
+#                              mean=False)
+#t_ = time.time()
+#est.fit(X, y)
+#beta = est.beta
+#elapsed_time = time.time() - t_
+#print "Time                 :", elapsed_time
+#
+#func = functions.LinearRegressionL1L2GL(X, y, l, k, g,
+#                                        A=A, mu=mu,
+#                                        penalty_start=0, mean=False)
+#alg = est.algorithm
+#
+#berr = np.linalg.norm(beta - beta_star)
+#print "||betak - beta*||²_2 :", berr
+#
+#f_parsimony = func.fmu(beta)
+#f_star = func.fmu(beta_star)
+#ferr = abs(f_parsimony - f_star)
+#print "f(betak) - f(beta*)  :", ferr
+#print "gap(betak)           :", func.gap(beta)
+#assert(ferr < func.gap(beta))
+#print "ferr < func.gap(beta):", ferr < func.gap(beta)
+#print "gap(beta*)           :", abs(func.gap(beta_star))
+#print "# continuations      :", alg.info_get(Info.continuations)
 
 
 

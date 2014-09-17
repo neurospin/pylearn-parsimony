@@ -85,6 +85,7 @@ class L1TV(properties.NesterovFunction,
         else:
             beta_ = beta
 
+        # lambda and gamma are in A.
         A = self.A()
         return maths.norm1(A[0].dot(beta_)) + \
                np.sum(np.sqrt(A[1].dot(beta_) ** 2.0 +

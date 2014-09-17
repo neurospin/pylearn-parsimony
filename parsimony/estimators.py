@@ -1818,9 +1818,9 @@ class LinearRegressionL2SmoothedL1TV(RegressionEstimator):
         super(LinearRegressionL2SmoothedL1TV, self).__init__(
                                                      algorithm=algorithm)
 
-        self.l2 = float(l2)
-        self.l1 = float(l1)
-        self.tv = float(tv)
+        self.l2 = max(0.0, float(l2))
+        self.l1 = max(0.0, float(l1))
+        self.tv = max(0.0, float(tv))
 
         if self.l2 < consts.TOLERANCE:
             warnings.warn("The ridge parameter should be non-zero.")
@@ -1829,7 +1829,7 @@ class LinearRegressionL2SmoothedL1TV(RegressionEstimator):
             raise TypeError("The A matrix may not be None.")
         self.A = A
 
-        self.penalty_start = int(penalty_start)
+        self.penalty_start = max(0, int(penalty_start))
         self.mean = bool(mean)
 
     def get_params(self):

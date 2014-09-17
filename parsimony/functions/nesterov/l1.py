@@ -23,13 +23,9 @@ import parsimony.utils.maths as maths
 __all__ = ["L1", "A_from_variables"]
 
 
-class L1(#properties.AtomicFunction,
-         properties.NesterovFunction,
+class L1(properties.NesterovFunction,
          properties.Penalty,
-         properties.Constraint,
-#         properties.Gradient,
-#         properties.LipschitzContinuousGradient
-         ):
+         properties.Constraint):
     """The proximal operator of the smoothed L1 function
 
         f(beta) = l * (L1mu(beta) - c),
