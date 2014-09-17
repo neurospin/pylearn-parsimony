@@ -529,8 +529,6 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
         else:
             beta_ = beta
 
-        alpha = self.tv.alpha(beta_)
-
 #        A = self.A()
 #        alpha = [0] * len(A)
 #        anorm = 0.0
@@ -546,6 +544,7 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
 #        for j in xrange(len(alpha)):
 #            alpha[j][i] = 0.0
 
+        alpha = self.tv.alpha(beta)
         g = self.fmu(beta)
 
         n = float(self.X.shape[0])
@@ -561,9 +560,15 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
         if self.penalty_start > 0:
             lAta = np.vstack((np.zeros((self.penalty_start, 1)),
                               lAta))
+
+        alpha_sqsum = 0.0
+        for a_ in alpha:
+            alpha_sqsum += np.sum(a_ ** 2.0)
+
         z = -np.dot(self.X.T, a)
         h_ = (1.0 / (2 * self.rr.k)) \
-           * np.sum(maths.positive(np.abs(z - lAta) - self.l1.l) ** 2.0)
+           * np.sum(maths.positive(np.abs(z - lAta) - self.l1.l) ** 2.0) \
+           + (0.5 * self.tv.l * self.tv.get_mu() * alpha_sqsum)
 
 #        print "g :", g
 #        print "f_:", f_
@@ -955,7 +960,7 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
 #
 #        g = self.f(beta)
 
-        alpha = self.gl.alpha(beta_)
+        alpha = self.gl.alpha(beta)
         g = self.fmu(beta)
 
         n = float(self.X.shape[0])
@@ -972,9 +977,14 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
             lAta = np.vstack((np.zeros((self.penalty_start, 1)),
                               lAta))
 
+        alpha_sqsum = 0.0
+        for a_ in alpha:
+            alpha_sqsum += np.sum(a_ ** 2.0)
+
         z = -np.dot(self.X.T, a)
         h_ = (1.0 / (2 * self.rr.k)) \
-           * np.sum(maths.positive(np.abs(z - lAta) - self.l1.l) ** 2.0)
+           * np.sum(maths.positive(np.abs(z - lAta) - self.l1.l) ** 2.0) \
+           + (0.5 * self.gl.l * self.gl.get_mu() * alpha_sqsum)
 
 #        print "g :", g
 #        print "f_:", f_
@@ -1031,11 +1041,11 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
         return self.gl.A()
 
     def Aa(self, alpha):
-        """Computes A^\T\alpha.
+        """Computes A^T.alpha.
 
         From the interface "NesterovFunction".
         """
-        return self.gl.Aa()
+        return self.gl.Aa(alpha)
 
     def project(self, a):
         """ Projection onto the compact space of the Nesterov function.
