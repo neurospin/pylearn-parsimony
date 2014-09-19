@@ -58,7 +58,8 @@ class TestL1(TestCase):
         function = CombinedFunction()
         function.add_function(losses.LinearRegression(X, y,
                                                    mean=False))
-        A = nesterov.l1.A_from_variables(p, penalty_start=penalty_start)
+        A = nesterov.l1.linear_operator_from_variables(p,
+                                                    penalty_start=penalty_start)
         function.add_penalty(nesterov.l1.L1(l, A=A, mu=mu_min,
                                             penalty_start=penalty_start))
 #        function.add_prox(penalties.L1(l, penalty_start=penalty_start))
@@ -73,7 +74,8 @@ class TestL1(TestCase):
         # Test proximal operator
         function = CombinedFunction()
         function.add_function(losses.LinearRegression(X, y, mean=False))
-        A = nesterov.l1.A_from_variables(p, penalty_start=penalty_start)
+        A = nesterov.l1.linear_operator_from_variables(p,
+                                                   penalty_start=penalty_start)
         function.add_prox(nesterov.l1.L1(l, A=A, mu=mu_min,
                                          penalty_start=penalty_start))
 
@@ -128,7 +130,7 @@ class TestL1(TestCase):
             function = CombinedFunction()
             function.add_function(losses.LinearRegression(X, y, mean=False))
 
-            A = nesterov.l1.A_from_variables(p, penalty_start=0)
+            A = nesterov.l1.linear_operator_from_variables(p, penalty_start=0)
             function.add_penalty(nesterov.l1.L1(l, A=A, mu=mu,
                                                 penalty_start=0))
 
@@ -143,7 +145,7 @@ class TestL1(TestCase):
         beta = beta_start
         function = CombinedFunction()
         function.add_function(losses.LinearRegression(X, y, mean=False))
-        A = nesterov.l1.A_from_variables(p, penalty_start=0)
+        A = nesterov.l1.linear_operator_from_variables(p, penalty_start=0)
 #        function.add_penalty(nesterov.l1.L1(l, A=A, mu=mu_min,
 #                                            penalty_start=penalty_start))
         function.add_prox(nesterov.l1.L1(l, A=A, mu=5e-5,
@@ -199,7 +201,7 @@ class TestL1TV(TestCase):
 
         mu = 5e-3
 
-        A, _ = tv.A_from_shape(shape)
+        A, _ = tv.linear_operator_from_shape(shape)
 #        X, y, beta_star = l1_l2_tvmu.load(l=l, k=k, g=g, beta=beta, M=M, e=e,
 #                                        A=A, mu=mu, snr=snr)
 
@@ -220,9 +222,9 @@ class TestL1TV(TestCase):
         function.add_function(functions.losses.LinearRegression(X, y,
                                                                mean=False))
         function.add_penalty(penalties.L2Squared(l=k))
-        A = l1tv.A_from_shape(shape, p)
+        A = l1tv.linear_operator_from_shape(shape, p)
         function.add_prox(l1tv.L1TV(l, g, A=A, mu=mu, penalty_start=0))
-#        A, _ = tv.A_from_shape(shape)
+#        A, _ = tv.linear_operator_from_shape(shape)
 #        function.add_penalty(tv.TotalVariation(l=g, A=A, mu=mu,
 #                                               penalty_start=0))
 #        function.add_prox(penalties.L1(l=l))

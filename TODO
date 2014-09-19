@@ -141,35 +141,35 @@
 
 ./parsimony/functions/nesterov/tv.py:
 ------------------------------------
-158: # TODO: This only work if the elements of self._A are scipy.sparse. We
-159: # should allow dense matrices as well.
+161: # TODO: This only work if the elements of self._A are scipy.sparse. We
+162: # should allow dense matrices as well.
 
-162: # TODO: Instead of p, this should really be the number of non-zero
-163: # rows of A.
+165: # TODO: Instead of p, this should really be the number of non-zero
+166: # rows of A.
 
-173: # TODO: Add max_iter here!
+176: # TODO: Add max_iter here!
 
 ./parsimony/functions/nesterov/l1tv.py:
 --------------------------------------
-62: # WARNING: Number of non-zero rows may differ from p.
+65: # WARNING: Number of non-zero rows may differ from p.
 
-146: # TODO: Instead of p, this should really be the number of non-zero
-147: # rows of A.
+149: # TODO: Instead of p, this should really be the number of non-zero
+150: # rows of A.
 
-158: # TODO: Add max_iter here!!
+161: # TODO: Add max_iter here!!
 
-267: # TODO: Do we need to take the number of variables here?
-268: # Why not use np.prod(shape) + penalty_start instead and save a parameter?
+276: # TODO: Do we need to take the number of variables here?
+277: # Why not use np.prod(shape) + penalty_start instead and save a parameter?
 
-291: # TODO: Do we need to take the number of variables here?
-292: # Why not use np.prod(shape) + penalty_start instead and save a parameter?
+306: # TODO: Do we need to take the number of variables here?
+307: # Why not use np.prod(shape) + penalty_start instead and save a parameter?
 
 ./parsimony/functions/nesterov/grouptv.py:
 -----------------------------------------
-158: # TODO: This only work if the elements of self._A are scipy.sparse. We
-159: # should allow dense matrices as well.
+157: # TODO: This only work if the elements of self._A are scipy.sparse. We
+158: # should allow dense matrices as well.
 
-165: # TODO: Add max_iter here!
+164: # TODO: Add max_iter here!
 
 ./parsimony/datasets/regression/dice5.py:
 ----------------------------------------

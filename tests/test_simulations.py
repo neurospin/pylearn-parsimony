@@ -61,7 +61,7 @@ class TestSimulations(TestCase):
         k = 1.0 - l
         g = 1.618
 
-        A, _ = tv.A_from_shape(shape)
+        A, _ = tv.linear_operator_from_shape(shape)
         snr = 100.0
         eps = 1e-8
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
@@ -255,7 +255,7 @@ class TestSimulations(TestCase):
 #        k = 1.0 - l
 #        g = 1.618
 #
-#        A, _ = tv.A_from_shape(shape)
+#        A, _ = tv.linear_operator_from_shape(shape)
 #        snr = 100.0
 #        eps = 1e-8
 #        mus = [5e-2, 5e-4, 5e-6, 5e-8]
@@ -535,7 +535,7 @@ class TestSimulations(TestCase):
         k = 1.0 - l
         g = 1.618
 
-        A, _ = tv.A_from_shape(shape)
+        A, _ = tv.linear_operator_from_shape(shape)
         snr = 100.0
         eps = 1e-8
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
@@ -829,7 +829,7 @@ class TestSimulations(TestCase):
 #        g = 1.618
 #
 #        groups = [range(0, 2 * p / 3), range(p / 3, p - 1)]
-#        A = gl.A_from_groups(p - 1, groups=groups)
+#        A = gl.linear_operator_from_groups(p - 1, groups=groups)
 #
 #        snr = 100.0
 #        eps = 1e-8
@@ -1112,7 +1112,7 @@ class TestSimulations(TestCase):
         g = 1.618
 
         groups = [range(0, 2 * p / 3), range(p / 3, p - 1)]
-        A = gl.A_from_groups(p - 1, groups=groups)
+        A = gl.linear_operator_from_groups(p - 1, groups=groups)
 
         snr = 100.0
         eps = 1e-8
@@ -1406,7 +1406,7 @@ class TestSimulations(TestCase):
 #        k = 1.0 - l
 #        g = 1.618
 #
-#        A, _ = tv.A_from_shape(shape)
+#        A, _ = tv.linear_operator_from_shape(shape)
 #        snr = 100.0
 #        eps = 1e-8
 #        mus = [5e-2, 5e-4, 5e-6, 5e-8]
@@ -1681,7 +1681,7 @@ class TestSimulations(TestCase):
 #        g = 1.618
 #
 #        groups = [range(0, 2 * p / 3), range(p / 3, p - 1)]
-#        A = gl.A_from_groups(p - 1, groups=groups)
+#        A = gl.linear_operator_from_groups(p - 1, groups=groups)
 #
 #        snr = 100.0
 #        eps = 1e-8

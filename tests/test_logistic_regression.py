@@ -43,7 +43,7 @@ class TestLogisticRegression(TestCase):
         shape = (pz, py, px)
         n, p = 50, np.prod(shape)
 
-        A, _ = tv.A_from_shape(shape)
+        A, _ = tv.linear_operator_from_shape(shape)
 
         alpha = 0.9
         Sigma = alpha * np.eye(p, p) \
@@ -173,7 +173,7 @@ class TestLogisticRegression(TestCase):
         shape = (pz, py, px)
         n, p = 50, np.prod(shape)
 
-        A, _ = tv.A_from_shape(shape)
+        A, _ = tv.linear_operator_from_shape(shape)
 
         alpha = 0.9
         Sigma = alpha * np.eye(p, p) \
@@ -304,7 +304,7 @@ class TestLogisticRegression(TestCase):
         shape = (pz, py, px)
         n, p = 50, np.prod(shape) + 1
 
-        A, _ = tv.A_from_shape(shape)
+        A, _ = tv.linear_operator_from_shape(shape)
 
         alpha = 0.9
         Sigma = alpha * np.eye(p - 1, p - 1) \
@@ -437,7 +437,7 @@ class TestLogisticRegression(TestCase):
         shape = (pz, py, px)
         n, p = 50, np.prod(shape)
 
-        A, _ = tv.A_from_shape(shape)
+        A, _ = tv.linear_operator_from_shape(shape)
 
         alpha = 0.9
         Sigma = alpha * np.eye(p, p) \
@@ -600,7 +600,7 @@ class TestLogisticRegression(TestCase):
         shape = (pz, py, px)
         n, p = 50, np.prod(shape) + 1
 
-        A, _ = tv.A_from_shape(shape)
+        A, _ = tv.linear_operator_from_shape(shape)
 
         alpha = 0.9
         Sigma = alpha * np.eye(p - 1, p - 1) \
@@ -735,7 +735,7 @@ class TestLogisticRegression(TestCase):
         groups = [range(0, p / 2), range(p / 2, p)]
 #        weights = [1.5, 0.5]
 
-        A = gl.A_from_groups(p, groups=groups)  # , weights=weights)
+        A = gl.linear_operator_from_groups(p, groups=groups)  # , weights=weights)
 
         alpha = 0.9
         Sigma = alpha * np.eye(p, p) \
@@ -882,7 +882,7 @@ class TestLogisticRegression(TestCase):
         shape = (pz, py, px)
         n, p = 50, np.prod(shape)
 
-        A, _ = tv.A_from_shape(shape)
+        A, _ = tv.linear_operator_from_shape(shape)
 
         alpha = 0.9
         Sigma = alpha * np.eye(p, p) \
@@ -1015,7 +1015,7 @@ class TestLogisticRegression(TestCase):
         shape = (pz, py, px)
         n, p = 50, np.prod(shape) + 1
 
-        A, _ = tv.A_from_shape(shape)
+        A, _ = tv.linear_operator_from_shape(shape)
 
         alpha = 0.9
         Sigma = alpha * np.eye(p - 1, p - 1) \
@@ -1149,7 +1149,7 @@ class TestLogisticRegression(TestCase):
         groups = [range(0, p / 2), range(p / 2, p)]
 #        weights = [1.5, 0.5]
 
-        A = gl.A_from_groups(p, groups=groups)  # , weights=weights)
+        A = gl.linear_operator_from_groups(p, groups=groups)  # , weights=weights)
 
         alpha = 0.9
         Sigma = alpha * np.eye(p, p) \
@@ -1291,7 +1291,7 @@ class TestLogisticRegression(TestCase):
 #        n, p = 50, 100 + 1
 #        groups = [range(0, p / 2), range(p / 2, p - 1)]
 #
-#        A = gl.A_from_groups(p - 1, groups=groups)
+#        A = gl.linear_operator_from_groups(p - 1, groups=groups)
 #
 #        alpha = 0.9
 #        Sigma = alpha * np.eye(p - 1, p - 1) \
@@ -1414,7 +1414,7 @@ class TestLogisticRegression(TestCase):
         shape = (pz, py, px)
         n, p = 100, np.prod(shape)
 
-        A, _ = tv.A_from_shape(shape)
+        A, _ = tv.linear_operator_from_shape(shape)
 
         alpha = 0.9
         Sigma = alpha * np.eye(p, p) \

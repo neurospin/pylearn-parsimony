@@ -499,7 +499,7 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
                                               mean=self.mean))
         function.add_function(losses.LinearFunction(Ata_tv))
 #        function.add_function(losses.LinearFunction(Ata_l1))
-#        A = nesterov.l1.A_from_variables(self.X.shape[1],
+#        A = nesterov.l1.linear_operator_from_variables(self.X.shape[1],
 #                                         penalty_start=self.penalty_start)
 #        function.add_penalty(nesterov.l1.L1(self.l1.l, A=A, mu=mu_min,
 #                                            penalty_start=self.penalty_start))
@@ -864,7 +864,7 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
             Ata_gl = np.vstack((np.zeros((self.penalty_start, 1)),
                                 Ata_gl))
 
-##        Al1 = nesterov.l1.A_from_variables(self.X.shape[1],
+##        Al1 = nesterov.l1.linear_operator_from_variables(self.X.shape[1],
 ##                                           penalty_start=self.penalty_start)
 ##        smoothed_l1 = nesterov.l1.L1(self.l1.l, A=Al1, mu=mu_min,
 ##                                     penalty_start=self.penalty_start)
@@ -915,7 +915,7 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
                                               mean=self.mean))
         function.add_function(losses.LinearFunction(Ata_gl))
 #        function.add_function(losses.LinearFunction(Ata_l1))
-#        A = nesterov.l1.A_from_variables(self.X.shape[1],
+#        A = nesterov.l1.linear_operator_from_variables(self.X.shape[1],
 #                                         penalty_start=self.penalty_start)
 #        function.add_penalty(nesterov.l1.L1(self.l1.l, A=A, mu=mu_min,
 #                                            penalty_start=self.penalty_start))

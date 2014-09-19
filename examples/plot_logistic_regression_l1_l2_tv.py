@@ -55,7 +55,7 @@ algorithm = algorithms.primaldual.StaticCONESTA(max_iter=500)
 ## Use parsimony l2 penalized LogisticRegression: LogisticRegressionL1L2TV with l1=tv=0
 # Minimize:
 #    f(beta, X, y) = - loglik/n_train + k/2 * ||beta||^2_2
-A, n_compacts = nesterov_tv.A_from_shape(beta3d.shape)
+A, n_compacts = nesterov_tv.linear_operator_from_shape(beta3d.shape)
 ridge2 = estimators.LogisticRegressionL1L2TV(0, alpha, 0, A, algorithm=algorithm)
 yte_pred_ridge2 = ridge2.fit(Xtr, ytr).predict(Xte)
 _, recall_ridge2, _, _ = precision_recall_fscore_support(yte, yte_pred_ridge2, average=None)
@@ -68,7 +68,7 @@ _, recall_ridge2, _, _ = precision_recall_fscore_support(yte, yte_pred_ridge2, a
 #                    + l * ||beta||_1
 #                    + g * TV(beta)
 l1, l2, tv = alpha * np.array((.33, .33, .33)) / 10 # l2, l1, tv penalties
-A, n_compacts = nesterov_tv.A_from_shape(beta3d.shape)
+A, n_compacts = nesterov_tv.linear_operator_from_shape(beta3d.shape)
 enettv = estimators.LogisticRegressionL1L2TV(l1, l2, tv, A, algorithm=algorithm)
 yte_pred_enettv = enettv.fit(Xtr, ytr).predict(Xte)
 _, recall_enettv, _, _ = precision_recall_fscore_support(yte, yte_pred_enettv, average=None)

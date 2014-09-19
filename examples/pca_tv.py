@@ -19,7 +19,7 @@ shape = (30, 30, 1)
 X3d, y, beta3d = parsimony.datasets.make_regression_struct(n_samples=n_samples,
     shape=shape, r2=.75, random_seed=1)
 X = X3d.reshape((n_samples, np.prod(shape)))
-A, n_compacts = tv.A_from_shape(shape)
+A, n_compacts = tv.linear_operator_from_shape(shape)
 start_vector = start_vectors.RandomStartVector()
 w = start_vector.get_vector(X.shape[1])
 

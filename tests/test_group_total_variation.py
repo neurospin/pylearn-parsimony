@@ -61,7 +61,7 @@ class TestGroupTotalVariation(TestCase):
 
         snr = 100.0
 
-        A = grouptv.A_from_rects(rects, shape)
+        A = grouptv.linear_operator_from_rects(rects, shape)
         mu_min = 5e-8
         X, y, beta_star = l1_l2_grouptvmu.load(l=l, k=k, g=g, beta=beta,
                                                M=M, e=e, A=A, mu=mu_min,
@@ -136,7 +136,7 @@ class TestGroupTotalVariation(TestCase):
 
         snr = 100.0
 
-        A = grouptv.A_from_rects(rects, shape)
+        A = grouptv.linear_operator_from_rects(rects, shape)
         mu_min = 5e-8
         X, y, beta_star = l1_l2_grouptvmu.load(l=l, k=k, g=g, beta=beta,
                                                M=M, e=e, A=A, mu=mu_min,

@@ -13,9 +13,9 @@ ParsimonY contains the following features:
         * Overlapping Group LASSO (GL)
         * Any combination of the above
     * Algorithms:
-        * _I_terative _S_hrinkage-_T_hresholding _A_lgorithm (fista)
-        * _F_ast _I_terative _S_hrinkage-_T_hresholding _A_lgorithm (fista)
-        * _CO_ntinuation of _NEST_sterov’s smoothing _A_lgorithm (conesta)
+        * _I_ terative _S_ hrinkage-_T_ hresholding _A_ lgorithm (fista)
+        * _F_ ast _I_ terative _S_ hrinkage-_T_ hresholding _A_ lgorithm (fista)
+        * _CO_ ntinuation of _NEST_ sterov’s smoothing _A_ lgorithm (conesta)
         * Excessive gap method
     * Estimators
         * LinearRegression
@@ -99,7 +99,7 @@ import parsimony.functions.nesterov.tv as tv
 k = 0.0  # l2 ridge regression coefficient
 l = 0.0  # l1 lasso coefficient
 g = 1.0  # tv coefficient
-A, n_compacts = tv.A_from_shape(shape)  # Memory allocation for TV
+A, n_compacts = tv.linear_operator_from_shape(shape)  # Memory allocation for TV
 olstv = estimators.LinearRegressionL1L2TV(k, l, g, A, mu=0.0001,
                                          algorithm=algorithms.explicit.FISTA(),
                                          algorithm_params=dict(max_iter=1000))

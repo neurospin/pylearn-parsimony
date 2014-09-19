@@ -48,7 +48,7 @@ class TestTotalVariation(TestCase):
 
         snr = 100.0
 
-        A, _ = tv.A_from_shape(shape)
+        A, _ = tv.linear_operator_from_shape(shape)
         X, y, beta_star = l1_l2_tv.load(l=l, k=k, g=g, beta=beta, M=M, e=e,
                                         A=A, snr=snr)
 
@@ -138,7 +138,7 @@ class TestTotalVariation(TestCase):
 
         snr = 100.0
 
-        A, _ = tv.A_from_shape(shape)
+        A, _ = tv.linear_operator_from_shape(shape)
         mu_min = 5e-8
         X, y, beta_star = l1_l2_tvmu.load(l=l, k=k, g=g, beta=beta, M=M, e=e,
                                           A=A, mu=mu_min, snr=snr)
@@ -208,7 +208,7 @@ class TestTotalVariation(TestCase):
 
         snr = 100.0
 
-        A, _ = tv.A_from_shape(shape)
+        A, _ = tv.linear_operator_from_shape(shape)
         X, y, beta_star = l1_l2_tv.load(l=l, k=k, g=g, beta=beta, M=M, e=e,
                                         A=A, snr=snr)
 
@@ -279,7 +279,7 @@ class TestTotalVariation(TestCase):
 
         snr = 100.0
 
-        A, _ = tv.A_from_shape(shape)
+        A, _ = tv.linear_operator_from_shape(shape)
         mu_min = 5e-8
         X, y, beta_star = l1_l2_tvmu.load(l=l, k=k, g=g, beta=beta, M=M, e=e,
                                           A=A, mu=mu_min, snr=snr)
@@ -325,7 +325,7 @@ class TestTotalVariation(TestCase):
         count[-1, :, :] -= 1
         return np.sum(np.sqrt(count))
 
-    def test_tvhelper_A_from_shape(self):
+    def test_tvhelper_linear_operator_from_shape(self):
 
         import parsimony.functions.nesterov.tv as tv
 
@@ -335,12 +335,12 @@ class TestTotalVariation(TestCase):
         p = np.prod(shape)
         beta = np.zeros(p)
         beta[0:p:2] = 1  # checkerboard of 0 and 1
-        A, _ = tv.A_from_shape(shape)
+        A, _ = tv.linear_operator_from_shape(shape)
         tvfunc = tv.TotalVariation(l=1.0, A=A)
 
         assert tvfunc.f(beta) == self._f_checkerboard_cube(shape)
 
-    def test_tvhelper_A_from_mask(self):
+    def test_tvhelper_linear_operator_from_mask(self):
 
         import parsimony.functions.nesterov.tv as tv
 
@@ -370,7 +370,7 @@ class TestTotalVariation(TestCase):
          [0, 0, 0, 0, 0, 0, 0, -1, 1, 0],
          [0, 0, 0, 0, 0, 0, 0, 0, -1, 1],
          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
-        A, _ = tv.A_from_mask(mask, offset=1)
+        A, _ = tv.linear_operator_from_mask(mask, offset=1)
         Ax, Ay, Az = A
 
         assert np.all(Ax.todense() == Ax_)
@@ -421,7 +421,7 @@ class TestTotalVariation(TestCase):
          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, 0],
          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1],
          [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
-        A, _ = tv.A_from_mask(mask)
+        A, _ = tv.linear_operator_from_mask(mask)
         Ax, Ay, Az = A
 
         assert np.all(Ax.todense() == Ax_)
@@ -439,7 +439,7 @@ class TestTotalVariation(TestCase):
         p = np.prod((dx - 2, dx - 2, dx - 2))
         beta = np.zeros(p)
         beta[0:p:2] = 1  # checkerboard of 0 and 1
-        A, _ = tv.A_from_mask(mask)
+        A, _ = tv.linear_operator_from_mask(mask)
         tvfunc = tv.TotalVariation(l=1., A=A)
 
         assert tvfunc.f(beta) == self._f_checkerboard_cube((dx - 2,
@@ -456,7 +456,7 @@ class TestTotalVariation(TestCase):
         p = np.prod((dx, dx, dx))
         beta = np.zeros(p)
         beta[0:p:2] = 1  # checkerboard of 0 and 1
-        A, _ = tv.A_from_mask(mask)
+        A, _ = tv.linear_operator_from_mask(mask)
         tvfunc = tv.TotalVariation(l=1., A=A)
 
         assert np.allclose(tvfunc.f(beta),
@@ -469,8 +469,8 @@ class TestTotalVariation(TestCase):
         mask = np.ones(shape)
         weights1D = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
         weights2D = np.reshape(weights1D, shape)
-        A_shape, _ = tv.A_from_shape(shape, weights1D)
-        A_mask, _ = tv.A_from_subset_mask(mask, weights2D)
+        A_shape, _ = tv.linear_operator_from_shape(shape, weights1D)
+        A_mask, _ = tv.linear_operator_from_subset_mask(mask, weights2D)
         A_true = (np.array([[-1., 1., 0., 0., 0., 0.],
                            [0., -2., 2., 0., 0., 0.],
                            [0., 0., 0., 0., 0., 0.],
@@ -501,8 +501,8 @@ class TestTotalVariation(TestCase):
         import parsimony.functions.nesterov.tv as tv_helper
         mesh_coord = np.array([[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2]])
         mesh_triangles = np.array([[0 ,1, 3], [0, 2 ,3], [2, 3, 5], [2, 4, 5]])
-        A, _ = tv_helper.nesterov_linear_operator_from_mesh(mesh_coord, mesh_triangles)        
-        a =[[np.where(l)[0].tolist() for l in a.toarray()] for a in A]        
+        A, _ = tv_helper.nesterov_linear_operator_from_mesh(mesh_coord, mesh_triangles)
+        a =[[np.where(l)[0].tolist() for l in a.toarray()] for a in A]
         b = [[[], [0, 1], [0, 2], [0, 3], [2, 4], [2, 5]],
              [[], [],     [],     [1, 3], [],     [3, 5]],
              [[], [],     [],     [2, 3], [],     [4, 5]]]

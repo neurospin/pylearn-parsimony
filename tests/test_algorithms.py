@@ -40,7 +40,7 @@ class TestAlgorithms(TestCase):
 #        g = 1.618
 #
 #        snr = 100.0
-#        A, _ = tv.A_from_shape(shape)
+#        A, _ = tv.linear_operator_from_shape(shape)
 #
 #        alpha = 0.9
 #        Sigma = alpha * np.eye(p, p) \
@@ -108,7 +108,7 @@ class TestAlgorithms(TestCase):
 #        g = 1.618
 #
 #        snr = 100.0
-#        A = gl.A_from_groups(p, groups=groups, weights=weights,
+#        A = gl.linear_operator_from_groups(p, groups=groups, weights=weights,
 #                             penalty_start=penalty_start)
 #
 #        alpha = 0.9
@@ -185,7 +185,7 @@ class TestAlgorithms(TestCase):
 #        # WARNING: We must have a non-zero TV parameter!
 #        g = 5e-8  # tv coefficient
 #
-#        Atv, n_compacts = tv.A_from_shape(shape)
+#        Atv, n_compacts = tv.linear_operator_from_shape(shape)
 #        tvl1l2_algorithms = []
 #        # Al1 = sparse.eye(num_ft, num_ft)
 #        tvl1l2_fista = estimators.RidgeRegression_L1_TV(

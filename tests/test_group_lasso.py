@@ -33,7 +33,7 @@ class TestGroupLasso(TestCase):
         groups = [range(0, p / 2), range(p / 2, p)]
 #        weights = [1.5, 0.5]
 
-        A = gl.A_from_groups(p, groups=groups)  # , weights=weights)
+        A = gl.linear_operator_from_groups(p, groups=groups)  # , weights=weights)
 
         l = 0.0
         k = 0.0
@@ -145,7 +145,7 @@ class TestGroupLasso(TestCase):
         groups = [range(0, p / 2), range(p / 2, p)]
 #        weights = [1.5, 0.5]
 
-        A = gl.A_from_groups(p, groups=groups)  # , weights=weights)
+        A = gl.linear_operator_from_groups(p, groups=groups)  # , weights=weights)
 
         l = 0.0
         k = 0.0
@@ -259,7 +259,7 @@ class TestGroupLasso(TestCase):
         groups = [range(0, 2 * p / 3), range(p / 3, p)]
         weights = [1.5, 0.5]
 
-        A = gl.A_from_groups(p, groups=groups, weights=weights)
+        A = gl.linear_operator_from_groups(p, groups=groups, weights=weights)
 
         l = 0.0
         k = 0.0
@@ -326,7 +326,7 @@ class TestGroupLasso(TestCase):
         groups = [range(0, 2 * p / 3), range(p / 3, p)]
         weights = [1.5, 0.5]
 
-        A = gl.A_from_groups(p, groups=groups, weights=weights)
+        A = gl.linear_operator_from_groups(p, groups=groups, weights=weights)
 
         l = 0.0
         k = 0.0
@@ -396,7 +396,7 @@ class TestGroupLasso(TestCase):
         groups = [range(0, 2 * p / 3), range(p / 3, p)]
         weights = [1.5, 0.5]
 
-        A = gl.A_from_groups(p, groups=groups, weights=weights)
+        A = gl.linear_operator_from_groups(p, groups=groups, weights=weights)
 
         l = 0.618
         k = 1.0 - l
@@ -468,7 +468,7 @@ class TestGroupLasso(TestCase):
         groups = [range(0, 2 * p / 3), range(p / 3, p)]
         weights = [1.5, 0.5]
 
-        A = gl.A_from_groups(p, groups=groups, weights=weights)
+        A = gl.linear_operator_from_groups(p, groups=groups, weights=weights)
 
         l = 0.618
         k = 1.0 - l

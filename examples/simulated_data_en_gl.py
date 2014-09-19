@@ -50,10 +50,13 @@ M = np.random.multivariate_normal(mean, Sigma, n)
 
 e = np.random.randn(n, 1)
 
-Agl = gl.A_from_groups(p, [range(0, int(p / 3.0)),
-                           range(int(p / 3.0), int(2.0 * p / 3.0)),
-                           range(int(2.0 * p / 3.0), p)])
-#Atv, n_compacts = tv.A_from_shape(shape)
+Agl = gl.linear_operator_from_groups(p, [range(0,
+                                               int(p / 3.0)),
+                                         range(int(p / 3.0),
+                                               int(2.0 * p / 3.0)),
+                                         range(int(2.0 * p / 3.0),
+                                               p)])
+#Atv, n_compacts = tv.linear_operator_from_shape(shape)
 
 snr = 20.0
 

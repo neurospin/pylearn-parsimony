@@ -30,7 +30,7 @@ class TestFunctions(TestCase):
 #        X = ret_data["X"]
 #        y = ret_data["y"]
 #
-#        Atv, n_compacts = tv.A_from_shape(shape)
+#        Atv, n_compacts = tv.linear_operator_from_shape(shape)
 #        k = 0.05  # ridge regression coefficient
 #        l = 0  # l1 coefficient
 #        g = 0  # tv coefficient
@@ -87,7 +87,7 @@ class TestFunctions(TestCase):
 #        import parsimony.algorithms as algorithms
 #        import parsimony.tv
 #        import scipy.sparse as sparse
-#        np.random.seed(1)        
+#        np.random.seed(1)
 #        shape = (4, 4, 1)
 #        num_samples = 10
 #        num_ft = shape[0] * shape[1] * shape[2]
@@ -95,7 +95,7 @@ class TestFunctions(TestCase):
 #        beta = np.random.random((num_ft, 1))
 #        y = np.dot(X, beta) + np.random.random((num_samples, 1)) * 0.0001
 #
-#        Atv, n_compacts = parsimony.tv.A_from_shape(shape)
+#        Atv, n_compacts = parsimony.tv.linear_operator_from_shape(shape)
 #        Al1 = sparse.eye(num_ft, num_ft)
 #        k = 0.05  # ridge regression coefficient
 #        l = 0.05  # l1 coefficient

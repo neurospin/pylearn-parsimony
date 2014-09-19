@@ -712,7 +712,7 @@ class LinearRegressionL1L2TV(RegressionEstimator):
     >>> l1 = 0.1  # L1 coefficient
     >>> l2 = 0.9  # Ridge coefficient
     >>> tv = 1.0  # TV coefficient
-    >>> A, n_compacts = total_variation.A_from_shape(shape)
+    >>> A, n_compacts = total_variation.linear_operator_from_shape(shape)
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                      algorithm=proximal.StaticCONESTA(max_iter=1000),
     ...                      mean=False)
@@ -743,7 +743,7 @@ class LinearRegressionL1L2TV(RegressionEstimator):
     >>>
     >>> import parsimony.functions.nesterov.l1tv as l1tv
     >>> np.random.seed(1337)
-    >>> A = l1tv.A_from_shape(shape, p, penalty_start=0)
+    >>> A = l1tv.linear_operator_from_shape(shape, p, penalty_start=0)
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                                 algorithm=proximal.ADMM(max_iter=1000),
     ...                                 mean=False)
@@ -924,7 +924,8 @@ class LinearRegressionL1L2GL(RegressionEstimator):
     >>> l2 = 0.9  # Ridge coefficient
     >>> gl = 1.0  # GL coefficient
     >>> groups = [range(0, 10), range(5, 15)]
-    >>> A = group_lasso.A_from_groups(p, groups, weights=None, penalty_start=0)
+    >>> A = group_lasso.linear_operator_from_groups(p, groups, weights=None,
+    ...                                             penalty_start=0)
     >>> lr = estimators.LinearRegressionL1L2GL(l1, l2, gl, A,
     ...                                   algorithm=proximal.StaticCONESTA(),
     ...                                   algorithm_params=dict(max_iter=1000),
@@ -1076,7 +1077,7 @@ class LinearRegressionL1L2GL(RegressionEstimator):
 ##    >>> k = 0.9  # ridge regression coefficient
 ##    >>> l = 0.1  # l1 coefficient
 ##    >>> g = 1.0  # tv coefficient
-##    >>> A, n_compacts = tv.A_from_shape(shape)
+##    >>> A, n_compacts = tv.linear_operator_from_shape(shape)
 ##    >>> ridge_l1_tv = estimators.RidgeRegression_L1_TV(k, l, g, A,
 ##    ...                     algorithm=proximal.StaticCONESTA(max_iter=1000))
 ##    >>> res = ridge_l1_tv.fit(X, y)
@@ -1461,7 +1462,7 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
     >>> l1 = 0.1  # L1 coefficient
     >>> l2 = 0.9  # Ridge coefficient
     >>> tv = 1.0  # TV coefficient
-    >>> A, n_compacts = total_variation.A_from_shape(shape)
+    >>> A, n_compacts = total_variation.linear_operator_from_shape(shape)
     >>> lr = estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
     ...                      algorithm=proximal.StaticCONESTA(max_iter=1000),
     ...                      mean=False)
@@ -1631,7 +1632,8 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
     >>> n, p = 10, 16
     >>> groups = [range(0, p / 2), range(p / 2, p)]
     >>> weights = [1.5, 0.5]
-    >>> A = group_lasso.A_from_groups(p, groups=groups, weights=weights)
+    >>> A = group_lasso.linear_operator_from_groups(p, groups=groups,
+    ...                                             weights=weights)
     >>>
     >>> X = np.random.rand(n, p)
     >>> y = np.random.randint(0, 2, (n, 1))
@@ -1797,7 +1799,7 @@ class LinearRegressionL2SmoothedL1TV(RegressionEstimator):
     >>> l1 = 0.1  # L1 coefficient
     >>> l2 = 0.9  # Ridge coefficient
     >>> tv = 1.0  # TV coefficient
-    >>> A = l1tv.A_from_shape(shape, p, penalty_start=0)
+    >>> A = l1tv.linear_operator_from_shape(shape, p, penalty_start=0)
     >>> lr = estimators.LinearRegressionL2SmoothedL1TV(l2, l1, tv, A,
     ...                 algorithm=primaldual.ExcessiveGapMethod(),
     ...                 algorithm_params=dict(max_iter=1000),
