@@ -19,8 +19,9 @@ import scipy.sparse as sparse
 from .. import properties
 import parsimony.utils.consts as consts
 import parsimony.utils.maths as maths
+import parsimony.utils as utils
 
-__all__ = ["L1", "A_from_variables"]
+__all__ = ["L1", "linear_operator_from_variables", "A_from_variables"]
 
 
 class L1(properties.NesterovFunction,
@@ -196,7 +197,13 @@ class L1(properties.NesterovFunction,
         return maths.norm1(beta_) <= self.c
 
 
-def A_from_variables(num_variables, penalty_start=0):
+@utils.deprecated("linear_operator_from_variables")
+def A_from_variables(*args, **kwargs):
+
+    return linear_operator_from_variables(*args, **kwargs)
+
+
+def linear_operator_from_variables(num_variables, penalty_start=0):
     """Generates the linear operator for the L1 Nesterov function from number
     of variables.
 

@@ -18,17 +18,16 @@ import numpy as np
 #from .properties import NesterovFunction
 from .. import properties
 import parsimony.utils.consts as consts
+import parsimony.utils as utils
 
-__all__ = ["GroupTotalVariation", "A_from_masks", "A_from_rects"]
+__all__ = ["GroupTotalVariation",
+           "linear_operator_from_masks", "A_from_masks",
+           "linear_operator_from_rects", "A_from_rects"]
 
 
-class GroupTotalVariation(#properties.AtomicFunction,
-                          properties.NesterovFunction,
+class GroupTotalVariation(properties.NesterovFunction,
                           properties.Penalty,
-                          properties.Constraint,
-#                          properties.Gradient,
-#                          properties.LipschitzContinuousGradient
-                          ):
+                          properties.Constraint):
     """The smoothed Group total variation (Group TV) function
 
         f(beta) = l * (GroupTV(beta) - c),
@@ -233,7 +232,13 @@ class GroupTotalVariation(#properties.AtomicFunction,
         return max_norm
 
 
-def A_from_masks(masks, weights=None):
+@utils.deprecated("linear_operator_from_masks")
+def A_from_masks(*args, **kwargs):
+
+    return linear_operator_from_masks(*args, **kwargs)
+
+
+def linear_operator_from_masks(masks, weights=None):
     """Generates the linear operator for the group total variation Nesterov
     function from a mask for a 3D image.
 
@@ -276,7 +281,13 @@ def A_from_masks(masks, weights=None):
     return A
 
 
-def A_from_rects(rects, shape, weights=None):
+@utils.deprecated("linear_operator_from_rects")
+def A_from_rects(*args, **kwargs):
+
+    return linear_operator_from_rects(*args, **kwargs)
+
+
+def linear_operator_from_rects(rects, shape, weights=None):
     """Generates the linear operator for the group total variation Nesterov
     function from the rectange of a 3D image.
 

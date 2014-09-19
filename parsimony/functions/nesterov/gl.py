@@ -18,8 +18,9 @@ import scipy.sparse as sparse
 from .. import properties
 import parsimony.utils.consts as consts
 import parsimony.utils.maths as maths
+import parsimony.utils as utils
 
-__all__ = ["GroupLassoOverlap", "A_from_groups"]
+__all__ = ["GroupLassoOverlap", "linear_operator_from_groups", "A_from_groups"]
 
 
 class GroupLassoOverlap(properties.NesterovFunction,
@@ -216,7 +217,14 @@ class GroupLassoOverlap(properties.NesterovFunction,
         return SS
 
 
-def A_from_groups(num_variables, groups, weights=None, penalty_start=0):
+@utils.deprecated("linear_operator_from_groups")
+def A_from_groups(*args, **kwargs):
+
+    return linear_operator_from_groups(*args, **kwargs)
+
+
+def linear_operator_from_groups(num_variables, groups, weights=None,
+                                penalty_start=0):
     """Generates the linear operator for the group lasso Nesterov function
     from the groups of variables.
 

@@ -23,7 +23,10 @@ import parsimony.utils.maths as maths
 import parsimony.utils as utils
 
 __all__ = ["TotalVariation",
-           "A_from_mask", "A_from_subset_mask", "A_from_shape", "A_from_mesh",
+           "linear_operator_from_mask", "A_from_mask",
+           "linear_operator_from_subset_mask", "A_from_subset_mask",
+           "linear_operator_from_shape", "A_from_shape",
+           "linear_operator_from_mesh", "A_from_mesh",
            "nesterov_linear_operator_from_mesh"]
 
 
@@ -280,7 +283,13 @@ class TotalVariation(properties.NesterovFunction,
         return np.max(np.sqrt(SS))
 
 
-def A_from_mask(mask, offset=0, weights=None):
+@utils.deprecated("linear_operator_from_mask")
+def A_from_mask(*args, **kwargs):
+
+    return linear_operator_from_mask(*args, **kwargs)
+
+
+def linear_operator_from_mask(mask, offset=0, weights=None):
     """Generates the linear operator for the total variation Nesterov function
     from a mask for a 3D image.
 
@@ -370,7 +379,13 @@ def A_from_mask(mask, offset=0, weights=None):
     return [Ax, Ay, Az], n_compacts
 
 
-def A_from_subset_mask(mask, weights=None):
+@utils.deprecated("linear_operator_from_subset_mask")
+def A_from_subset_mask(*args, **kwargs):
+
+    return linear_operator_from_subset_mask(*args, **kwargs)
+
+
+def linear_operator_from_subset_mask(mask, weights=None):
     """Generates the linear operator for the total variation Nesterov function
     from a mask for a 3D image.
 
@@ -456,7 +471,13 @@ def A_from_subset_mask(mask, weights=None):
     return [Ax, Ay, Az], num_compacts
 
 
-def A_from_shape(shape, weights=None):
+@utils.deprecated("linear_operator_from_shape")
+def A_from_shape(*args, **kwargs):
+
+    return linear_operator_from_shape(*args, **kwargs)
+
+
+def linear_operator_from_shape(shape, weights=None):
     """Generates the linear operator for the total variation Nesterov function
     from the shape of a 1D, 2D or 3D image.
 
@@ -540,13 +561,20 @@ def A_from_shape(shape, weights=None):
     return [Ax, Ay, Az], (nz * ny * nx - 1)
 
 
-@utils.deprecated("A_from_mesh")
+@utils.deprecated("linear_operator_from_mesh")
+def A_from_mesh(*args, **kwargs):
+
+    return linear_operator_from_mesh(*args, **kwargs)
+
+
+@utils.deprecated("linear_operator_from_mesh")
 def nesterov_linear_operator_from_mesh(*args, **kwargs):
 
-    return A_from_mesh(*args, **kwargs)
+    return linear_operator_from_mesh(*args, **kwargs)
 
 
-def A_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0, weights=None):
+def linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0,
+                              weights=None):
     """Generates the linear operator for the total variation Nesterov function
     from a mesh.
 

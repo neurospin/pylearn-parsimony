@@ -21,10 +21,13 @@ import numpy as np
 from .. import properties
 import parsimony.utils.consts as consts
 import parsimony.utils.maths as maths
+import parsimony.utils as utils
 import tv
 import l1
 
-__all__ = ["L1TV", "A_from_mask", "A_from_shape"]
+__all__ = ["L1TV",
+           "linear_operator_from_mask", "A_from_mask",
+           "linear_operator_from_shape", "A_from_shape"]
 
 
 class L1TV(properties.NesterovFunction,
@@ -264,9 +267,15 @@ class L1TV(properties.NesterovFunction,
              + (A[1].shape[0] / 2.0)
 
 
+@utils.deprecated("linear_operator_from_mask")
+def A_from_mask(*args, **kwargs):
+
+    return linear_operator_from_mask(*args, **kwargs)
+
+
 # TODO: Do we need to take the number of variables here?
 # Why not use np.prod(shape) + penalty_start instead and save a parameter?
-def A_from_mask(mask, num_variables, penalty_start=0):
+def linear_operator_from_mask(mask, num_variables, penalty_start=0):
     """Generates the linear operator for the total variation Nesterov function
     from a mask for a 3D image.
 
@@ -288,9 +297,15 @@ def A_from_mask(mask, num_variables, penalty_start=0):
     return Al1[0], Atv[0], Atv[1], Atv[2]
 
 
+@utils.deprecated("linear_operator_from_shape")
+def A_from_shape(*args, **kwargs):
+
+    return linear_operator_from_shape(*args, **kwargs)
+
+
 # TODO: Do we need to take the number of variables here?
 # Why not use np.prod(shape) + penalty_start instead and save a parameter?
-def A_from_shape(shape, num_variables, penalty_start=0):
+def linear_operator_from_shape(shape, num_variables, penalty_start=0):
     """Generates the linear operator for the total variation Nesterov function
     from the shape of a 3D image.
 
