@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>General framework &mdash; Parsimony 0.1.9 documentation</title>
+    <title>General framework &mdash; Parsimony 0.2.1 documentation</title>
     
     <link rel="stylesheet" href="static/default.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.1.9',
+        VERSION:     '0.2.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="static/jquery.js"></script>
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
-    <link rel="top" title="Parsimony 0.1.9 documentation" href="index.html" />
+    <link rel="top" title="Parsimony 0.2.1 documentation" href="index.html" />
     <link rel="prev" title="Getting the dependencies" href="installing.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="installing.html" title="Getting the dependencies"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Parsimony 0.1.9 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Parsimony 0.2.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -187,7 +187,7 @@ minimizing the OLS loss function. Note that the defaulyt option is to minimize t
 <span class="n">l1</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c"># l1 penalty</span>
 <span class="n">l2</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c"># l2 penalty</span>
 <span class="n">tv</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c"># tv penalty</span>
-<span class="n">A</span><span class="p">,</span> <span class="n">n_compacts</span> <span class="o">=</span> <span class="n">tv_helper</span><span class="o">.</span><span class="n">A_from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>  <span class="c"># Memory allocation for TV</span>
+<span class="n">A</span><span class="p">,</span> <span class="n">n_compacts</span> <span class="o">=</span> <span class="n">tv_helper</span><span class="o">.</span><span class="n">linear_operator_from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>  <span class="c"># Memory allocation for TV</span>
 <span class="n">tvenet_estimator</span> <span class="o">=</span> <span class="n">estimators</span><span class="o">.</span><span class="n">LinearRegressionL1L2TV</span><span class="p">(</span><span class="n">l1</span><span class="o">=</span><span class="n">l1</span><span class="p">,</span> <span class="n">l2</span><span class="o">=</span><span class="n">l2</span><span class="p">,</span> <span class="n">tv</span><span class="o">=</span><span class="n">tv</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">A</span><span class="p">)</span>
 <span class="n">tvenet_estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 <span class="k">print</span> <span class="s">&quot;Estimated beta error =&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">tvenet_estimator</span><span class="o">.</span><span class="n">beta</span> <span class="o">-</span> <span class="n">beta</span><span class="p">)</span>
@@ -207,7 +207,7 @@ constraint, <img class="math" src="images/math/8b9c2dc7b393fc8d4314b46b44b5e4e0a
 <span class="n">l</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c"># l1 lasso coefficient</span>
 <span class="n">g</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c"># group lasso coefficient</span>
 <span class="n">groups</span> <span class="o">=</span> <span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">num_ft</span> <span class="o">/</span> <span class="mi">3</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_ft</span><span class="o">/</span> <span class="mi">3</span><span class="p">,</span> <span class="n">num_ft</span><span class="p">)]</span>
-<span class="n">A</span> <span class="o">=</span> <span class="n">gl</span><span class="o">.</span><span class="n">A_from_groups</span><span class="p">(</span><span class="n">num_ft</span><span class="p">,</span> <span class="n">groups</span><span class="p">)</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">gl</span><span class="o">.</span><span class="n">linear_operator_from_groups</span><span class="p">(</span><span class="n">num_ft</span><span class="p">,</span> <span class="n">groups</span><span class="p">)</span>
 <span class="n">estimator</span> <span class="o">=</span> <span class="n">estimators</span><span class="o">.</span><span class="n">LinearRegressionL1L2GL</span><span class="p">(</span>
                                       <span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">A</span><span class="p">,</span>
                                       <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithms</span><span class="o">.</span><span class="n">FISTA</span><span class="p">(),</span>
@@ -258,7 +258,7 @@ LogisticRegressionL1L2TV estimator with null <img class="math" src="images/math/
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">parsimony.estimators</span> <span class="kn">as</span> <span class="nn">estimators</span>
 <span class="kn">import</span> <span class="nn">parsimony.functions.nesterov.tv</span> <span class="kn">as</span> <span class="nn">tv_helper</span>
 <span class="n">l2</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c"># l2 ridge regression coefficient</span>
-<span class="n">A</span><span class="p">,</span> <span class="n">n_compacts</span> <span class="o">=</span> <span class="n">tv_helper</span><span class="o">.</span><span class="n">A_from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">A</span><span class="p">,</span> <span class="n">n_compacts</span> <span class="o">=</span> <span class="n">tv_helper</span><span class="o">.</span><span class="n">linear_operator_from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
 <span class="n">ridge_lr_estimator</span> <span class="o">=</span> <span class="n">estimators</span><span class="o">.</span><span class="n">LogisticRegressionL1L2TV</span><span class="p">(</span><span class="n">l1</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">l2</span><span class="o">=</span><span class="n">l2</span><span class="p">,</span> <span class="n">tv</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">A</span><span class="p">)</span>
 <span class="n">ridge_lr_estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 <span class="k">print</span> <span class="s">&quot;Estimated prediction rate =&quot;</span><span class="p">,</span> <span class="n">ridge_lr_estimator</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
@@ -276,7 +276,7 @@ minimise:</p>
 <span class="kn">import</span> <span class="nn">parsimony.functions.nesterov.tv</span> <span class="kn">as</span> <span class="nn">tv_helper</span>
 <span class="n">l1</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c"># l1 lasso coefficient</span>
 <span class="n">l2</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c"># l2 ridge regression coefficient</span>
-<span class="n">A</span><span class="p">,</span> <span class="n">n_compacts</span> <span class="o">=</span> <span class="n">tv_helper</span><span class="o">.</span><span class="n">A_from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">A</span><span class="p">,</span> <span class="n">n_compacts</span> <span class="o">=</span> <span class="n">tv_helper</span><span class="o">.</span><span class="n">linear_operator_from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
 <span class="n">enet_lr_estimator</span> <span class="o">=</span> <span class="n">estimators</span><span class="o">.</span><span class="n">LogisticRegressionL1L2TV</span><span class="p">(</span><span class="n">l1</span><span class="o">=</span><span class="n">l1</span><span class="p">,</span> <span class="n">l2</span><span class="o">=</span><span class="n">l2</span><span class="p">,</span> <span class="n">tv</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">A</span><span class="p">)</span>
 <span class="n">enet_lr_estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 <span class="k">print</span> <span class="s">&quot;Estimated prediction rate =&quot;</span><span class="p">,</span> <span class="n">enet_lr_estimator</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
@@ -293,7 +293,7 @@ minimise:</p>
 <span class="n">l1</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c"># l1 lasso coefficient</span>
 <span class="n">l2</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c"># l2 ridge regression coefficient</span>
 <span class="n">tv</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c"># l2 ridge regression coefficient</span>
-<span class="n">A</span><span class="p">,</span> <span class="n">n_compacts</span> <span class="o">=</span> <span class="n">tv_helper</span><span class="o">.</span><span class="n">A_from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">A</span><span class="p">,</span> <span class="n">n_compacts</span> <span class="o">=</span> <span class="n">tv_helper</span><span class="o">.</span><span class="n">linear_operator_from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
 <span class="n">enettv_lr_estimator</span> <span class="o">=</span> <span class="n">estimators</span><span class="o">.</span><span class="n">LogisticRegressionL1L2TV</span><span class="p">(</span><span class="n">l1</span><span class="o">=</span><span class="n">l1</span><span class="p">,</span> <span class="n">l2</span><span class="o">=</span><span class="n">l2</span><span class="p">,</span> <span class="n">tv</span><span class="o">=</span><span class="n">tv</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">A</span><span class="p">)</span>
 <span class="n">enettv_lr_estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 <span class="k">print</span> <span class="s">&quot;Estimated prediction rate =&quot;</span><span class="p">,</span> <span class="n">enettv_lr_estimator</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
@@ -313,7 +313,7 @@ constraint and instead minimise</p>
 <span class="n">l</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c"># l1 lasso coefficient</span>
 <span class="n">g</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c"># group lasso coefficient</span>
 <span class="n">groups</span> <span class="o">=</span> <span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">num_ft</span> <span class="o">/</span> <span class="mi">3</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_ft</span><span class="o">/</span> <span class="mi">3</span><span class="p">,</span> <span class="n">num_ft</span><span class="p">)]</span>
-<span class="n">A</span> <span class="o">=</span> <span class="n">gl</span><span class="o">.</span><span class="n">A_from_groups</span><span class="p">(</span><span class="n">num_ft</span><span class="p">,</span> <span class="n">groups</span><span class="p">)</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">gl</span><span class="o">.</span><span class="n">linear_operator_from_groups</span><span class="p">(</span><span class="n">num_ft</span><span class="p">,</span> <span class="n">groups</span><span class="p">)</span>
 <span class="n">estimator</span> <span class="o">=</span> <span class="n">estimators</span><span class="o">.</span><span class="n">LogisticRegressionL1L2GL</span><span class="p">(</span>
                                       <span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">A</span><span class="p">,</span>
                                       <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithms</span><span class="o">.</span><span class="n">FISTA</span><span class="p">(),</span>
@@ -332,24 +332,19 @@ constraint and instead minimise</p>
 <div class="section" id="conesta">
 <h2>CONESTA<a class="headerlink" href="#conesta" title="Permalink to this headline">¶</a></h2>
 <p>We applied FISTA (<a class="reference internal" href="#fista2009">[FISTA2009]</a>) in the previous sections. In this section, we
-switch to Dynamic CONESTA and Static CONESTA to minimise the function.</p>
+switch to CONESTA to minimise the function.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">parsimony.estimators</span> <span class="kn">as</span> <span class="nn">estimators</span>
 <span class="kn">import</span> <span class="nn">parsimony.algorithms.explicit</span> <span class="kn">as</span> <span class="nn">algorithms</span>
 <span class="kn">import</span> <span class="nn">parsimony.functions.nesterov.tv</span> <span class="kn">as</span> <span class="nn">tv</span>
 <span class="n">k</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c"># l2 ridge regression coefficient</span>
 <span class="n">l</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c"># l1 lasso coefficient</span>
 <span class="n">g</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c"># tv coefficient</span>
-<span class="n">Atv</span><span class="p">,</span> <span class="n">n_compacts</span> <span class="o">=</span> <span class="n">tv</span><span class="o">.</span><span class="n">A_from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
-<span class="n">tvl1l2_conesta_static</span> <span class="o">=</span> <span class="n">estimators</span><span class="o">.</span><span class="n">LinearRegressionL1L2TV</span><span class="p">(</span>
+<span class="n">Atv</span><span class="p">,</span> <span class="n">n_compacts</span> <span class="o">=</span> <span class="n">tv</span><span class="o">.</span><span class="n">linear_operator_from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">tvl1l2_conesta</span> <span class="o">=</span> <span class="n">estimators</span><span class="o">.</span><span class="n">LinearRegressionL1L2TV</span><span class="p">(</span>
                                       <span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">Atv</span><span class="p">,</span>
-                                      <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithms</span><span class="o">.</span><span class="n">StaticCONESTA</span><span class="p">())</span>
-<span class="n">res</span> <span class="o">=</span> <span class="n">tvl1l2_conesta_static</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-<span class="k">print</span> <span class="s">&quot;Estimated beta error =&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">tvl1l2_conesta_static</span><span class="o">.</span><span class="n">beta</span> <span class="o">-</span> <span class="n">beta</span><span class="p">)</span>
-<span class="n">tvl1l2_conesta_dynamic</span> <span class="o">=</span> <span class="n">estimators</span><span class="o">.</span><span class="n">LinearRegressionL1L2TV</span><span class="p">(</span>
-                                     <span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">Atv</span><span class="p">,</span>
-                                     <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithms</span><span class="o">.</span><span class="n">DynamicCONESTA</span><span class="p">())</span>
-<span class="n">res</span> <span class="o">=</span> <span class="n">tvl1l2_conesta_dynamic</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-<span class="k">print</span> <span class="s">&quot;Estimated beta error =&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">tvl1l2_conesta_dynamic</span><span class="o">.</span><span class="n">beta</span> <span class="o">-</span> <span class="n">beta</span><span class="p">)</span>
+                                      <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithms</span><span class="o">.</span><span class="n">CONESTA</span><span class="p">())</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">tvl1l2_conesta</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&quot;Estimated beta error =&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">tvl1l2_conesta</span><span class="o">.</span><span class="n">beta</span> <span class="o">-</span> <span class="n">beta</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -360,9 +355,9 @@ switch to Dynamic CONESTA and Static CONESTA to minimise the function.</p>
 positive.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="kn">as</span> <span class="nn">sparse</span>
 <span class="kn">import</span> <span class="nn">parsimony.functions.nesterov.l1tv</span> <span class="kn">as</span> <span class="nn">l1tv</span>
-<span class="c">#Atv, n_compacts = tv.A_from_shape(shape)</span>
+<span class="c">#Atv, n_compacts = tv.linear_operator_from_shape(shape)</span>
 <span class="c">#Al1 = sparse.eye(num_ft, num_ft)</span>
-<span class="n">Atv</span><span class="p">,</span> <span class="n">Al1</span> <span class="o">=</span> <span class="n">l1tv</span><span class="o">.</span><span class="n">A_from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">num_ft</span><span class="p">,</span> <span class="n">penalty_start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">Atv</span><span class="p">,</span> <span class="n">Al1</span> <span class="o">=</span> <span class="n">l1tv</span><span class="o">.</span><span class="n">linear_operator_from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">num_ft</span><span class="p">,</span> <span class="n">penalty_start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">k</span> <span class="o">=</span> <span class="mf">0.05</span>  <span class="c"># ridge regression coefficient</span>
 <span class="n">l</span> <span class="o">=</span> <span class="mf">0.05</span>  <span class="c"># l1 coefficient</span>
 <span class="n">g</span> <span class="o">=</span> <span class="mf">0.05</span>  <span class="c"># tv coefficient</span>
@@ -460,7 +455,7 @@ positive.</p>
         <li class="right" >
           <a href="installing.html" title="Getting the dependencies"
              >previous</a> |</li>
-        <li><a href="index.html">Parsimony 0.1.9 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Parsimony 0.2.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

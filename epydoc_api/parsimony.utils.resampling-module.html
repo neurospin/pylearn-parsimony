@@ -38,7 +38,7 @@
     <td width="100%">
       <span class="breadcrumbs">
         <a href="parsimony-module.html">Package&nbsp;parsimony</a> ::
-        <a href="parsimony.utils-module.html" onclick="show_private();">Package&nbsp;utils</a> ::
+        <a href="parsimony.utils-module.html">Package&nbsp;utils</a> ::
         Module&nbsp;resampling
       </span>
     </td>
@@ -114,6 +114,44 @@
       Stratified k-fold cross validation iterator.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="parsimony.utils.resampling-pysrc.html#stratified_k_fold">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.utils.resampling-module.html#bootstrap" class="summary-sig-name">bootstrap</a>(<span class="summary-sig-arg">n</span>,
+        <span class="summary-sig-arg">B</span>=<span class="summary-sig-default">100</span>,
+        <span class="summary-sig-arg">seed</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Bootstrap sample iterator.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.utils.resampling-pysrc.html#bootstrap">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.utils.resampling-module.html#stratified_bootstrap" class="summary-sig-name">stratified_bootstrap</a>(<span class="summary-sig-arg">y</span>,
+        <span class="summary-sig-arg">B</span>=<span class="summary-sig-default">100</span>,
+        <span class="summary-sig-arg">seed</span>=<span class="summary-sig-default">None</span>)</span><br />
+      Stratified bootstrap sample iterator.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.utils.resampling-pysrc.html#stratified_bootstrap">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -228,6 +266,81 @@ K : Positive integer greater than or equal to two. The number of folds.
   </dl>
 </td></tr></table>
 </div>
+<a name="bootstrap"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">bootstrap</span>(<span class="sig-arg">n</span>,
+        <span class="sig-arg">B</span>=<span class="sig-default">100</span>,
+        <span class="sig-arg">seed</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.utils.resampling-pysrc.html#bootstrap">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+Bootstrap sample iterator.
+
+Returns indices for a bootstrap training set.
+
+Parameters
+----------
+n : Positive integer greater than one. The number of samples.
+
+B : Positive integer greater than or equal to two. The number of bootstrap
+        samples to draw.
+
+seed : Integer. A random seed to initialise the random number generator
+        with. Use in order to obtain deterministic results. The seed is not
+        used if the seed is None.
+
+</pre>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
+<a name="stratified_bootstrap"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">stratified_bootstrap</span>(<span class="sig-arg">y</span>,
+        <span class="sig-arg">B</span>=<span class="sig-default">100</span>,
+        <span class="sig-arg">seed</span>=<span class="sig-default">None</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.utils.resampling-pysrc.html#stratified_bootstrap">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+Stratified bootstrap sample iterator.
+
+Returns indices for a bootstrap training set.
+
+Parameters
+----------
+y : Numpy array with n &gt; 1 elements. The class labels. These labels are
+        used to stratify the samples.
+
+B : Positive integer greater than or equal to two. The number of bootstrap
+        samples to draw.
+
+seed : Integer. A random seed to initialise the random number generator
+        with. Use in order to obtain deterministic results. The seed is not
+        used if the seed is None.
+
+</pre>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
 <br />
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
@@ -255,7 +368,7 @@ K : Positive integer greater than or equal to two. The number of folds.
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Jul  6 11:32:50 2014
+    Generated by Epydoc 3.0.1 on Thu Oct  2 23:35:45 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

@@ -38,7 +38,7 @@
     <td width="100%">
       <span class="breadcrumbs">
         <a href="parsimony-module.html">Package&nbsp;parsimony</a> ::
-        <a href="parsimony.functions-module.html" onclick="show_private();">Package&nbsp;functions</a> ::
+        <a href="parsimony.functions-module.html">Package&nbsp;functions</a> ::
         <a href="parsimony.functions.nesterov-module.html" onclick="show_private();">Package&nbsp;nesterov</a> ::
         <a href="parsimony.functions.nesterov.grouptv-module.html">Module&nbsp;grouptv</a> ::
         Class&nbsp;GroupTotalVariation
@@ -60,33 +60,33 @@
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class GroupTotalVariation</h1><p class="nomargin-top"><span class="codelink"><a href="parsimony.functions.nesterov.grouptv-pysrc.html#GroupTotalVariation">source&nbsp;code</a></span></p>
 <pre class="base-tree">
-                        object --+        
-                                 |        
-               <a href="parsimony.functions.properties.Function-class.html">properties.Function</a> --+    
-                                     |    
-             <a href="parsimony.functions.properties.AtomicFunction-class.html">properties.AtomicFunction</a> --+
-                                         |
-                            object --+   |
-                                     |   |
-           <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html">properties.NesterovFunction</a> --+
-                                         |
-                            object --+   |
-                                     |   |
-                    <a href="parsimony.functions.properties.Penalty-class.html">properties.Penalty</a> --+
-                                         |
-                            object --+   |
-                                     |   |
-                 <a href="parsimony.functions.properties.Constraint-class.html">properties.Constraint</a> --+
-                                         |
-                            object --+   |
-                                     |   |
-                   <a href="parsimony.functions.properties.Gradient-class.html">properties.Gradient</a> --+
-                                         |
-                            object --+   |
-                                     |   |
-<a href="parsimony.functions.properties.LipschitzContinuousGradient-class.html">properties.LipschitzContinuousGradient</a> --+
-                                         |
-                                        <strong class="uidshort">GroupTotalVariation</strong>
+                            object --+        
+                                     |        
+                   <a href="parsimony.functions.properties.Gradient-class.html">properties.Gradient</a> --+    
+                                         |    
+                            object --+   |    
+                                     |   |    
+<a href="parsimony.functions.properties.LipschitzContinuousGradient-class.html">properties.LipschitzContinuousGradient</a> --+    
+                                         |    
+                            object --+   |    
+                                     |   |    
+                <a href="parsimony.functions.properties.Eigenvalues-class.html">properties.Eigenvalues</a> --+    
+                                         |    
+                            object --+   |    
+                                     |   |    
+           <a href="parsimony.functions.properties.ProximalOperator-class.html">properties.ProximalOperator</a> --+    
+                                         |    
+               <a href="parsimony.functions.properties.NesterovFunction-class.html" onclick="show_private();">properties.NesterovFunction</a> --+
+                                             |
+                                object --+   |
+                                         |   |
+                        <a href="parsimony.functions.properties.Penalty-class.html">properties.Penalty</a> --+
+                                             |
+                                object --+   |
+                                         |   |
+                     <a href="parsimony.functions.properties.Constraint-class.html">properties.Constraint</a> --+
+                                             |
+                                            <strong class="uidshort">GroupTotalVariation</strong>
 </pre>
 
 <hr />
@@ -149,8 +149,7 @@ l : Non-negative float.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="parsimony.functions.nesterov.grouptv.GroupTotalVariation-class.html#reset" class="summary-sig-name">reset</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Free any cached computations from previous use of this Function.</td>
+          <td><span class="summary-sig"><a name="reset"></a><span class="summary-sig-name">reset</span>(<span class="summary-sig-arg">self</span>)</span></td>
           <td align="right" valign="top">
             <span class="codelink"><a href="parsimony.functions.nesterov.grouptv-pysrc.html#GroupTotalVariation.reset">source&nbsp;code</a></span>
             
@@ -166,7 +165,7 @@ l : Non-negative float.</td>
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a href="parsimony.functions.nesterov.grouptv.GroupTotalVariation-class.html#f" class="summary-sig-name">f</a>(<span class="summary-sig-arg">self</span>,
+          <td><span class="summary-sig"><a name="f"></a><span class="summary-sig-name">f</span>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">beta</span>)</span><br />
       Function value.</td>
           <td align="right" valign="top">
@@ -305,24 +304,25 @@ l : Non-negative float.</td>
   </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.Function-class.html">properties.Function</a></code></b>:
-      <code><a href="parsimony.functions.properties.Function-class.html#get_params">get_params</a></code>,
-      <code><a href="parsimony.functions.properties.Function-class.html#set_params">set_params</a></code>
-      </p>
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html">properties.NesterovFunction</a></code></b>:
-      <code><a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#A">A</a></code>,
-      <code><a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#Aa">Aa</a></code>,
-      <code><a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#alpha">alpha</a></code>,
-      <code><a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#fmu">fmu</a></code>,
-      <code><a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#get_mu">get_mu</a></code>,
-      <code><a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#grad">grad</a></code>,
-      <code><a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#set_mu">set_mu</a></code>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.NesterovFunction-class.html" onclick="show_private();">properties.NesterovFunction</a></code></b>:
+      <code><a href="parsimony.functions.properties.NesterovFunction-class.html#A">A</a></code>,
+      <code><a href="parsimony.functions.properties.NesterovFunction-class.html#Aa">Aa</a></code>,
+      <code><a href="parsimony.functions.properties.NesterovFunction-class.html#alpha">alpha</a></code>,
+      <code><a href="parsimony.functions.properties.NesterovFunction-class.html#fmu">fmu</a></code>,
+      <code><a href="parsimony.functions.properties.NesterovFunction-class.html#get_mu">get_mu</a></code>,
+      <code><a href="parsimony.functions.properties.NesterovFunction-class.html#grad">grad</a></code>,
+      <code><a href="parsimony.functions.properties.NesterovFunction-class.html#lA">lA</a></code>,
+      <code><a href="parsimony.functions.properties.NesterovFunction-class.html#prox">prox</a></code>,
+      <code><a href="parsimony.functions.properties.NesterovFunction-class.html#set_mu">set_mu</a></code>
       </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.Gradient-class.html">properties.Gradient</a></code></b>:
       <code><a href="parsimony.functions.properties.Gradient-class.html#approx_grad">approx_grad</a></code>
       </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.LipschitzContinuousGradient-class.html">properties.LipschitzContinuousGradient</a></code></b>:
       <code><a href="parsimony.functions.properties.LipschitzContinuousGradient-class.html#approx_L">approx_L</a></code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.Eigenvalues-class.html">properties.Eigenvalues</a></code></b>:
+      <code><a href="parsimony.functions.properties.Eigenvalues-class.html#lambda_min">lambda_min</a></code>
       </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
@@ -367,14 +367,14 @@ l : Non-negative float.</td>
   </tr>
   <tr>
     <td colspan="2" class="summary">
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.AtomicFunction-class.html">properties.AtomicFunction</a></code></b>:
-      <code><a href="parsimony.functions.properties.AtomicFunction-class.html#__metaclass__">__metaclass__</a></code>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.NesterovFunction-class.html" onclick="show_private();">properties.NesterovFunction</a></code></b>:
+      <code><a href="parsimony.functions.properties.NesterovFunction-class.html#__metaclass__">__metaclass__</a></code>
       </p>
-    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.Function-class.html">properties.Function</a></code></b> (private):
-      <code><a href="parsimony.functions.properties.Function-class.html#_abc_cache" onclick="show_private();">_abc_cache</a></code>,
-      <code><a href="parsimony.functions.properties.Function-class.html#_abc_negative_cache" onclick="show_private();">_abc_negative_cache</a></code>,
-      <code><a href="parsimony.functions.properties.Function-class.html#_abc_negative_cache_version" onclick="show_private();">_abc_negative_cache_version</a></code>,
-      <code><a href="parsimony.functions.properties.Function-class.html#_abc_registry" onclick="show_private();">_abc_registry</a></code>
+    <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.Gradient-class.html">properties.Gradient</a></code></b> (private):
+      <code><a href="parsimony.functions.properties.Gradient-class.html#_abc_cache" onclick="show_private();">_abc_cache</a></code>,
+      <code><a href="parsimony.functions.properties.Gradient-class.html#_abc_negative_cache" onclick="show_private();">_abc_negative_cache</a></code>,
+      <code><a href="parsimony.functions.properties.Gradient-class.html#_abc_negative_cache_version" onclick="show_private();">_abc_negative_cache_version</a></code>,
+      <code><a href="parsimony.functions.properties.Gradient-class.html#_abc_registry" onclick="show_private();">_abc_registry</a></code>
       </p></div>
     </td>
   </tr>
@@ -472,52 +472,6 @@ penalty_start : Non-negative integer. The number of columns, variables
   </dl>
 </td></tr></table>
 </div>
-<a name="reset"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">reset</span>(<span class="sig-arg">self</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="parsimony.functions.nesterov.grouptv-pysrc.html#GroupTotalVariation.reset">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Free any cached computations from previous use of this Function.</p>
-  <dl class="fields">
-    <dt>Overrides:
-        <a href="parsimony.functions.properties.Function-class.html#reset">properties.Function.reset</a>
-        <dd><em class="note">(inherited documentation)</em></dd>
-    </dt>
-  </dl>
-</td></tr></table>
-</div>
-<a name="f"></a>
-<div>
-<table class="details" border="1" cellpadding="3"
-       cellspacing="0" width="100%" bgcolor="white">
-<tr><td>
-  <table width="100%" cellpadding="0" cellspacing="0" border="0">
-  <tr valign="top"><td>
-  <h3 class="epydoc"><span class="sig"><span class="sig-name">f</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">beta</span>)</span>
-  </h3>
-  </td><td align="right" valign="top"
-    ><span class="codelink"><a href="parsimony.functions.nesterov.grouptv-pysrc.html#GroupTotalVariation.f">source&nbsp;code</a></span>&nbsp;
-    </td>
-  </tr></table>
-  
-  <p>Function value.</p>
-  <dl class="fields">
-    <dt>Overrides:
-        <a href="parsimony.functions.properties.Function-class.html#f">properties.Function.f</a>
-    </dt>
-  </dl>
-</td></tr></table>
-</div>
 <a name="phi"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -538,7 +492,7 @@ penalty_start : Non-negative integer. The number of columns, variables
   <p>From the interface &quot;NesterovFunction&quot;.</p>
   <dl class="fields">
     <dt>Overrides:
-        <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#phi">properties.NesterovFunction.phi</a>
+        <a href="parsimony.functions.properties.NesterovFunction-class.html#phi">properties.NesterovFunction.phi</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -607,6 +561,9 @@ penalty_start : Non-negative integer. The number of columns, variables
   <p>Largest eigenvalue of the corresponding covariance matrix.</p>
   <p>From the interface &quot;Eigenvalues&quot;.</p>
   <dl class="fields">
+    <dt>Overrides:
+        <a href="parsimony.functions.properties.Eigenvalues-class.html#lambda_max">properties.Eigenvalues.lambda_max</a>
+    </dt>
   </dl>
 </td></tr></table>
 </div>
@@ -629,7 +586,7 @@ penalty_start : Non-negative integer. The number of columns, variables
   <p>From the interface &quot;NesterovFunction&quot;.</p>
   <dl class="fields">
     <dt>Overrides:
-        <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#project">properties.NesterovFunction.project</a>
+        <a href="parsimony.functions.properties.NesterovFunction-class.html#project">properties.NesterovFunction.project</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -659,7 +616,7 @@ From the interface &quot;NesterovFunction&quot;.
 </pre>
   <dl class="fields">
     <dt>Overrides:
-        <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#M">properties.NesterovFunction.M</a>
+        <a href="parsimony.functions.properties.NesterovFunction-class.html#M">properties.NesterovFunction.M</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -684,7 +641,7 @@ From the interface &quot;NesterovFunction&quot;.
   <p>From the interface &quot;NesterovFunction&quot;.</p>
   <dl class="fields">
     <dt>Overrides:
-        <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#estimate_mu">properties.NesterovFunction.estimate_mu</a>
+        <a href="parsimony.functions.properties.NesterovFunction-class.html#estimate_mu">properties.NesterovFunction.estimate_mu</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -716,7 +673,7 @@ From the interface &quot;NesterovFunction&quot;.
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Jul  6 11:32:52 2014
+    Generated by Epydoc 3.0.1 on Thu Oct  2 23:35:46 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

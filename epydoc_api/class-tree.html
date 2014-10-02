@@ -66,6 +66,9 @@
     <li> <strong class="uidlink"><a href="parsimony.algorithms.bases.ExplicitAlgorithm-class.html">parsimony.algorithms.bases.ExplicitAlgorithm</a></strong>:
       <em class="summary">Explicit algorithms are algorithms that minimises a given function.</em>
     <ul>
+    <li> <strong class="uidlink"><a href="parsimony.algorithms.proximal.ADMM-class.html">parsimony.algorithms.proximal.ADMM</a></strong>:
+      <em class="summary">The alternating direction method of multipliers (ADMM).</em>
+    </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.utils.BacktrackingLineSearch-class.html">parsimony.algorithms.utils.BacktrackingLineSearch</a></strong>:
       <em class="summary">Finds a step length a that fulfills a given descent criterion.</em>
     </li>
@@ -73,19 +76,9 @@
       <em class="summary">Finds a root of the function assumed to be on the line between two
 points.</em>
     </li>
-    <li> <strong class="uidlink"><a href="parsimony.algorithms.primaldual.CONESTA-class.html">parsimony.algorithms.primaldual.CONESTA</a></strong>:
+    <li> <strong class="uidlink"><a href="parsimony.algorithms.proximal.CONESTA-class.html">parsimony.algorithms.proximal.CONESTA</a></strong>:
       <em class="summary">COntinuation with NEsterov smoothing in a Soft-Thresholding Algorithm,
 or CONESTA for short.</em>
-    <ul>
-    <li> <strong class="uidlink"><a href="parsimony.algorithms.primaldual.DynamicCONESTA-class.html">parsimony.algorithms.primaldual.DynamicCONESTA</a></strong>:
-      <em class="summary">COntinuation with NEsterov smoothing in a Soft-Thresholding 
-        Algorithm, or CONESTA for short, with a dynamically decreasing mu.</em>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.algorithms.primaldual.StaticCONESTA-class.html">parsimony.algorithms.primaldual.StaticCONESTA</a></strong>:
-      <em class="summary">COntinuation with NEsterov smoothing in a Soft-Thresholding 
-        Algorithm, or CONESTA for short, with a statically decreasing mu.</em>
-    </li>
-    </ul>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.proximal.DykstrasProjectionAlgorithm-class.html">parsimony.algorithms.proximal.DykstrasProjectionAlgorithm</a></strong>:
       <em class="summary">Dykstra's projection algorithm.</em>
@@ -113,10 +106,6 @@ the inner minimisation.</em>
       <em class="summary">The projected gradient algorithm with alternating minimisations in a
 multiblock setting.</em>
     </li>
-    <li> <strong class="uidlink"><a href="parsimony.algorithms.primaldual.NaiveCONESTA-class.html">parsimony.algorithms.primaldual.NaiveCONESTA</a></strong>:
-      <em class="summary">A na&#239;ve implementation of COntinuation with NEsterov smoothing in a
-Soft-Thresholding Algorithm, or CONESTA for short.</em>
-    </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.utils.NewtonRaphson-class.html">parsimony.algorithms.utils.NewtonRaphson</a></strong>:
       <em class="summary">Finds a root of the function assumed to be in the vicinity of a given
 point.</em>
@@ -126,6 +115,10 @@ point.</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.proximal.ParallelDykstrasProximalAlgorithm-class.html" onclick="show_private();">parsimony.algorithms.proximal.ParallelDykstrasProximalAlgorithm</a></strong>:
       <em class="summary">Dykstra's projection algorithm for two or more functions.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.algorithms.proximal.StaticCONESTA-class.html">parsimony.algorithms.proximal.StaticCONESTA</a></strong>:
+      <em class="summary">COntinuation with NEsterov smoothing in a Soft-Thresholding Algorithm,
+or CONESTA for short, with a statically decreasing sequence of eps and mu.</em>
     </li>
     </ul>
     </li>
@@ -140,12 +133,18 @@ point.</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms._implicit.FastSVDProduct-class.html">parsimony.algorithms._implicit.FastSVDProduct</a></strong>
     </li>
+    <li> <strong class="uidlink"><a href="parsimony.algorithms._implicit.FastSparseSVD-class.html">parsimony.algorithms._implicit.FastSparseSVD</a></strong>
+    </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.nipals.FastSparseSVD-class.html">parsimony.algorithms.nipals.FastSparseSVD</a></strong>
     </li>
-    <li> <strong class="uidlink"><a href="parsimony.algorithms._implicit.FastSparseSVD-class.html">parsimony.algorithms._implicit.FastSparseSVD</a></strong>
+    <li> <strong class="uidlink"><a href="parsimony.algorithms.coordinate.LassoCoordinateDescent-class.html">parsimony.algorithms.coordinate.LassoCoordinateDescent</a></strong>:
+      <em class="summary">A coordinate descent algorithm for the lasso.</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.nipals.PLSR-class.html">parsimony.algorithms.nipals.PLSR</a></strong>:
       <em class="summary">A NIPALS implementation for PLS regresison.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.algorithms.coordinate.ShootingAlgorithm-class.html">parsimony.algorithms.coordinate.ShootingAlgorithm</a></strong>:
+      <em class="summary">The shooting algorithm for the lasso.</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.nipals.SparsePLSR-class.html" onclick="show_private();">parsimony.algorithms.nipals.SparsePLSR</a></strong>:
       <em class="summary">A NIPALS implementation for Sparse PLS regresison.</em>
@@ -257,11 +256,14 @@ formulation</em>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.LInf-class.html">parsimony.functions.penalties.LInf</a></strong>:
       <em class="summary">The proximal operator of the L-infinity function</em>
     </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.penalties.LinearVariableConstraint-class.html">parsimony.functions.penalties.LinearVariableConstraint</a></strong>:
+      <em class="summary">Represents a linear constraint</em>
+    </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.QuadraticConstraint-class.html">parsimony.functions.penalties.QuadraticConstraint</a></strong>:
       <em class="summary">The proximal operator of the quadratic function</em>
     <ul>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.RGCCAConstraint-class.html">parsimony.functions.penalties.RGCCAConstraint</a></strong>:
-      <em class="summary">The proximal operator of the quadratic function</em>
+      <em class="summary">Represents the quadratic function</em>
     </li>
     </ul>
     </li>
@@ -349,31 +351,53 @@ L1 and TotalVariation.</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.multiblock.losses.LatentVariableCovariance-class.html">parsimony.functions.multiblock.losses.LatentVariableCovariance</a></strong>
     </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.properties.NesterovFunction-class.html" onclick="show_private();">parsimony.functions.properties.NesterovFunction</a></strong>:
+      <em class="summary">Abstract superclass of Nesterov functions.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.gl.GroupLassoOverlap-class.html">parsimony.functions.nesterov.gl.GroupLassoOverlap</a></strong>:
+      <em class="summary">Group L1-L2 function, with overlapping groups.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.grouptv.GroupTotalVariation-class.html">parsimony.functions.nesterov.grouptv.GroupTotalVariation</a></strong>:
+      <em class="summary">The smoothed Group total variation (Group TV) function</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.l1.L1-class.html">parsimony.functions.nesterov.l1.L1</a></strong>:
+      <em class="summary">The proximal operator of the smoothed L1 function</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.l1tv.L1TV-class.html">parsimony.functions.nesterov.l1tv.L1TV</a></strong>:
+      <em class="summary">The proximal operator of the smoothed sum of the TV and L1 functions</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.LinearRegressionL1L2TV-class.html">parsimony.functions.combinedfunctions.LinearRegressionL1L2TV</a></strong>:
+      <em class="summary">Combination (sum) of LinearRegression, L1, L2 and TotalVariation.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.LinearRegressionL1L2GL-class.html">parsimony.functions.combinedfunctions.LinearRegressionL1L2GL</a></strong>:
+      <em class="summary">Combination (sum) of RidgeRegression, L1 and Overlapping Group 
+        Lasso.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.LogisticRegressionL1L2GL-class.html">parsimony.functions.combinedfunctions.LogisticRegressionL1L2GL</a></strong>:
+      <em class="summary">Combination (sum) of RidgeLogisticRegression, L1 and 
+        TotalVariation.</em>
+    </li>
     </ul>
     </li>
-    <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.grad.Function-class.html" onclick="show_private();">parsimony.datasets.simulate.grad.Function</a></strong>
-    <ul>
-    <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.grad.GroupLasso-class.html" onclick="show_private();">parsimony.datasets.simulate.grad.GroupLasso</a></strong>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.grad.L1-class.html" onclick="show_private();">parsimony.datasets.simulate.grad.L1</a></strong>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.grad.L2-class.html" onclick="show_private();">parsimony.datasets.simulate.grad.L2</a></strong>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.grad.L2Squared-class.html" onclick="show_private();">parsimony.datasets.simulate.grad.L2Squared</a></strong>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.grad.NesterovFunction-class.html" onclick="show_private();">parsimony.datasets.simulate.grad.NesterovFunction</a></strong>
-    <ul>
-    <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.grad.SmoothedGroupLasso-class.html" onclick="show_private();">parsimony.datasets.simulate.grad.SmoothedGroupLasso</a></strong>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.grad.SmoothedGroupTotalVariation-class.html" onclick="show_private();">parsimony.datasets.simulate.grad.SmoothedGroupTotalVariation</a></strong>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.grad.SmoothedTotalVariation-class.html" onclick="show_private();">parsimony.datasets.simulate.grad.SmoothedTotalVariation</a></strong>
+    <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.LogisticRegressionL1L2TV-class.html">parsimony.functions.combinedfunctions.LogisticRegressionL1L2TV</a></strong>:
+      <em class="summary">Combination (sum) of RidgeLogisticRegression, L1 and 
+        TotalVariation.</em>
     </li>
     </ul>
     </li>
-    <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.grad.SmoothedL1-class.html" onclick="show_private();">parsimony.datasets.simulate.grad.SmoothedL1</a></strong>
+    <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV-class.html">parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV</a></strong>:
+      <em class="summary">Combination (sum) of Linear Regression, L2 and simultaneously smoothed
+L1 and TotalVariation.</em>
     </li>
-    <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.grad.TotalVariation-class.html" onclick="show_private();">parsimony.datasets.simulate.grad.TotalVariation</a></strong>
+    <li> <strong class="uidlink"><a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html">parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper</a></strong>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV-class.html">parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV</a></strong>:
+      <em class="summary">Combination (sum) of PCA (Variance), L1 and TotalVariation</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.tv.TotalVariation-class.html">parsimony.functions.nesterov.tv.TotalVariation</a></strong>:
+      <em class="summary">The smoothed Total variation (TV) function</em>
+    </li>
+    </ul>
     </li>
     </ul>
     </li>
@@ -383,26 +407,14 @@ L1 and TotalVariation.</em>
       <em class="summary">This is a function that is not in general supposed to be minimised 
         by itself.</em>
     <ul>
-    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.gl.GroupLassoOverlap-class.html">parsimony.functions.nesterov.gl.GroupLassoOverlap</a></strong>:
-      <em class="summary">Group L1-L2 function, with overlapping groups.</em>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.grouptv.GroupTotalVariation-class.html">parsimony.functions.nesterov.grouptv.GroupTotalVariation</a></strong>:
-      <em class="summary">The smoothed Group total variation (Group TV) function</em>
-    </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.L0-class.html">parsimony.functions.penalties.L0</a></strong>:
       <em class="summary">The proximal operator of the &quot;pseudo&quot; L0 function</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.L1-class.html">parsimony.functions.penalties.L1</a></strong>:
       <em class="summary">The proximal operator of the L1 function with a penalty formulation</em>
     </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.l1.L1-class.html">parsimony.functions.nesterov.l1.L1</a></strong>:
-      <em class="summary">The proximal operator of the smoothed L1 function</em>
-    </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.L1L2Squared-class.html">parsimony.functions.penalties.L1L2Squared</a></strong>:
       <em class="summary">The proximal operator of the L1 function with an L2 constraint.</em>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.l1tv.L1TV-class.html">parsimony.functions.nesterov.l1tv.L1TV</a></strong>:
-      <em class="summary">The proximal operator of the smoothed sum of the TV and L1 functions</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.L2-class.html">parsimony.functions.penalties.L2</a></strong>:
       <em class="summary">The proximal operator of the L2 function with a penalty formulation</em>
@@ -421,12 +433,9 @@ formulation</em>
       <em class="summary">The proximal operator of the quadratic function</em>
     <ul>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.RGCCAConstraint-class.html">parsimony.functions.penalties.RGCCAConstraint</a></strong>:
-      <em class="summary">The proximal operator of the quadratic function</em>
+      <em class="summary">Represents the quadratic function</em>
     </li>
     </ul>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.tv.TotalVariation-class.html">parsimony.functions.nesterov.tv.TotalVariation</a></strong>:
-      <em class="summary">The smoothed Total variation (TV) function</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.ZeroFunction-class.html">parsimony.functions.penalties.ZeroFunction</a></strong>
     </li>
@@ -498,11 +507,57 @@ or one proximal operator.</em>
     <li> <strong class="uidlink"><a href="parsimony.functions.losses.RidgeRegression-class.html">parsimony.functions.losses.RidgeRegression</a></strong>:
       <em class="summary">The Ridge Regression function, i.e.</em>
     </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.penalties.RidgeSquaredError-class.html">parsimony.functions.penalties.RidgeSquaredError</a></strong>:
+      <em class="summary">Represents a ridge squared error penalty, i.e.</em>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.properties.IndicatorFunction-class.html" onclick="show_private();">parsimony.functions.properties.IndicatorFunction</a></strong>:
+      <em class="summary">Represents an indicator function.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="parsimony.functions.penalties.LinearVariableConstraint-class.html">parsimony.functions.penalties.LinearVariableConstraint</a></strong>:
+      <em class="summary">Represents a linear constraint</em>
+    </li>
     </ul>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.losses.LatentVariableVariance-class.html">parsimony.functions.losses.LatentVariableVariance</a></strong>
     </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.properties.SplittableFunction-class.html" onclick="show_private();">parsimony.functions.properties.SplittableFunction</a></strong>:
+      <em class="summary">Represents a function that is the sum of two other functions such that</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.AugmentedLinearRegressionL1L2TV-class.html">parsimony.functions.combinedfunctions.AugmentedLinearRegressionL1L2TV</a></strong>:
+      <em class="summary">Combination (sum) of LinearRegression, L1, L2 and 1D TotalVariation
+with a linear constraint.</em>
+    </li>
+    </ul>
+    </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.SufficientDescentCondition-class.html">parsimony.functions.penalties.SufficientDescentCondition</a></strong>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.grad.Function-class.html" onclick="show_private();">parsimony.datasets.simulate.grad.Function</a></strong>
+    <ul>
+    <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.grad.GroupLasso-class.html" onclick="show_private();">parsimony.datasets.simulate.grad.GroupLasso</a></strong>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.grad.L1-class.html" onclick="show_private();">parsimony.datasets.simulate.grad.L1</a></strong>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.grad.L2-class.html" onclick="show_private();">parsimony.datasets.simulate.grad.L2</a></strong>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.grad.L2Squared-class.html" onclick="show_private();">parsimony.datasets.simulate.grad.L2Squared</a></strong>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.grad.NesterovFunction-class.html" onclick="show_private();">parsimony.datasets.simulate.grad.NesterovFunction</a></strong>
+    <ul>
+    <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.grad.SmoothedGroupLasso-class.html" onclick="show_private();">parsimony.datasets.simulate.grad.SmoothedGroupLasso</a></strong>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.grad.SmoothedGroupTotalVariation-class.html" onclick="show_private();">parsimony.datasets.simulate.grad.SmoothedGroupTotalVariation</a></strong>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.grad.SmoothedTotalVariation-class.html" onclick="show_private();">parsimony.datasets.simulate.grad.SmoothedTotalVariation</a></strong>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.grad.SmoothedL1-class.html" onclick="show_private();">parsimony.datasets.simulate.grad.SmoothedL1</a></strong>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.grad.TotalVariation-class.html" onclick="show_private();">parsimony.datasets.simulate.grad.TotalVariation</a></strong>
     </li>
     </ul>
     </li>
@@ -511,15 +566,6 @@ or one proximal operator.</em>
     <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.CombinedFunction-class.html">parsimony.functions.combinedfunctions.CombinedFunction</a></strong>:
       <em class="summary">Combines one or more loss functions, any number of penalties and zero
 or one proximal operator.</em>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.gl.GroupLassoOverlap-class.html">parsimony.functions.nesterov.gl.GroupLassoOverlap</a></strong>:
-      <em class="summary">Group L1-L2 function, with overlapping groups.</em>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.grouptv.GroupTotalVariation-class.html">parsimony.functions.nesterov.grouptv.GroupTotalVariation</a></strong>:
-      <em class="summary">The smoothed Group total variation (Group TV) function</em>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.l1.L1-class.html">parsimony.functions.nesterov.l1.L1</a></strong>:
-      <em class="summary">The proximal operator of the smoothed L1 function</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.L2Squared-class.html">parsimony.functions.penalties.L2Squared</a></strong>:
       <em class="summary">The proximal operator of the squared L2 function with a penalty
@@ -532,6 +578,30 @@ formulation</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.losses.LinearRegression-class.html">parsimony.functions.losses.LinearRegression</a></strong>:
       <em class="summary">The Linear regression loss function.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.losses.LogisticRegression-class.html">parsimony.functions.losses.LogisticRegression</a></strong>:
+      <em class="summary">The Logistic Regression loss function.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.multiblock.losses.MultiblockFunctionWrapper-class.html">parsimony.functions.multiblock.losses.MultiblockFunctionWrapper</a></strong>
+    <ul>
+    <li> <strong class="uidlink"><a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html">parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper</a></strong>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.properties.NesterovFunction-class.html" onclick="show_private();">parsimony.functions.properties.NesterovFunction</a></strong>:
+      <em class="summary">Abstract superclass of Nesterov functions.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.gl.GroupLassoOverlap-class.html">parsimony.functions.nesterov.gl.GroupLassoOverlap</a></strong>:
+      <em class="summary">Group L1-L2 function, with overlapping groups.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.grouptv.GroupTotalVariation-class.html">parsimony.functions.nesterov.grouptv.GroupTotalVariation</a></strong>:
+      <em class="summary">The smoothed Group total variation (Group TV) function</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.l1.L1-class.html">parsimony.functions.nesterov.l1.L1</a></strong>:
+      <em class="summary">The proximal operator of the smoothed L1 function</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.l1tv.L1TV-class.html">parsimony.functions.nesterov.l1tv.L1TV</a></strong>:
+      <em class="summary">The proximal operator of the smoothed sum of the TV and L1 functions</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.LinearRegressionL1L2TV-class.html">parsimony.functions.combinedfunctions.LinearRegressionL1L2TV</a></strong>:
       <em class="summary">Combination (sum) of LinearRegression, L1, L2 and TotalVariation.</em>
@@ -552,23 +622,25 @@ formulation</em>
     </li>
     </ul>
     </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.losses.LogisticRegression-class.html">parsimony.functions.losses.LogisticRegression</a></strong>:
-      <em class="summary">The Logistic Regression loss function.</em>
+    <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV-class.html">parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV</a></strong>:
+      <em class="summary">Combination (sum) of Linear Regression, L2 and simultaneously smoothed
+L1 and TotalVariation.</em>
     </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.multiblock.losses.MultiblockFunctionWrapper-class.html">parsimony.functions.multiblock.losses.MultiblockFunctionWrapper</a></strong>
-    <ul>
     <li> <strong class="uidlink"><a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html">parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper</a></strong>
-    </li>
-    </ul>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV-class.html">parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV</a></strong>:
       <em class="summary">Combination (sum) of PCA (Variance), L1 and TotalVariation</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.tv.TotalVariation-class.html">parsimony.functions.nesterov.tv.TotalVariation</a></strong>:
+      <em class="summary">The smoothed Total variation (TV) function</em>
+    </li>
+    </ul>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.QuadraticConstraint-class.html">parsimony.functions.penalties.QuadraticConstraint</a></strong>:
       <em class="summary">The proximal operator of the quadratic function</em>
     <ul>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.RGCCAConstraint-class.html">parsimony.functions.penalties.RGCCAConstraint</a></strong>:
-      <em class="summary">The proximal operator of the quadratic function</em>
+      <em class="summary">Represents the quadratic function</em>
     </li>
     </ul>
     </li>
@@ -578,8 +650,8 @@ formulation</em>
     <li> <strong class="uidlink"><a href="parsimony.functions.losses.RidgeRegression-class.html">parsimony.functions.losses.RidgeRegression</a></strong>:
       <em class="summary">The Ridge Regression function, i.e.</em>
     </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.tv.TotalVariation-class.html">parsimony.functions.nesterov.tv.TotalVariation</a></strong>:
-      <em class="summary">The smoothed Total variation (TV) function</em>
+    <li> <strong class="uidlink"><a href="parsimony.functions.penalties.RidgeSquaredError-class.html">parsimony.functions.penalties.RidgeSquaredError</a></strong>:
+      <em class="summary">Represents a ridge squared error penalty, i.e.</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.ZeroFunction-class.html">parsimony.functions.penalties.ZeroFunction</a></strong>
     </li>
@@ -601,23 +673,16 @@ L1 and TotalVariation.</em>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.bases.InformationAlgorithm-class.html">parsimony.algorithms.bases.InformationAlgorithm</a></strong>:
       <em class="summary">Algorithms that produce information about their run.</em>
     <ul>
+    <li> <strong class="uidlink"><a href="parsimony.algorithms.proximal.ADMM-class.html">parsimony.algorithms.proximal.ADMM</a></strong>:
+      <em class="summary">The alternating direction method of multipliers (ADMM).</em>
+    </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.utils.Bisection-class.html">parsimony.algorithms.utils.Bisection</a></strong>:
       <em class="summary">Finds a root of the function assumed to be on the line between two
 points.</em>
     </li>
-    <li> <strong class="uidlink"><a href="parsimony.algorithms.primaldual.CONESTA-class.html">parsimony.algorithms.primaldual.CONESTA</a></strong>:
+    <li> <strong class="uidlink"><a href="parsimony.algorithms.proximal.CONESTA-class.html">parsimony.algorithms.proximal.CONESTA</a></strong>:
       <em class="summary">COntinuation with NEsterov smoothing in a Soft-Thresholding Algorithm,
 or CONESTA for short.</em>
-    <ul>
-    <li> <strong class="uidlink"><a href="parsimony.algorithms.primaldual.DynamicCONESTA-class.html">parsimony.algorithms.primaldual.DynamicCONESTA</a></strong>:
-      <em class="summary">COntinuation with NEsterov smoothing in a Soft-Thresholding 
-        Algorithm, or CONESTA for short, with a dynamically decreasing mu.</em>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.algorithms.primaldual.StaticCONESTA-class.html">parsimony.algorithms.primaldual.StaticCONESTA</a></strong>:
-      <em class="summary">COntinuation with NEsterov smoothing in a Soft-Thresholding 
-        Algorithm, or CONESTA for short, with a statically decreasing mu.</em>
-    </li>
-    </ul>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.primaldual.ExcessiveGapMethod-class.html">parsimony.algorithms.primaldual.ExcessiveGapMethod</a></strong>:
       <em class="summary">Nesterov's excessive gap method for strongly convex functions.</em>
@@ -631,6 +696,9 @@ or CONESTA for short.</em>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.proximal.ISTA-class.html">parsimony.algorithms.proximal.ISTA</a></strong>:
       <em class="summary">The iterative shrinkage-thresholding algorithm.</em>
     </li>
+    <li> <strong class="uidlink"><a href="parsimony.algorithms.coordinate.LassoCoordinateDescent-class.html">parsimony.algorithms.coordinate.LassoCoordinateDescent</a></strong>:
+      <em class="summary">A coordinate descent algorithm for the lasso.</em>
+    </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.multiblock.MultiblockCONESTA-class.html" onclick="show_private();">parsimony.algorithms.multiblock.MultiblockCONESTA</a></strong>:
       <em class="summary">An alternating minimising multiblock algorithm that utilises CONESTA in
 the inner minimisation.</em>
@@ -639,36 +707,32 @@ the inner minimisation.</em>
       <em class="summary">The projected gradient algorithm with alternating minimisations in a
 multiblock setting.</em>
     </li>
-    <li> <strong class="uidlink"><a href="parsimony.algorithms.primaldual.NaiveCONESTA-class.html">parsimony.algorithms.primaldual.NaiveCONESTA</a></strong>:
-      <em class="summary">A na&#239;ve implementation of COntinuation with NEsterov smoothing in a
-Soft-Thresholding Algorithm, or CONESTA for short.</em>
-    </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.utils.NewtonRaphson-class.html">parsimony.algorithms.utils.NewtonRaphson</a></strong>:
       <em class="summary">Finds a root of the function assumed to be in the vicinity of a given
 point.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.algorithms.coordinate.ShootingAlgorithm-class.html">parsimony.algorithms.coordinate.ShootingAlgorithm</a></strong>:
+      <em class="summary">The shooting algorithm for the lasso.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.algorithms.proximal.StaticCONESTA-class.html">parsimony.algorithms.proximal.StaticCONESTA</a></strong>:
+      <em class="summary">COntinuation with NEsterov smoothing in a Soft-Thresholding Algorithm,
+or CONESTA for short, with a statically decreasing sequence of eps and mu.</em>
     </li>
     </ul>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.bases.IterativeAlgorithm-class.html">parsimony.algorithms.bases.IterativeAlgorithm</a></strong>:
       <em class="summary">Algorithms that require iterative steps to achieve the goal.</em>
     <ul>
+    <li> <strong class="uidlink"><a href="parsimony.algorithms.proximal.ADMM-class.html">parsimony.algorithms.proximal.ADMM</a></strong>:
+      <em class="summary">The alternating direction method of multipliers (ADMM).</em>
+    </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.utils.Bisection-class.html">parsimony.algorithms.utils.Bisection</a></strong>:
       <em class="summary">Finds a root of the function assumed to be on the line between two
 points.</em>
     </li>
-    <li> <strong class="uidlink"><a href="parsimony.algorithms.primaldual.CONESTA-class.html">parsimony.algorithms.primaldual.CONESTA</a></strong>:
+    <li> <strong class="uidlink"><a href="parsimony.algorithms.proximal.CONESTA-class.html">parsimony.algorithms.proximal.CONESTA</a></strong>:
       <em class="summary">COntinuation with NEsterov smoothing in a Soft-Thresholding Algorithm,
 or CONESTA for short.</em>
-    <ul>
-    <li> <strong class="uidlink"><a href="parsimony.algorithms.primaldual.DynamicCONESTA-class.html">parsimony.algorithms.primaldual.DynamicCONESTA</a></strong>:
-      <em class="summary">COntinuation with NEsterov smoothing in a Soft-Thresholding 
-        Algorithm, or CONESTA for short, with a dynamically decreasing mu.</em>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.algorithms.primaldual.StaticCONESTA-class.html">parsimony.algorithms.primaldual.StaticCONESTA</a></strong>:
-      <em class="summary">COntinuation with NEsterov smoothing in a Soft-Thresholding 
-        Algorithm, or CONESTA for short, with a statically decreasing mu.</em>
-    </li>
-    </ul>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.primaldual.ExcessiveGapMethod-class.html">parsimony.algorithms.primaldual.ExcessiveGapMethod</a></strong>:
       <em class="summary">Nesterov's excessive gap method for strongly convex functions.</em>
@@ -682,6 +746,9 @@ or CONESTA for short.</em>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.proximal.ISTA-class.html">parsimony.algorithms.proximal.ISTA</a></strong>:
       <em class="summary">The iterative shrinkage-thresholding algorithm.</em>
     </li>
+    <li> <strong class="uidlink"><a href="parsimony.algorithms.coordinate.LassoCoordinateDescent-class.html">parsimony.algorithms.coordinate.LassoCoordinateDescent</a></strong>:
+      <em class="summary">A coordinate descent algorithm for the lasso.</em>
+    </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.multiblock.MultiblockCONESTA-class.html" onclick="show_private();">parsimony.algorithms.multiblock.MultiblockCONESTA</a></strong>:
       <em class="summary">An alternating minimising multiblock algorithm that utilises CONESTA in
 the inner minimisation.</em>
@@ -689,10 +756,6 @@ the inner minimisation.</em>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.multiblock.MultiblockFISTA-class.html">parsimony.algorithms.multiblock.MultiblockFISTA</a></strong>:
       <em class="summary">The projected gradient algorithm with alternating minimisations in a
 multiblock setting.</em>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.algorithms.primaldual.NaiveCONESTA-class.html">parsimony.algorithms.primaldual.NaiveCONESTA</a></strong>:
-      <em class="summary">A na&#239;ve implementation of COntinuation with NEsterov smoothing in a
-Soft-Thresholding Algorithm, or CONESTA for short.</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.utils.NewtonRaphson-class.html">parsimony.algorithms.utils.NewtonRaphson</a></strong>:
       <em class="summary">Finds a root of the function assumed to be in the vicinity of a given
@@ -701,22 +764,20 @@ point.</em>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.nipals.PLSR-class.html">parsimony.algorithms.nipals.PLSR</a></strong>:
       <em class="summary">A NIPALS implementation for PLS regresison.</em>
     </li>
+    <li> <strong class="uidlink"><a href="parsimony.algorithms.coordinate.ShootingAlgorithm-class.html">parsimony.algorithms.coordinate.ShootingAlgorithm</a></strong>:
+      <em class="summary">The shooting algorithm for the lasso.</em>
+    </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.nipals.SparsePLSR-class.html" onclick="show_private();">parsimony.algorithms.nipals.SparsePLSR</a></strong>:
       <em class="summary">A NIPALS implementation for Sparse PLS regresison.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.algorithms.proximal.StaticCONESTA-class.html">parsimony.algorithms.proximal.StaticCONESTA</a></strong>:
+      <em class="summary">COntinuation with NEsterov smoothing in a Soft-Thresholding Algorithm,
+or CONESTA for short, with a statically decreasing sequence of eps and mu.</em>
     </li>
     </ul>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.properties.LipschitzContinuousGradient-class.html">parsimony.functions.properties.LipschitzContinuousGradient</a></strong>
     <ul>
-    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.gl.GroupLassoOverlap-class.html">parsimony.functions.nesterov.gl.GroupLassoOverlap</a></strong>:
-      <em class="summary">Group L1-L2 function, with overlapping groups.</em>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.grouptv.GroupTotalVariation-class.html">parsimony.functions.nesterov.grouptv.GroupTotalVariation</a></strong>:
-      <em class="summary">The smoothed Group total variation (Group TV) function</em>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.l1.L1-class.html">parsimony.functions.nesterov.l1.L1</a></strong>:
-      <em class="summary">The proximal operator of the smoothed L1 function</em>
-    </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.L2Squared-class.html">parsimony.functions.penalties.L2Squared</a></strong>:
       <em class="summary">The proximal operator of the squared L2 function with a penalty
 formulation</em>
@@ -728,6 +789,24 @@ formulation</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.losses.LinearRegression-class.html">parsimony.functions.losses.LinearRegression</a></strong>:
       <em class="summary">The Linear regression loss function.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.losses.LogisticRegression-class.html">parsimony.functions.losses.LogisticRegression</a></strong>:
+      <em class="summary">The Logistic Regression loss function.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.properties.NesterovFunction-class.html" onclick="show_private();">parsimony.functions.properties.NesterovFunction</a></strong>:
+      <em class="summary">Abstract superclass of Nesterov functions.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.gl.GroupLassoOverlap-class.html">parsimony.functions.nesterov.gl.GroupLassoOverlap</a></strong>:
+      <em class="summary">Group L1-L2 function, with overlapping groups.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.grouptv.GroupTotalVariation-class.html">parsimony.functions.nesterov.grouptv.GroupTotalVariation</a></strong>:
+      <em class="summary">The smoothed Group total variation (Group TV) function</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.l1.L1-class.html">parsimony.functions.nesterov.l1.L1</a></strong>:
+      <em class="summary">The proximal operator of the smoothed L1 function</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.l1tv.L1TV-class.html">parsimony.functions.nesterov.l1tv.L1TV</a></strong>:
+      <em class="summary">The proximal operator of the smoothed sum of the TV and L1 functions</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.LinearRegressionL1L2TV-class.html">parsimony.functions.combinedfunctions.LinearRegressionL1L2TV</a></strong>:
       <em class="summary">Combination (sum) of LinearRegression, L1, L2 and TotalVariation.</em>
@@ -752,20 +831,21 @@ formulation</em>
       <em class="summary">Combination (sum) of Linear Regression, L2 and simultaneously smoothed
 L1 and TotalVariation.</em>
     </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.losses.LogisticRegression-class.html">parsimony.functions.losses.LogisticRegression</a></strong>:
-      <em class="summary">The Logistic Regression loss function.</em>
+    <li> <strong class="uidlink"><a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html">parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper</a></strong>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV-class.html">parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV</a></strong>:
       <em class="summary">Combination (sum) of PCA (Variance), L1 and TotalVariation</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.tv.TotalVariation-class.html">parsimony.functions.nesterov.tv.TotalVariation</a></strong>:
+      <em class="summary">The smoothed Total variation (TV) function</em>
+    </li>
+    </ul>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.losses.RidgeLogisticRegression-class.html">parsimony.functions.losses.RidgeLogisticRegression</a></strong>:
       <em class="summary">The Logistic Regression loss function with a squared L2 penalty.</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.losses.RidgeRegression-class.html">parsimony.functions.losses.RidgeRegression</a></strong>:
       <em class="summary">The Ridge Regression function, i.e.</em>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.tv.TotalVariation-class.html">parsimony.functions.nesterov.tv.TotalVariation</a></strong>:
-      <em class="summary">The smoothed Total variation (TV) function</em>
     </li>
     </ul>
     </li>
@@ -815,53 +895,7 @@ or one proximal operator.</em>
     </li>
     </ul>
     </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html">parsimony.functions.nesterov.properties.NesterovFunction</a></strong>:
-      <em class="summary">Abstract superclass of Nesterov functions.</em>
-    <ul>
-    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.gl.GroupLassoOverlap-class.html">parsimony.functions.nesterov.gl.GroupLassoOverlap</a></strong>:
-      <em class="summary">Group L1-L2 function, with overlapping groups.</em>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.grouptv.GroupTotalVariation-class.html">parsimony.functions.nesterov.grouptv.GroupTotalVariation</a></strong>:
-      <em class="summary">The smoothed Group total variation (Group TV) function</em>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.l1.L1-class.html">parsimony.functions.nesterov.l1.L1</a></strong>:
-      <em class="summary">The proximal operator of the smoothed L1 function</em>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.l1tv.L1TV-class.html">parsimony.functions.nesterov.l1tv.L1TV</a></strong>:
-      <em class="summary">The proximal operator of the smoothed sum of the TV and L1 functions</em>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.LinearRegressionL1L2TV-class.html">parsimony.functions.combinedfunctions.LinearRegressionL1L2TV</a></strong>:
-      <em class="summary">Combination (sum) of LinearRegression, L1, L2 and TotalVariation.</em>
-    <ul>
-    <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.LinearRegressionL1L2GL-class.html">parsimony.functions.combinedfunctions.LinearRegressionL1L2GL</a></strong>:
-      <em class="summary">Combination (sum) of RidgeRegression, L1 and Overlapping Group 
-        Lasso.</em>
-    <ul>
-    <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.LogisticRegressionL1L2GL-class.html">parsimony.functions.combinedfunctions.LogisticRegressionL1L2GL</a></strong>:
-      <em class="summary">Combination (sum) of RidgeLogisticRegression, L1 and 
-        TotalVariation.</em>
-    </li>
-    </ul>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.LogisticRegressionL1L2TV-class.html">parsimony.functions.combinedfunctions.LogisticRegressionL1L2TV</a></strong>:
-      <em class="summary">Combination (sum) of RidgeLogisticRegression, L1 and 
-        TotalVariation.</em>
-    </li>
-    </ul>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV-class.html">parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV</a></strong>:
-      <em class="summary">Combination (sum) of Linear Regression, L2 and simultaneously smoothed
-L1 and TotalVariation.</em>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html">parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper</a></strong>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV-class.html">parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV</a></strong>:
-      <em class="summary">Combination (sum) of PCA (Variance), L1 and TotalVariation</em>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.tv.TotalVariation-class.html">parsimony.functions.nesterov.tv.TotalVariation</a></strong>:
-      <em class="summary">The smoothed Total variation (TV) function</em>
-    </li>
-    </ul>
+    <li> <strong class="uidlink"><a href="parsimony.utils.linalgs.MultipartArray-class.html">parsimony.utils.linalgs.MultipartArray</a></strong>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.properties.OR-class.html">parsimony.functions.properties.OR</a></strong>
     </li>
@@ -916,9 +950,12 @@ formulation</em>
       <em class="summary">The proximal operator of the quadratic function</em>
     <ul>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.RGCCAConstraint-class.html">parsimony.functions.penalties.RGCCAConstraint</a></strong>:
-      <em class="summary">The proximal operator of the quadratic function</em>
+      <em class="summary">Represents the quadratic function</em>
     </li>
     </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.penalties.RidgeSquaredError-class.html">parsimony.functions.penalties.RidgeSquaredError</a></strong>:
+      <em class="summary">Represents a ridge squared error penalty, i.e.</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.tv.TotalVariation-class.html">parsimony.functions.nesterov.tv.TotalVariation</a></strong>:
       <em class="summary">The smoothed Total variation (TV) function</em>
@@ -951,8 +988,11 @@ formulation</em>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.LInf-class.html">parsimony.functions.penalties.LInf</a></strong>:
       <em class="summary">The proximal operator of the L-infinity function</em>
     </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.penalties.LinearVariableConstraint-class.html">parsimony.functions.penalties.LinearVariableConstraint</a></strong>:
+      <em class="summary">Represents a linear constraint</em>
+    </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.RGCCAConstraint-class.html">parsimony.functions.penalties.RGCCAConstraint</a></strong>:
-      <em class="summary">The proximal operator of the quadratic function</em>
+      <em class="summary">Represents the quadratic function</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.ZeroFunction-class.html">parsimony.functions.penalties.ZeroFunction</a></strong>
     </li>
@@ -960,6 +1000,15 @@ formulation</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.properties.ProximalOperator-class.html">parsimony.functions.properties.ProximalOperator</a></strong>
     <ul>
+    <li> <strong class="uidlink"><a href="parsimony.functions.properties.AugmentedProximalOperator-class.html" onclick="show_private();">parsimony.functions.properties.AugmentedProximalOperator</a></strong>:
+      <em class="summary">Given the problem</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.AugmentedLinearRegressionL1L2TV-class.html">parsimony.functions.combinedfunctions.AugmentedLinearRegressionL1L2TV</a></strong>:
+      <em class="summary">Combination (sum) of LinearRegression, L1, L2 and 1D TotalVariation
+with a linear constraint.</em>
+    </li>
+    </ul>
+    </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.CombinedFunction-class.html">parsimony.functions.combinedfunctions.CombinedFunction</a></strong>:
       <em class="summary">Combines one or more loss functions, any number of penalties and zero
 or one proximal operator.</em>
@@ -1008,8 +1057,56 @@ formulation</em>
     </li>
     </ul>
     </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.properties.NesterovFunction-class.html" onclick="show_private();">parsimony.functions.properties.NesterovFunction</a></strong>:
+      <em class="summary">Abstract superclass of Nesterov functions.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.gl.GroupLassoOverlap-class.html">parsimony.functions.nesterov.gl.GroupLassoOverlap</a></strong>:
+      <em class="summary">Group L1-L2 function, with overlapping groups.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.grouptv.GroupTotalVariation-class.html">parsimony.functions.nesterov.grouptv.GroupTotalVariation</a></strong>:
+      <em class="summary">The smoothed Group total variation (Group TV) function</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.l1.L1-class.html">parsimony.functions.nesterov.l1.L1</a></strong>:
+      <em class="summary">The proximal operator of the smoothed L1 function</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.l1tv.L1TV-class.html">parsimony.functions.nesterov.l1tv.L1TV</a></strong>:
+      <em class="summary">The proximal operator of the smoothed sum of the TV and L1 functions</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.LinearRegressionL1L2TV-class.html">parsimony.functions.combinedfunctions.LinearRegressionL1L2TV</a></strong>:
+      <em class="summary">Combination (sum) of LinearRegression, L1, L2 and TotalVariation.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.LinearRegressionL1L2GL-class.html">parsimony.functions.combinedfunctions.LinearRegressionL1L2GL</a></strong>:
+      <em class="summary">Combination (sum) of RidgeRegression, L1 and Overlapping Group 
+        Lasso.</em>
+    <ul>
+    <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.LogisticRegressionL1L2GL-class.html">parsimony.functions.combinedfunctions.LogisticRegressionL1L2GL</a></strong>:
+      <em class="summary">Combination (sum) of RidgeLogisticRegression, L1 and 
+        TotalVariation.</em>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.LogisticRegressionL1L2TV-class.html">parsimony.functions.combinedfunctions.LogisticRegressionL1L2TV</a></strong>:
+      <em class="summary">Combination (sum) of RidgeLogisticRegression, L1 and 
+        TotalVariation.</em>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV-class.html">parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV</a></strong>:
+      <em class="summary">Combination (sum) of Linear Regression, L2 and simultaneously smoothed
+L1 and TotalVariation.</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html">parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper</a></strong>
+    </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV-class.html">parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV</a></strong>:
       <em class="summary">Combination (sum) of PCA (Variance), L1 and TotalVariation</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.tv.TotalVariation-class.html">parsimony.functions.nesterov.tv.TotalVariation</a></strong>:
+      <em class="summary">The smoothed Total variation (TV) function</em>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.penalties.RidgeSquaredError-class.html">parsimony.functions.penalties.RidgeSquaredError</a></strong>:
+      <em class="summary">Represents a ridge squared error penalty, i.e.</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.ZeroFunction-class.html">parsimony.functions.penalties.ZeroFunction</a></strong>
     </li>
@@ -1023,6 +1120,14 @@ formulation</em>
     <li> <strong class="uidlink"><a href="parsimony.datasets.simulate.simulate.LinearRegressionData-class.html">parsimony.datasets.simulate.simulate.LinearRegressionData</a></strong>:
       <em class="summary">Returns data for linear regression that is generated such that we know
 the exact solution.</em>
+    </li>
+    </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.utils.linalgs.Solver-class.html" onclick="show_private();">parsimony.utils.linalgs.Solver</a></strong>
+    <ul>
+    <li> <strong class="uidlink"><a href="parsimony.utils.linalgs.SparseSolver-class.html" onclick="show_private();">parsimony.utils.linalgs.SparseSolver</a></strong>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.utils.linalgs.TridiagonalSolver-class.html" onclick="show_private();">parsimony.utils.linalgs.TridiagonalSolver</a></strong>
     </li>
     </ul>
     </li>
@@ -1113,7 +1218,12 @@ L1 and TotalVariation.</em>
     <li> <strong class="uidlink"><a href="parsimony.functions.losses.RidgeRegression-class.html">parsimony.functions.losses.RidgeRegression</a></strong>:
       <em class="summary">The Ridge Regression function, i.e.</em>
     </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.penalties.RidgeSquaredError-class.html">parsimony.functions.penalties.RidgeSquaredError</a></strong>:
+      <em class="summary">Represents a ridge squared error penalty, i.e.</em>
+    </li>
     </ul>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.utils.linalgs.MultipartArray.__ops-class.html" onclick="show_private();">parsimony.utils.linalgs.MultipartArray.__ops</a></strong>
     </li>
     <li> <strong class="uidlink">type</strong>:
       <em class="summary">type(object) -&gt; the object's type type(name, bases, dict) -&gt; 
@@ -1153,7 +1263,7 @@ L1 and TotalVariation.</em>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Jul  6 11:32:50 2014
+    Generated by Epydoc 3.0.1 on Thu Oct  2 23:35:45 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

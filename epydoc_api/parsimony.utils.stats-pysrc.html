@@ -38,7 +38,7 @@
     <td width="100%">
       <span class="breadcrumbs">
         <a href="parsimony-module.html">Package&nbsp;parsimony</a> ::
-        <a href="parsimony.utils-module.html" onclick="show_private();">Package&nbsp;utils</a> ::
+        <a href="parsimony.utils-module.html">Package&nbsp;utils</a> ::
         Module&nbsp;stats
       </span>
     </td>
@@ -57,73 +57,589 @@
 </table>
 <h1 class="epydoc">Source Code for <a href="parsimony.utils.stats-module.html">Module parsimony.utils.stats</a></h1>
 <pre class="py-src">
-<a name="L1"></a><tt class="py-lineno"> 1</tt>  <tt class="py-line"><tt class="py-comment"># -*- coding: utf-8 -*-</tt> </tt>
-<a name="L2"></a><tt class="py-lineno"> 2</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
-<a name="L3"></a><tt class="py-lineno"> 3</tt>  <tt class="py-line"><tt class="py-docstring">Created on Tue Jul  1 16:30:38 2014</tt> </tt>
-<a name="L4"></a><tt class="py-lineno"> 4</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
-<a name="L5"></a><tt class="py-lineno"> 5</tt>  <tt class="py-line"><tt class="py-docstring">Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.</tt> </tt>
-<a name="L6"></a><tt class="py-lineno"> 6</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
-<a name="L7"></a><tt class="py-lineno"> 7</tt>  <tt class="py-line"><tt class="py-docstring">@author:  Tommy L&#246;fstedt</tt> </tt>
-<a name="L8"></a><tt class="py-lineno"> 8</tt>  <tt class="py-line"><tt class="py-docstring">@email:   tommy.loefstedt@cea.fr</tt> </tt>
-<a name="L9"></a><tt class="py-lineno"> 9</tt>  <tt class="py-line"><tt class="py-docstring">@license: BSD 3-clause.</tt> </tt>
-<a name="L10"></a><tt class="py-lineno">10</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
-<a name="L11"></a><tt class="py-lineno">11</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">numpy</tt> <tt class="py-keyword">as</tt> <tt class="py-name">np</tt> </tt>
-<a name="L12"></a><tt class="py-lineno">12</tt>  <tt class="py-line"> </tt>
-<a name="L13"></a><tt class="py-lineno">13</tt>  <tt class="py-line"><tt class="py-name">__all__</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">"sensitivity"</tt><tt class="py-op">,</tt> <tt class="py-string">"specificity"</tt><tt class="py-op">]</tt> </tt>
-<a name="L14"></a><tt class="py-lineno">14</tt>  <tt class="py-line"> </tt>
-<a name="L15"></a><tt class="py-lineno">15</tt>  <tt class="py-line"> </tt>
-<a name="sensitivity"></a><div id="sensitivity-def"><a name="L16"></a><tt class="py-lineno">16</tt> <a class="py-toggle" href="#" id="sensitivity-toggle" onclick="return toggle('sensitivity');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.stats-module.html#sensitivity">sensitivity</a><tt class="py-op">(</tt><tt class="py-param">cond</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
-</div><div id="sensitivity-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="sensitivity-expanded"><a name="L17"></a><tt class="py-lineno">17</tt>  <tt class="py-line">    <tt class="py-docstring">"""A test's ability to identify a condition correctly.</tt> </tt>
-<a name="L18"></a><tt class="py-lineno">18</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
-<a name="L19"></a><tt class="py-lineno">19</tt>  <tt class="py-line"><tt class="py-docstring">    Parameters</tt> </tt>
-<a name="L20"></a><tt class="py-lineno">20</tt>  <tt class="py-line"><tt class="py-docstring">    ----------</tt> </tt>
-<a name="L21"></a><tt class="py-lineno">21</tt>  <tt class="py-line"><tt class="py-docstring">    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.</tt> </tt>
-<a name="L22"></a><tt class="py-lineno">22</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
-<a name="L23"></a><tt class="py-lineno">23</tt>  <tt class="py-line"><tt class="py-docstring">    test : Numpy array, boolean or 0/1 integer. The estimated outcome.</tt> </tt>
-<a name="L24"></a><tt class="py-lineno">24</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
-<a name="L25"></a><tt class="py-lineno">25</tt>  <tt class="py-line">    <tt class="py-name">true_pos</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">logical_and</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">cond</tt> <tt class="py-op">==</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-op">(</tt><tt class="py-name">test</tt> <tt class="py-op">==</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
-<a name="L26"></a><tt class="py-lineno">26</tt>  <tt class="py-line">    <tt class="py-name">false_neg</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">logical_and</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">cond</tt> <tt class="py-op">==</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-op">(</tt><tt class="py-name">test</tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
-<a name="L27"></a><tt class="py-lineno">27</tt>  <tt class="py-line"> </tt>
-<a name="L28"></a><tt class="py-lineno">28</tt>  <tt class="py-line">    <tt class="py-name">sens</tt> <tt class="py-op">=</tt> <tt class="py-name">true_pos</tt><tt class="py-op">.</tt><tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> <tt class="py-op">/</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">true_pos</tt><tt class="py-op">.</tt><tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> <tt class="py-op">+</tt> <tt class="py-name">false_neg</tt><tt class="py-op">.</tt><tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
-<a name="L29"></a><tt class="py-lineno">29</tt>  <tt class="py-line"> </tt>
-<a name="L30"></a><tt class="py-lineno">30</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">sens</tt> </tt>
-</div><a name="L31"></a><tt class="py-lineno">31</tt>  <tt class="py-line"> </tt>
-<a name="L32"></a><tt class="py-lineno">32</tt>  <tt class="py-line"> </tt>
-<a name="specificity"></a><div id="specificity-def"><a name="L33"></a><tt class="py-lineno">33</tt> <a class="py-toggle" href="#" id="specificity-toggle" onclick="return toggle('specificity');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.stats-module.html#specificity">specificity</a><tt class="py-op">(</tt><tt class="py-param">cond</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
-</div><div id="specificity-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="specificity-expanded"><a name="L34"></a><tt class="py-lineno">34</tt>  <tt class="py-line">    <tt class="py-docstring">"""A test's ability to exclude a condition correctly.</tt> </tt>
-<a name="L35"></a><tt class="py-lineno">35</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
-<a name="L36"></a><tt class="py-lineno">36</tt>  <tt class="py-line"><tt class="py-docstring">    Parameters</tt> </tt>
-<a name="L37"></a><tt class="py-lineno">37</tt>  <tt class="py-line"><tt class="py-docstring">    ----------</tt> </tt>
-<a name="L38"></a><tt class="py-lineno">38</tt>  <tt class="py-line"><tt class="py-docstring">    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.</tt> </tt>
-<a name="L39"></a><tt class="py-lineno">39</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
-<a name="L40"></a><tt class="py-lineno">40</tt>  <tt class="py-line"><tt class="py-docstring">    test : Numpy array, boolean or 0/1 integer. The estimated outcome.</tt> </tt>
-<a name="L41"></a><tt class="py-lineno">41</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
-<a name="L42"></a><tt class="py-lineno">42</tt>  <tt class="py-line">    <tt class="py-name">true_neg</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">logical_and</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">cond</tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-op">(</tt><tt class="py-name">test</tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
-<a name="L43"></a><tt class="py-lineno">43</tt>  <tt class="py-line">    <tt class="py-name">false_pos</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">logical_and</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">cond</tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-op">(</tt><tt class="py-name">test</tt> <tt class="py-op">==</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
-<a name="L44"></a><tt class="py-lineno">44</tt>  <tt class="py-line"> </tt>
-<a name="L45"></a><tt class="py-lineno">45</tt>  <tt class="py-line">    <tt class="py-name">spec</tt> <tt class="py-op">=</tt> <tt class="py-name">true_neg</tt><tt class="py-op">.</tt><tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> <tt class="py-op">/</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">false_pos</tt><tt class="py-op">.</tt><tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> <tt class="py-op">+</tt> <tt class="py-name">true_neg</tt><tt class="py-op">.</tt><tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
-<a name="L46"></a><tt class="py-lineno">46</tt>  <tt class="py-line"> </tt>
-<a name="L47"></a><tt class="py-lineno">47</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">spec</tt> </tt>
-</div><a name="L48"></a><tt class="py-lineno">48</tt>  <tt class="py-line"> </tt>
-<a name="L49"></a><tt class="py-lineno">49</tt>  <tt class="py-line"> </tt>
-<a name="accuracy"></a><div id="accuracy-def"><a name="L50"></a><tt class="py-lineno">50</tt> <a class="py-toggle" href="#" id="accuracy-toggle" onclick="return toggle('accuracy');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.stats-module.html#accuracy">accuracy</a><tt class="py-op">(</tt><tt class="py-param">cond</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
-</div><div id="accuracy-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="accuracy-expanded"><a name="L51"></a><tt class="py-lineno">51</tt>  <tt class="py-line">    <tt class="py-docstring">"""The degree of correctly estimated outcomes.</tt> </tt>
-<a name="L52"></a><tt class="py-lineno">52</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
-<a name="L53"></a><tt class="py-lineno">53</tt>  <tt class="py-line"><tt class="py-docstring">    Parameters</tt> </tt>
-<a name="L54"></a><tt class="py-lineno">54</tt>  <tt class="py-line"><tt class="py-docstring">    ----------</tt> </tt>
-<a name="L55"></a><tt class="py-lineno">55</tt>  <tt class="py-line"><tt class="py-docstring">    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.</tt> </tt>
-<a name="L56"></a><tt class="py-lineno">56</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
-<a name="L57"></a><tt class="py-lineno">57</tt>  <tt class="py-line"><tt class="py-docstring">    test : Numpy array, boolean or 0/1 integer. The estimated outcome.</tt> </tt>
-<a name="L58"></a><tt class="py-lineno">58</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
-<a name="L59"></a><tt class="py-lineno">59</tt>  <tt class="py-line">    <tt class="py-name">true_pos</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">logical_and</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">cond</tt> <tt class="py-op">==</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-op">(</tt><tt class="py-name">test</tt> <tt class="py-op">==</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
-<a name="L60"></a><tt class="py-lineno">60</tt>  <tt class="py-line">    <tt class="py-name">true_neg</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">logical_and</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">cond</tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-op">(</tt><tt class="py-name">test</tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
-<a name="L61"></a><tt class="py-lineno">61</tt>  <tt class="py-line"> </tt>
-<a name="L62"></a><tt class="py-lineno">62</tt>  <tt class="py-line">    <tt class="py-name">n</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">prod</tt><tt class="py-op">(</tt><tt class="py-name">cond</tt><tt class="py-op">.</tt><tt class="py-name">shape</tt><tt class="py-op">)</tt> </tt>
-<a name="L63"></a><tt class="py-lineno">63</tt>  <tt class="py-line"> </tt>
-<a name="L64"></a><tt class="py-lineno">64</tt>  <tt class="py-line">    <tt class="py-name">spec</tt> <tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-name">true_pos</tt><tt class="py-op">.</tt><tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> <tt class="py-op">+</tt> <tt class="py-name">true_neg</tt><tt class="py-op">.</tt><tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> <tt class="py-op">/</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">n</tt><tt class="py-op">)</tt> </tt>
-<a name="L65"></a><tt class="py-lineno">65</tt>  <tt class="py-line"> </tt>
-<a name="L66"></a><tt class="py-lineno">66</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">spec</tt> </tt>
-</div><a name="L67"></a><tt class="py-lineno">67</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<a name="L1"></a><tt class="py-lineno">  1</tt>  <tt class="py-line"><tt class="py-comment"># -*- coding: utf-8 -*-</tt> </tt>
+<a name="L2"></a><tt class="py-lineno">  2</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L3"></a><tt class="py-lineno">  3</tt>  <tt class="py-line"><tt class="py-docstring">Created on Tue Jul  1 16:30:38 2014</tt> </tt>
+<a name="L4"></a><tt class="py-lineno">  4</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L5"></a><tt class="py-lineno">  5</tt>  <tt class="py-line"><tt class="py-docstring">Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.</tt> </tt>
+<a name="L6"></a><tt class="py-lineno">  6</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L7"></a><tt class="py-lineno">  7</tt>  <tt class="py-line"><tt class="py-docstring">@author:  Tommy L&#246;fstedt</tt> </tt>
+<a name="L8"></a><tt class="py-lineno">  8</tt>  <tt class="py-line"><tt class="py-docstring">@email:   lofstedt.tommy@gmail.com</tt> </tt>
+<a name="L9"></a><tt class="py-lineno">  9</tt>  <tt class="py-line"><tt class="py-docstring">@license: BSD 3-clause.</tt> </tt>
+<a name="L10"></a><tt class="py-lineno"> 10</tt>  <tt class="py-line"><tt class="py-docstring">"""</tt> </tt>
+<a name="L11"></a><tt class="py-lineno"> 11</tt>  <tt class="py-line"><tt class="py-keyword">import</tt> <tt class="py-name">numpy</tt> <tt class="py-keyword">as</tt> <tt class="py-name">np</tt> </tt>
+<a name="L12"></a><tt class="py-lineno"> 12</tt>  <tt class="py-line"> </tt>
+<a name="L13"></a><tt class="py-lineno"> 13</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-op">.</tt> <tt class="py-keyword">import</tt> <tt id="link-0" class="py-name" targets="Module parsimony.utils.consts=parsimony.utils.consts-module.html"><a title="parsimony.utils.consts" class="py-name" href="#" onclick="return doclink('link-0', 'consts', 'link-0');">consts</a></tt> </tt>
+<a name="L14"></a><tt class="py-lineno"> 14</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-op">.</tt> <tt class="py-keyword">import</tt> <tt id="link-1" class="py-name" targets="Function parsimony.utils.utils.deprecated()=parsimony.utils.utils-module.html#deprecated"><a title="parsimony.utils.utils.deprecated" class="py-name" href="#" onclick="return doclink('link-1', 'deprecated', 'link-1');">deprecated</a></tt> </tt>
+<a name="L15"></a><tt class="py-lineno"> 15</tt>  <tt class="py-line"> </tt>
+<a name="L16"></a><tt class="py-lineno"> 16</tt>  <tt class="py-line"><tt class="py-name">__all__</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">"multivariate_normal"</tt><tt class="py-op">,</tt> <tt class="py-string">"sensitivity"</tt><tt class="py-op">,</tt> <tt class="py-string">"precision"</tt><tt class="py-op">,</tt> <tt class="py-string">"specificity"</tt><tt class="py-op">,</tt> </tt>
+<a name="L17"></a><tt class="py-lineno"> 17</tt>  <tt class="py-line">           <tt class="py-string">"npv"</tt><tt class="py-op">,</tt> <tt class="py-string">"F_score"</tt><tt class="py-op">,</tt> <tt class="py-string">"fleiss_kappa"</tt><tt class="py-op">]</tt> </tt>
+<a name="multivariate_normal"></a><div id="multivariate_normal-def"><a name="L18"></a><tt class="py-lineno"> 18</tt>  <tt class="py-line"> </tt>
+<a name="L19"></a><tt class="py-lineno"> 19</tt>  <tt class="py-line"> </tt>
+<a name="L20"></a><tt class="py-lineno"> 20</tt> <a class="py-toggle" href="#" id="multivariate_normal-toggle" onclick="return toggle('multivariate_normal');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.stats-module.html#multivariate_normal">multivariate_normal</a><tt class="py-op">(</tt><tt class="py-param">mu</tt><tt class="py-op">,</tt> <tt class="py-param">Sigma</tt><tt class="py-op">,</tt> <tt class="py-param">n</tt><tt class="py-op">=</tt><tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="multivariate_normal-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="multivariate_normal-expanded"><a name="L21"></a><tt class="py-lineno"> 21</tt>  <tt class="py-line">    <tt class="py-docstring">"""Generates n random vectors from the multivariate normal distribution</tt> </tt>
+<a name="L22"></a><tt class="py-lineno"> 22</tt>  <tt class="py-line"><tt class="py-docstring">    with mean mu and covariance matrix Sigma.</tt> </tt>
+<a name="L23"></a><tt class="py-lineno"> 23</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L24"></a><tt class="py-lineno"> 24</tt>  <tt class="py-line"><tt class="py-docstring">    This function is faster (roughly 11 times faster for a 600-by-4000 matrix</tt> </tt>
+<a name="L25"></a><tt class="py-lineno"> 25</tt>  <tt class="py-line"><tt class="py-docstring">    on my computer) than numpy.random.multivariate_normal. This method differs</tt> </tt>
+<a name="L26"></a><tt class="py-lineno"> 26</tt>  <tt class="py-line"><tt class="py-docstring">    from  numpy's function in that it uses the Cholesky factorisation. Note</tt> </tt>
+<a name="L27"></a><tt class="py-lineno"> 27</tt>  <tt class="py-line"><tt class="py-docstring">    that this requires the covariance matrix to be positive definite, as</tt> </tt>
+<a name="L28"></a><tt class="py-lineno"> 28</tt>  <tt class="py-line"><tt class="py-docstring">    opposed to positive semi-definite in the numpy case.</tt> </tt>
+<a name="L29"></a><tt class="py-lineno"> 29</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L30"></a><tt class="py-lineno"> 30</tt>  <tt class="py-line"><tt class="py-docstring">    See details at: https://en.wikipedia.org/wiki/</tt> </tt>
+<a name="L31"></a><tt class="py-lineno"> 31</tt>  <tt class="py-line"><tt class="py-docstring">    Multivariate_normal_distribution#Drawing_values_from_the_distribution</tt> </tt>
+<a name="L32"></a><tt class="py-lineno"> 32</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L33"></a><tt class="py-lineno"> 33</tt>  <tt class="py-line"><tt class="py-docstring">    Parameters</tt> </tt>
+<a name="L34"></a><tt class="py-lineno"> 34</tt>  <tt class="py-line"><tt class="py-docstring">    ----------</tt> </tt>
+<a name="L35"></a><tt class="py-lineno"> 35</tt>  <tt class="py-line"><tt class="py-docstring">    mu : Numpy array, shape (n, 1). The mean vector.</tt> </tt>
+<a name="L36"></a><tt class="py-lineno"> 36</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L37"></a><tt class="py-lineno"> 37</tt>  <tt class="py-line"><tt class="py-docstring">    Sigma : Numpy array, shape (p, p). The covariance matrix.</tt> </tt>
+<a name="L38"></a><tt class="py-lineno"> 38</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L39"></a><tt class="py-lineno"> 39</tt>  <tt class="py-line"><tt class="py-docstring">    n : Integer. The number of multivariate normal vectors to generate.</tt> </tt>
+<a name="L40"></a><tt class="py-lineno"> 40</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L41"></a><tt class="py-lineno"> 41</tt>  <tt class="py-line"><tt class="py-docstring">    Example</tt> </tt>
+<a name="L42"></a><tt class="py-lineno"> 42</tt>  <tt class="py-line"><tt class="py-docstring">    -------</tt> </tt>
+<a name="L43"></a><tt class="py-lineno"> 43</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import parsimony.utils.stats as stats</tt> </tt>
+<a name="L44"></a><tt class="py-lineno"> 44</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import numpy as np</tt> </tt>
+<a name="L45"></a><tt class="py-lineno"> 45</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; np.random.seed(42)</tt> </tt>
+<a name="L46"></a><tt class="py-lineno"> 46</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; n, p = 50000, 100</tt> </tt>
+<a name="L47"></a><tt class="py-lineno"> 47</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; mu = np.random.rand(p, 1)</tt> </tt>
+<a name="L48"></a><tt class="py-lineno"> 48</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; alpha = 0.01</tt> </tt>
+<a name="L49"></a><tt class="py-lineno"> 49</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; Sigma = alpha * np.random.rand(p, p) + (1 - alpha) * np.eye(p, p)</tt> </tt>
+<a name="L50"></a><tt class="py-lineno"> 50</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; M = stats.multivariate_normal(mu, Sigma, n)</tt> </tt>
+<a name="L51"></a><tt class="py-lineno"> 51</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; mean = np.mean(M, axis=0)</tt> </tt>
+<a name="L52"></a><tt class="py-lineno"> 52</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; S = np.dot((M - mean).T, (M - mean)) * (1.0 / float(n - 1))</tt> </tt>
+<a name="L53"></a><tt class="py-lineno"> 53</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; round(np.linalg.norm(Sigma - S), 14)</tt> </tt>
+<a name="L54"></a><tt class="py-lineno"> 54</tt>  <tt class="py-line"><tt class="py-docstring">    0.51886218849785</tt> </tt>
+<a name="L55"></a><tt class="py-lineno"> 55</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L56"></a><tt class="py-lineno"> 56</tt>  <tt class="py-line">    <tt class="py-comment"># Type check.</tt> </tt>
+<a name="L57"></a><tt class="py-lineno"> 57</tt>  <tt class="py-line">    <tt class="py-name">n</tt> <tt class="py-op">=</tt> <tt class="py-name">max</tt><tt class="py-op">(</tt><tt class="py-number">1</tt><tt class="py-op">,</tt> <tt class="py-name">int</tt><tt class="py-op">(</tt><tt class="py-name">n</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L58"></a><tt class="py-lineno"> 58</tt>  <tt class="py-line">    <tt id="link-2" class="py-name" targets="Variable parsimony.algorithms.utils.Info.mu=parsimony.algorithms.utils.Info-class.html#mu"><a title="parsimony.algorithms.utils.Info.mu" class="py-name" href="#" onclick="return doclink('link-2', 'mu', 'link-2');">mu</a></tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">array</tt><tt class="py-op">(</tt><tt id="link-3" class="py-name"><a title="parsimony.algorithms.utils.Info.mu" class="py-name" href="#" onclick="return doclink('link-3', 'mu', 'link-2');">mu</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L59"></a><tt class="py-lineno"> 59</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-keyword">not</tt> <tt class="py-name">isinstance</tt><tt class="py-op">(</tt><tt class="py-name">Sigma</tt><tt class="py-op">,</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">ndarray</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L60"></a><tt class="py-lineno"> 60</tt>  <tt class="py-line">        <tt class="py-name">Sigma</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">array</tt><tt class="py-op">(</tt><tt class="py-name">Sigma</tt><tt class="py-op">)</tt> </tt>
+<a name="L61"></a><tt class="py-lineno"> 61</tt>  <tt class="py-line"> </tt>
+<a name="L62"></a><tt class="py-lineno"> 62</tt>  <tt class="py-line">    <tt class="py-comment"># Check input dimensions.</tt> </tt>
+<a name="L63"></a><tt class="py-lineno"> 63</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">len</tt><tt class="py-op">(</tt><tt class="py-name">Sigma</tt><tt class="py-op">.</tt><tt class="py-name">shape</tt><tt class="py-op">)</tt> <tt class="py-op">!=</tt> <tt class="py-number">2</tt> <tt class="py-keyword">or</tt> <tt class="py-name">Sigma</tt><tt class="py-op">.</tt><tt class="py-name">shape</tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt> <tt class="py-op">!=</tt> <tt class="py-name">Sigma</tt><tt class="py-op">.</tt><tt class="py-name">shape</tt><tt class="py-op">[</tt><tt class="py-number">1</tt><tt class="py-op">]</tt><tt class="py-op">:</tt> </tt>
+<a name="L64"></a><tt class="py-lineno"> 64</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">ValueError</tt><tt class="py-op">(</tt><tt class="py-string">"Sigma must be a square matrix."</tt><tt class="py-op">)</tt> </tt>
+<a name="L65"></a><tt class="py-lineno"> 65</tt>  <tt class="py-line">    <tt class="py-name">p</tt> <tt class="py-op">=</tt> <tt class="py-name">Sigma</tt><tt class="py-op">.</tt><tt class="py-name">shape</tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt> </tt>
+<a name="L66"></a><tt class="py-lineno"> 66</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-keyword">not</tt> <tt class="py-op">(</tt><tt class="py-name">len</tt><tt class="py-op">(</tt><tt id="link-4" class="py-name"><a title="parsimony.algorithms.utils.Info.mu" class="py-name" href="#" onclick="return doclink('link-4', 'mu', 'link-2');">mu</a></tt><tt class="py-op">.</tt><tt class="py-name">shape</tt><tt class="py-op">)</tt> <tt class="py-op">==</tt> <tt class="py-number">1</tt> <tt class="py-keyword">or</tt> \ </tt>
+<a name="L67"></a><tt class="py-lineno"> 67</tt>  <tt class="py-line">            <tt class="py-op">(</tt><tt class="py-name">len</tt><tt class="py-op">(</tt><tt id="link-5" class="py-name"><a title="parsimony.algorithms.utils.Info.mu" class="py-name" href="#" onclick="return doclink('link-5', 'mu', 'link-2');">mu</a></tt><tt class="py-op">.</tt><tt class="py-name">shape</tt><tt class="py-op">)</tt> <tt class="py-op">==</tt> <tt class="py-number">2</tt> <tt class="py-keyword">and</tt> <tt class="py-name">min</tt><tt class="py-op">(</tt><tt id="link-6" class="py-name"><a title="parsimony.algorithms.utils.Info.mu" class="py-name" href="#" onclick="return doclink('link-6', 'mu', 'link-2');">mu</a></tt><tt class="py-op">.</tt><tt class="py-name">shape</tt><tt class="py-op">)</tt> <tt class="py-op">==</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L68"></a><tt class="py-lineno"> 68</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">ValueError</tt><tt class="py-op">(</tt><tt class="py-string">"The mean 'mu' must be 1 dimensional or "</tt> \ </tt>
+<a name="L69"></a><tt class="py-lineno"> 69</tt>  <tt class="py-line">                         <tt class="py-string">"p-by-1 dimensional"</tt><tt class="py-op">)</tt> </tt>
+<a name="L70"></a><tt class="py-lineno"> 70</tt>  <tt class="py-line">    <tt id="link-7" class="py-name"><a title="parsimony.algorithms.utils.Info.mu" class="py-name" href="#" onclick="return doclink('link-7', 'mu', 'link-2');">mu</a></tt> <tt class="py-op">=</tt> <tt id="link-8" class="py-name"><a title="parsimony.algorithms.utils.Info.mu" class="py-name" href="#" onclick="return doclink('link-8', 'mu', 'link-2');">mu</a></tt><tt class="py-op">.</tt><tt class="py-name">reshape</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">max</tt><tt class="py-op">(</tt><tt id="link-9" class="py-name"><a title="parsimony.algorithms.utils.Info.mu" class="py-name" href="#" onclick="return doclink('link-9', 'mu', 'link-2');">mu</a></tt><tt class="py-op">.</tt><tt class="py-name">shape</tt><tt class="py-op">)</tt><tt class="py-op">,</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L71"></a><tt class="py-lineno"> 71</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt id="link-10" class="py-name"><a title="parsimony.algorithms.utils.Info.mu" class="py-name" href="#" onclick="return doclink('link-10', 'mu', 'link-2');">mu</a></tt><tt class="py-op">.</tt><tt class="py-name">shape</tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt> <tt class="py-op">!=</tt> <tt class="py-name">Sigma</tt><tt class="py-op">.</tt><tt class="py-name">shape</tt><tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt><tt class="py-op">:</tt> </tt>
+<a name="L72"></a><tt class="py-lineno"> 72</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">ValueError</tt><tt class="py-op">(</tt><tt class="py-string">"Mu and Sigma must have matching dimensions."</tt><tt class="py-op">)</tt> </tt>
+<a name="L73"></a><tt class="py-lineno"> 73</tt>  <tt class="py-line"> </tt>
+<a name="L74"></a><tt class="py-lineno"> 74</tt>  <tt class="py-line">    <tt id="link-11" class="py-name" targets="Method parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.A()=parsimony.functions.combinedfunctions.LinearRegressionL1L2GL-class.html#A,Method parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.A()=parsimony.functions.combinedfunctions.LinearRegressionL1L2TV-class.html#A,Method parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.A()=parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV-class.html#A,Method parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.A()=parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV-class.html#A,Method parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper.A()=parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html#A,Method parsimony.functions.properties.NesterovFunction.A()=parsimony.functions.properties.NesterovFunction-class.html#A"><a title="parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.A
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.A
+parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.A
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.A
+parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper.A
+parsimony.functions.properties.NesterovFunction.A" class="py-name" href="#" onclick="return doclink('link-11', 'A', 'link-11');">A</a></tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">linalg</tt><tt class="py-op">.</tt><tt class="py-name">cholesky</tt><tt class="py-op">(</tt><tt class="py-name">Sigma</tt><tt class="py-op">)</tt>  <tt class="py-comment"># Sigma = A.A'</tt> </tt>
+<a name="L75"></a><tt class="py-lineno"> 75</tt>  <tt class="py-line">    <tt class="py-name">z</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt id="link-12" class="py-name" targets="Function parsimony.datasets.simulate.beta.random()=parsimony.datasets.simulate.beta-module.html#random"><a title="parsimony.datasets.simulate.beta.random" class="py-name" href="#" onclick="return doclink('link-12', 'random', 'link-12');">random</a></tt><tt class="py-op">.</tt><tt class="py-name">randn</tt><tt class="py-op">(</tt><tt class="py-name">p</tt><tt class="py-op">,</tt> <tt class="py-name">n</tt><tt class="py-op">)</tt>  <tt class="py-comment"># Independent standard normal vector.</tt> </tt>
+<a name="L76"></a><tt class="py-lineno"> 76</tt>  <tt class="py-line"> </tt>
+<a name="L77"></a><tt class="py-lineno"> 77</tt>  <tt class="py-line">    <tt class="py-comment"># Affine transformation property.</tt> </tt>
+<a name="L78"></a><tt class="py-lineno"> 78</tt>  <tt class="py-line">    <tt id="link-13" class="py-name" targets="Method parsimony.datasets.simulate.utils.RandomUniform.rand()=parsimony.datasets.simulate.utils.RandomUniform-class.html#rand"><a title="parsimony.datasets.simulate.utils.RandomUniform.rand" class="py-name" href="#" onclick="return doclink('link-13', 'rand', 'link-13');">rand</a></tt> <tt class="py-op">=</tt> <tt id="link-14" class="py-name"><a title="parsimony.algorithms.utils.Info.mu" class="py-name" href="#" onclick="return doclink('link-14', 'mu', 'link-2');">mu</a></tt><tt class="py-op">[</tt><tt class="py-op">:</tt><tt class="py-op">,</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">newaxis</tt><tt class="py-op">]</tt> <tt class="py-op">+</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt id="link-15" class="py-name" targets="Method parsimony.utils.linalgs.MultipartArray.dot()=parsimony.utils.linalgs.MultipartArray-class.html#dot"><a title="parsimony.utils.linalgs.MultipartArray.dot" class="py-name" href="#" onclick="return doclink('link-15', 'dot', 'link-15');">dot</a></tt><tt class="py-op">(</tt><tt id="link-16" class="py-name"><a title="parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.A
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.A
+parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.A
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.A
+parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper.A
+parsimony.functions.properties.NesterovFunction.A" class="py-name" href="#" onclick="return doclink('link-16', 'A', 'link-11');">A</a></tt><tt class="py-op">,</tt> <tt class="py-name">z</tt><tt class="py-op">)</tt> </tt>
+<a name="L79"></a><tt class="py-lineno"> 79</tt>  <tt class="py-line"> </tt>
+<a name="L80"></a><tt class="py-lineno"> 80</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt id="link-17" class="py-name"><a title="parsimony.datasets.simulate.utils.RandomUniform.rand" class="py-name" href="#" onclick="return doclink('link-17', 'rand', 'link-13');">rand</a></tt><tt class="py-op">.</tt><tt id="link-18" class="py-name" targets="Variable parsimony.utils.linalgs.MultipartArray.T=parsimony.utils.linalgs.MultipartArray-class.html#T"><a title="parsimony.utils.linalgs.MultipartArray.T" class="py-name" href="#" onclick="return doclink('link-18', 'T', 'link-18');">T</a></tt> </tt>
+</div><a name="L81"></a><tt class="py-lineno"> 81</tt>  <tt class="py-line"> </tt>
+<a name="sensitivity"></a><div id="sensitivity-def"><a name="L82"></a><tt class="py-lineno"> 82</tt>  <tt class="py-line"> </tt>
+<a name="L83"></a><tt class="py-lineno"> 83</tt> <a class="py-toggle" href="#" id="sensitivity-toggle" onclick="return toggle('sensitivity');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.stats-module.html#sensitivity">sensitivity</a><tt class="py-op">(</tt><tt class="py-param">cond</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="sensitivity-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="sensitivity-expanded"><a name="L84"></a><tt class="py-lineno"> 84</tt>  <tt class="py-line">    <tt class="py-docstring">"""A test's ability to identify a condition correctly.</tt> </tt>
+<a name="L85"></a><tt class="py-lineno"> 85</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L86"></a><tt class="py-lineno"> 86</tt>  <tt class="py-line"><tt class="py-docstring">    Also called true positive rate or recall.</tt> </tt>
+<a name="L87"></a><tt class="py-lineno"> 87</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L88"></a><tt class="py-lineno"> 88</tt>  <tt class="py-line"><tt class="py-docstring">    Parameters</tt> </tt>
+<a name="L89"></a><tt class="py-lineno"> 89</tt>  <tt class="py-line"><tt class="py-docstring">    ----------</tt> </tt>
+<a name="L90"></a><tt class="py-lineno"> 90</tt>  <tt class="py-line"><tt class="py-docstring">    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.</tt> </tt>
+<a name="L91"></a><tt class="py-lineno"> 91</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L92"></a><tt class="py-lineno"> 92</tt>  <tt class="py-line"><tt class="py-docstring">    test : Numpy array, boolean or 0/1 integer. The estimated outcome.</tt> </tt>
+<a name="L93"></a><tt class="py-lineno"> 93</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L94"></a><tt class="py-lineno"> 94</tt>  <tt class="py-line"><tt class="py-docstring">    Example</tt> </tt>
+<a name="L95"></a><tt class="py-lineno"> 95</tt>  <tt class="py-line"><tt class="py-docstring">    -------</tt> </tt>
+<a name="L96"></a><tt class="py-lineno"> 96</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import parsimony.utils.stats as stats</tt> </tt>
+<a name="L97"></a><tt class="py-lineno"> 97</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import numpy as np</tt> </tt>
+<a name="L98"></a><tt class="py-lineno"> 98</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; np.random.seed(42)</tt> </tt>
+<a name="L99"></a><tt class="py-lineno"> 99</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; p = 2030</tt> </tt>
+<a name="L100"></a><tt class="py-lineno">100</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; cond = np.zeros((p, 1))</tt> </tt>
+<a name="L101"></a><tt class="py-lineno">101</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test = np.zeros((p, 1))</tt> </tt>
+<a name="L102"></a><tt class="py-lineno">102</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; stats.sensitivity(cond, test)</tt> </tt>
+<a name="L103"></a><tt class="py-lineno">103</tt>  <tt class="py-line"><tt class="py-docstring">    1.0</tt> </tt>
+<a name="L104"></a><tt class="py-lineno">104</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; stats.sensitivity(cond, np.logical_not(test))</tt> </tt>
+<a name="L105"></a><tt class="py-lineno">105</tt>  <tt class="py-line"><tt class="py-docstring">    1.0</tt> </tt>
+<a name="L106"></a><tt class="py-lineno">106</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; cond[:30] = 1.0</tt> </tt>
+<a name="L107"></a><tt class="py-lineno">107</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[:30] = 1.0</tt> </tt>
+<a name="L108"></a><tt class="py-lineno">108</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[:10] = 0.0</tt> </tt>
+<a name="L109"></a><tt class="py-lineno">109</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[-180:] = 1.0</tt> </tt>
+<a name="L110"></a><tt class="py-lineno">110</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; round(stats.sensitivity(cond, test), 2)</tt> </tt>
+<a name="L111"></a><tt class="py-lineno">111</tt>  <tt class="py-line"><tt class="py-docstring">    0.67</tt> </tt>
+<a name="L112"></a><tt class="py-lineno">112</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L113"></a><tt class="py-lineno">113</tt>  <tt class="py-line">    <tt class="py-name">true_pos</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">logical_and</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">cond</tt> <tt class="py-op">==</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-op">(</tt><tt class="py-name">test</tt> <tt class="py-op">==</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L114"></a><tt class="py-lineno">114</tt>  <tt class="py-line">    <tt class="py-name">false_neg</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">logical_and</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">cond</tt> <tt class="py-op">==</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-op">(</tt><tt class="py-name">test</tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L115"></a><tt class="py-lineno">115</tt>  <tt class="py-line"> </tt>
+<a name="L116"></a><tt class="py-lineno">116</tt>  <tt class="py-line">    <tt class="py-name">TP</tt> <tt class="py-op">=</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">true_pos</tt><tt class="py-op">.</tt><tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L117"></a><tt class="py-lineno">117</tt>  <tt class="py-line">    <tt class="py-name">FN</tt> <tt class="py-op">=</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">false_neg</tt><tt class="py-op">.</tt><tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L118"></a><tt class="py-lineno">118</tt>  <tt class="py-line"> </tt>
+<a name="L119"></a><tt class="py-lineno">119</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">FN</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
+<a name="L120"></a><tt class="py-lineno">120</tt>  <tt class="py-line">        <tt class="py-name">value</tt> <tt class="py-op">=</tt> <tt class="py-name">TP</tt> <tt class="py-op">/</tt> <tt class="py-op">(</tt><tt class="py-name">TP</tt> <tt class="py-op">+</tt> <tt class="py-name">FN</tt><tt class="py-op">)</tt> </tt>
+<a name="L121"></a><tt class="py-lineno">121</tt>  <tt class="py-line">    <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L122"></a><tt class="py-lineno">122</tt>  <tt class="py-line">        <tt class="py-name">value</tt> <tt class="py-op">=</tt> <tt class="py-number">1.0</tt>  <tt class="py-comment"># TODO: Is this really correct?</tt> </tt>
+<a name="L123"></a><tt class="py-lineno">123</tt>  <tt class="py-line"> </tt>
+<a name="L124"></a><tt class="py-lineno">124</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">value</tt> </tt>
+</div><a name="L125"></a><tt class="py-lineno">125</tt>  <tt class="py-line"> </tt>
+<a name="specificity"></a><div id="specificity-def"><a name="L126"></a><tt class="py-lineno">126</tt>  <tt class="py-line"> </tt>
+<a name="L127"></a><tt class="py-lineno">127</tt> <a class="py-toggle" href="#" id="specificity-toggle" onclick="return toggle('specificity');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.stats-module.html#specificity">specificity</a><tt class="py-op">(</tt><tt class="py-param">cond</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="specificity-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="specificity-expanded"><a name="L128"></a><tt class="py-lineno">128</tt>  <tt class="py-line">    <tt class="py-docstring">"""A test's ability to exclude a condition correctly.</tt> </tt>
+<a name="L129"></a><tt class="py-lineno">129</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L130"></a><tt class="py-lineno">130</tt>  <tt class="py-line"><tt class="py-docstring">    Also called true negative rate.</tt> </tt>
+<a name="L131"></a><tt class="py-lineno">131</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L132"></a><tt class="py-lineno">132</tt>  <tt class="py-line"><tt class="py-docstring">    Parameters</tt> </tt>
+<a name="L133"></a><tt class="py-lineno">133</tt>  <tt class="py-line"><tt class="py-docstring">    ----------</tt> </tt>
+<a name="L134"></a><tt class="py-lineno">134</tt>  <tt class="py-line"><tt class="py-docstring">    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.</tt> </tt>
+<a name="L135"></a><tt class="py-lineno">135</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L136"></a><tt class="py-lineno">136</tt>  <tt class="py-line"><tt class="py-docstring">    test : Numpy array, boolean or 0/1 integer. The estimated outcome.</tt> </tt>
+<a name="L137"></a><tt class="py-lineno">137</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L138"></a><tt class="py-lineno">138</tt>  <tt class="py-line"><tt class="py-docstring">    Example</tt> </tt>
+<a name="L139"></a><tt class="py-lineno">139</tt>  <tt class="py-line"><tt class="py-docstring">    -------</tt> </tt>
+<a name="L140"></a><tt class="py-lineno">140</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import parsimony.utils.stats as stats</tt> </tt>
+<a name="L141"></a><tt class="py-lineno">141</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import numpy as np</tt> </tt>
+<a name="L142"></a><tt class="py-lineno">142</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; np.random.seed(42)</tt> </tt>
+<a name="L143"></a><tt class="py-lineno">143</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; p = 2030</tt> </tt>
+<a name="L144"></a><tt class="py-lineno">144</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; cond = np.zeros((p, 1))</tt> </tt>
+<a name="L145"></a><tt class="py-lineno">145</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test = np.zeros((p, 1))</tt> </tt>
+<a name="L146"></a><tt class="py-lineno">146</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; stats.specificity(cond, test)</tt> </tt>
+<a name="L147"></a><tt class="py-lineno">147</tt>  <tt class="py-line"><tt class="py-docstring">    1.0</tt> </tt>
+<a name="L148"></a><tt class="py-lineno">148</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; stats.specificity(cond, np.logical_not(test))</tt> </tt>
+<a name="L149"></a><tt class="py-lineno">149</tt>  <tt class="py-line"><tt class="py-docstring">    0.0</tt> </tt>
+<a name="L150"></a><tt class="py-lineno">150</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; cond[:30] = 1.0</tt> </tt>
+<a name="L151"></a><tt class="py-lineno">151</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[:30] = 1.0</tt> </tt>
+<a name="L152"></a><tt class="py-lineno">152</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[:10] = 0.0</tt> </tt>
+<a name="L153"></a><tt class="py-lineno">153</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[-180:] = 1.0</tt> </tt>
+<a name="L154"></a><tt class="py-lineno">154</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; round(stats.specificity(cond, test), 2)</tt> </tt>
+<a name="L155"></a><tt class="py-lineno">155</tt>  <tt class="py-line"><tt class="py-docstring">    0.91</tt> </tt>
+<a name="L156"></a><tt class="py-lineno">156</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L157"></a><tt class="py-lineno">157</tt>  <tt class="py-line">    <tt class="py-name">true_neg</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">logical_and</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">cond</tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-op">(</tt><tt class="py-name">test</tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L158"></a><tt class="py-lineno">158</tt>  <tt class="py-line">    <tt class="py-name">false_pos</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">logical_and</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">cond</tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-op">(</tt><tt class="py-name">test</tt> <tt class="py-op">==</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L159"></a><tt class="py-lineno">159</tt>  <tt class="py-line"> </tt>
+<a name="L160"></a><tt class="py-lineno">160</tt>  <tt class="py-line">    <tt class="py-name">TN</tt> <tt class="py-op">=</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">true_neg</tt><tt class="py-op">.</tt><tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L161"></a><tt class="py-lineno">161</tt>  <tt class="py-line">    <tt class="py-name">FP</tt> <tt class="py-op">=</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">false_pos</tt><tt class="py-op">.</tt><tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L162"></a><tt class="py-lineno">162</tt>  <tt class="py-line"> </tt>
+<a name="L163"></a><tt class="py-lineno">163</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">FP</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
+<a name="L164"></a><tt class="py-lineno">164</tt>  <tt class="py-line">        <tt class="py-name">value</tt> <tt class="py-op">=</tt> <tt class="py-name">TN</tt> <tt class="py-op">/</tt> <tt class="py-op">(</tt><tt class="py-name">TN</tt> <tt class="py-op">+</tt> <tt class="py-name">FP</tt><tt class="py-op">)</tt> </tt>
+<a name="L165"></a><tt class="py-lineno">165</tt>  <tt class="py-line">    <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L166"></a><tt class="py-lineno">166</tt>  <tt class="py-line">        <tt class="py-name">value</tt> <tt class="py-op">=</tt> <tt class="py-number">1.0</tt> </tt>
+<a name="L167"></a><tt class="py-lineno">167</tt>  <tt class="py-line"> </tt>
+<a name="L168"></a><tt class="py-lineno">168</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">value</tt> </tt>
+</div><a name="L169"></a><tt class="py-lineno">169</tt>  <tt class="py-line"> </tt>
+<a name="ppv"></a><div id="ppv-def"><a name="L170"></a><tt class="py-lineno">170</tt>  <tt class="py-line"> </tt>
+<a name="L171"></a><tt class="py-lineno">171</tt> <a class="py-toggle" href="#" id="ppv-toggle" onclick="return toggle('ppv');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.stats-module.html#ppv">ppv</a><tt class="py-op">(</tt><tt class="py-param">cond</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="ppv-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="ppv-expanded"><a name="L172"></a><tt class="py-lineno">172</tt>  <tt class="py-line">    <tt class="py-docstring">"""A test's ability to correctly identify positive outcomes.</tt> </tt>
+<a name="L173"></a><tt class="py-lineno">173</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L174"></a><tt class="py-lineno">174</tt>  <tt class="py-line"><tt class="py-docstring">    Short for positive predictive value. Also called precision.</tt> </tt>
+<a name="L175"></a><tt class="py-lineno">175</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L176"></a><tt class="py-lineno">176</tt>  <tt class="py-line"><tt class="py-docstring">    Parameters</tt> </tt>
+<a name="L177"></a><tt class="py-lineno">177</tt>  <tt class="py-line"><tt class="py-docstring">    ----------</tt> </tt>
+<a name="L178"></a><tt class="py-lineno">178</tt>  <tt class="py-line"><tt class="py-docstring">    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.</tt> </tt>
+<a name="L179"></a><tt class="py-lineno">179</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L180"></a><tt class="py-lineno">180</tt>  <tt class="py-line"><tt class="py-docstring">    test : Numpy array, boolean or 0/1 integer. The estimated outcome.</tt> </tt>
+<a name="L181"></a><tt class="py-lineno">181</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L182"></a><tt class="py-lineno">182</tt>  <tt class="py-line"><tt class="py-docstring">    Example</tt> </tt>
+<a name="L183"></a><tt class="py-lineno">183</tt>  <tt class="py-line"><tt class="py-docstring">    -------</tt> </tt>
+<a name="L184"></a><tt class="py-lineno">184</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import parsimony.utils.stats as stats</tt> </tt>
+<a name="L185"></a><tt class="py-lineno">185</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import numpy as np</tt> </tt>
+<a name="L186"></a><tt class="py-lineno">186</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; np.random.seed(42)</tt> </tt>
+<a name="L187"></a><tt class="py-lineno">187</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; p = 2030</tt> </tt>
+<a name="L188"></a><tt class="py-lineno">188</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; cond = np.zeros((p, 1))</tt> </tt>
+<a name="L189"></a><tt class="py-lineno">189</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test = np.zeros((p, 1))</tt> </tt>
+<a name="L190"></a><tt class="py-lineno">190</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; stats.ppv(cond, test)</tt> </tt>
+<a name="L191"></a><tt class="py-lineno">191</tt>  <tt class="py-line"><tt class="py-docstring">    1.0</tt> </tt>
+<a name="L192"></a><tt class="py-lineno">192</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; stats.ppv(cond, np.logical_not(test))</tt> </tt>
+<a name="L193"></a><tt class="py-lineno">193</tt>  <tt class="py-line"><tt class="py-docstring">    0.0</tt> </tt>
+<a name="L194"></a><tt class="py-lineno">194</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; cond[:30] = 1.0</tt> </tt>
+<a name="L195"></a><tt class="py-lineno">195</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[:30] = 1.0</tt> </tt>
+<a name="L196"></a><tt class="py-lineno">196</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[:10] = 0.0</tt> </tt>
+<a name="L197"></a><tt class="py-lineno">197</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[-180:] = 1.0</tt> </tt>
+<a name="L198"></a><tt class="py-lineno">198</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; round(stats.ppv(cond, test), 2)</tt> </tt>
+<a name="L199"></a><tt class="py-lineno">199</tt>  <tt class="py-line"><tt class="py-docstring">    0.1</tt> </tt>
+<a name="L200"></a><tt class="py-lineno">200</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L201"></a><tt class="py-lineno">201</tt>  <tt class="py-line">    <tt class="py-name">true_pos</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">logical_and</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">cond</tt> <tt class="py-op">==</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-op">(</tt><tt class="py-name">test</tt> <tt class="py-op">==</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L202"></a><tt class="py-lineno">202</tt>  <tt class="py-line">    <tt class="py-name">false_pos</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">logical_and</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">cond</tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-op">(</tt><tt class="py-name">test</tt> <tt class="py-op">==</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L203"></a><tt class="py-lineno">203</tt>  <tt class="py-line"> </tt>
+<a name="L204"></a><tt class="py-lineno">204</tt>  <tt class="py-line">    <tt class="py-name">TP</tt> <tt class="py-op">=</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">true_pos</tt><tt class="py-op">.</tt><tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L205"></a><tt class="py-lineno">205</tt>  <tt class="py-line">    <tt class="py-name">FP</tt> <tt class="py-op">=</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">false_pos</tt><tt class="py-op">.</tt><tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L206"></a><tt class="py-lineno">206</tt>  <tt class="py-line"> </tt>
+<a name="L207"></a><tt class="py-lineno">207</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">FP</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
+<a name="L208"></a><tt class="py-lineno">208</tt>  <tt class="py-line">        <tt class="py-name">value</tt> <tt class="py-op">=</tt> <tt class="py-name">TP</tt> <tt class="py-op">/</tt> <tt class="py-op">(</tt><tt class="py-name">TP</tt> <tt class="py-op">+</tt> <tt class="py-name">FP</tt><tt class="py-op">)</tt> </tt>
+<a name="L209"></a><tt class="py-lineno">209</tt>  <tt class="py-line">    <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L210"></a><tt class="py-lineno">210</tt>  <tt class="py-line">        <tt class="py-name">value</tt> <tt class="py-op">=</tt> <tt class="py-number">1.0</tt> </tt>
+<a name="L211"></a><tt class="py-lineno">211</tt>  <tt class="py-line"> </tt>
+<a name="L212"></a><tt class="py-lineno">212</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">value</tt> </tt>
+</div><a name="L213"></a><tt class="py-lineno">213</tt>  <tt class="py-line"> </tt>
+<a name="precision"></a><div id="precision-def"><a name="L214"></a><tt class="py-lineno">214</tt>  <tt class="py-line"> </tt>
+<a name="L215"></a><tt class="py-lineno">215</tt>  <tt class="py-line"><tt class="py-decorator">@</tt><tt class="py-decorator">deprecated</tt><tt class="py-op">(</tt><tt class="py-string">"ppv"</tt><tt class="py-op">)</tt> </tt>
+<a name="L216"></a><tt class="py-lineno">216</tt> <a class="py-toggle" href="#" id="precision-toggle" onclick="return toggle('precision');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.stats-module.html#precision">precision</a><tt class="py-op">(</tt><tt class="py-param">cond</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="precision-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="precision-expanded"><a name="L217"></a><tt class="py-lineno">217</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt id="link-19" class="py-name" targets="Function parsimony.utils.stats.ppv()=parsimony.utils.stats-module.html#ppv"><a title="parsimony.utils.stats.ppv" class="py-name" href="#" onclick="return doclink('link-19', 'ppv', 'link-19');">ppv</a></tt><tt class="py-op">(</tt><tt class="py-name">cond</tt><tt class="py-op">,</tt> <tt class="py-name">test</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L218"></a><tt class="py-lineno">218</tt>  <tt class="py-line"> </tt>
+<a name="npv"></a><div id="npv-def"><a name="L219"></a><tt class="py-lineno">219</tt>  <tt class="py-line"> </tt>
+<a name="L220"></a><tt class="py-lineno">220</tt> <a class="py-toggle" href="#" id="npv-toggle" onclick="return toggle('npv');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.stats-module.html#npv">npv</a><tt class="py-op">(</tt><tt class="py-param">cond</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="npv-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="npv-expanded"><a name="L221"></a><tt class="py-lineno">221</tt>  <tt class="py-line">    <tt class="py-docstring">"""A test's ability to correctly identify negative outcomes.</tt> </tt>
+<a name="L222"></a><tt class="py-lineno">222</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L223"></a><tt class="py-lineno">223</tt>  <tt class="py-line"><tt class="py-docstring">    The negative predictive value, NPV.</tt> </tt>
+<a name="L224"></a><tt class="py-lineno">224</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L225"></a><tt class="py-lineno">225</tt>  <tt class="py-line"><tt class="py-docstring">    Parameters</tt> </tt>
+<a name="L226"></a><tt class="py-lineno">226</tt>  <tt class="py-line"><tt class="py-docstring">    ----------</tt> </tt>
+<a name="L227"></a><tt class="py-lineno">227</tt>  <tt class="py-line"><tt class="py-docstring">    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.</tt> </tt>
+<a name="L228"></a><tt class="py-lineno">228</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L229"></a><tt class="py-lineno">229</tt>  <tt class="py-line"><tt class="py-docstring">    test : Numpy array, boolean or 0/1 integer. The estimated outcome.</tt> </tt>
+<a name="L230"></a><tt class="py-lineno">230</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L231"></a><tt class="py-lineno">231</tt>  <tt class="py-line"><tt class="py-docstring">    Example</tt> </tt>
+<a name="L232"></a><tt class="py-lineno">232</tt>  <tt class="py-line"><tt class="py-docstring">    -------</tt> </tt>
+<a name="L233"></a><tt class="py-lineno">233</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import parsimony.utils.stats as stats</tt> </tt>
+<a name="L234"></a><tt class="py-lineno">234</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import numpy as np</tt> </tt>
+<a name="L235"></a><tt class="py-lineno">235</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; np.random.seed(42)</tt> </tt>
+<a name="L236"></a><tt class="py-lineno">236</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; p = 2030</tt> </tt>
+<a name="L237"></a><tt class="py-lineno">237</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; cond = np.zeros((p, 1))</tt> </tt>
+<a name="L238"></a><tt class="py-lineno">238</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test = np.zeros((p, 1))</tt> </tt>
+<a name="L239"></a><tt class="py-lineno">239</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; stats.npv(cond, test)</tt> </tt>
+<a name="L240"></a><tt class="py-lineno">240</tt>  <tt class="py-line"><tt class="py-docstring">    1.0</tt> </tt>
+<a name="L241"></a><tt class="py-lineno">241</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; stats.npv(cond, np.logical_not(test))</tt> </tt>
+<a name="L242"></a><tt class="py-lineno">242</tt>  <tt class="py-line"><tt class="py-docstring">    1.0</tt> </tt>
+<a name="L243"></a><tt class="py-lineno">243</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; cond[:30] = 1.0</tt> </tt>
+<a name="L244"></a><tt class="py-lineno">244</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[:30] = 1.0</tt> </tt>
+<a name="L245"></a><tt class="py-lineno">245</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[:10] = 0.0</tt> </tt>
+<a name="L246"></a><tt class="py-lineno">246</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[-180:] = 1.0</tt> </tt>
+<a name="L247"></a><tt class="py-lineno">247</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; round(stats.npv(cond, test), 3)</tt> </tt>
+<a name="L248"></a><tt class="py-lineno">248</tt>  <tt class="py-line"><tt class="py-docstring">    0.995</tt> </tt>
+<a name="L249"></a><tt class="py-lineno">249</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L250"></a><tt class="py-lineno">250</tt>  <tt class="py-line">    <tt class="py-name">true_neg</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">logical_and</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">cond</tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-op">(</tt><tt class="py-name">test</tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L251"></a><tt class="py-lineno">251</tt>  <tt class="py-line">    <tt class="py-name">false_neg</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">logical_and</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">cond</tt> <tt class="py-op">==</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-op">(</tt><tt class="py-name">test</tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L252"></a><tt class="py-lineno">252</tt>  <tt class="py-line"> </tt>
+<a name="L253"></a><tt class="py-lineno">253</tt>  <tt class="py-line">    <tt class="py-name">TN</tt> <tt class="py-op">=</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">true_neg</tt><tt class="py-op">.</tt><tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L254"></a><tt class="py-lineno">254</tt>  <tt class="py-line">    <tt class="py-name">FN</tt> <tt class="py-op">=</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">false_neg</tt><tt class="py-op">.</tt><tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L255"></a><tt class="py-lineno">255</tt>  <tt class="py-line"> </tt>
+<a name="L256"></a><tt class="py-lineno">256</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">FN</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
+<a name="L257"></a><tt class="py-lineno">257</tt>  <tt class="py-line">        <tt class="py-name">value</tt> <tt class="py-op">=</tt> <tt class="py-name">TN</tt> <tt class="py-op">/</tt> <tt class="py-op">(</tt><tt class="py-name">TN</tt> <tt class="py-op">+</tt> <tt class="py-name">FN</tt><tt class="py-op">)</tt> </tt>
+<a name="L258"></a><tt class="py-lineno">258</tt>  <tt class="py-line">    <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L259"></a><tt class="py-lineno">259</tt>  <tt class="py-line">        <tt class="py-name">value</tt> <tt class="py-op">=</tt> <tt class="py-number">1.0</tt> </tt>
+<a name="L260"></a><tt class="py-lineno">260</tt>  <tt class="py-line"> </tt>
+<a name="L261"></a><tt class="py-lineno">261</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">value</tt> </tt>
+</div><a name="L262"></a><tt class="py-lineno">262</tt>  <tt class="py-line"> </tt>
+<a name="accuracy"></a><div id="accuracy-def"><a name="L263"></a><tt class="py-lineno">263</tt>  <tt class="py-line"> </tt>
+<a name="L264"></a><tt class="py-lineno">264</tt> <a class="py-toggle" href="#" id="accuracy-toggle" onclick="return toggle('accuracy');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.stats-module.html#accuracy">accuracy</a><tt class="py-op">(</tt><tt class="py-param">cond</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="accuracy-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="accuracy-expanded"><a name="L265"></a><tt class="py-lineno">265</tt>  <tt class="py-line">    <tt class="py-docstring">"""The degree of correctly estimated outcomes.</tt> </tt>
+<a name="L266"></a><tt class="py-lineno">266</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L267"></a><tt class="py-lineno">267</tt>  <tt class="py-line"><tt class="py-docstring">    Parameters</tt> </tt>
+<a name="L268"></a><tt class="py-lineno">268</tt>  <tt class="py-line"><tt class="py-docstring">    ----------</tt> </tt>
+<a name="L269"></a><tt class="py-lineno">269</tt>  <tt class="py-line"><tt class="py-docstring">    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.</tt> </tt>
+<a name="L270"></a><tt class="py-lineno">270</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L271"></a><tt class="py-lineno">271</tt>  <tt class="py-line"><tt class="py-docstring">    test : Numpy array, boolean or 0/1 integer. The estimated outcome.</tt> </tt>
+<a name="L272"></a><tt class="py-lineno">272</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L273"></a><tt class="py-lineno">273</tt>  <tt class="py-line"><tt class="py-docstring">    Example</tt> </tt>
+<a name="L274"></a><tt class="py-lineno">274</tt>  <tt class="py-line"><tt class="py-docstring">    -------</tt> </tt>
+<a name="L275"></a><tt class="py-lineno">275</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import parsimony.utils.stats as stats</tt> </tt>
+<a name="L276"></a><tt class="py-lineno">276</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import numpy as np</tt> </tt>
+<a name="L277"></a><tt class="py-lineno">277</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; np.random.seed(42)</tt> </tt>
+<a name="L278"></a><tt class="py-lineno">278</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; p = 2030</tt> </tt>
+<a name="L279"></a><tt class="py-lineno">279</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; cond = np.zeros((p, 1))</tt> </tt>
+<a name="L280"></a><tt class="py-lineno">280</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test = np.zeros((p, 1))</tt> </tt>
+<a name="L281"></a><tt class="py-lineno">281</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; stats.accuracy(cond, test)</tt> </tt>
+<a name="L282"></a><tt class="py-lineno">282</tt>  <tt class="py-line"><tt class="py-docstring">    1.0</tt> </tt>
+<a name="L283"></a><tt class="py-lineno">283</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; stats.accuracy(cond, np.logical_not(test))</tt> </tt>
+<a name="L284"></a><tt class="py-lineno">284</tt>  <tt class="py-line"><tt class="py-docstring">    0.0</tt> </tt>
+<a name="L285"></a><tt class="py-lineno">285</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; cond[:30] = 1.0</tt> </tt>
+<a name="L286"></a><tt class="py-lineno">286</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[:30] = 1.0</tt> </tt>
+<a name="L287"></a><tt class="py-lineno">287</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[:10] = 0.0</tt> </tt>
+<a name="L288"></a><tt class="py-lineno">288</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[-180:] = 1.0</tt> </tt>
+<a name="L289"></a><tt class="py-lineno">289</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; round(stats.accuracy(cond, test), 2)</tt> </tt>
+<a name="L290"></a><tt class="py-lineno">290</tt>  <tt class="py-line"><tt class="py-docstring">    0.91</tt> </tt>
+<a name="L291"></a><tt class="py-lineno">291</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L292"></a><tt class="py-lineno">292</tt>  <tt class="py-line">    <tt class="py-name">true_pos</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">logical_and</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">cond</tt> <tt class="py-op">==</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-op">(</tt><tt class="py-name">test</tt> <tt class="py-op">==</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L293"></a><tt class="py-lineno">293</tt>  <tt class="py-line">    <tt class="py-name">true_neg</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">logical_and</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">cond</tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">,</tt> <tt class="py-op">(</tt><tt class="py-name">test</tt> <tt class="py-op">==</tt> <tt class="py-number">0</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L294"></a><tt class="py-lineno">294</tt>  <tt class="py-line"> </tt>
+<a name="L295"></a><tt class="py-lineno">295</tt>  <tt class="py-line">    <tt class="py-name">TP</tt> <tt class="py-op">=</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">true_pos</tt><tt class="py-op">.</tt><tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L296"></a><tt class="py-lineno">296</tt>  <tt class="py-line">    <tt class="py-name">TN</tt> <tt class="py-op">=</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">true_neg</tt><tt class="py-op">.</tt><tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L297"></a><tt class="py-lineno">297</tt>  <tt class="py-line"> </tt>
+<a name="L298"></a><tt class="py-lineno">298</tt>  <tt class="py-line">    <tt class="py-name">n</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">prod</tt><tt class="py-op">(</tt><tt class="py-name">cond</tt><tt class="py-op">.</tt><tt class="py-name">shape</tt><tt class="py-op">)</tt> </tt>
+<a name="L299"></a><tt class="py-lineno">299</tt>  <tt class="py-line"> </tt>
+<a name="L300"></a><tt class="py-lineno">300</tt>  <tt class="py-line">    <tt class="py-name">value</tt> <tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-name">TP</tt> <tt class="py-op">+</tt> <tt class="py-name">TN</tt><tt class="py-op">)</tt> <tt class="py-op">/</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">n</tt><tt class="py-op">)</tt> </tt>
+<a name="L301"></a><tt class="py-lineno">301</tt>  <tt class="py-line"> </tt>
+<a name="L302"></a><tt class="py-lineno">302</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">value</tt> </tt>
+</div><a name="L303"></a><tt class="py-lineno">303</tt>  <tt class="py-line"> </tt>
+<a name="F_score"></a><div id="F_score-def"><a name="L304"></a><tt class="py-lineno">304</tt>  <tt class="py-line"> </tt>
+<a name="L305"></a><tt class="py-lineno">305</tt> <a class="py-toggle" href="#" id="F_score-toggle" onclick="return toggle('F_score');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.stats-module.html#F_score">F_score</a><tt class="py-op">(</tt><tt class="py-param">cond</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="F_score-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="F_score-expanded"><a name="L306"></a><tt class="py-lineno">306</tt>  <tt class="py-line">    <tt class="py-docstring">"""A measure of a test's accuracy by a weighted average of the precision</tt> </tt>
+<a name="L307"></a><tt class="py-lineno">307</tt>  <tt class="py-line"><tt class="py-docstring">    and sensitivity.</tt> </tt>
+<a name="L308"></a><tt class="py-lineno">308</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L309"></a><tt class="py-lineno">309</tt>  <tt class="py-line"><tt class="py-docstring">    Also called the harmonic mean of precision and sensitivity.</tt> </tt>
+<a name="L310"></a><tt class="py-lineno">310</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L311"></a><tt class="py-lineno">311</tt>  <tt class="py-line"><tt class="py-docstring">    Parameters</tt> </tt>
+<a name="L312"></a><tt class="py-lineno">312</tt>  <tt class="py-line"><tt class="py-docstring">    ----------</tt> </tt>
+<a name="L313"></a><tt class="py-lineno">313</tt>  <tt class="py-line"><tt class="py-docstring">    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.</tt> </tt>
+<a name="L314"></a><tt class="py-lineno">314</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L315"></a><tt class="py-lineno">315</tt>  <tt class="py-line"><tt class="py-docstring">    test : Numpy array, boolean or 0/1 integer. The estimated outcome.</tt> </tt>
+<a name="L316"></a><tt class="py-lineno">316</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L317"></a><tt class="py-lineno">317</tt>  <tt class="py-line"><tt class="py-docstring">    Example</tt> </tt>
+<a name="L318"></a><tt class="py-lineno">318</tt>  <tt class="py-line"><tt class="py-docstring">    -------</tt> </tt>
+<a name="L319"></a><tt class="py-lineno">319</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import parsimony.utils.stats as stats</tt> </tt>
+<a name="L320"></a><tt class="py-lineno">320</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import numpy as np</tt> </tt>
+<a name="L321"></a><tt class="py-lineno">321</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; np.random.seed(42)</tt> </tt>
+<a name="L322"></a><tt class="py-lineno">322</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; p = 2030</tt> </tt>
+<a name="L323"></a><tt class="py-lineno">323</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; cond = np.zeros((p, 1))</tt> </tt>
+<a name="L324"></a><tt class="py-lineno">324</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test = np.zeros((p, 1))</tt> </tt>
+<a name="L325"></a><tt class="py-lineno">325</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; stats.F_score(cond, test)</tt> </tt>
+<a name="L326"></a><tt class="py-lineno">326</tt>  <tt class="py-line"><tt class="py-docstring">    1.0</tt> </tt>
+<a name="L327"></a><tt class="py-lineno">327</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; stats.F_score(cond, np.logical_not(test))</tt> </tt>
+<a name="L328"></a><tt class="py-lineno">328</tt>  <tt class="py-line"><tt class="py-docstring">    0.0</tt> </tt>
+<a name="L329"></a><tt class="py-lineno">329</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; cond[:30] = 1.0</tt> </tt>
+<a name="L330"></a><tt class="py-lineno">330</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[:30] = 1.0</tt> </tt>
+<a name="L331"></a><tt class="py-lineno">331</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[:10] = 0.0</tt> </tt>
+<a name="L332"></a><tt class="py-lineno">332</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[-180:] = 1.0</tt> </tt>
+<a name="L333"></a><tt class="py-lineno">333</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; round(stats.F_score(cond, test), 2)</tt> </tt>
+<a name="L334"></a><tt class="py-lineno">334</tt>  <tt class="py-line"><tt class="py-docstring">    0.17</tt> </tt>
+<a name="L335"></a><tt class="py-lineno">335</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L336"></a><tt class="py-lineno">336</tt>  <tt class="py-line">    <tt class="py-name">PR</tt> <tt class="py-op">=</tt> <tt id="link-20" class="py-name" targets="Function parsimony.utils.stats.precision()=parsimony.utils.stats-module.html#precision"><a title="parsimony.utils.stats.precision" class="py-name" href="#" onclick="return doclink('link-20', 'precision', 'link-20');">precision</a></tt><tt class="py-op">(</tt><tt class="py-name">cond</tt><tt class="py-op">,</tt> <tt class="py-name">test</tt><tt class="py-op">)</tt> </tt>
+<a name="L337"></a><tt class="py-lineno">337</tt>  <tt class="py-line">    <tt class="py-name">RE</tt> <tt class="py-op">=</tt> <tt id="link-21" class="py-name" targets="Function parsimony.utils.stats.sensitivity()=parsimony.utils.stats-module.html#sensitivity"><a title="parsimony.utils.stats.sensitivity" class="py-name" href="#" onclick="return doclink('link-21', 'sensitivity', 'link-21');">sensitivity</a></tt><tt class="py-op">(</tt><tt class="py-name">cond</tt><tt class="py-op">,</tt> <tt class="py-name">test</tt><tt class="py-op">)</tt> </tt>
+<a name="L338"></a><tt class="py-lineno">338</tt>  <tt class="py-line"> </tt>
+<a name="L339"></a><tt class="py-lineno">339</tt>  <tt class="py-line">    <tt class="py-name">value</tt> <tt class="py-op">=</tt> <tt class="py-number">2.0</tt> <tt class="py-op">*</tt> <tt class="py-name">PR</tt> <tt class="py-op">*</tt> <tt class="py-name">RE</tt> <tt class="py-op">/</tt> <tt class="py-op">(</tt><tt class="py-name">PR</tt> <tt class="py-op">+</tt> <tt class="py-name">RE</tt><tt class="py-op">)</tt> </tt>
+<a name="L340"></a><tt class="py-lineno">340</tt>  <tt class="py-line"> </tt>
+<a name="L341"></a><tt class="py-lineno">341</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">value</tt> </tt>
+</div><a name="L342"></a><tt class="py-lineno">342</tt>  <tt class="py-line"> </tt>
+<a name="alpha"></a><div id="alpha-def"><a name="L343"></a><tt class="py-lineno">343</tt>  <tt class="py-line"> </tt>
+<a name="L344"></a><tt class="py-lineno">344</tt> <a class="py-toggle" href="#" id="alpha-toggle" onclick="return toggle('alpha');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.stats-module.html#alpha">alpha</a><tt class="py-op">(</tt><tt class="py-param">cond</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="alpha-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="alpha-expanded"><a name="L345"></a><tt class="py-lineno">345</tt>  <tt class="py-line">    <tt class="py-docstring">"""False positive rate or type I error.</tt> </tt>
+<a name="L346"></a><tt class="py-lineno">346</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L347"></a><tt class="py-lineno">347</tt>  <tt class="py-line"><tt class="py-docstring">    Parameters</tt> </tt>
+<a name="L348"></a><tt class="py-lineno">348</tt>  <tt class="py-line"><tt class="py-docstring">    ----------</tt> </tt>
+<a name="L349"></a><tt class="py-lineno">349</tt>  <tt class="py-line"><tt class="py-docstring">    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.</tt> </tt>
+<a name="L350"></a><tt class="py-lineno">350</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L351"></a><tt class="py-lineno">351</tt>  <tt class="py-line"><tt class="py-docstring">    test : Numpy array, boolean or 0/1 integer. The estimated outcome.</tt> </tt>
+<a name="L352"></a><tt class="py-lineno">352</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L353"></a><tt class="py-lineno">353</tt>  <tt class="py-line"><tt class="py-docstring">    Example</tt> </tt>
+<a name="L354"></a><tt class="py-lineno">354</tt>  <tt class="py-line"><tt class="py-docstring">    -------</tt> </tt>
+<a name="L355"></a><tt class="py-lineno">355</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import parsimony.utils.stats as stats</tt> </tt>
+<a name="L356"></a><tt class="py-lineno">356</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import numpy as np</tt> </tt>
+<a name="L357"></a><tt class="py-lineno">357</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; np.random.seed(42)</tt> </tt>
+<a name="L358"></a><tt class="py-lineno">358</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; p = 2030</tt> </tt>
+<a name="L359"></a><tt class="py-lineno">359</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; cond = np.zeros((p, 1))</tt> </tt>
+<a name="L360"></a><tt class="py-lineno">360</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test = np.zeros((p, 1))</tt> </tt>
+<a name="L361"></a><tt class="py-lineno">361</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; stats.alpha(cond, test)</tt> </tt>
+<a name="L362"></a><tt class="py-lineno">362</tt>  <tt class="py-line"><tt class="py-docstring">    0.0</tt> </tt>
+<a name="L363"></a><tt class="py-lineno">363</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; stats.alpha(cond, np.logical_not(test))</tt> </tt>
+<a name="L364"></a><tt class="py-lineno">364</tt>  <tt class="py-line"><tt class="py-docstring">    1.0</tt> </tt>
+<a name="L365"></a><tt class="py-lineno">365</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; cond[:30] = 1.0</tt> </tt>
+<a name="L366"></a><tt class="py-lineno">366</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[:30] = 1.0</tt> </tt>
+<a name="L367"></a><tt class="py-lineno">367</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[:10] = 0.0</tt> </tt>
+<a name="L368"></a><tt class="py-lineno">368</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[-180:] = 1.0</tt> </tt>
+<a name="L369"></a><tt class="py-lineno">369</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; round(stats.alpha(cond, test), 2)</tt> </tt>
+<a name="L370"></a><tt class="py-lineno">370</tt>  <tt class="py-line"><tt class="py-docstring">    0.09</tt> </tt>
+<a name="L371"></a><tt class="py-lineno">371</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L372"></a><tt class="py-lineno">372</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-number">1.0</tt> <tt class="py-op">-</tt> <tt id="link-22" class="py-name" targets="Function parsimony.utils.stats.specificity()=parsimony.utils.stats-module.html#specificity"><a title="parsimony.utils.stats.specificity" class="py-name" href="#" onclick="return doclink('link-22', 'specificity', 'link-22');">specificity</a></tt><tt class="py-op">(</tt><tt class="py-name">cond</tt><tt class="py-op">,</tt> <tt class="py-name">test</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L373"></a><tt class="py-lineno">373</tt>  <tt class="py-line"> </tt>
+<a name="beta"></a><div id="beta-def"><a name="L374"></a><tt class="py-lineno">374</tt>  <tt class="py-line"> </tt>
+<a name="L375"></a><tt class="py-lineno">375</tt> <a class="py-toggle" href="#" id="beta-toggle" onclick="return toggle('beta');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.stats-module.html#beta">beta</a><tt class="py-op">(</tt><tt class="py-param">cond</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="beta-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="beta-expanded"><a name="L376"></a><tt class="py-lineno">376</tt>  <tt class="py-line">    <tt class="py-docstring">"""False negative rate or type II error.</tt> </tt>
+<a name="L377"></a><tt class="py-lineno">377</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L378"></a><tt class="py-lineno">378</tt>  <tt class="py-line"><tt class="py-docstring">    Parameters</tt> </tt>
+<a name="L379"></a><tt class="py-lineno">379</tt>  <tt class="py-line"><tt class="py-docstring">    ----------</tt> </tt>
+<a name="L380"></a><tt class="py-lineno">380</tt>  <tt class="py-line"><tt class="py-docstring">    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.</tt> </tt>
+<a name="L381"></a><tt class="py-lineno">381</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L382"></a><tt class="py-lineno">382</tt>  <tt class="py-line"><tt class="py-docstring">    test : Numpy array, boolean or 0/1 integer. The estimated outcome.</tt> </tt>
+<a name="L383"></a><tt class="py-lineno">383</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L384"></a><tt class="py-lineno">384</tt>  <tt class="py-line"><tt class="py-docstring">    Example</tt> </tt>
+<a name="L385"></a><tt class="py-lineno">385</tt>  <tt class="py-line"><tt class="py-docstring">    -------</tt> </tt>
+<a name="L386"></a><tt class="py-lineno">386</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import parsimony.utils.stats as stats</tt> </tt>
+<a name="L387"></a><tt class="py-lineno">387</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import numpy as np</tt> </tt>
+<a name="L388"></a><tt class="py-lineno">388</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; np.random.seed(42)</tt> </tt>
+<a name="L389"></a><tt class="py-lineno">389</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; p = 2030</tt> </tt>
+<a name="L390"></a><tt class="py-lineno">390</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; cond = np.zeros((p, 1))</tt> </tt>
+<a name="L391"></a><tt class="py-lineno">391</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test = np.zeros((p, 1))</tt> </tt>
+<a name="L392"></a><tt class="py-lineno">392</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; stats.beta(cond, test)</tt> </tt>
+<a name="L393"></a><tt class="py-lineno">393</tt>  <tt class="py-line"><tt class="py-docstring">    0.0</tt> </tt>
+<a name="L394"></a><tt class="py-lineno">394</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; stats.beta(cond, np.logical_not(test))</tt> </tt>
+<a name="L395"></a><tt class="py-lineno">395</tt>  <tt class="py-line"><tt class="py-docstring">    0.0</tt> </tt>
+<a name="L396"></a><tt class="py-lineno">396</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; cond[:30] = 1.0</tt> </tt>
+<a name="L397"></a><tt class="py-lineno">397</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[:30] = 1.0</tt> </tt>
+<a name="L398"></a><tt class="py-lineno">398</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[:10] = 0.0</tt> </tt>
+<a name="L399"></a><tt class="py-lineno">399</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[-180:] = 1.0</tt> </tt>
+<a name="L400"></a><tt class="py-lineno">400</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; round(stats.beta(cond, test), 2)</tt> </tt>
+<a name="L401"></a><tt class="py-lineno">401</tt>  <tt class="py-line"><tt class="py-docstring">    0.33</tt> </tt>
+<a name="L402"></a><tt class="py-lineno">402</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L403"></a><tt class="py-lineno">403</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-number">1.0</tt> <tt class="py-op">-</tt> <tt id="link-23" class="py-name"><a title="parsimony.utils.stats.sensitivity" class="py-name" href="#" onclick="return doclink('link-23', 'sensitivity', 'link-21');">sensitivity</a></tt><tt class="py-op">(</tt><tt class="py-name">cond</tt><tt class="py-op">,</tt> <tt class="py-name">test</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L404"></a><tt class="py-lineno">404</tt>  <tt class="py-line"> </tt>
+<a name="power"></a><div id="power-def"><a name="L405"></a><tt class="py-lineno">405</tt>  <tt class="py-line"> </tt>
+<a name="L406"></a><tt class="py-lineno">406</tt> <a class="py-toggle" href="#" id="power-toggle" onclick="return toggle('power');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.stats-module.html#power">power</a><tt class="py-op">(</tt><tt class="py-param">cond</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="power-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="power-expanded"><a name="L407"></a><tt class="py-lineno">407</tt>  <tt class="py-line">    <tt class="py-docstring">"""Statistical power for a test. The probability that it correctly rejects</tt> </tt>
+<a name="L408"></a><tt class="py-lineno">408</tt>  <tt class="py-line"><tt class="py-docstring">    the null hypothesis when the null hypothesis is false.</tt> </tt>
+<a name="L409"></a><tt class="py-lineno">409</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L410"></a><tt class="py-lineno">410</tt>  <tt class="py-line"><tt class="py-docstring">    Parameters</tt> </tt>
+<a name="L411"></a><tt class="py-lineno">411</tt>  <tt class="py-line"><tt class="py-docstring">    ----------</tt> </tt>
+<a name="L412"></a><tt class="py-lineno">412</tt>  <tt class="py-line"><tt class="py-docstring">    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.</tt> </tt>
+<a name="L413"></a><tt class="py-lineno">413</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L414"></a><tt class="py-lineno">414</tt>  <tt class="py-line"><tt class="py-docstring">    test : Numpy array, boolean or 0/1 integer. The estimated outcome.</tt> </tt>
+<a name="L415"></a><tt class="py-lineno">415</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L416"></a><tt class="py-lineno">416</tt>  <tt class="py-line"><tt class="py-docstring">    Example</tt> </tt>
+<a name="L417"></a><tt class="py-lineno">417</tt>  <tt class="py-line"><tt class="py-docstring">    -------</tt> </tt>
+<a name="L418"></a><tt class="py-lineno">418</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import parsimony.utils.stats as stats</tt> </tt>
+<a name="L419"></a><tt class="py-lineno">419</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import numpy as np</tt> </tt>
+<a name="L420"></a><tt class="py-lineno">420</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; np.random.seed(42)</tt> </tt>
+<a name="L421"></a><tt class="py-lineno">421</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; p = 2030</tt> </tt>
+<a name="L422"></a><tt class="py-lineno">422</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; cond = np.zeros((p, 1))</tt> </tt>
+<a name="L423"></a><tt class="py-lineno">423</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test = np.zeros((p, 1))</tt> </tt>
+<a name="L424"></a><tt class="py-lineno">424</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; stats.power(cond, test)</tt> </tt>
+<a name="L425"></a><tt class="py-lineno">425</tt>  <tt class="py-line"><tt class="py-docstring">    1.0</tt> </tt>
+<a name="L426"></a><tt class="py-lineno">426</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; stats.power(cond, np.logical_not(test))</tt> </tt>
+<a name="L427"></a><tt class="py-lineno">427</tt>  <tt class="py-line"><tt class="py-docstring">    1.0</tt> </tt>
+<a name="L428"></a><tt class="py-lineno">428</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; cond[:30] = 1.0</tt> </tt>
+<a name="L429"></a><tt class="py-lineno">429</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[:30] = 1.0</tt> </tt>
+<a name="L430"></a><tt class="py-lineno">430</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[:10] = 0.0</tt> </tt>
+<a name="L431"></a><tt class="py-lineno">431</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[-180:] = 1.0</tt> </tt>
+<a name="L432"></a><tt class="py-lineno">432</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; round(stats.power(cond, test), 2)</tt> </tt>
+<a name="L433"></a><tt class="py-lineno">433</tt>  <tt class="py-line"><tt class="py-docstring">    0.67</tt> </tt>
+<a name="L434"></a><tt class="py-lineno">434</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L435"></a><tt class="py-lineno">435</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-number">1.0</tt> <tt class="py-op">-</tt> <tt id="link-24" class="py-name" targets="Variable parsimony.algorithms.utils.Info.beta=parsimony.algorithms.utils.Info-class.html#beta,Module parsimony.datasets.simulate.beta=parsimony.datasets.simulate.beta-module.html,Function parsimony.utils.stats.beta()=parsimony.utils.stats-module.html#beta"><a title="parsimony.algorithms.utils.Info.beta
+parsimony.datasets.simulate.beta
+parsimony.utils.stats.beta" class="py-name" href="#" onclick="return doclink('link-24', 'beta', 'link-24');">beta</a></tt><tt class="py-op">(</tt><tt class="py-name">cond</tt><tt class="py-op">,</tt> <tt class="py-name">test</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L436"></a><tt class="py-lineno">436</tt>  <tt class="py-line"> </tt>
+<a name="likelihood_ratio_positive"></a><div id="likelihood_ratio_positive-def"><a name="L437"></a><tt class="py-lineno">437</tt>  <tt class="py-line"> </tt>
+<a name="L438"></a><tt class="py-lineno">438</tt> <a class="py-toggle" href="#" id="likelihood_ratio_positive-toggle" onclick="return toggle('likelihood_ratio_positive');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.stats-module.html#likelihood_ratio_positive">likelihood_ratio_positive</a><tt class="py-op">(</tt><tt class="py-param">cond</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="likelihood_ratio_positive-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="likelihood_ratio_positive-expanded"><a name="L439"></a><tt class="py-lineno">439</tt>  <tt class="py-line">    <tt class="py-docstring">"""Assesses the value of performing a diagnostic test for the positive</tt> </tt>
+<a name="L440"></a><tt class="py-lineno">440</tt>  <tt class="py-line"><tt class="py-docstring">    outcome.</tt> </tt>
+<a name="L441"></a><tt class="py-lineno">441</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L442"></a><tt class="py-lineno">442</tt>  <tt class="py-line"><tt class="py-docstring">    Parameters</tt> </tt>
+<a name="L443"></a><tt class="py-lineno">443</tt>  <tt class="py-line"><tt class="py-docstring">    ----------</tt> </tt>
+<a name="L444"></a><tt class="py-lineno">444</tt>  <tt class="py-line"><tt class="py-docstring">    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.</tt> </tt>
+<a name="L445"></a><tt class="py-lineno">445</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L446"></a><tt class="py-lineno">446</tt>  <tt class="py-line"><tt class="py-docstring">    test : Numpy array, boolean or 0/1 integer. The estimated outcome.</tt> </tt>
+<a name="L447"></a><tt class="py-lineno">447</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L448"></a><tt class="py-lineno">448</tt>  <tt class="py-line"><tt class="py-docstring">    Example</tt> </tt>
+<a name="L449"></a><tt class="py-lineno">449</tt>  <tt class="py-line"><tt class="py-docstring">    -------</tt> </tt>
+<a name="L450"></a><tt class="py-lineno">450</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import parsimony.utils.stats as stats</tt> </tt>
+<a name="L451"></a><tt class="py-lineno">451</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import numpy as np</tt> </tt>
+<a name="L452"></a><tt class="py-lineno">452</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; np.random.seed(42)</tt> </tt>
+<a name="L453"></a><tt class="py-lineno">453</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; p = 2030</tt> </tt>
+<a name="L454"></a><tt class="py-lineno">454</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; cond = np.zeros((p, 1))</tt> </tt>
+<a name="L455"></a><tt class="py-lineno">455</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test = np.zeros((p, 1))</tt> </tt>
+<a name="L456"></a><tt class="py-lineno">456</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; stats.likelihood_ratio_positive(cond, test)</tt> </tt>
+<a name="L457"></a><tt class="py-lineno">457</tt>  <tt class="py-line"><tt class="py-docstring">    inf</tt> </tt>
+<a name="L458"></a><tt class="py-lineno">458</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; stats.likelihood_ratio_positive(cond, np.logical_not(test))</tt> </tt>
+<a name="L459"></a><tt class="py-lineno">459</tt>  <tt class="py-line"><tt class="py-docstring">    1.0</tt> </tt>
+<a name="L460"></a><tt class="py-lineno">460</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; cond[:30] = 1.0</tt> </tt>
+<a name="L461"></a><tt class="py-lineno">461</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[:30] = 1.0</tt> </tt>
+<a name="L462"></a><tt class="py-lineno">462</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[:10] = 0.0</tt> </tt>
+<a name="L463"></a><tt class="py-lineno">463</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[-180:] = 1.0</tt> </tt>
+<a name="L464"></a><tt class="py-lineno">464</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; round(stats.likelihood_ratio_positive(cond, test), 1)</tt> </tt>
+<a name="L465"></a><tt class="py-lineno">465</tt>  <tt class="py-line"><tt class="py-docstring">    7.4</tt> </tt>
+<a name="L466"></a><tt class="py-lineno">466</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L467"></a><tt class="py-lineno">467</tt>  <tt class="py-line">    <tt class="py-name">sens</tt> <tt class="py-op">=</tt> <tt id="link-25" class="py-name"><a title="parsimony.utils.stats.sensitivity" class="py-name" href="#" onclick="return doclink('link-25', 'sensitivity', 'link-21');">sensitivity</a></tt><tt class="py-op">(</tt><tt class="py-name">cond</tt><tt class="py-op">,</tt> <tt class="py-name">test</tt><tt class="py-op">)</tt> </tt>
+<a name="L468"></a><tt class="py-lineno">468</tt>  <tt class="py-line">    <tt class="py-name">spec</tt> <tt class="py-op">=</tt> <tt id="link-26" class="py-name"><a title="parsimony.utils.stats.specificity" class="py-name" href="#" onclick="return doclink('link-26', 'specificity', 'link-22');">specificity</a></tt><tt class="py-op">(</tt><tt class="py-name">cond</tt><tt class="py-op">,</tt> <tt class="py-name">test</tt><tt class="py-op">)</tt> </tt>
+<a name="L469"></a><tt class="py-lineno">469</tt>  <tt class="py-line"> </tt>
+<a name="L470"></a><tt class="py-lineno">470</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">spec</tt> <tt class="py-op">==</tt> <tt class="py-number">1.0</tt><tt class="py-op">:</tt> </tt>
+<a name="L471"></a><tt class="py-lineno">471</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">inf</tt> </tt>
+<a name="L472"></a><tt class="py-lineno">472</tt>  <tt class="py-line">    <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L473"></a><tt class="py-lineno">473</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">sens</tt> <tt class="py-op">/</tt> <tt class="py-op">(</tt><tt class="py-number">1.0</tt> <tt class="py-op">-</tt> <tt class="py-name">spec</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L474"></a><tt class="py-lineno">474</tt>  <tt class="py-line"> </tt>
+<a name="likelihood_ratio_negative"></a><div id="likelihood_ratio_negative-def"><a name="L475"></a><tt class="py-lineno">475</tt>  <tt class="py-line"> </tt>
+<a name="L476"></a><tt class="py-lineno">476</tt> <a class="py-toggle" href="#" id="likelihood_ratio_negative-toggle" onclick="return toggle('likelihood_ratio_negative');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.stats-module.html#likelihood_ratio_negative">likelihood_ratio_negative</a><tt class="py-op">(</tt><tt class="py-param">cond</tt><tt class="py-op">,</tt> <tt class="py-param">test</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="likelihood_ratio_negative-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="likelihood_ratio_negative-expanded"><a name="L477"></a><tt class="py-lineno">477</tt>  <tt class="py-line">    <tt class="py-docstring">"""Assesses the value of performing a diagnostic test for the negative</tt> </tt>
+<a name="L478"></a><tt class="py-lineno">478</tt>  <tt class="py-line"><tt class="py-docstring">    outcome.</tt> </tt>
+<a name="L479"></a><tt class="py-lineno">479</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L480"></a><tt class="py-lineno">480</tt>  <tt class="py-line"><tt class="py-docstring">    Parameters</tt> </tt>
+<a name="L481"></a><tt class="py-lineno">481</tt>  <tt class="py-line"><tt class="py-docstring">    ----------</tt> </tt>
+<a name="L482"></a><tt class="py-lineno">482</tt>  <tt class="py-line"><tt class="py-docstring">    cond : Numpy array, boolean or 0/1 integer. The "true", known condition.</tt> </tt>
+<a name="L483"></a><tt class="py-lineno">483</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L484"></a><tt class="py-lineno">484</tt>  <tt class="py-line"><tt class="py-docstring">    test : Numpy array, boolean or 0/1 integer. The estimated outcome.</tt> </tt>
+<a name="L485"></a><tt class="py-lineno">485</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L486"></a><tt class="py-lineno">486</tt>  <tt class="py-line"><tt class="py-docstring">    Example</tt> </tt>
+<a name="L487"></a><tt class="py-lineno">487</tt>  <tt class="py-line"><tt class="py-docstring">    -------</tt> </tt>
+<a name="L488"></a><tt class="py-lineno">488</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import parsimony.utils.stats as stats</tt> </tt>
+<a name="L489"></a><tt class="py-lineno">489</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; import numpy as np</tt> </tt>
+<a name="L490"></a><tt class="py-lineno">490</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; np.random.seed(42)</tt> </tt>
+<a name="L491"></a><tt class="py-lineno">491</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; p = 2030</tt> </tt>
+<a name="L492"></a><tt class="py-lineno">492</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; cond = np.zeros((p, 1))</tt> </tt>
+<a name="L493"></a><tt class="py-lineno">493</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test = np.zeros((p, 1))</tt> </tt>
+<a name="L494"></a><tt class="py-lineno">494</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; stats.likelihood_ratio_negative(cond, test)</tt> </tt>
+<a name="L495"></a><tt class="py-lineno">495</tt>  <tt class="py-line"><tt class="py-docstring">    0.0</tt> </tt>
+<a name="L496"></a><tt class="py-lineno">496</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; stats.likelihood_ratio_negative(cond, np.logical_not(test))</tt> </tt>
+<a name="L497"></a><tt class="py-lineno">497</tt>  <tt class="py-line"><tt class="py-docstring">    inf</tt> </tt>
+<a name="L498"></a><tt class="py-lineno">498</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; cond[:30] = 1.0</tt> </tt>
+<a name="L499"></a><tt class="py-lineno">499</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[:30] = 1.0</tt> </tt>
+<a name="L500"></a><tt class="py-lineno">500</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[:10] = 0.0</tt> </tt>
+<a name="L501"></a><tt class="py-lineno">501</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; test[-180:] = 1.0</tt> </tt>
+<a name="L502"></a><tt class="py-lineno">502</tt>  <tt class="py-line"><tt class="py-docstring">    &gt;&gt;&gt; round(stats.likelihood_ratio_negative(cond, test), 2)</tt> </tt>
+<a name="L503"></a><tt class="py-lineno">503</tt>  <tt class="py-line"><tt class="py-docstring">    0.37</tt> </tt>
+<a name="L504"></a><tt class="py-lineno">504</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L505"></a><tt class="py-lineno">505</tt>  <tt class="py-line">    <tt class="py-name">sens</tt> <tt class="py-op">=</tt> <tt id="link-27" class="py-name"><a title="parsimony.utils.stats.sensitivity" class="py-name" href="#" onclick="return doclink('link-27', 'sensitivity', 'link-21');">sensitivity</a></tt><tt class="py-op">(</tt><tt class="py-name">cond</tt><tt class="py-op">,</tt> <tt class="py-name">test</tt><tt class="py-op">)</tt> </tt>
+<a name="L506"></a><tt class="py-lineno">506</tt>  <tt class="py-line">    <tt class="py-name">spec</tt> <tt class="py-op">=</tt> <tt id="link-28" class="py-name"><a title="parsimony.utils.stats.specificity" class="py-name" href="#" onclick="return doclink('link-28', 'specificity', 'link-22');">specificity</a></tt><tt class="py-op">(</tt><tt class="py-name">cond</tt><tt class="py-op">,</tt> <tt class="py-name">test</tt><tt class="py-op">)</tt> </tt>
+<a name="L507"></a><tt class="py-lineno">507</tt>  <tt class="py-line"> </tt>
+<a name="L508"></a><tt class="py-lineno">508</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">spec</tt> <tt class="py-op">==</tt> <tt class="py-number">0.0</tt><tt class="py-op">:</tt> </tt>
+<a name="L509"></a><tt class="py-lineno">509</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">inf</tt> </tt>
+<a name="L510"></a><tt class="py-lineno">510</tt>  <tt class="py-line">    <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L511"></a><tt class="py-lineno">511</tt>  <tt class="py-line">        <tt class="py-keyword">return</tt> <tt class="py-op">(</tt><tt class="py-number">1.0</tt> <tt class="py-op">-</tt> <tt class="py-name">sens</tt><tt class="py-op">)</tt> <tt class="py-op">/</tt> <tt class="py-name">spec</tt> </tt>
+</div><a name="L512"></a><tt class="py-lineno">512</tt>  <tt class="py-line"> </tt>
+<a name="fleiss_kappa"></a><div id="fleiss_kappa-def"><a name="L513"></a><tt class="py-lineno">513</tt>  <tt class="py-line"> </tt>
+<a name="L514"></a><tt class="py-lineno">514</tt> <a class="py-toggle" href="#" id="fleiss_kappa-toggle" onclick="return toggle('fleiss_kappa');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.stats-module.html#fleiss_kappa">fleiss_kappa</a><tt class="py-op">(</tt><tt class="py-param">W</tt><tt class="py-op">,</tt> <tt class="py-param">k</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="fleiss_kappa-collapsed" style="display:none;" pad="+++" indent="++++"></div><div id="fleiss_kappa-expanded"><a name="L515"></a><tt class="py-lineno">515</tt>  <tt class="py-line">    <tt class="py-docstring">"""Computes Fleiss' kappa for a set of variables classified into k</tt> </tt>
+<a name="L516"></a><tt class="py-lineno">516</tt>  <tt class="py-line"><tt class="py-docstring">    categories by a number of different raters.</tt> </tt>
+<a name="L517"></a><tt class="py-lineno">517</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
+<a name="L518"></a><tt class="py-lineno">518</tt>  <tt class="py-line"><tt class="py-docstring">    W is a matrix with shape (variables, raters) with k categories between</tt> </tt>
+<a name="L519"></a><tt class="py-lineno">519</tt>  <tt class="py-line"><tt class="py-docstring">    0, ..., k - 1.</tt> </tt>
+<a name="L520"></a><tt class="py-lineno">520</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
+<a name="L521"></a><tt class="py-lineno">521</tt>  <tt class="py-line">    <tt class="py-name">N</tt><tt class="py-op">,</tt> <tt class="py-name">n</tt> <tt class="py-op">=</tt> <tt class="py-name">W</tt><tt class="py-op">.</tt><tt class="py-name">shape</tt> </tt>
+<a name="L522"></a><tt class="py-lineno">522</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">n</tt> <tt class="py-op">&lt;=</tt> <tt class="py-number">1</tt><tt class="py-op">:</tt> </tt>
+<a name="L523"></a><tt class="py-lineno">523</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">ValueError</tt><tt class="py-op">(</tt><tt class="py-string">"At least two ratings are needed"</tt><tt class="py-op">)</tt> </tt>
+<a name="L524"></a><tt class="py-lineno">524</tt>  <tt class="py-line">    <tt id="link-29" class="py-name"><a title="parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.A
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.A
+parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.A
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.A
+parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper.A
+parsimony.functions.properties.NesterovFunction.A" class="py-name" href="#" onclick="return doclink('link-29', 'A', 'link-11');">A</a></tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">zeros</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">N</tt><tt class="py-op">,</tt> <tt class="py-name">k</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L525"></a><tt class="py-lineno">525</tt>  <tt class="py-line">    <tt class="py-name">Nn</tt> <tt class="py-op">=</tt> <tt class="py-name">N</tt> <tt class="py-op">*</tt> <tt class="py-name">n</tt> </tt>
+<a name="L526"></a><tt class="py-lineno">526</tt>  <tt class="py-line">    <tt class="py-name">p</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-number">0.0</tt><tt class="py-op">]</tt> <tt class="py-op">*</tt> <tt class="py-name">k</tt> </tt>
+<a name="L527"></a><tt class="py-lineno">527</tt>  <tt class="py-line">    <tt class="py-keyword">for</tt> <tt class="py-name">j</tt> <tt class="py-keyword">in</tt> <tt class="py-name">xrange</tt><tt class="py-op">(</tt><tt class="py-name">k</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L528"></a><tt class="py-lineno">528</tt>  <tt class="py-line">        <tt id="link-30" class="py-name"><a title="parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.A
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.A
+parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.A
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.A
+parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper.A
+parsimony.functions.properties.NesterovFunction.A" class="py-name" href="#" onclick="return doclink('link-30', 'A', 'link-11');">A</a></tt><tt class="py-op">[</tt><tt class="py-op">:</tt><tt class="py-op">,</tt> <tt class="py-name">j</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-name">W</tt> <tt class="py-op">==</tt> <tt class="py-name">j</tt><tt class="py-op">,</tt> <tt class="py-name">axis</tt><tt class="py-op">=</tt><tt class="py-number">1</tt><tt class="py-op">)</tt> </tt>
+<a name="L529"></a><tt class="py-lineno">529</tt>  <tt class="py-line"> </tt>
+<a name="L530"></a><tt class="py-lineno">530</tt>  <tt class="py-line">        <tt class="py-name">p</tt><tt class="py-op">[</tt><tt class="py-name">j</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">sum</tt><tt class="py-op">(</tt><tt id="link-31" class="py-name"><a title="parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.A
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.A
+parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.A
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.A
+parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper.A
+parsimony.functions.properties.NesterovFunction.A" class="py-name" href="#" onclick="return doclink('link-31', 'A', 'link-11');">A</a></tt><tt class="py-op">[</tt><tt class="py-op">:</tt><tt class="py-op">,</tt> <tt class="py-name">j</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> <tt class="py-op">/</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">Nn</tt><tt class="py-op">)</tt> </tt>
+<a name="L531"></a><tt class="py-lineno">531</tt>  <tt class="py-line"> </tt>
+<a name="L532"></a><tt class="py-lineno">532</tt>  <tt class="py-line">    <tt class="py-name">P</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-number">0.0</tt><tt class="py-op">]</tt> <tt class="py-op">*</tt> <tt class="py-name">N</tt> </tt>
+<a name="L533"></a><tt class="py-lineno">533</tt>  <tt class="py-line">    <tt class="py-keyword">for</tt> <tt class="py-name">i</tt> <tt class="py-keyword">in</tt> <tt class="py-name">xrange</tt><tt class="py-op">(</tt><tt class="py-name">N</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L534"></a><tt class="py-lineno">534</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">j</tt> <tt class="py-keyword">in</tt> <tt class="py-name">xrange</tt><tt class="py-op">(</tt><tt class="py-name">k</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L535"></a><tt class="py-lineno">535</tt>  <tt class="py-line">            <tt class="py-name">P</tt><tt class="py-op">[</tt><tt class="py-name">i</tt><tt class="py-op">]</tt> <tt class="py-op">+=</tt> <tt id="link-32" class="py-name"><a title="parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.A
+parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.A
+parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.A
+parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.A
+parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper.A
+parsimony.functions.properties.NesterovFunction.A" class="py-name" href="#" onclick="return doclink('link-32', 'A', 'link-11');">A</a></tt><tt class="py-op">[</tt><tt class="py-name">i</tt><tt class="py-op">,</tt> <tt class="py-name">j</tt><tt class="py-op">]</tt> <tt class="py-op">**</tt> <tt class="py-number">2.0</tt> </tt>
+<a name="L536"></a><tt class="py-lineno">536</tt>  <tt class="py-line">        <tt class="py-name">P</tt><tt class="py-op">[</tt><tt class="py-name">i</tt><tt class="py-op">]</tt> <tt class="py-op">-=</tt> <tt class="py-name">n</tt> </tt>
+<a name="L537"></a><tt class="py-lineno">537</tt>  <tt class="py-line">        <tt class="py-name">P</tt><tt class="py-op">[</tt><tt class="py-name">i</tt><tt class="py-op">]</tt> <tt class="py-op">/=</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">n</tt> <tt class="py-op">*</tt> <tt class="py-op">(</tt><tt class="py-name">n</tt> <tt class="py-op">-</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
+<a name="L538"></a><tt class="py-lineno">538</tt>  <tt class="py-line"> </tt>
+<a name="L539"></a><tt class="py-lineno">539</tt>  <tt class="py-line">    <tt class="py-name">P_</tt> <tt class="py-op">=</tt> <tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-name">P</tt><tt class="py-op">)</tt> <tt class="py-op">/</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">N</tt><tt class="py-op">)</tt> </tt>
+<a name="L540"></a><tt class="py-lineno">540</tt>  <tt class="py-line">    <tt class="py-name">Pe</tt> <tt class="py-op">=</tt> <tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-op">[</tt><tt class="py-name">pj</tt> <tt class="py-op">**</tt> <tt class="py-number">2.0</tt> <tt class="py-keyword">for</tt> <tt class="py-name">pj</tt> <tt class="py-keyword">in</tt> <tt class="py-name">p</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
+<a name="L541"></a><tt class="py-lineno">541</tt>  <tt class="py-line"> </tt>
+<a name="L542"></a><tt class="py-lineno">542</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">abs</tt><tt class="py-op">(</tt><tt class="py-name">Pe</tt> <tt class="py-op">-</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt> <tt class="py-op">&lt;</tt> <tt id="link-33" class="py-name"><a title="parsimony.utils.consts" class="py-name" href="#" onclick="return doclink('link-33', 'consts', 'link-0');">consts</a></tt><tt class="py-op">.</tt><tt id="link-34" class="py-name" targets="Variable parsimony.datasets.simulate.utils.TOLERANCE=parsimony.datasets.simulate.utils-module.html#TOLERANCE,Variable parsimony.utils.consts.TOLERANCE=parsimony.utils.consts-module.html#TOLERANCE"><a title="parsimony.datasets.simulate.utils.TOLERANCE
+parsimony.utils.consts.TOLERANCE" class="py-name" href="#" onclick="return doclink('link-34', 'TOLERANCE', 'link-34');">TOLERANCE</a></tt><tt class="py-op">:</tt> </tt>
+<a name="L543"></a><tt class="py-lineno">543</tt>  <tt class="py-line">        <tt class="py-name">kappa</tt> <tt class="py-op">=</tt> <tt class="py-number">1.0</tt> </tt>
+<a name="L544"></a><tt class="py-lineno">544</tt>  <tt class="py-line">    <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
+<a name="L545"></a><tt class="py-lineno">545</tt>  <tt class="py-line">        <tt class="py-name">kappa</tt> <tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-name">P_</tt> <tt class="py-op">-</tt> <tt class="py-name">Pe</tt><tt class="py-op">)</tt> <tt class="py-op">/</tt> <tt class="py-op">(</tt><tt class="py-number">1.0</tt> <tt class="py-op">-</tt> <tt class="py-name">Pe</tt><tt class="py-op">)</tt> </tt>
+<a name="L546"></a><tt class="py-lineno">546</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">kappa</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">1.0</tt><tt class="py-op">:</tt> </tt>
+<a name="L547"></a><tt class="py-lineno">547</tt>  <tt class="py-line">        <tt class="py-name">kappa</tt> <tt class="py-op">=</tt> <tt class="py-number">1.0</tt> </tt>
+<a name="L548"></a><tt class="py-lineno">548</tt>  <tt class="py-line"> </tt>
+<a name="L549"></a><tt class="py-lineno">549</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">kappa</tt> </tt>
+</div><a name="L550"></a><tt class="py-lineno">550</tt>  <tt class="py-line"> </tt><script type="text/javascript">
 <!--
 expandto(location.href);
 // -->
@@ -156,7 +672,7 @@ expandto(location.href);
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Jul  6 11:32:54 2014
+    Generated by Epydoc 3.0.1 on Thu Oct  2 23:35:48 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

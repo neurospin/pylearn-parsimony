@@ -38,7 +38,7 @@
     <td width="100%">
       <span class="breadcrumbs">
         <a href="parsimony-module.html">Package&nbsp;parsimony</a> ::
-        <a href="parsimony.functions-module.html" onclick="show_private();">Package&nbsp;functions</a> ::
+        <a href="parsimony.functions-module.html">Package&nbsp;functions</a> ::
         <a href="parsimony.functions.combinedfunctions-module.html" onclick="show_private();">Module&nbsp;combinedfunctions</a> ::
         Class&nbsp;LinearRegressionL2SmoothedL1TV
       </span>
@@ -59,33 +59,43 @@
 <!-- ==================== CLASS DESCRIPTION ==================== -->
 <h1 class="epydoc">Class LinearRegressionL2SmoothedL1TV</h1><p class="nomargin-top"><span class="codelink"><a href="parsimony.functions.combinedfunctions-pysrc.html#LinearRegressionL2SmoothedL1TV">source&nbsp;code</a></span></p>
 <pre class="base-tree">
-                        object --+        
-                                 |        
-               <a href="parsimony.functions.properties.Function-class.html">properties.Function</a> --+    
-                                     |    
-          <a href="parsimony.functions.properties.CompositeFunction-class.html">properties.CompositeFunction</a> --+
-                                         |
-                            object --+   |
-                                     |   |
-<a href="parsimony.functions.properties.LipschitzContinuousGradient-class.html">properties.LipschitzContinuousGradient</a> --+
-                                         |
-                            object --+   |
-                                     |   |
-  <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html">nesterov.properties.NesterovFunction</a> --+
-                                         |
-                            object --+   |
-                                     |   |
-                <a href="parsimony.functions.properties.GradientMap-class.html">properties.GradientMap</a> --+
-                                         |
-                            object --+   |
-                                     |   |
-               <a href="parsimony.functions.properties.DualFunction-class.html">properties.DualFunction</a> --+
-                                         |
-                            object --+   |
-                                     |   |
-             <a href="parsimony.functions.properties.StronglyConvex-class.html">properties.StronglyConvex</a> --+
-                                         |
-                                        <strong class="uidshort">LinearRegressionL2SmoothedL1TV</strong>
+                            object --+        
+                                     |        
+                   <a href="parsimony.functions.properties.Function-class.html">properties.Function</a> --+    
+                                         |    
+              <a href="parsimony.functions.properties.CompositeFunction-class.html">properties.CompositeFunction</a> --+
+                                             |
+                            object --+       |
+                                     |       |
+                   <a href="parsimony.functions.properties.Gradient-class.html">properties.Gradient</a> --+   |
+                                         |   |
+                            object --+   |   |
+                                     |   |   |
+<a href="parsimony.functions.properties.LipschitzContinuousGradient-class.html">properties.LipschitzContinuousGradient</a> --+   |
+                                         |   |
+                            object --+   |   |
+                                     |   |   |
+                <a href="parsimony.functions.properties.Eigenvalues-class.html">properties.Eigenvalues</a> --+   |
+                                         |   |
+                            object --+   |   |
+                                     |   |   |
+           <a href="parsimony.functions.properties.ProximalOperator-class.html">properties.ProximalOperator</a> --+   |
+                                         |   |
+               <a href="parsimony.functions.properties.NesterovFunction-class.html" onclick="show_private();">properties.NesterovFunction</a> --+
+                                             |
+                                object --+   |
+                                         |   |
+                    <a href="parsimony.functions.properties.GradientMap-class.html">properties.GradientMap</a> --+
+                                             |
+                                object --+   |
+                                         |   |
+                   <a href="parsimony.functions.properties.DualFunction-class.html">properties.DualFunction</a> --+
+                                             |
+                                object --+   |
+                                         |   |
+                 <a href="parsimony.functions.properties.StronglyConvex-class.html">properties.StronglyConvex</a> --+
+                                             |
+                                            <strong class="uidshort">LinearRegressionL2SmoothedL1TV</strong>
 </pre>
 
 <hr />
@@ -99,23 +109,21 @@ X : Numpy array. The X matrix for the ridge regression.
 
 y : Numpy array. The y vector for the ridge regression.
 
-l : Non-negative float. The Lagrange multiplier, or regularisation
+l2 : Non-negative float. The Lagrange multiplier, or regularisation
+        constant, for the ridge (L2) penalty.
+
+l1 : Non-negative float. The Lagrange multiplier, or regularisation
         constant, for the L1 penalty.
 
-k : Non-negative float. The Lagrange multiplier, or regularisation
-        constant, for the ridge penalty.
-
-g : Non-negative float. The Lagrange multiplier, or regularisation
+tv : Non-negative float. The Lagrange multiplier, or regularisation
         constant, of the TV function.
 
-Atv : Numpy array (usually sparse). The linear operator for the Nesterov
-        formulation of the smoothed TV function. May not be None!
+A : A list or tuple with 4 elements of (usually sparse) arrays. The linear
+        operator for the smoothed L1+TV. The first element must be the
+        linear operator for L1 and the following three for TV. May not be
+        None.
 
-Al1 : Numpy array (usually sparse). The linear operator for the Nesterov
-        formulation of the smoothed L1 function. May not be None!
-
-mu : Non-negative float. The regularisation constant for the smoothing of
-        the TV function.
+mu : Non-negative float. The regularisation constant for the smoothing.
 
 penalty_start : Non-negative integer. The number of columns, variables
         etc., to except from penalisation. Equivalently, the first index
@@ -152,11 +160,10 @@ mean : Boolean. Whether to compute the squared loss or the mean squared
           <td><span class="summary-sig"><a href="parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">X</span>,
         <span class="summary-sig-arg">y</span>,
-        <span class="summary-sig-arg">l</span>,
-        <span class="summary-sig-arg">k</span>,
-        <span class="summary-sig-arg">g</span>,
-        <span class="summary-sig-arg">Atv</span>=<span class="summary-sig-default">None</span>,
-        <span class="summary-sig-arg">Al1</span>=<span class="summary-sig-default">None</span>,
+        <span class="summary-sig-arg">l2</span>,
+        <span class="summary-sig-arg">l1</span>,
+        <span class="summary-sig-arg">tv</span>,
+        <span class="summary-sig-arg">A</span>=<span class="summary-sig-default">None</span>,
         <span class="summary-sig-arg">mu</span>=<span class="summary-sig-default">5e-08</span>,
         <span class="summary-sig-arg">penalty_start</span>=<span class="summary-sig-default">0</span>,
         <span class="summary-sig-arg">mean</span>=<span class="summary-sig-default">True</span>)</span><br />
@@ -336,7 +343,7 @@ l : Non-negative float.</td>
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV-class.html#V" class="summary-sig-name">V</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">u</span>,
+        <span class="summary-sig-arg">alpha</span>,
         <span class="summary-sig-arg">beta</span>,
         <span class="summary-sig-arg">L</span>)</span><br />
       The gradient map associated to the function.</td>
@@ -413,8 +420,8 @@ l : Non-negative float.</td>
         <tr>
           <td><span class="summary-sig"><a href="parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV-class.html#estimate_mu" class="summary-sig-name">estimate_mu</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">beta</span>)</span><br />
-      Computes a &quot;good&quot; value of \mu with respect to the given 
-      eta.</td>
+      Computes a &quot;good&quot; value of mu with respect to the given 
+      beta.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="parsimony.functions.combinedfunctions-pysrc.html#LinearRegressionL2SmoothedL1TV.estimate_mu">source&nbsp;code</a></span>
             
@@ -464,13 +471,22 @@ l : Non-negative float.</td>
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.Function-class.html">properties.Function</a></code></b>:
       <code><a href="parsimony.functions.properties.Function-class.html#get_params">get_params</a></code>
       </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.NesterovFunction-class.html" onclick="show_private();">properties.NesterovFunction</a></code></b>:
+      <code><a href="parsimony.functions.properties.NesterovFunction-class.html#Aa">Aa</a></code>,
+      <code><a href="parsimony.functions.properties.NesterovFunction-class.html#fmu">fmu</a></code>,
+      <code><a href="parsimony.functions.properties.NesterovFunction-class.html#grad">grad</a></code>,
+      <code><a href="parsimony.functions.properties.NesterovFunction-class.html#lA">lA</a></code>,
+      <code><a href="parsimony.functions.properties.NesterovFunction-class.html#lambda_max">lambda_max</a></code>,
+      <code><a href="parsimony.functions.properties.NesterovFunction-class.html#prox">prox</a></code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.Gradient-class.html">properties.Gradient</a></code></b>:
+      <code><a href="parsimony.functions.properties.Gradient-class.html#approx_grad">approx_grad</a></code>
+      </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.LipschitzContinuousGradient-class.html">properties.LipschitzContinuousGradient</a></code></b>:
       <code><a href="parsimony.functions.properties.LipschitzContinuousGradient-class.html#approx_L">approx_L</a></code>
       </p>
-    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html">nesterov.properties.NesterovFunction</a></code></b>:
-      <code><a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#Aa">Aa</a></code>,
-      <code><a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#fmu">fmu</a></code>,
-      <code><a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#grad">grad</a></code>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.Eigenvalues-class.html">properties.Eigenvalues</a></code></b>:
+      <code><a href="parsimony.functions.properties.Eigenvalues-class.html#lambda_min">lambda_min</a></code>
       </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
@@ -580,11 +596,10 @@ l : Non-negative float.</td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
         <span class="sig-arg">X</span>,
         <span class="sig-arg">y</span>,
-        <span class="sig-arg">l</span>,
-        <span class="sig-arg">k</span>,
-        <span class="sig-arg">g</span>,
-        <span class="sig-arg">Atv</span>=<span class="sig-default">None</span>,
-        <span class="sig-arg">Al1</span>=<span class="sig-default">None</span>,
+        <span class="sig-arg">l2</span>,
+        <span class="sig-arg">l1</span>,
+        <span class="sig-arg">tv</span>,
+        <span class="sig-arg">A</span>=<span class="sig-default">None</span>,
         <span class="sig-arg">mu</span>=<span class="sig-default">5e-08</span>,
         <span class="sig-arg">penalty_start</span>=<span class="sig-default">0</span>,
         <span class="sig-arg">mean</span>=<span class="sig-default">True</span>)</span>
@@ -684,7 +699,7 @@ penalty_start : Non-negative integer. The number of columns, variables
   <p>From the interface &quot;NesterovFunction&quot;.</p>
   <dl class="fields">
     <dt>Overrides:
-        <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#get_mu">nesterov.properties.NesterovFunction.get_mu</a>
+        <a href="parsimony.functions.properties.NesterovFunction-class.html#get_mu">properties.NesterovFunction.get_mu</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -722,7 +737,7 @@ old_mu : Non-negative float. The old regularisation constant for the
 </pre>
   <dl class="fields">
     <dt>Overrides:
-        <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#set_mu">nesterov.properties.NesterovFunction.set_mu</a>
+        <a href="parsimony.functions.properties.NesterovFunction-class.html#set_mu">properties.NesterovFunction.set_mu</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -769,7 +784,7 @@ old_mu : Non-negative float. The old regularisation constant for the
   <p>Function value.</p>
   <dl class="fields">
     <dt>Overrides:
-        <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#phi">nesterov.properties.NesterovFunction.phi</a>
+        <a href="parsimony.functions.properties.NesterovFunction-class.html#phi">properties.NesterovFunction.phi</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -791,7 +806,7 @@ old_mu : Non-negative float. The old regularisation constant for the
   <p>Linear operator of the Nesterov function.</p>
   <dl class="fields">
     <dt>Overrides:
-        <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#A">nesterov.properties.NesterovFunction.A</a>
+        <a href="parsimony.functions.properties.NesterovFunction-class.html#A">properties.NesterovFunction.A</a>
         <dd><em class="note">(inherited documentation)</em></dd>
     </dt>
   </dl>
@@ -851,7 +866,7 @@ old_mu : Non-negative float. The old regularisation constant for the
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">V</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">u</span>,
+        <span class="sig-arg">alpha</span>,
         <span class="sig-arg">beta</span>,
         <span class="sig-arg">L</span>)</span>
   </h3>
@@ -888,7 +903,7 @@ old_mu : Non-negative float. The old regularisation constant for the
   <p>From the interface &quot;NesterovFunction&quot;.</p>
   <dl class="fields">
     <dt>Overrides:
-        <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#alpha">nesterov.properties.NesterovFunction.alpha</a>
+        <a href="parsimony.functions.properties.NesterovFunction-class.html#alpha">properties.NesterovFunction.alpha</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -958,12 +973,12 @@ old_mu : Non-negative float. The old regularisation constant for the
     </td>
   </tr></table>
   
-  <p>Computes a &quot;good&quot; value of \mu with respect to the given 
-  eta.</p>
+  <p>Computes a &quot;good&quot; value of mu with respect to the given 
+  beta.</p>
   <p>From the interface &quot;NesterovFunction&quot;.</p>
   <dl class="fields">
     <dt>Overrides:
-        <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#estimate_mu">nesterov.properties.NesterovFunction.estimate_mu</a>
+        <a href="parsimony.functions.properties.NesterovFunction-class.html#estimate_mu">properties.NesterovFunction.estimate_mu</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -986,14 +1001,14 @@ old_mu : Non-negative float. The old regularisation constant for the
 The maximum value of the regularisation of the dual variable. We
 have
 
-    M = max_{lpha \in K} 0.5*|lpha|&#178;_2.
+    M = max_{alpha in K} 0.5*|alpha|&#178;_2.
 
 From the interface &quot;NesterovFunction&quot;.
 
 </pre>
   <dl class="fields">
     <dt>Overrides:
-        <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#M">nesterov.properties.NesterovFunction.M</a>
+        <a href="parsimony.functions.properties.NesterovFunction-class.html#M">properties.NesterovFunction.M</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -1017,7 +1032,7 @@ From the interface &quot;NesterovFunction&quot;.
   <p>From the interface &quot;NesterovFunction&quot;.</p>
   <dl class="fields">
     <dt>Overrides:
-        <a href="parsimony.functions.nesterov.properties.NesterovFunction-class.html#project">nesterov.properties.NesterovFunction.project</a>
+        <a href="parsimony.functions.properties.NesterovFunction-class.html#project">properties.NesterovFunction.project</a>
     </dt>
   </dl>
 </td></tr></table>
@@ -1049,7 +1064,7 @@ From the interface &quot;NesterovFunction&quot;.
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Jul  6 11:32:51 2014
+    Generated by Epydoc 3.0.1 on Thu Oct  2 23:35:46 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

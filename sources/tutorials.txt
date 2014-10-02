@@ -167,7 +167,7 @@ You can combine :math:`\ell_1`, :math:`\ell_2` and TV penalties with coefficient
     l1 = 0.1  # l1 penalty
     l2 = 0.1  # l2 penalty
     tv = 0.1  # tv penalty
-    A, n_compacts = tv_helper.A_from_shape(shape)  # Memory allocation for TV
+    A, n_compacts = tv_helper.linear_operator_from_shape(shape)  # Memory allocation for TV
     tvenet_estimator = estimators.LinearRegressionL1L2TV(l1=l1, l2=l2, tv=tv, A=A)
     tvenet_estimator.fit(X, y)
     print "Estimated beta error =", np.linalg.norm(tvenet_estimator.beta - beta)
@@ -191,7 +191,7 @@ constraint, :math:`\mathrm{GL}`, and instead minimise
     l = 0.1  # l1 lasso coefficient
     g = 0.1  # group lasso coefficient
     groups = [range(0, 2 * num_ft / 3), range(num_ft/ 3, num_ft)]
-    A = gl.A_from_groups(num_ft, groups)
+    A = gl.linear_operator_from_groups(num_ft, groups)
     estimator = estimators.LinearRegressionL1L2GL(
                                           k, l, g, A=A,
                                           algorithm=algorithms.FISTA(),
@@ -246,7 +246,7 @@ minimise
 
    \min\left(\frac{1}{n}\sum_{i=1}^n\log(1 + e^{-y_i(\beta^Tx_i)}) + \frac{l_2}{2}\|\beta\|_2^2\right).
 
-Note that there is not specfific estimator, but you can use the generic 
+Note that there is not specfific estimator, but you can use the generic
 LogisticRegressionL1L2TV estimator with null :math:`l_1, tv` coefficient
 
 .. code-block:: python
@@ -254,7 +254,7 @@ LogisticRegressionL1L2TV estimator with null :math:`l_1, tv` coefficient
     import parsimony.estimators as estimators
     import parsimony.functions.nesterov.tv as tv_helper
     l2 = 0.1  # l2 ridge regression coefficient
-    A, n_compacts = tv_helper.A_from_shape(shape)
+    A, n_compacts = tv_helper.linear_operator_from_shape(shape)
     ridge_lr_estimator = estimators.LogisticRegressionL1L2TV(l1=0, l2=l2, tv=0, A=A)
     ridge_lr_estimator.fit(X, y)
     print "Estimated prediction rate =", ridge_lr_estimator.score(X, y)
@@ -276,7 +276,7 @@ minimise:
     import parsimony.functions.nesterov.tv as tv_helper
     l1 = 0.1  # l1 lasso coefficient
     l2 = 0.1  # l2 ridge regression coefficient
-    A, n_compacts = tv_helper.A_from_shape(shape)
+    A, n_compacts = tv_helper.linear_operator_from_shape(shape)
     enet_lr_estimator = estimators.LogisticRegressionL1L2TV(l1=l1, l2=l2, tv=0, A=A)
     enet_lr_estimator.fit(X, y)
     print "Estimated prediction rate =", enet_lr_estimator.score(X, y)
@@ -297,7 +297,7 @@ Finally, you can add a :math:`\mathrm{TV}` penalty minimise:
     l1 = 0.1  # l1 lasso coefficient
     l2 = 0.1  # l2 ridge regression coefficient
     tv = 0.1  # l2 ridge regression coefficient
-    A, n_compacts = tv_helper.A_from_shape(shape)
+    A, n_compacts = tv_helper.linear_operator_from_shape(shape)
     enettv_lr_estimator = estimators.LogisticRegressionL1L2TV(l1=l1, l2=l2, tv=tv, A=A)
     enettv_lr_estimator.fit(X, y)
     print "Estimated prediction rate =", enettv_lr_estimator.score(X, y)
@@ -321,7 +321,7 @@ constraint and instead minimise
     l = 0.1  # l1 lasso coefficient
     g = 0.1  # group lasso coefficient
     groups = [range(0, 2 * num_ft / 3), range(num_ft/ 3, num_ft)]
-    A = gl.A_from_groups(num_ft, groups)
+    A = gl.linear_operator_from_groups(num_ft, groups)
     estimator = estimators.LogisticRegressionL1L2GL(
                                           k, l, g, A=A,
                                           algorithm=algorithms.FISTA(),
@@ -339,7 +339,7 @@ CONESTA
 -------
 
 We applied FISTA ([FISTA2009]_) in the previous sections. In this section, we
-switch to Dynamic CONESTA and Static CONESTA to minimise the function.
+switch to CONESTA to minimise the function.
 
 .. code-block:: python
 
@@ -349,17 +349,12 @@ switch to Dynamic CONESTA and Static CONESTA to minimise the function.
     k = 0.0  # l2 ridge regression coefficient
     l = 0.1  # l1 lasso coefficient
     g = 0.1  # tv coefficient
-    Atv, n_compacts = tv.A_from_shape(shape)
-    tvl1l2_conesta_static = estimators.LinearRegressionL1L2TV(
+    Atv, n_compacts = tv.linear_operator_from_shape(shape)
+    tvl1l2_conesta = estimators.LinearRegressionL1L2TV(
                                           k, l, g, A=Atv,
-                                          algorithm=algorithms.StaticCONESTA())
-    res = tvl1l2_conesta_static.fit(X, y)
-    print "Estimated beta error =", np.linalg.norm(tvl1l2_conesta_static.beta - beta)
-    tvl1l2_conesta_dynamic = estimators.LinearRegressionL1L2TV(
-                                         k, l, g, A=Atv,
-                                         algorithm=algorithms.DynamicCONESTA())
-    res = tvl1l2_conesta_dynamic.fit(X, y)
-    print "Estimated beta error =", np.linalg.norm(tvl1l2_conesta_dynamic.beta - beta)
+                                          algorithm=algorithms.CONESTA())
+    res = tvl1l2_conesta.fit(X, y)
+    print "Estimated beta error =", np.linalg.norm(tvl1l2_conesta.beta - beta)
 
 Excessive gap method
 --------------------
@@ -372,9 +367,9 @@ positive.
 
     import scipy.sparse as sparse
     import parsimony.functions.nesterov.l1tv as l1tv
-    #Atv, n_compacts = tv.A_from_shape(shape)
+    #Atv, n_compacts = tv.linear_operator_from_shape(shape)
     #Al1 = sparse.eye(num_ft, num_ft)
-    Atv, Al1 = l1tv.A_from_shape(shape, num_ft, penalty_start=0)
+    Atv, Al1 = l1tv.linear_operator_from_shape(shape, num_ft, penalty_start=0)
     k = 0.05  # ridge regression coefficient
     l = 0.05  # l1 coefficient
     g = 0.05  # tv coefficient

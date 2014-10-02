@@ -84,6 +84,14 @@ Parameters
 ----------
 eps : Positive float. Tolerance for the stopping criterion.
 
+use_gap : Boolean. If true, FISTA will use a dual gap, from the interface
+        DualFunction, in the stopping criterion as
+
+                if function.gap(beta) &lt; eps:
+                    break
+
+        Default is False, since the gap may be very expensive to compute.
+
 info : List or tuple of utils.consts.Info. What, if any, extra run
         information should be stored. Default is an empty list, which means
         that no run information is computed nor returned.
@@ -104,25 +112,25 @@ Example
 &gt;&gt;&gt; X = np.random.rand(100, 50)
 &gt;&gt;&gt; y = np.random.rand(100, 1)
 &gt;&gt;&gt; A = sparse.csr_matrix((50, 50))  # Unused here
-&gt;&gt;&gt; function = LinearRegressionL1L2TV(X, y, k=0.0, l=0.0, g=0.0,
+&gt;&gt;&gt; function = LinearRegressionL1L2TV(X, y, 0.0, 0.0, 0.0,
 ...                                   A=A, mu=0.0)
 &gt;&gt;&gt; fista = FISTA(max_iter=10000)
 &gt;&gt;&gt; beta1 = fista.run(function, np.random.rand(50, 1))
 &gt;&gt;&gt; beta2 = np.dot(np.linalg.pinv(X), y)
-&gt;&gt;&gt; np.linalg.norm(beta1 - beta2)
-4.618281654691976e-06
+&gt;&gt;&gt; round(np.linalg.norm(beta1 - beta2), 13)
+4.6182817e-06
 &gt;&gt;&gt;
 &gt;&gt;&gt; np.random.seed(42)
 &gt;&gt;&gt; X = np.random.rand(100, 50)
 &gt;&gt;&gt; y = np.random.rand(100, 1)
 &gt;&gt;&gt; A = sparse.csr_matrix((50, 50))  # Unused here
-&gt;&gt;&gt; function = LinearRegressionL1L2TV(X, y, k=0.0, l=0.1, g=0.0,
+&gt;&gt;&gt; function = LinearRegressionL1L2TV(X, y, 0.1, 0.0, 0.0,
 ...                                   A=A, mu=0.0)
 &gt;&gt;&gt; fista = FISTA(max_iter=10000)
 &gt;&gt;&gt; beta1 = fista.run(function, np.random.rand(50, 1))
 &gt;&gt;&gt; beta2 = np.dot(np.linalg.pinv(X), y)
-&gt;&gt;&gt; np.linalg.norm(beta1 - beta2)
-0.82723292510702928
+&gt;&gt;&gt; round(np.linalg.norm(beta1 - beta2), 14)
+0.82723292510703
 &gt;&gt;&gt; np.linalg.norm(beta2.ravel(), 0)
 50
 &gt;&gt;&gt; np.linalg.norm(beta1.ravel(), 0)
@@ -154,8 +162,9 @@ Example
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="parsimony.algorithms.proximal.FISTA-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">eps</span>=<span class="summary-sig-default">5e-08</span>,
+        <span class="summary-sig-arg">use_gap</span>=<span class="summary-sig-default">False</span>,
         <span class="summary-sig-arg">info</span>=<span class="summary-sig-default"><code class="variable-group">[</code><code class="variable-group">]</code></span>,
+        <span class="summary-sig-arg">eps</span>=<span class="summary-sig-default">5e-08</span>,
         <span class="summary-sig-arg">max_iter</span>=<span class="summary-sig-default">10000</span>,
         <span class="summary-sig-arg">min_iter</span>=<span class="summary-sig-default">1</span>,
         <span class="summary-sig-arg">conesta_stop</span>=<span class="summary-sig-default">None</span>)</span><br />
@@ -290,13 +299,6 @@ Example
         <a name="__abstractmethods__"></a><span class="summary-name">__abstractmethods__</span> = <code title="frozenset([])"><code class="variable-group">frozenset([</code><code class="variable-group">])</code></code>
     </td>
   </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="_abc_negative_cache_version"></a><span class="summary-name">_abc_negative_cache_version</span> = <code title="14">14</code>
-    </td>
-  </tr>
   <tr>
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.algorithms.bases.ExplicitAlgorithm-class.html">bases.ExplicitAlgorithm</a></code></b>:
@@ -305,6 +307,7 @@ Example
     <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html">bases.BaseAlgorithm</a></code></b> (private):
       <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_cache" onclick="show_private();">_abc_cache</a></code>,
       <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_negative_cache" onclick="show_private();">_abc_negative_cache</a></code>,
+      <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_negative_cache_version" onclick="show_private();">_abc_negative_cache_version</a></code>,
       <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_registry" onclick="show_private();">_abc_registry</a></code>
       </p></div>
     </td>
@@ -361,8 +364,9 @@ Example
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">eps</span>=<span class="sig-default">5e-08</span>,
+        <span class="sig-arg">use_gap</span>=<span class="sig-default">False</span>,
         <span class="sig-arg">info</span>=<span class="sig-default"><code class="variable-group">[</code><code class="variable-group">]</code></span>,
+        <span class="sig-arg">eps</span>=<span class="sig-default">5e-08</span>,
         <span class="sig-arg">max_iter</span>=<span class="sig-default">10000</span>,
         <span class="sig-arg">min_iter</span>=<span class="sig-default">1</span>,
         <span class="sig-arg">conesta_stop</span>=<span class="sig-default">None</span>)</span>
@@ -488,7 +492,7 @@ beta : Numpy array. The start vector.
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Jul  6 11:32:51 2014
+    Generated by Epydoc 3.0.1 on Thu Oct  2 23:35:46 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

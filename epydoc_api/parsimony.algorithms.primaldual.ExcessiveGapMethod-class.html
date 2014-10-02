@@ -239,18 +239,25 @@ min_iter : Non-negative integer less than or equal to max_iter. Minimum
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="parsimony.algorithms.primaldual.ExcessiveGapMethod-class.html#INTERFACES" class="summary-name">INTERFACES</a> = <code title="[&lt;class 'parsimony.functions.nesterov.properties.NesterovFunction'&gt;,
- &lt;class 'parsimony.functions.properties.LipschitzContinuousGradient'&gt;,
+        <a href="parsimony.algorithms.primaldual.ExcessiveGapMethod-class.html#INTERFACES" class="summary-name">INTERFACES</a> = <code title="[&lt;class 'parsimony.functions.properties.NesterovFunction'&gt;,
  &lt;class 'parsimony.functions.properties.GradientMap'&gt;,
  &lt;class 'parsimony.functions.properties.DualFunction'&gt;,
- &lt;class 'parsimony.functions.properties.StronglyConvex'&gt;]"><code class="variable-group">[</code>&lt;class 'parsimony.functions.nesterov.properties.<code class="variable-ellipsis">...</code></code>
+ &lt;class 'parsimony.functions.properties.StronglyConvex'&gt;]"><code class="variable-group">[</code>&lt;class 'parsimony.functions.properties.NesterovF<code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a href="parsimony.algorithms.primaldual.ExcessiveGapMethod-class.html#INFO_PROVIDED" class="summary-name">INFO_PROVIDED</a> = <code title="['ok', 'num_iter', 'time', 'fvalue', 'bound', 'converged']"><code class="variable-group">[</code><code class="variable-quote">'</code><code class="variable-string">ok</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">num_iter</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">time</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">fvalue</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">bound</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-ellipsis">...</code></code>
+        <a href="parsimony.algorithms.primaldual.ExcessiveGapMethod-class.html#INFO_PROVIDED" class="summary-name">INFO_PROVIDED</a> = <code title="['ok',
+ 'converged',
+ 'num_iter',
+ 'time',
+ 'fvalue',
+ 'mu',
+ 'bound',
+ 'gap',
+..."><code class="variable-group">[</code><code class="variable-quote">'</code><code class="variable-string">ok</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">converged</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">num_iter</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">time</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">fvalu</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
@@ -258,13 +265,6 @@ min_iter : Non-negative integer less than or equal to max_iter. Minimum
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="__abstractmethods__"></a><span class="summary-name">__abstractmethods__</span> = <code title="frozenset([])"><code class="variable-group">frozenset([</code><code class="variable-group">])</code></code>
-    </td>
-  </tr>
-<tr class="private">
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-        <a name="_abc_negative_cache_version"></a><span class="summary-name">_abc_negative_cache_version</span> = <code title="14">14</code>
     </td>
   </tr>
   <tr>
@@ -275,6 +275,7 @@ min_iter : Non-negative integer less than or equal to max_iter. Minimum
     <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html">bases.BaseAlgorithm</a></code></b> (private):
       <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_cache" onclick="show_private();">_abc_cache</a></code>,
       <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_negative_cache" onclick="show_private();">_abc_negative_cache</a></code>,
+      <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_negative_cache_version" onclick="show_private();">_abc_negative_cache_version</a></code>,
       <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_registry" onclick="show_private();">_abc_registry</a></code>
       </p></div>
     </td>
@@ -424,8 +425,7 @@ beta : Numpy array. A start vector. This is normally not given, but
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-group">[</code>&lt;class 'parsimony.functions.nesterov.properties.NesterovFunction'&gt;<code class="variable-op">,</code>
- &lt;class 'parsimony.functions.properties.LipschitzContinuousGradient'&gt;<code class="variable-op">,</code>
+<code class="variable-group">[</code>&lt;class 'parsimony.functions.properties.NesterovFunction'&gt;<code class="variable-op">,</code>
  &lt;class 'parsimony.functions.properties.GradientMap'&gt;<code class="variable-op">,</code>
  &lt;class 'parsimony.functions.properties.DualFunction'&gt;<code class="variable-op">,</code>
  &lt;class 'parsimony.functions.properties.StronglyConvex'&gt;<code class="variable-group">]</code>
@@ -446,7 +446,15 @@ beta : Numpy array. A start vector. This is normally not given, but
   <dl class="fields">
     <dt>Value:</dt>
       <dd><table><tr><td><pre class="variable">
-<code class="variable-group">[</code><code class="variable-quote">'</code><code class="variable-string">ok</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">num_iter</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">time</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">fvalue</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">bound</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">converged</code><code class="variable-quote">'</code><code class="variable-group">]</code>
+<code class="variable-group">[</code><code class="variable-quote">'</code><code class="variable-string">ok</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">converged</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">num_iter</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">time</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">fvalue</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">mu</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">bound</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">gap</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+<code class="variable-ellipsis">...</code>
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -479,7 +487,7 @@ beta : Numpy array. A start vector. This is normally not given, but
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Jul  6 11:32:51 2014
+    Generated by Epydoc 3.0.1 on Thu Oct  2 23:35:46 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

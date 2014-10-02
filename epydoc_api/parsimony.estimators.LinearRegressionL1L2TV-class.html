@@ -95,6 +95,8 @@ algorithm : ExplicitAlgorithm. The algorithm that should be applied.
             2. DynamicCONESTA(...)
             3. FISTA(...)
             4. ISTA(...)
+            5. ADMM(...)
+            6. NaiveCONESTA(...)
 
         Default is StaticCONESTA(...).
 
@@ -111,11 +113,13 @@ penalty_start : Non-negative integer. The number of columns, variables
 mean : Boolean. Whether to compute the squared loss or the mean squared
         loss. Default is True, the mean squared loss.
 
+rho : Positive float. Regularisation constant only used in ADMM. Default
+        is 1.0.
+
 Examples
 --------
 &gt;&gt;&gt; import numpy as np
 &gt;&gt;&gt; import parsimony.estimators as estimators
-&gt;&gt;&gt; import parsimony.algorithms.primaldual as primaldual
 &gt;&gt;&gt; import parsimony.algorithms.proximal as proximal
 &gt;&gt;&gt; import parsimony.functions.nesterov.tv as total_variation
 &gt;&gt;&gt; shape = (1, 4, 4)
@@ -128,35 +132,44 @@ Examples
 &gt;&gt;&gt; l1 = 0.1  # L1 coefficient
 &gt;&gt;&gt; l2 = 0.9  # Ridge coefficient
 &gt;&gt;&gt; tv = 1.0  # TV coefficient
-&gt;&gt;&gt; A, n_compacts = total_variation.A_from_shape(shape)
+&gt;&gt;&gt; A, n_compacts = total_variation.linear_operator_from_shape(shape)
 &gt;&gt;&gt; lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
-...                      algorithm=primaldual.StaticCONESTA(max_iter=1000),
+...                      algorithm=proximal.StaticCONESTA(max_iter=1000),
 ...                      mean=False)
 &gt;&gt;&gt; res = lr.fit(X, y)
-&gt;&gt;&gt; error = lr.score(X, y)
-&gt;&gt;&gt; print &quot;error = &quot;, error
-error =  0.0683839364837
+&gt;&gt;&gt; round(lr.score(X, y), 15)
+0.068359831130674
+&gt;&gt;&gt;
 &gt;&gt;&gt; lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
-...                     algorithm=primaldual.DynamicCONESTA(max_iter=1000),
+...                     algorithm=proximal.CONESTA(max_iter=1000),
 ...                     mean=False)
 &gt;&gt;&gt; res = lr.fit(X, y)
-&gt;&gt;&gt; error = lr.score(X, y)
-&gt;&gt;&gt; print &quot;error = &quot;, error
-error =  0.0683839265093
+&gt;&gt;&gt; round(lr.score(X, y), 13)
+0.0683585895559
+&gt;&gt;&gt;
 &gt;&gt;&gt; lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
 ...                                algorithm=proximal.FISTA(max_iter=1000),
 ...                                mean=False)
 &gt;&gt;&gt; lr = lr.fit(X, y)
-&gt;&gt;&gt; error = lr.score(X, y)
-&gt;&gt;&gt; print &quot;error = &quot;, error
-error =  1.58175771272
+&gt;&gt;&gt; round(lr.score(X, y), 13)
+1.5817577127184
+&gt;&gt;&gt;
 &gt;&gt;&gt; lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
 ...                                 algorithm=proximal.ISTA(max_iter=1000),
 ...                                 mean=False)
 &gt;&gt;&gt; lr = lr.fit(X, y)
-&gt;&gt;&gt; error = lr.score(X, y)
-&gt;&gt;&gt; print &quot;error = &quot;, error
-error =  2.075830689
+&gt;&gt;&gt; round(lr.score(X, y), 14)
+2.07583068899674
+&gt;&gt;&gt;
+&gt;&gt;&gt; import parsimony.functions.nesterov.l1tv as l1tv
+&gt;&gt;&gt; np.random.seed(1337)
+&gt;&gt;&gt; A = l1tv.linear_operator_from_shape(shape, p, penalty_start=0)
+&gt;&gt;&gt; lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
+...                                 algorithm=proximal.ADMM(max_iter=1000),
+...                                 mean=False)
+&gt;&gt;&gt; lr = lr.fit(X, y)
+&gt;&gt;&gt; round(lr.score(X, y), 13)
+0.0623552412543
 
 </pre>
 
@@ -192,7 +205,8 @@ error =  2.075830689
         <span class="summary-sig-arg">algorithm</span>=<span class="summary-sig-default">None</span>,
         <span class="summary-sig-arg">algorithm_params</span>=<span class="summary-sig-default"><code class="variable-group">{</code><code class="variable-group">}</code></span>,
         <span class="summary-sig-arg">penalty_start</span>=<span class="summary-sig-default">0</span>,
-        <span class="summary-sig-arg">mean</span>=<span class="summary-sig-default">True</span>)</span><br />
+        <span class="summary-sig-arg">mean</span>=<span class="summary-sig-default">True</span>,
+        <span class="summary-sig-arg">rho</span>=<span class="summary-sig-default">1.0</span>)</span><br />
       x.__init__(...) initializes x; see help(type(x)) for signature</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="parsimony.estimators-pysrc.html#LinearRegressionL1L2TV.__init__">source&nbsp;code</a></span>
@@ -382,7 +396,8 @@ error =  2.075830689
         <span class="sig-arg">algorithm</span>=<span class="sig-default">None</span>,
         <span class="sig-arg">algorithm_params</span>=<span class="sig-default"><code class="variable-group">{</code><code class="variable-group">}</code></span>,
         <span class="sig-arg">penalty_start</span>=<span class="sig-default">0</span>,
-        <span class="sig-arg">mean</span>=<span class="sig-default">True</span>)</span>
+        <span class="sig-arg">mean</span>=<span class="sig-default">True</span>,
+        <span class="sig-arg">rho</span>=<span class="sig-default">1.0</span>)</span>
     <br /><em class="fname">(Constructor)</em>
   </h3>
   </td><td align="right" valign="top"
@@ -497,7 +512,7 @@ error =  2.075830689
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Jul  6 11:32:51 2014
+    Generated by Epydoc 3.0.1 on Thu Oct  2 23:35:46 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

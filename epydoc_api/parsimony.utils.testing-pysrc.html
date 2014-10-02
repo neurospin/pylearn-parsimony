@@ -38,7 +38,7 @@
     <td width="100%">
       <span class="breadcrumbs">
         <a href="parsimony-module.html">Package&nbsp;parsimony</a> ::
-        <a href="parsimony.utils-module.html" onclick="show_private();">Package&nbsp;utils</a> ::
+        <a href="parsimony.utils-module.html">Package&nbsp;utils</a> ::
         Module&nbsp;testing
       </span>
     </td>
@@ -92,7 +92,7 @@ parsimony.utils.utils" class="py-name" href="#" onclick="return doclink('link-0'
 <a name="L29"></a><tt class="py-lineno">29</tt>  <tt class="py-line"> </tt>
 <a name="L30"></a><tt class="py-lineno">30</tt>  <tt class="py-line"> </tt>
 <a name="L31"></a><tt class="py-lineno">31</tt>  <tt class="py-line"><tt class="py-comment">#'assert_array_almost_equal', </tt> </tt>
-<a name="L32"></a><tt class="py-lineno">32</tt>  <tt class="py-line"><tt class="py-name">__all__</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">'fleiss_kappa'</tt><tt class="py-op">,</tt> <tt class="py-string">'orth_matrix'</tt><tt class="py-op">]</tt> </tt>
+<a name="L32"></a><tt class="py-lineno">32</tt>  <tt class="py-line"><tt class="py-name">__all__</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-string">"orth_matrix"</tt><tt class="py-op">]</tt> </tt>
 <a name="L33"></a><tt class="py-lineno">33</tt>  <tt class="py-line"><tt class="py-comment">#           'check_ortho']</tt> </tt>
 <a name="L34"></a><tt class="py-lineno">34</tt>  <tt class="py-line">           <tt class="py-comment">#"assert_equal", "assert_not_equal", "assert_raises", "raises",</tt> </tt>
 <a name="L35"></a><tt class="py-lineno">35</tt>  <tt class="py-line"><tt class="py-comment">#           "with_setup", "assert_true", "assert_false", "assert_almost_equal",</tt> </tt>
@@ -100,114 +100,51 @@ parsimony.utils.utils" class="py-name" href="#" onclick="return doclink('link-0'
 <a name="L37"></a><tt class="py-lineno">37</tt>  <tt class="py-line"><tt class="py-comment">#           "assert_array_less"]</tt> </tt>
 <a name="L38"></a><tt class="py-lineno">38</tt>  <tt class="py-line"> </tt>
 <a name="L39"></a><tt class="py-lineno">39</tt>  <tt class="py-line"> </tt>
-<a name="fleiss_kappa"></a><div id="fleiss_kappa-def"><a name="L40"></a><tt class="py-lineno">40</tt> <a class="py-toggle" href="#" id="fleiss_kappa-toggle" onclick="return toggle('fleiss_kappa');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.testing-module.html#fleiss_kappa">fleiss_kappa</a><tt class="py-op">(</tt><tt class="py-param">W</tt><tt class="py-op">,</tt> <tt class="py-param">k</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
-</div><div id="fleiss_kappa-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="fleiss_kappa-expanded"><a name="L41"></a><tt class="py-lineno">41</tt>  <tt class="py-line">    <tt class="py-docstring">"""Computes Fleiss' kappa for a set of variables classified into k</tt> </tt>
-<a name="L42"></a><tt class="py-lineno">42</tt>  <tt class="py-line"><tt class="py-docstring">    categories by a number of different raters.</tt> </tt>
-<a name="L43"></a><tt class="py-lineno">43</tt>  <tt class="py-line"><tt class="py-docstring"></tt> </tt>
-<a name="L44"></a><tt class="py-lineno">44</tt>  <tt class="py-line"><tt class="py-docstring">    W is a matrix with shape (variables, raters) with k categories between</tt> </tt>
-<a name="L45"></a><tt class="py-lineno">45</tt>  <tt class="py-line"><tt class="py-docstring">    0,...,k.</tt> </tt>
-<a name="L46"></a><tt class="py-lineno">46</tt>  <tt class="py-line"><tt class="py-docstring">    """</tt> </tt>
-<a name="L47"></a><tt class="py-lineno">47</tt>  <tt class="py-line">    <tt class="py-name">N</tt><tt class="py-op">,</tt> <tt class="py-name">n</tt> <tt class="py-op">=</tt> <tt class="py-name">W</tt><tt class="py-op">.</tt><tt class="py-name">shape</tt> </tt>
-<a name="L48"></a><tt class="py-lineno">48</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">n</tt> <tt class="py-op">&lt;=</tt> <tt class="py-number">1</tt><tt class="py-op">:</tt> </tt>
-<a name="L49"></a><tt class="py-lineno">49</tt>  <tt class="py-line">        <tt class="py-keyword">raise</tt> <tt class="py-name">ValueError</tt><tt class="py-op">(</tt><tt class="py-string">"At least two ratings are needed"</tt><tt class="py-op">)</tt> </tt>
-<a name="L50"></a><tt class="py-lineno">50</tt>  <tt class="py-line">    <tt id="link-1" class="py-name" targets="Method parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.A()=parsimony.functions.combinedfunctions.LinearRegressionL1L2GL-class.html#A,Method parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.A()=parsimony.functions.combinedfunctions.LinearRegressionL1L2TV-class.html#A,Method parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.A()=parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV-class.html#A,Method parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.A()=parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV-class.html#A,Method parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper.A()=parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper-class.html#A,Method parsimony.functions.nesterov.properties.NesterovFunction.A()=parsimony.functions.nesterov.properties.NesterovFunction-class.html#A"><a title="parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.A
-parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.A
-parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.A
-parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.A
-parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper.A
-parsimony.functions.nesterov.properties.NesterovFunction.A" class="py-name" href="#" onclick="return doclink('link-1', 'A', 'link-1');">A</a></tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">zeros</tt><tt class="py-op">(</tt><tt class="py-op">(</tt><tt class="py-name">N</tt><tt class="py-op">,</tt> <tt class="py-name">k</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
-<a name="L51"></a><tt class="py-lineno">51</tt>  <tt class="py-line">    <tt class="py-name">Nn</tt> <tt class="py-op">=</tt> <tt class="py-name">N</tt> <tt class="py-op">*</tt> <tt class="py-name">n</tt> </tt>
-<a name="L52"></a><tt class="py-lineno">52</tt>  <tt class="py-line">    <tt class="py-name">p</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt> <tt class="py-op">*</tt> <tt class="py-name">k</tt> </tt>
-<a name="L53"></a><tt class="py-lineno">53</tt>  <tt class="py-line">    <tt class="py-keyword">for</tt> <tt class="py-name">j</tt> <tt class="py-keyword">in</tt> <tt class="py-name">xrange</tt><tt class="py-op">(</tt><tt class="py-name">k</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
-<a name="L54"></a><tt class="py-lineno">54</tt>  <tt class="py-line">        <tt id="link-2" class="py-name"><a title="parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.A
-parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.A
-parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.A
-parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.A
-parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper.A
-parsimony.functions.nesterov.properties.NesterovFunction.A" class="py-name" href="#" onclick="return doclink('link-2', 'A', 'link-1');">A</a></tt><tt class="py-op">[</tt><tt class="py-op">:</tt><tt class="py-op">,</tt> <tt class="py-name">j</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-name">W</tt> <tt class="py-op">==</tt> <tt class="py-name">j</tt><tt class="py-op">,</tt> <tt class="py-name">axis</tt><tt class="py-op">=</tt><tt class="py-number">1</tt><tt class="py-op">)</tt> </tt>
-<a name="L55"></a><tt class="py-lineno">55</tt>  <tt class="py-line"> </tt>
-<a name="L56"></a><tt class="py-lineno">56</tt>  <tt class="py-line">        <tt class="py-name">p</tt><tt class="py-op">[</tt><tt class="py-name">j</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">np</tt><tt class="py-op">.</tt><tt class="py-name">sum</tt><tt class="py-op">(</tt><tt id="link-3" class="py-name"><a title="parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.A
-parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.A
-parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.A
-parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.A
-parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper.A
-parsimony.functions.nesterov.properties.NesterovFunction.A" class="py-name" href="#" onclick="return doclink('link-3', 'A', 'link-1');">A</a></tt><tt class="py-op">[</tt><tt class="py-op">:</tt><tt class="py-op">,</tt> <tt class="py-name">j</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> <tt class="py-op">/</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">Nn</tt><tt class="py-op">)</tt> </tt>
-<a name="L57"></a><tt class="py-lineno">57</tt>  <tt class="py-line"> </tt>
-<a name="L58"></a><tt class="py-lineno">58</tt>  <tt class="py-line">    <tt class="py-name">P</tt> <tt class="py-op">=</tt> <tt class="py-op">[</tt><tt class="py-number">0</tt><tt class="py-op">]</tt> <tt class="py-op">*</tt> <tt class="py-name">N</tt> </tt>
-<a name="L59"></a><tt class="py-lineno">59</tt>  <tt class="py-line">    <tt class="py-keyword">for</tt> <tt class="py-name">i</tt> <tt class="py-keyword">in</tt> <tt class="py-name">xrange</tt><tt class="py-op">(</tt><tt class="py-name">N</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
-<a name="L60"></a><tt class="py-lineno">60</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">j</tt> <tt class="py-keyword">in</tt> <tt class="py-name">xrange</tt><tt class="py-op">(</tt><tt class="py-name">k</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
-<a name="L61"></a><tt class="py-lineno">61</tt>  <tt class="py-line">            <tt class="py-name">P</tt><tt class="py-op">[</tt><tt class="py-name">i</tt><tt class="py-op">]</tt> <tt class="py-op">+=</tt> <tt id="link-4" class="py-name"><a title="parsimony.functions.combinedfunctions.LinearRegressionL1L2GL.A
-parsimony.functions.combinedfunctions.LinearRegressionL1L2TV.A
-parsimony.functions.combinedfunctions.LinearRegressionL2SmoothedL1TV.A
-parsimony.functions.combinedfunctions.PrincipalComponentAnalysisL1TV.A
-parsimony.functions.multiblock.losses.MultiblockNesterovFunctionWrapper.A
-parsimony.functions.nesterov.properties.NesterovFunction.A" class="py-name" href="#" onclick="return doclink('link-4', 'A', 'link-1');">A</a></tt><tt class="py-op">[</tt><tt class="py-name">i</tt><tt class="py-op">,</tt> <tt class="py-name">j</tt><tt class="py-op">]</tt> <tt class="py-op">**</tt> <tt class="py-number">2</tt> </tt>
-<a name="L62"></a><tt class="py-lineno">62</tt>  <tt class="py-line">        <tt class="py-name">P</tt><tt class="py-op">[</tt><tt class="py-name">i</tt><tt class="py-op">]</tt> <tt class="py-op">-=</tt> <tt class="py-name">n</tt> </tt>
-<a name="L63"></a><tt class="py-lineno">63</tt>  <tt class="py-line">        <tt class="py-name">P</tt><tt class="py-op">[</tt><tt class="py-name">i</tt><tt class="py-op">]</tt> <tt class="py-op">/=</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">n</tt> <tt class="py-op">*</tt> <tt class="py-op">(</tt><tt class="py-name">n</tt> <tt class="py-op">-</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> </tt>
-<a name="L64"></a><tt class="py-lineno">64</tt>  <tt class="py-line"> </tt>
-<a name="L65"></a><tt class="py-lineno">65</tt>  <tt class="py-line">    <tt class="py-name">P_</tt> <tt class="py-op">=</tt> <tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-name">P</tt><tt class="py-op">)</tt> <tt class="py-op">/</tt> <tt class="py-name">float</tt><tt class="py-op">(</tt><tt class="py-name">N</tt><tt class="py-op">)</tt> </tt>
-<a name="L66"></a><tt class="py-lineno">66</tt>  <tt class="py-line">    <tt class="py-name">Pe</tt> <tt class="py-op">=</tt> <tt class="py-name">sum</tt><tt class="py-op">(</tt><tt class="py-op">[</tt><tt class="py-name">pj</tt> <tt class="py-op">**</tt> <tt class="py-number">2</tt> <tt class="py-keyword">for</tt> <tt class="py-name">pj</tt> <tt class="py-keyword">in</tt> <tt class="py-name">p</tt><tt class="py-op">]</tt><tt class="py-op">)</tt> </tt>
-<a name="L67"></a><tt class="py-lineno">67</tt>  <tt class="py-line"> </tt>
-<a name="L68"></a><tt class="py-lineno">68</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">abs</tt><tt class="py-op">(</tt><tt class="py-name">Pe</tt> <tt class="py-op">-</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt> <tt class="py-op">&lt;</tt> <tt id="link-5" class="py-name"><a title="parsimony.algorithms.utils
+<a name="orth_matrix"></a><div id="orth_matrix-def"><a name="L40"></a><tt class="py-lineno">40</tt> <a class="py-toggle" href="#" id="orth_matrix-toggle" onclick="return toggle('orth_matrix');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.testing-module.html#orth_matrix">orth_matrix</a><tt class="py-op">(</tt><tt class="py-param">n</tt><tt class="py-op">=</tt><tt class="py-number">10</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="orth_matrix-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="orth_matrix-expanded"><a name="L41"></a><tt class="py-lineno">41</tt>  <tt class="py-line">    <tt class="py-name">Y</tt> <tt class="py-op">=</tt> <tt id="link-1" class="py-name"><a title="parsimony.algorithms.utils
 parsimony.datasets.simulate.utils
 parsimony.datasets.utils
 parsimony.utils
-parsimony.utils.utils" class="py-name" href="#" onclick="return doclink('link-5', 'utils', 'link-0');">utils</a></tt><tt class="py-op">.</tt><tt id="link-6" class="py-name" targets="Variable parsimony.datasets.simulate.utils.TOLERANCE=parsimony.datasets.simulate.utils-module.html#TOLERANCE,Variable parsimony.utils.consts.TOLERANCE=parsimony.utils.consts-module.html#TOLERANCE"><a title="parsimony.datasets.simulate.utils.TOLERANCE
-parsimony.utils.consts.TOLERANCE" class="py-name" href="#" onclick="return doclink('link-6', 'TOLERANCE', 'link-6');">TOLERANCE</a></tt><tt class="py-op">:</tt> </tt>
-<a name="L69"></a><tt class="py-lineno">69</tt>  <tt class="py-line">        <tt class="py-name">kappa</tt> <tt class="py-op">=</tt> <tt class="py-number">1</tt> </tt>
-<a name="L70"></a><tt class="py-lineno">70</tt>  <tt class="py-line">    <tt class="py-keyword">else</tt><tt class="py-op">:</tt> </tt>
-<a name="L71"></a><tt class="py-lineno">71</tt>  <tt class="py-line">        <tt class="py-name">kappa</tt> <tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-name">P_</tt> <tt class="py-op">-</tt> <tt class="py-name">Pe</tt><tt class="py-op">)</tt> <tt class="py-op">/</tt> <tt class="py-op">(</tt><tt class="py-number">1.0</tt> <tt class="py-op">-</tt> <tt class="py-name">Pe</tt><tt class="py-op">)</tt> </tt>
-<a name="L72"></a><tt class="py-lineno">72</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">kappa</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">1</tt><tt class="py-op">:</tt> </tt>
-<a name="L73"></a><tt class="py-lineno">73</tt>  <tt class="py-line">        <tt class="py-name">kappa</tt> <tt class="py-op">=</tt> <tt class="py-number">1</tt> </tt>
-<a name="L74"></a><tt class="py-lineno">74</tt>  <tt class="py-line"> </tt>
-<a name="L75"></a><tt class="py-lineno">75</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">kappa</tt> </tt>
-</div><a name="L76"></a><tt class="py-lineno">76</tt>  <tt class="py-line"> </tt>
-<a name="L77"></a><tt class="py-lineno">77</tt>  <tt class="py-line"> </tt>
-<a name="orth_matrix"></a><div id="orth_matrix-def"><a name="L78"></a><tt class="py-lineno">78</tt> <a class="py-toggle" href="#" id="orth_matrix-toggle" onclick="return toggle('orth_matrix');">-</a><tt class="py-line"><tt class="py-keyword">def</tt> <a class="py-def-name" href="parsimony.utils.testing-module.html#orth_matrix">orth_matrix</a><tt class="py-op">(</tt><tt class="py-param">n</tt><tt class="py-op">=</tt><tt class="py-number">10</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
-</div><div id="orth_matrix-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="orth_matrix-expanded"><a name="L79"></a><tt class="py-lineno">79</tt>  <tt class="py-line">    <tt class="py-name">Y</tt> <tt class="py-op">=</tt> <tt id="link-7" class="py-name"><a title="parsimony.algorithms.utils
+parsimony.utils.utils" class="py-name" href="#" onclick="return doclink('link-1', 'utils', 'link-0');">utils</a></tt><tt class="py-op">.</tt><tt id="link-2" class="py-name" targets="Method parsimony.datasets.simulate.utils.RandomUniform.rand()=parsimony.datasets.simulate.utils.RandomUniform-class.html#rand"><a title="parsimony.datasets.simulate.utils.RandomUniform.rand" class="py-name" href="#" onclick="return doclink('link-2', 'rand', 'link-2');">rand</a></tt><tt class="py-op">(</tt><tt class="py-name">n</tt><tt class="py-op">,</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt> </tt>
+<a name="L42"></a><tt class="py-lineno">42</tt>  <tt class="py-line">    <tt class="py-name">X</tt> <tt class="py-op">=</tt> <tt id="link-3" class="py-name"><a title="parsimony.algorithms.utils
 parsimony.datasets.simulate.utils
 parsimony.datasets.utils
 parsimony.utils
-parsimony.utils.utils" class="py-name" href="#" onclick="return doclink('link-7', 'utils', 'link-0');">utils</a></tt><tt class="py-op">.</tt><tt id="link-8" class="py-name" targets="Method parsimony.datasets.simulate.utils.RandomUniform.rand()=parsimony.datasets.simulate.utils.RandomUniform-class.html#rand"><a title="parsimony.datasets.simulate.utils.RandomUniform.rand" class="py-name" href="#" onclick="return doclink('link-8', 'rand', 'link-8');">rand</a></tt><tt class="py-op">(</tt><tt class="py-name">n</tt><tt class="py-op">,</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt> </tt>
-<a name="L80"></a><tt class="py-lineno">80</tt>  <tt class="py-line">    <tt class="py-name">X</tt> <tt class="py-op">=</tt> <tt id="link-9" class="py-name"><a title="parsimony.algorithms.utils
+parsimony.utils.utils" class="py-name" href="#" onclick="return doclink('link-3', 'utils', 'link-0');">utils</a></tt><tt class="py-op">.</tt><tt class="py-name">zeros</tt><tt class="py-op">(</tt><tt class="py-name">n</tt><tt class="py-op">,</tt> <tt class="py-name">n</tt><tt class="py-op">)</tt> </tt>
+<a name="L43"></a><tt class="py-lineno">43</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">n</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">2</tt><tt class="py-op">:</tt> </tt>
+<a name="L44"></a><tt class="py-lineno">44</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">j</tt> <tt class="py-keyword">in</tt> <tt class="py-name">xrange</tt><tt class="py-op">(</tt><tt class="py-name">n</tt> <tt class="py-op">-</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+<a name="L45"></a><tt class="py-lineno">45</tt>  <tt class="py-line">            <tt class="py-name">x</tt> <tt class="py-op">=</tt> <tt id="link-4" class="py-name"><a title="parsimony.algorithms.utils
 parsimony.datasets.simulate.utils
 parsimony.datasets.utils
 parsimony.utils
-parsimony.utils.utils" class="py-name" href="#" onclick="return doclink('link-9', 'utils', 'link-0');">utils</a></tt><tt class="py-op">.</tt><tt class="py-name">zeros</tt><tt class="py-op">(</tt><tt class="py-name">n</tt><tt class="py-op">,</tt> <tt class="py-name">n</tt><tt class="py-op">)</tt> </tt>
-<a name="L81"></a><tt class="py-lineno">81</tt>  <tt class="py-line">    <tt class="py-keyword">if</tt> <tt class="py-name">n</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">2</tt><tt class="py-op">:</tt> </tt>
-<a name="L82"></a><tt class="py-lineno">82</tt>  <tt class="py-line">        <tt class="py-keyword">for</tt> <tt class="py-name">j</tt> <tt class="py-keyword">in</tt> <tt class="py-name">xrange</tt><tt class="py-op">(</tt><tt class="py-name">n</tt> <tt class="py-op">-</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
-<a name="L83"></a><tt class="py-lineno">83</tt>  <tt class="py-line">            <tt class="py-name">x</tt> <tt class="py-op">=</tt> <tt id="link-10" class="py-name"><a title="parsimony.algorithms.utils
+parsimony.utils.utils" class="py-name" href="#" onclick="return doclink('link-4', 'utils', 'link-0');">utils</a></tt><tt class="py-op">.</tt><tt id="link-5" class="py-name"><a title="parsimony.datasets.simulate.utils.RandomUniform.rand" class="py-name" href="#" onclick="return doclink('link-5', 'rand', 'link-2');">rand</a></tt><tt class="py-op">(</tt><tt class="py-name">n</tt><tt class="py-op">,</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt> </tt>
+<a name="L46"></a><tt class="py-lineno">46</tt>  <tt class="py-line">            <tt class="py-keyword">while</tt> <tt class="py-name">abs</tt><tt class="py-op">(</tt><tt class="py-name">abs</tt><tt class="py-op">(</tt><tt id="link-6" class="py-name"><a title="parsimony.algorithms.utils
 parsimony.datasets.simulate.utils
 parsimony.datasets.utils
 parsimony.utils
-parsimony.utils.utils" class="py-name" href="#" onclick="return doclink('link-10', 'utils', 'link-0');">utils</a></tt><tt class="py-op">.</tt><tt id="link-11" class="py-name"><a title="parsimony.datasets.simulate.utils.RandomUniform.rand" class="py-name" href="#" onclick="return doclink('link-11', 'rand', 'link-8');">rand</a></tt><tt class="py-op">(</tt><tt class="py-name">n</tt><tt class="py-op">,</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt> </tt>
-<a name="L84"></a><tt class="py-lineno">84</tt>  <tt class="py-line">            <tt class="py-keyword">while</tt> <tt class="py-name">abs</tt><tt class="py-op">(</tt><tt class="py-name">abs</tt><tt class="py-op">(</tt><tt id="link-12" class="py-name"><a title="parsimony.algorithms.utils
+parsimony.utils.utils" class="py-name" href="#" onclick="return doclink('link-6', 'utils', 'link-0');">utils</a></tt><tt class="py-op">.</tt><tt id="link-7" class="py-name" targets="Function parsimony.utils.maths.corr()=parsimony.utils.maths-module.html#corr"><a title="parsimony.utils.maths.corr" class="py-name" href="#" onclick="return doclink('link-7', 'corr', 'link-7');">corr</a></tt><tt class="py-op">(</tt><tt class="py-name">x</tt><tt class="py-op">,</tt> <tt class="py-name">Y</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> <tt class="py-op">-</tt> <tt class="py-name">j</tt> <tt class="py-op">/</tt> <tt class="py-op">(</tt><tt class="py-name">n</tt> <tt class="py-op">-</tt> <tt class="py-number">1.0</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">0.005</tt><tt class="py-op">:</tt> </tt>
+<a name="L47"></a><tt class="py-lineno">47</tt>  <tt class="py-line">                <tt class="py-name">x</tt> <tt class="py-op">=</tt> <tt id="link-8" class="py-name"><a title="parsimony.algorithms.utils
 parsimony.datasets.simulate.utils
 parsimony.datasets.utils
 parsimony.utils
-parsimony.utils.utils" class="py-name" href="#" onclick="return doclink('link-12', 'utils', 'link-0');">utils</a></tt><tt class="py-op">.</tt><tt id="link-13" class="py-name" targets="Function parsimony.utils.maths.corr()=parsimony.utils.maths-module.html#corr"><a title="parsimony.utils.maths.corr" class="py-name" href="#" onclick="return doclink('link-13', 'corr', 'link-13');">corr</a></tt><tt class="py-op">(</tt><tt class="py-name">x</tt><tt class="py-op">,</tt> <tt class="py-name">Y</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> <tt class="py-op">-</tt> <tt class="py-name">j</tt> <tt class="py-op">/</tt> <tt class="py-op">(</tt><tt class="py-name">n</tt> <tt class="py-op">-</tt> <tt class="py-number">1.0</tt><tt class="py-op">)</tt><tt class="py-op">)</tt> <tt class="py-op">&gt;</tt> <tt class="py-number">0.005</tt><tt class="py-op">:</tt> </tt>
-<a name="L85"></a><tt class="py-lineno">85</tt>  <tt class="py-line">                <tt class="py-name">x</tt> <tt class="py-op">=</tt> <tt id="link-14" class="py-name"><a title="parsimony.algorithms.utils
+parsimony.utils.utils" class="py-name" href="#" onclick="return doclink('link-8', 'utils', 'link-0');">utils</a></tt><tt class="py-op">.</tt><tt id="link-9" class="py-name"><a title="parsimony.datasets.simulate.utils.RandomUniform.rand" class="py-name" href="#" onclick="return doclink('link-9', 'rand', 'link-2');">rand</a></tt><tt class="py-op">(</tt><tt class="py-name">n</tt><tt class="py-op">,</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt> </tt>
+<a name="L48"></a><tt class="py-lineno">48</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt id="link-10" class="py-name"><a title="parsimony.algorithms.utils
 parsimony.datasets.simulate.utils
 parsimony.datasets.utils
 parsimony.utils
-parsimony.utils.utils" class="py-name" href="#" onclick="return doclink('link-14', 'utils', 'link-0');">utils</a></tt><tt class="py-op">.</tt><tt id="link-15" class="py-name"><a title="parsimony.datasets.simulate.utils.RandomUniform.rand" class="py-name" href="#" onclick="return doclink('link-15', 'rand', 'link-8');">rand</a></tt><tt class="py-op">(</tt><tt class="py-name">n</tt><tt class="py-op">,</tt> <tt class="py-number">1</tt><tt class="py-op">)</tt> </tt>
-<a name="L86"></a><tt class="py-lineno">86</tt>  <tt class="py-line">            <tt class="py-keyword">if</tt> <tt id="link-16" class="py-name"><a title="parsimony.algorithms.utils
-parsimony.datasets.simulate.utils
-parsimony.datasets.utils
-parsimony.utils
-parsimony.utils.utils" class="py-name" href="#" onclick="return doclink('link-16', 'utils', 'link-0');">utils</a></tt><tt class="py-op">.</tt><tt id="link-17" class="py-name"><a title="parsimony.utils.maths.corr" class="py-name" href="#" onclick="return doclink('link-17', 'corr', 'link-13');">corr</a></tt><tt class="py-op">(</tt><tt class="py-name">x</tt><tt class="py-op">,</tt> <tt class="py-name">Y</tt><tt class="py-op">)</tt> <tt class="py-op">&lt;</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
-<a name="L87"></a><tt class="py-lineno">87</tt>  <tt class="py-line">                <tt class="py-name">x</tt> <tt class="py-op">*=</tt> <tt class="py-op">-</tt><tt class="py-number">1</tt> </tt>
-<a name="L88"></a><tt class="py-lineno">88</tt>  <tt class="py-line">            <tt class="py-name">X</tt><tt class="py-op">[</tt><tt class="py-op">:</tt><tt class="py-op">,</tt> <tt class="py-name">j</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">x</tt><tt class="py-op">.</tt><tt class="py-name">ravel</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
-<a name="L89"></a><tt class="py-lineno">89</tt>  <tt class="py-line"> </tt>
-<a name="L90"></a><tt class="py-lineno">90</tt>  <tt class="py-line">    <tt class="py-name">X</tt><tt class="py-op">[</tt><tt class="py-op">:</tt><tt class="py-op">,</tt> <tt class="py-name">n</tt> <tt class="py-op">-</tt> <tt class="py-number">1</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">Y</tt><tt class="py-op">.</tt><tt class="py-name">ravel</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
-<a name="L91"></a><tt class="py-lineno">91</tt>  <tt class="py-line"> </tt>
-<a name="L92"></a><tt class="py-lineno">92</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">X</tt><tt class="py-op">,</tt> <tt class="py-name">Y</tt> </tt>
-</div><a name="L93"></a><tt class="py-lineno">93</tt>  <tt class="py-line"> </tt>
-<a name="L94"></a><tt class="py-lineno">94</tt>  <tt class="py-line"> </tt>
-<a name="L95"></a><tt class="py-lineno">95</tt>  <tt class="py-line"><tt class="py-comment">#def check_ortho(M, err_msg):</tt> </tt>
-<a name="L96"></a><tt class="py-lineno">96</tt>  <tt class="py-line"><tt class="py-comment">#    K = np.dot(M.T, M)</tt> </tt>
-<a name="L97"></a><tt class="py-lineno">97</tt>  <tt class="py-line"><tt class="py-comment">#    assert_array_almost_equal(K, np.diag(np.diag(K)), err_msg=err_msg)</tt> </tt>
-<a name="L98"></a><tt class="py-lineno">98</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+parsimony.utils.utils" class="py-name" href="#" onclick="return doclink('link-10', 'utils', 'link-0');">utils</a></tt><tt class="py-op">.</tt><tt id="link-11" class="py-name"><a title="parsimony.utils.maths.corr" class="py-name" href="#" onclick="return doclink('link-11', 'corr', 'link-7');">corr</a></tt><tt class="py-op">(</tt><tt class="py-name">x</tt><tt class="py-op">,</tt> <tt class="py-name">Y</tt><tt class="py-op">)</tt> <tt class="py-op">&lt;</tt> <tt class="py-number">0</tt><tt class="py-op">:</tt> </tt>
+<a name="L49"></a><tt class="py-lineno">49</tt>  <tt class="py-line">                <tt class="py-name">x</tt> <tt class="py-op">*=</tt> <tt class="py-op">-</tt><tt class="py-number">1</tt> </tt>
+<a name="L50"></a><tt class="py-lineno">50</tt>  <tt class="py-line">            <tt class="py-name">X</tt><tt class="py-op">[</tt><tt class="py-op">:</tt><tt class="py-op">,</tt> <tt class="py-name">j</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">x</tt><tt class="py-op">.</tt><tt class="py-name">ravel</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L51"></a><tt class="py-lineno">51</tt>  <tt class="py-line"> </tt>
+<a name="L52"></a><tt class="py-lineno">52</tt>  <tt class="py-line">    <tt class="py-name">X</tt><tt class="py-op">[</tt><tt class="py-op">:</tt><tt class="py-op">,</tt> <tt class="py-name">n</tt> <tt class="py-op">-</tt> <tt class="py-number">1</tt><tt class="py-op">]</tt> <tt class="py-op">=</tt> <tt class="py-name">Y</tt><tt class="py-op">.</tt><tt class="py-name">ravel</tt><tt class="py-op">(</tt><tt class="py-op">)</tt> </tt>
+<a name="L53"></a><tt class="py-lineno">53</tt>  <tt class="py-line"> </tt>
+<a name="L54"></a><tt class="py-lineno">54</tt>  <tt class="py-line">    <tt class="py-keyword">return</tt> <tt class="py-name">X</tt><tt class="py-op">,</tt> <tt class="py-name">Y</tt> </tt>
+</div><a name="L55"></a><tt class="py-lineno">55</tt>  <tt class="py-line"> </tt>
+<a name="L56"></a><tt class="py-lineno">56</tt>  <tt class="py-line"> </tt>
+<a name="L57"></a><tt class="py-lineno">57</tt>  <tt class="py-line"><tt class="py-comment">#def check_ortho(M, err_msg):</tt> </tt>
+<a name="L58"></a><tt class="py-lineno">58</tt>  <tt class="py-line"><tt class="py-comment">#    K = np.dot(M.T, M)</tt> </tt>
+<a name="L59"></a><tt class="py-lineno">59</tt>  <tt class="py-line"><tt class="py-comment">#    assert_array_almost_equal(K, np.diag(np.diag(K)), err_msg=err_msg)</tt> </tt>
+<a name="L60"></a><tt class="py-lineno">60</tt>  <tt class="py-line"> </tt><script type="text/javascript">
 <!--
 expandto(location.href);
 // -->
@@ -240,7 +177,7 @@ expandto(location.href);
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Sun Jul  6 11:32:53 2014
+    Generated by Epydoc 3.0.1 on Thu Oct  2 23:35:48 2014
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
