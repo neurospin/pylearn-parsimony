@@ -4,9 +4,8 @@ Getting the dependencies
 ========================
 
 The reference environment for pylearn-parsimony is Ubuntu 12.04 LTS with
-Python 2.7.3, Numpy 1.6.1 and Scipy 0.9.0. More recent versions likely w
-ork,
-but have not been tested thoroughly.
+Python 2.7.3, Numpy 1.6.1 and Scipy 0.9.0. More recent versions likely
+work, but have not been tested thoroughly.
 
 Unless you already have Numpy and Scipy installed, you need to install them:
 
@@ -39,6 +38,5 @@ You can check out the latest sources with the command:
     git clone git@github.com:neurospin/pylearn-parsimony.git
     # or
     git clone https://github.com/neurospin/pylearn-parsimony.git
-
 
 Then add ``pylearn-parsimony`` directory in your ``$PYTHONPATH``

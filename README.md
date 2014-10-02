@@ -15,7 +15,7 @@ ParsimonY contains the following features:
     * Algorithms:
         * _I_ terative _S_ hrinkage-_T_ hresholding _A_ lgorithm (fista)
         * _F_ ast _I_ terative _S_ hrinkage-_T_ hresholding _A_ lgorithm (fista)
-        * _CO_ ntinuation of _NEST_ sterov’s smoothing _A_ lgorithm (conesta)
+        * _CO_ ntinuation of _NEST_ erov’s smoothing _A_ lgorithm (conesta)
         * Excessive gap method
     * Estimators
         * LinearRegression

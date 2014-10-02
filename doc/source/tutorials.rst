@@ -339,7 +339,7 @@ CONESTA
 -------
 
 We applied FISTA ([FISTA2009]_) in the previous sections. In this section, we
-switch to Dynamic CONESTA and Static CONESTA to minimise the function.
+switch to CONESTA to minimise the function.
 
 .. code-block:: python
 
@@ -350,16 +350,11 @@ switch to Dynamic CONESTA and Static CONESTA to minimise the function.
     l = 0.1  # l1 lasso coefficient
     g = 0.1  # tv coefficient
     Atv, n_compacts = tv.linear_operator_from_shape(shape)
-    tvl1l2_conesta_static = estimators.LinearRegressionL1L2TV(
+    tvl1l2_conesta = estimators.LinearRegressionL1L2TV(
                                           k, l, g, A=Atv,
-                                          algorithm=algorithms.StaticCONESTA())
-    res = tvl1l2_conesta_static.fit(X, y)
-    print "Estimated beta error =", np.linalg.norm(tvl1l2_conesta_static.beta - beta)
-    tvl1l2_conesta_dynamic = estimators.LinearRegressionL1L2TV(
-                                         k, l, g, A=Atv,
-                                         algorithm=algorithms.DynamicCONESTA())
-    res = tvl1l2_conesta_dynamic.fit(X, y)
-    print "Estimated beta error =", np.linalg.norm(tvl1l2_conesta_dynamic.beta - beta)
+                                          algorithm=algorithms.CONESTA())
+    res = tvl1l2_conesta.fit(X, y)
+    print "Estimated beta error =", np.linalg.norm(tvl1l2_conesta.beta - beta)
 
 Excessive gap method
 --------------------
