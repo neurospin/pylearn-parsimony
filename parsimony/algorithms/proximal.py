@@ -821,7 +821,7 @@ class ADMM(bases.ExplicitAlgorithm,
                      Info.fvalue,
                      Info.converged]
 
-    def __init__(self, rho=1.0, mu=10.0, tau=1.0001,
+    def __init__(self, rho=1.0, mu=10.0, tau=2.0,
                  info=[],
                  eps=consts.TOLERANCE, max_iter=1000, min_iter=1):
                  # TODO: Investigate what is a good default value here!
