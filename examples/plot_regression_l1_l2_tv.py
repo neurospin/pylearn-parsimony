@@ -22,7 +22,7 @@ from sklearn.metrics import r2_score
 n_samples = 500
 shape = (100, 100, 1)
 X3d, y, beta3d = datasets.regression.dice5.load(n_samples=n_samples,
-    shape=shape, r2=.75, random_seed=0)
+shape=shape, r2=.75, random_seed=1, obj_pix_ratio=2.)
 X = X3d.reshape((n_samples, np.prod(shape)))
 n_train = 100
 Xtr = X[:n_train, :]
@@ -50,7 +50,7 @@ yte_pred_enet = enet.fit(Xtr, ytr).predict(Xte)
 #
 l1, l2, tv = alpha * np.array((.33, .33, .33))  # l1, l2, tv penalties
 A, n_compacts = nesterov_tv.linear_operator_from_shape(shape)
-algo = algorithms.primaldual.StaticCONESTA(max_iter=500)
+algo = algorithms.proximal.CONESTA(max_iter=500)
 enettv = estimators.LinearRegressionL1L2TV(l1, l2, tv, A, algorithm=algo)
 yte_pred_enettv = enettv.fit(Xtr, ytr).predict(Xte)
 
@@ -59,16 +59,14 @@ yte_pred_enettv = enettv.fit(Xtr, ytr).predict(Xte)
 
 # TODO: Please remove dependence on scikit-learn. Add required functionality
 # to parsimony instead.
-limits = np.array((beta3d.min(), beta3d.max()))
 plot = plt.subplot(131)
 utils.plot_map2d(beta3d.reshape(shape), plot, title="beta star")
 plot = plt.subplot(132)
 utils.plot_map2d(enet.beta.reshape(shape), plot, title="beta enet (R2=%.2f)" %
-    r2_score(yte, yte_pred_enet), limits=limits/1.)
+    r2_score(yte, yte_pred_enet))
 #utils.plot_map2d(enet.coef_.reshape(shape), plot, title="beta enet (R2=%.2f)" %
 #    r2_score(yte, yte_pred_enet), limits=limits/1.)
 plot = plt.subplot(133)
 utils.plot_map2d(enettv.beta.reshape(shape), plot,
-                 title="beta enettv (R2=%.2f)"  % r2_score(yte, yte_pred_enettv),
-                 limits=limits/10.)
+                 title="beta enettv (R2=%.2f)"  % r2_score(yte, yte_pred_enettv))
 plt.show()

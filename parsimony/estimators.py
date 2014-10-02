@@ -725,7 +725,7 @@ class LinearRegressionL1L2TV(RegressionEstimator):
     ...                     mean=False)
     >>> res = lr.fit(X, y)
     >>> round(lr.score(X, y), 13)
-    0.0683585895559
+    0.0683583406798
     >>>
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                                algorithm=proximal.FISTA(max_iter=1000),
@@ -940,7 +940,7 @@ class LinearRegressionL1L2GL(RegressionEstimator):
     ...                                  mean=False)
     >>> res = lr.fit(X, y)
     >>> round(lr.score(X, y), 11)
-    0.61110459348
+    0.61139525439
     >>>
     >>> lr = estimators.LinearRegressionL1L2GL(l1, l2, gl, A,
     ...                                   algorithm=proximal.FISTA(),

@@ -61,7 +61,7 @@ def load(n_samples=100, shape=(30, 30, 1),
     ...     n_samples=n_samples, shape=shape, snr=5, random_seed=1)
     >>> print "Likelihood = %f" % (np.prod(proba[y.ravel()==1])
     ...                          * np.prod(1-proba[y.ravel()==0]))
-    Likelihood = 0.000002
+    Likelihood = 0.000004
     >>> X3d, y, beta3d, proba = datasets.classification.dice5.load(
     ...     n_samples=n_samples, shape=shape, sigma_logit=5., random_seed=1)
     >>> print "Likelihood = %f" % (np.prod(proba[y.ravel()==1])

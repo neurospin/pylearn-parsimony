@@ -2856,8 +2856,7 @@ class TestLinearRegression(TestCase):
                                       mean=False)
         logreg_dynamic.fit(X, y)
         err = logreg_dynamic.score(X, y)
-#        print err
-        assert_less(err, 0.0259,
+        assert_less(err, 0.02591,
                     msg="The found regression vector is not correct.")
 
         np.random.seed(42)
