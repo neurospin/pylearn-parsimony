@@ -302,19 +302,14 @@ class FISTA(bases.ExplicitAlgorithm,
 
             if self.conesta_stop is not None:
                 mu_min = self.conesta_stop[0]
-#                print "mu_min:", mu_min
                 mu_old = function.set_mu(mu_min)
-#                print "mu_old:", mu_old
                 stop_step = function.step(betanew)
-#                print "step  :", step
+
                 # Take one ISTA step for use in the stopping criterion.
                 stop_z = function.prox(betanew - stop_step \
                                                     * function.grad(betanew),
                                   stop_step)
                 function.set_mu(mu_old)
-#                print "err   :", maths.norm(betanew - z)
-#                print "sc err:", (1.0 / step) * maths.norm(betanew - z)
-#                print "eps   :", self.eps
 
                 if (1. / stop_step) * maths.norm(betanew - stop_z) < self.eps \
                         and i >= self.min_iter:
@@ -328,22 +323,17 @@ class FISTA(bases.ExplicitAlgorithm,
 
                 gap = function.gap(betanew,
                                    eps=self.eps, max_iter=self.max_iter)
-                #print "FISTA", ", mu:", function.get_mu(), ", eps:", self.eps, ", gap:", gap
 
                 # TODO: Warn if G_new < -consts.TOLERANCE.
                 gap = abs(gap)  # May happen close to machine epsilon.
                 if self.info_requested(Info.gap):
                     gap_.append(gap)
-#                print "FISTA gap:", gap, ", eps:", self.eps, ", f:", function.fmu(betanew)
 
                 if gap < self.eps:
                     if self.info_requested(Info.converged):
                         self.info_set(Info.converged, True)
 
-#                    print "FISTA: Gap < eps!"
-
                     break
-#                    pass
             else:
                 if step > 0.0:
                     if (1.0 / step) * maths.norm(betanew - z) < self.eps \
@@ -425,7 +415,7 @@ class CONESTA(bases.ExplicitAlgorithm,
         super(CONESTA, self).__init__(info=info,
                                       max_iter=max_iter, min_iter=min_iter)
 
-        self.mu_min = max(consts.TOLERANCE, float(mu_min))
+        self.mu_min = max(consts.FLOAT_EPSILON, float(mu_min))
         self.tau = max(consts.TOLERANCE,
                        min(float(tau), 1.0 - consts.TOLERANCE))
         self.eps = max(consts.TOLERANCE, float(eps))
@@ -434,11 +424,14 @@ class CONESTA(bases.ExplicitAlgorithm,
     @bases.check_compatibility
     def run(self, function, beta):
 
-        # Copy the allowed info keys for FISTA. CONESTA always ask the gap.
-        fista_info = [Info.gap]
+        # Copy the allowed info keys for FISTA.
+        fista_info = list()
         for nfo in self.info_copy():
             if nfo in FISTA.INFO_PROVIDED:
                 fista_info.append(nfo)
+        # CONESTA always asks for the gap.
+        if Info.gap not in fista_info:
+            fista_info.append(Info.gap)
 
         # Create the inner algorithm.
         algorithm = FISTA(use_gap=True, info=fista_info, eps=self.eps,
@@ -448,18 +441,18 @@ class CONESTA(bases.ExplicitAlgorithm,
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, False)
 
-        # Time the init computation  (essentialy Lipchitz within mu_opt).
+        # Time the init computation (essentialy Lipchitz constant in mu_opt).
         if self.info_requested(Info.time):
             init_time = utils.time_cpu()
 
-        # Compute gap, precision (decreased by tau) and mu 
+        # Compute current gap, precision eps (gap decreased by tau) and mu.
         gap = function.gap(beta, eps=self.eps, max_iter=self.max_iter)
         eps = self.tau * gap
         mu = function.mu_opt(eps)
         function.set_mu(mu)
         gM = function.eps_max(1.0)
 
-        # Initialise info variables. suffixed with "_"
+        # Initialise info variables. Info variables have the suffix "_".
         if self.info_requested(Info.time):
             t_ = []
             init_time = utils.time_cpu() - init_time
@@ -471,6 +464,7 @@ class CONESTA(bases.ExplicitAlgorithm,
             self.info_set(Info.converged, False)
         if self.info_requested(Info.mu):
             mu_ = []
+
         i = 0  # Iteration counter.
         while True:
             converged = False
@@ -478,19 +472,20 @@ class CONESTA(bases.ExplicitAlgorithm,
             # Current precision.
             derived_eps = eps - mu * gM
 
-            # FISTA
+            # Set current parameters to algorithm.
             algorithm.set_params(eps=derived_eps,
                                  max_iter=self.max_iter - self.num_iter)
+            # Run FISTA.
             beta = algorithm.run(function, beta)
 
             # Get info from algorithm.
             if Info.time in algorithm.info and \
-               self.info_requested(Info.time):
+                    self.info_requested(Info.time):
                 t_ += algorithm.info_get(Info.time)
-                if i == 0:  # add init time to first iteration
+                if i == 0:  # Add init time to first iteration.
                     t_[0] += init_time
             if Info.fvalue in algorithm.info and \
-                self.info_requested(Info.fvalue):
+                    self.info_requested(Info.fvalue):
                 f_ += algorithm.info_get(Info.fvalue)
             if self.info_requested(Info.mu):
                 mu_ += [mu] * algorithm.num_iter
@@ -499,27 +494,27 @@ class CONESTA(bases.ExplicitAlgorithm,
 
             #print gap, derived_eps, eps, mu, self.tau, self.num_iter
 
-            # Update iteration counter.
+            # Update global iteration count.
             self.num_iter += algorithm.num_iter
 
-            # get gap from last FISTA run
-            gap = algorithm.info_get(Info.gap)[-1]
+            # Obtain the gap from the last FISTA run. May be small and negative
+            # close to machine epsilon.
+            gap = abs(algorithm.info_get(Info.gap)[-1])
             # TODO: Warn if gap < -consts.TOLERANCE.
 
-            # TODO check is current mu can be used here: Yes it must be the
-            # same mu used in the gap computation
             if gap < self.eps - mu * gM:
-                converged = True
                 if self.info_requested(Info.converged):
                     self.info_set(Info.converged, True)
+                converged = True
 
-            # Stopping criteria
+            # Stopping criteria.
             if converged or self.num_iter >= self.max_iter or \
-               mu < consts.TOLERANCE:
+                    (eps < consts.TOLERANCE and mu < consts.TOLERANCE):
                 break
 
-            # Update the precision eps and mu
+            # Update the precision eps.
             eps = self.tau * (gap + mu * gM)
+            # Compute and update mu.
             mu = max(self.mu_min, min(function.mu_opt(eps), mu))
             function.set_mu(mu)
 
