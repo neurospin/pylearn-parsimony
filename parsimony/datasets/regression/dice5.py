@@ -17,7 +17,7 @@ from parsimony.datasets.utils import Dot, ObjImage, spatial_smoothing, corr_to_c
 def load(n_samples=100, shape=(30, 30, 1),
                            r2=.75,
                            sigma_spatial_smoothing=1,
-                           signal_std_pixel_obj_ratio=1.,
+                           obj_pix_ratio=2.,
                            model = "independant",
                            random_seed=None):
     """Generates regression samples (images + target variable) and beta.
@@ -89,12 +89,12 @@ def load(n_samples=100, shape=(30, 30, 1),
             are usefull since they are suppressing unwilling variance that stem
             from latents l12 and l45.
 
-    signal_std_pixel_obj_ratio: Float. Controls the ratio between object-level signal
+    obj_pix_ratio: Float. Controls the ratio between object-level signal
             and pixel-level signal for pixels within objects. If
-            signal_std_pixel_obj_ratio == 1 then 100% of the signal of pixels within
+            obj_pix_ratio == 1 then 100% of the signal of pixels within
             the same object is shared (ie.: no pixel level) signal. If
-            signal_std_pixel_obj_ratio == 0 then all the signal is pixel specific.
-            High signal_std_pixel_obj_ratio promotes spatial correlation between
+            obj_pix_ratio == 0 then all the signal is pixel specific.
+            High obj_pix_ratio promotes spatial correlation between
             pixels of the same object.
 
     random_seed: None or integer. See numpy.random.seed(). If not None, it can
@@ -156,8 +156,9 @@ def load(n_samples=100, shape=(30, 30, 1),
     >>> X3d, y, beta3d = datasets.regression.dice5.load(n_samples=n_samples,
     ...     shape=shape, r2=.5, random_seed=1)
     """
-    # TODO use signal_std_pixel_obj_ratio to fix signal_std_obj
-    signal_std_pix = signal_std_obj = 1  # items std-dev
+    # TODO use obj_pix_ratio to fix signal_std_obj
+    signal_std_pix = 1.  # items std-dev
+    signal_std_obj = float(obj_pix_ratio) / signal_std_pix 
     mu_e = 0
     if shape[0] < 5 or shape[1] < 5:
         raise ValueError("Shape too small. The minimun is (5, 5, 0)")
@@ -247,7 +248,7 @@ def load(n_samples=100, shape=(30, 30, 1),
     ## 4. Pixel-level signal structure: spatial smoothing
     if sigma_spatial_smoothing != 0:
         X3d = spatial_smoothing(X3d, sigma_spatial_smoothing, mu_e,
-                                  signal_std_pix)
+                                  obj_pix_ratio)
     X = X3d.reshape((X3d.shape[0], np.prod(X3d.shape[1:])))
     X -= X.mean(axis=0)
     X /= X.std(axis=0)
