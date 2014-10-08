@@ -15,7 +15,10 @@ Created on Mon Feb  3 09:55:51 2014
 """
 import abc
 
+import numpy as np
+
 from .. import properties
+import parsimony.utils.consts as consts
 
 __all__ = ["MultiblockFunction", "MultiblockGradient",
            "MultiblockLipschitzContinuousGradient",
@@ -57,18 +60,49 @@ class MultiblockGradient(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def grad(self, w, index):
+    def grad(self, x, index):
         """Gradient of the function.
 
         Parameters
         ----------
-        w : List of numpy arrays. The weight vectors, w[index] is the point at
+        x : List of numpy arrays. The weight vectors, x[index] is the point at
                 which to evaluate the gradient.
 
-        index : Non-negative integer. Which variable the step is for.
+        index : Non-negative integer. Which variable the gradient is for.
         """
         raise NotImplementedError('Abstract method "grad" must be '
                                   'specialised!')
+
+    def approx_grad(self, x, index, eps=1e-4):
+        """Numerical approximation of the gradient.
+
+        Parameters
+        ----------
+        x : List of numpy arrays. The weight vectors, x[index] is the point at
+                which to evaluate the gradient.
+
+        index : Non-negative integer. Which variable the gradient is for.
+
+        eps : Positive integer. The precision of the numerical solution.
+                Smaller is better, but too small may result in floating point
+                precision errors.
+        """
+        x_ = x[index]
+        p = x_.shape[0]
+        grad = np.zeros(x_.shape)
+#        if isinstance(self, (Penalty, Constraint)):
+#            start = self.penalty_start
+#        else:
+        start = 0
+        for i in xrange(start, p):
+            x_[i, 0] -= eps
+            loss1 = self.f(x)
+            x_[i, 0] += 2.0 * eps
+            loss2 = self.f(x)
+            x_[i, 0] -= eps
+            grad[i, 0] = (loss2 - loss1) / (2.0 * eps)
+
+        return grad
 
 
 class MultiblockLipschitzContinuousGradient(object):
@@ -96,7 +130,7 @@ class MultiblockProximalOperator(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def prox(self, w, index, factor=1.0):
+    def prox(self, w, index, factor=1.0, eps=consts.TOLERANCE, max_iter=100):
         """A proximal operator of the non-differentiable part of the function
         with the given index.
 
@@ -118,7 +152,7 @@ class MultiblockProjectionOperator(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def proj(self, w, index):
+    def proj(self, w, index, eps=consts.TOLERANCE, max_iter=100):
         """The projection operator of a constraint that corresponds to the
         function with the given index.
 

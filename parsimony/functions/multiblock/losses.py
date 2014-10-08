@@ -16,11 +16,11 @@ import numbers
 
 import numpy as np
 
-#import parsimony.utils as utils
+import parsimony.utils as utils
+import parsimony.utils.maths as maths
 import parsimony.functions.properties as properties
 import parsimony.utils.consts as consts
 import properties as mb_properties
-#import parsimony.functions.nesterov.properties as n_properties
 
 __all__ = ["CombinedMultiblockFunction",
            "MultiblockFunctionWrapper", "MultiblockNesterovFunctionWrapper",
@@ -50,7 +50,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
     NesterovFunctions. All functions and penalties must thus have Gradients,
     unless they are ProximalOperators.
 
-    If no ProximalOperator is given, prox is the identity.
+    If no ProximalOperator is given, prox will be the identity.
 
     Parameters
     ----------
@@ -275,7 +275,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
 
         return grad
 
-    def prox(self, w, index, factor=1.0):
+    def prox(self, w, index, factor=1.0, eps=consts.TOLERANCE, max_iter=100):
         """The proximal operator of the non-differentiable part of the
         function with the given index.
 
@@ -300,20 +300,20 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
             prox_w = prox[0].prox(w[index])
 
         elif len(prox) == 0 and (len(proj) == 1 or len(proj) == 2):
-            prox_w = self.proj(w, index)
+            prox_w = self.proj(w, index, eps=eps, max_iter=max_iter)
 
         else:
             from parsimony.algorithms.proximal \
                     import ParallelDykstrasProximalAlgorithm
             combo = ParallelDykstrasProximalAlgorithm(output=False,
-                                                      eps=consts.TOLERANCE,
-                                                      max_iter=consts.MAX_ITER,
+                                                      eps=eps,
+                                                      max_iter=max_iter,
                                                       min_iter=1)
             prox_w = combo.run(w[index], prox=prox, proj=proj, factor=factor)
 
         return prox_w
 
-    def proj(self, w, index):
+    def proj(self, w, index, eps=consts.TOLERANCE, max_iter=100):
         """The projection operator of a constraint that corresponds to the
         function with the given index.
 
@@ -328,14 +328,18 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
         prox = self._prox[index]
         proj = self._c[index]
         if len(proj) == 1 and len(prox) == 0:
-            proj_w = proj[0].proj(w[index])
+            proj_w = proj[0].proj(w[index], eps=eps, max_iter=max_iter)
 
         elif len(proj) == 2 and len(prox) == 0:
-            constraint = properties.CombinedProjectionOperator(proj)
-            proj_w = constraint.proj(w[index])
+            from parsimony.algorithms.proximal \
+                    import DykstrasProjectionAlgorithm
+            combo = DykstrasProjectionAlgorithm(eps=eps,
+                                                max_iter=max_iter, min_iter=1)
+
+            proj_w = combo.run(proj, w[index])
 
         else:
-            proj_w = self.prox(w, index)
+            proj_w = self.prox(w, index, eps=eps, max_iter=max_iter)
 
         return proj_w
 
@@ -494,7 +498,7 @@ class MultiblockFunctionWrapper(properties.CompositeFunction,
                                   self.w[self.index + 1:],
                                   self.index)
 
-    def prox(self, w, factor=1.0):
+    def prox(self, w, factor=1.0, eps=consts.TOLERANCE, max_iter=100):
         """The proximal operator corresponding to the function.
 
         Parameters
@@ -508,7 +512,8 @@ class MultiblockFunctionWrapper(properties.CompositeFunction,
         return self.function.prox(self.w[:self.index] + \
                                   [w] + \
                                   self.w[self.index + 1:],
-                                  self.index, factor)
+                                  self.index, factor=factor,
+                                  eps=eps, max_iter=max_iter)
 
     def step(self, w, index=0):
         """The step size to use in descent methods.
@@ -777,17 +782,22 @@ class MultiblockNesterovFunctionWrapper(MultiblockFunctionWrapper,
 
 
 class LatentVariableCovariance(mb_properties.MultiblockFunction,
-                           mb_properties.MultiblockGradient,
-                           mb_properties.MultiblockLipschitzContinuousGradient,
-                           properties.Eigenvalues):
+                          mb_properties.MultiblockGradient,
+                          mb_properties.MultiblockLipschitzContinuousGradient):
+                           #properties.Eigenvalues):
+    """Represents
 
+        Cov(X.w, Y.c) = (1 / (n - 1)) * w'.X'.Y.c,
+
+    where X.w and Y.c are latent variables.
+    """
     def __init__(self, X, unbiased=True):
 
         self.X = X
         if unbiased:
-            self.n = X[0].shape[0] - 1.0
+            self.n = float(X[0].shape[0] - 1.0)
         else:
-            self.n = X[0].shape[0]
+            self.n = float(X[0].shape[0])
 
         self.reset()
 
@@ -803,27 +813,42 @@ class LatentVariableCovariance(mb_properties.MultiblockFunction,
         wX = np.dot(self.X[0], w[0]).T
         Yc = np.dot(self.X[1], w[1])
         wXYc = np.dot(wX, Yc)
-        return -wXYc[0, 0] / float(self.n)
+
+        return -wXYc[0, 0] / self.n
 
     def grad(self, w, index):
         """Gradient of the function.
 
         From the interface "MultiblockGradient".
+
+        Parameters
+        ----------
+        w : List of numpy arrays. The weight vectors, w[index] is the point at
+                which to evaluate the gradient.
+
+        index : Non-negative integer. Which variable the gradient is for.
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from parsimony.functions.multiblock.losses import LatentVariableCovariance
+        >>>
+        >>> np.random.seed(42)
+        >>> X = np.random.rand(100, 150)
+        >>> Y = np.random.rand(100, 50)
+        >>> w = np.random.rand(150, 1)
+        >>> c = np.random.rand(50, 1)
+        >>> cov = LatentVariableCovariance([X, Y])
+        >>> grad = cov.grad([w, c], 0)
+        >>> approx_grad = cov.approx_grad([w, c], 0)
+        >>> round(np.linalg.norm(grad - approx_grad), 9)
+        1.2e-08
         """
         index = int(index)
         grad = -np.dot(self.X[index].T,
                        np.dot(self.X[1 - index], w[1 - index])) \
-             * (1.0 / float(self.n))
+             * (1.0 / self.n)
 
-#        def fun(x):
-#            w_ = [0, 0]
-#            w_[index] = x
-#            w_[1 - index] = w[1 - index]
-#            return self.f(w_)
-#        approx_grad = utils.approx_grad(fun, w[index], eps=1e-6)
-#        print "LatentVariableCovariance:", maths.norm(grad - approx_grad)
-
-#        print "grad:", grad
         return grad
 
     def L(self, w, index):
@@ -831,26 +856,112 @@ class LatentVariableCovariance(mb_properties.MultiblockFunction,
 
         From the interface "MultiblockLipschitzContinuousGradient".
         """
-#        return maths.norm(self.grad(w, index))
+        # Any positive real number suffices, but a small one will give a larger
+        # step in e.g. proximal gradient descent.
+        return np.sqrt(consts.TOLERANCE)  # 1.0
 
-#        if self._lambda_max is None:
-#            self._lambda_max = self.lambda_max()
+#    def lambda_max(self):
+#        """ Largest eigenvalue of the corresponding covariance matrix.
+#
+#        From the interface "Eigenvalues".
+#        """
+#        # Note that we can save the state here since lmax(A) does not
+#
+#        from algorithms import FastSVDProduct
+#        svd = FastSVDProduct()
+#        v = svd(self.X[0].T, self.X[1], max_iter=100)
+#        s = np.dot(self.X[0].T, np.dot(self.X[1], v))
+#
+#        return np.sum(s ** 2.0) / (self.n ** 2.0)
 
-        return 1.0  # self._lambda_max
 
-    def lambda_max(self):
-        """ Largest eigenvalue of the corresponding covariance matrix.
+class LatentVariableCovarianceSquared(mb_properties.MultiblockFunction,
+                          mb_properties.MultiblockGradient,
+                          mb_properties.MultiblockLipschitzContinuousGradient):
+    """Represents
 
-        From the interface "Eigenvalues".
+        Cov(X.w, Y.c)² = ((1 / (n - 1)) * w'.X'.Y.c)²,
+
+    where X.w and Y.c are latent variables.
+    """
+    def __init__(self, X, unbiased=True):
+
+        self.X = X
+        if unbiased:
+            self.n = float(X[0].shape[0] - 1.0)
+        else:
+            self.n = float(X[0].shape[0])
+
+        self.reset()
+
+    def reset(self):
+        pass
+
+    def f(self, w):
+        """Function value.
+
+        From the interface "Function".
+
+        Parameters
+        ----------
+        w : Numpy array (p-by-1). The point at which to evaluate the function.
         """
-        # Note that we can save the state here since lmax(A) does not
+        wX = np.dot(self.X[0], w[0]).T
+        Yc = np.dot(self.X[1], w[1])
+        wXYc = np.dot(wX, Yc)[0, 0]
 
-        from algorithms import FastSVDProduct
-        svd = FastSVDProduct()
-        v = svd(self.X[0].T, self.X[1], max_iter=100)
-        s = np.dot(self.X[0].T, np.dot(self.X[1], v))
+        return -((wXYc / self.n) ** 2.0)
 
-        return np.sum(s ** 2.0) / (self.n ** 2.0)
+    def grad(self, w, index):
+        """Gradient of the function.
+
+        From the interface "MultiblockGradient".
+
+        Parameters
+        ----------
+        w : List of numpy arrays. The weight vectors, w[index] is the point at
+                which to evaluate the gradient.
+
+        index : Non-negative integer. Which variable the gradient is for.
+
+        Examples
+        --------
+        >>> import numpy as np
+        >>> from parsimony.functions.multiblock.losses import LatentVariableCovarianceSquared
+        >>>
+        >>> np.random.seed(42)
+        >>> X = np.random.rand(100, 150)
+        >>> Y = np.random.rand(100, 50)
+        >>> w = np.random.rand(150, 1)
+        >>> c = np.random.rand(50, 1)
+        >>> cov = LatentVariableCovarianceSquared([X, Y])
+        >>> grad = cov.grad([w, c], 0)
+        >>> approx_grad = cov.approx_grad([w, c], 0)
+        >>> round(np.linalg.norm(grad - approx_grad), 9)
+        1.0413e-05
+        """
+        wX = np.dot(self.X[0], w[0]).T
+        Yc = np.dot(self.X[1], w[1])
+        wXYc = np.dot(wX, Yc)[0, 0]
+
+        index = int(index)
+        grad = np.dot(self.X[index].T,
+                      np.dot(self.X[1 - index], w[1 - index])) \
+             * ((2.0 * wXYc) / (self.n * self.n))
+
+        return -grad
+
+    def L(self, w, index):
+        """Lipschitz constant of the gradient with given index.
+
+        From the interface "MultiblockLipschitzContinuousGradient".
+        """
+        index = int(index)
+        grad = np.dot(self.X[index].T,
+                      np.dot(self.X[1 - index], w[1 - index])) \
+             * (1.0 / self.n)
+
+        return 2.0 * maths.norm(grad) ** 2.0
 
 
 class GeneralisedMultiblock(mb_properties.MultiblockFunction,

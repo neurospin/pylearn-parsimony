@@ -241,13 +241,14 @@ class ProjectionOperator(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def proj(self, beta):
+    def proj(self, beta, eps=consts.TOLERANCE, max_iter=100):
         """The projection operator corresponding to the function.
         """
         raise NotImplementedError('Abstract method "proj" must be '
                                   'specialised!')
 
 
+# TODO: Remove.
 class CombinedProjectionOperator(Function, ProjectionOperator):
 
     def __init__(self, functions):

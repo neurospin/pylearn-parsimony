@@ -1260,7 +1260,7 @@ class RGCCAConstraint(QuadraticConstraint,
 
         return xtMx <= self.c
 
-    def proj(self, beta):
+    def proj(self, beta, **kwargs):
         """The projection operator corresponding to the function.
 
         From the interface "ProjectionOperator".

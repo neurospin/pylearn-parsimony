@@ -478,6 +478,9 @@ class CONESTA(bases.ExplicitAlgorithm,
             # Run FISTA.
             beta = algorithm.run(function, beta)
 
+            # Update global iteration count.
+            self.num_iter += algorithm.num_iter
+
             # Get info from algorithm.
             if Info.time in algorithm.info and \
                     self.info_requested(Info.time):
@@ -493,9 +496,6 @@ class CONESTA(bases.ExplicitAlgorithm,
                 gap_ += algorithm.info_get(Info.gap)
 
             #print gap, derived_eps, eps, mu, self.tau, self.num_iter
-
-            # Update global iteration count.
-            self.num_iter += algorithm.num_iter
 
             # Obtain the gap from the last FISTA run. May be small and negative
             # close to machine epsilon.
@@ -914,12 +914,10 @@ class DykstrasProximalAlgorithm(bases.ExplicitAlgorithm):
     INTERFACES = [properties.Function,
                   properties.ProximalOperator]
 
-    def __init__(self, output=False,
-                 eps=consts.TOLERANCE,
-                 max_iter=10000, min_iter=1):
+    def __init__(self, eps=consts.TOLERANCE,
+                 max_iter=1000, min_iter=1):
                  # TODO: Investigate what is a good default value here!
 
-        self.output = output
         self.eps = eps
         self.max_iter = max_iter
         self.min_iter = min_iter
@@ -968,12 +966,10 @@ class DykstrasProjectionAlgorithm(bases.ExplicitAlgorithm):
     INTERFACES = [properties.Function,
                   properties.ProjectionOperator]
 
-    def __init__(self, output=False,
-                 eps=consts.TOLERANCE,
-                 max_iter=10000, min_iter=1):
+    def __init__(self, eps=consts.TOLERANCE,
+                 max_iter=1000, min_iter=1):
                  # TODO: Investigate what is a good default value here!
 
-        self.output = output
         self.eps = eps
         self.max_iter = max_iter
         self.min_iter = min_iter
@@ -1021,12 +1017,10 @@ class ParallelDykstrasProjectionAlgorithm(bases.ExplicitAlgorithm):
     INTERFACES = [properties.Function,
                   properties.ProjectionOperator]
 
-    def __init__(self, output=False,
-                 eps=consts.TOLERANCE,
+    def __init__(self, eps=consts.TOLERANCE,
                  max_iter=100, min_iter=1):
                  # TODO: Investigate what is a good default value here!
 
-        self.output = output
         self.eps = eps
         self.max_iter = max_iter
         self.min_iter = min_iter
@@ -1095,12 +1089,10 @@ class ParallelDykstrasProximalAlgorithm(bases.ExplicitAlgorithm):
                   properties.OR(properties.ProjectionOperator,
                                 properties.ProximalOperator)]
 
-    def __init__(self, output=False,
-                 eps=consts.TOLERANCE,
+    def __init__(self, eps=consts.TOLERANCE,
                  max_iter=100, min_iter=1):
                  # TODO: Investigate what is a good default value here!
 
-        self.output = output
         self.eps = eps
         self.max_iter = max_iter
         self.min_iter = min_iter

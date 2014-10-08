@@ -25,10 +25,10 @@ except ValueError:
 import parsimony.utils.consts as consts
 from parsimony.algorithms.utils import Info
 import parsimony.utils.maths as maths
-#import parsimony.functions.properties as properties
+import parsimony.functions.properties as properties
 import parsimony.functions.multiblock.properties as multiblock_properties
 import parsimony.functions.multiblock.losses as mb_losses
-from parsimony.algorithms.proximal import FISTA
+from parsimony.algorithms.proximal import FISTA, ISTA
 
 __all__ = ["MultiblockFISTA"]
 
@@ -80,29 +80,29 @@ __all__ = ["MultiblockFISTA"]
 class MultiblockFISTA(bases.ExplicitAlgorithm,
                       bases.IterativeAlgorithm,
                       bases.InformationAlgorithm):
-    """ The projected gradient algorithm with alternating minimisations in a
-    multiblock setting.
+    """The projected or proximal gradient algorithm with alternating
+    minimisations in a multiblock setting.
 
     Parameters
     ----------
-    info : List or tuple of utils.consts.Info. What, if any, extra run
-            information should be stored. Default is an empty list, which means
-            that no run information is computed nor returned.
+    info : List or tuple of utils.Info. What, if any, extra run information
+            should be stored. Default is an empty list, which means that no
+            run information is computed nor returned.
 
     eps : Positive float. Tolerance for the stopping criterion.
 
-    outer_iter : Non-negative integer. Maximum allowed number of outer loop
+    max_iter : Non-negative integer. Maximum total allowed number of
             iterations.
-
-    max_iter : Non-negative integer. Maximum allowed number of iterations.
 
     min_iter : Non-negative integer less than or equal to max_iter. Minimum
             number of iterations that must be performed. Default is 1.
     """
     INTERFACES = [multiblock_properties.MultiblockFunction,
                   multiblock_properties.MultiblockGradient,
-                  multiblock_properties.MultiblockProjectionOperator,
-                  multiblock_properties.MultiblockStepSize]
+                  multiblock_properties.MultiblockStepSize,
+                  properties.OR(
+                          multiblock_properties.MultiblockProjectionOperator,
+                          multiblock_properties.MultiblockProximalOperator)]
 
     INFO_PROVIDED = [Info.ok,
                      Info.num_iter,
@@ -110,7 +110,7 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                      Info.fvalue,
                      Info.converged]
 
-    def __init__(self, info=[], outer_iter=20,
+    def __init__(self, info=[],
                  eps=consts.TOLERANCE,
                  max_iter=consts.MAX_ITER, min_iter=1):
 
@@ -118,106 +118,101 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                                               max_iter=max_iter,
                                               min_iter=min_iter)
 
-        self.outer_iter = outer_iter
-        self.eps = float(eps)
-
-#        from parsimony.algorithms.primaldual import NaiveCONESTA
-        # Copy the allowed info keys for FISTA.
-        self.fista_info = list()
-        for nfo in self.info_copy():
-            if nfo in FISTA.INFO_PROVIDED:
-                self.fista_info.append(nfo)
-#        if not self.fista_info.allows(Info.num_iter):
-#            self.fista_info.add_key(Info.num_iter)
-        if Info.converged not in self.fista_info:
-            self.fista_info.append(Info.converged)
-
-#        self.algorithm = FISTA(info=self.fista_info,
-#                               eps=self.eps,
-#                               max_iter=self.max_iter,
-#                               min_iter=self.min_iter)
-#        self.algorithm = algorithms.StaticCONESTA(mu_start=1.0,
-#                                                  info=self.info,
-#                                                  eps=self.eps,
-#                                                  max_iter=self.max_iter,
-#                                                  min_iter=self.min_iter)
+        self.eps = max(consts.FLOAT_EPSILON, float(eps))
 
     @bases.force_reset
     @bases.check_compatibility
     def run(self, function, w):
 
+        # Copy the allowed info keys for FISTA.
+        fista_info = list()
+        for nfo in self.info_copy():
+            if nfo in FISTA.INFO_PROVIDED:
+                fista_info.append(nfo)
+        if Info.num_iter not in fista_info:
+            fista_info.append(Info.num_iter)
+        if Info.converged not in fista_info:
+            fista_info.append(Info.converged)
+
+        # Create the inner algorithm.
+        algorithm = ISTA(info=fista_info, eps=self.eps,
+                         max_iter=self.max_iter, min_iter=self.min_iter)
+
+        # Not ok until the end.
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, False)
+
+        # Initialise info variables. Info variables have the prefix "_".
         if self.info_requested(Info.time):
-            t = [0.0]
+            _t = []
         if self.info_requested(Info.fvalue):
-            f = [function.f(w)]
+            _f = []
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
 
-        self.algorithm = FISTA(info=self.fista_info,
-                               eps=self.eps,
-                               max_iter=self.max_iter,
-                               min_iter=self.min_iter)
-
-        print "len(w):", len(w)
-        print "max_iter:", self.algorithm.max_iter
-
-        num_iter = [0] * len(w)
-#        w_old = [0] * len(w)
-
-#        it = 0
-#        while True:
-        for it in xrange(1, self.outer_iter + 1):
+        it = 0
+        while True:
+#        for it in xrange(1, self.outer_iter + 1):
 
             all_converged = True
 
             for i in xrange(len(w)):
                 print "it: %d, i: %d" % (it, i)
 
-#                for j in xrange(len(w)):
-#                    w_old[j] = w[j]
-
-                if i == 0:
-                    pass
-                if i == 1:
-                    pass
-                if i == 2:
-                    pass
-
+                 # Wrap a function around the ith block.
                 func = mb_losses.MultiblockFunctionWrapper(function, w, i)
-#                self.fista_info.clear()
-#                self.algorithm.set_params(max_iter=self.max_iter - num_iter[i])
-#                w[i] = self.algorithm.run(func, w_old[i])
-                w[i] = self.algorithm.run(func, w[i])
 
-                num_iter[i] += self.algorithm.num_iter
+#                # Set current parameters to algorithm.
+#                algorithm.set_params(max_iter=self.max_iter - self.num_iter)
+#                # Run FISTA.
+#                w[i] = algorithm.run(func, w[i])
 
-                if self.algorithm.info_requested(Info.time):
-                    tval = self.algorithm.info_get(Info.time)
-                if self.algorithm.info_requested(Info.fvalue):
-                    fval = self.algorithm.info_get(Info.fvalue)
+                w_new = w_old = w[i]
+                for k in xrange(1, max(self.min_iter, self.max_iter) + 1):
 
-#                if Info.converged in self.fista_info:
-#                    if not self.fista_info[Info.converged] \
-#                            or self.fista_info[Info.num_iter] > 1:
-#                        all_converged = False
+#                    z = w_new + ((i - 2.0) / (i + 1.0)) * (w_new - w_old)
 
-#                if maths.norm(w_old[i] - w[i]) < self.eps:
-#                    converged = True
-#                    break
+#                    step = function.step(w[:i] + [w] + w[i + 1:], i)
+                    step = func.step(w_new)
 
-                if self.info_requested(Info.time):
-                    t = t + tval
-                if self.info_requested(Info.fvalue):
-                    f = f + fval
+                    w_old = w_new
+#                    w_new = w_old - step * function.grad(w[:i] \
+#                                                         + [w_old] \
+#                                                         + w[i + 1:], i)
+                    w_new = w_old - step * func.grad(w_old)
+                    w_new = function.prox(w[:i] + [w_new] + w[i + 1:],
+                                          index=i,
+                                          factor=step,
+                                          eps=consts.TOLERANCE)  # 1.0 / (i ** (4.0 + consts.TOLERANCE)))
+                    w_new_ = func.prox(w_new, factor=step,
+                                       eps=consts.TOLERANCE)
+                    print "diff here:", np.linalg.norm(w_new - w_new_)
+
+                    print function.f(w[:i] + [w_new] + w[i + 1:]), step, \
+                            (1.0 / step) * maths.norm(w_new - w_old), self.eps
+                    if (1.0 / step) * maths.norm(w_new - w_old) < self.eps \
+                            and k >= self.min_iter:
+                        break
+                w[i] = w_new
+
+                # Update global iteration count.
+                self.num_iter += algorithm.num_iter
+                print "algorithm.num_iter: %d, self.num_iter: %d" \
+                        % (self.num_iter, algorithm.num_iter)
+
+#                if Info.time in algorithm.info and \
+#                        self.info_requested(Info.time):
+#                    _t += algorithm.info_get(Info.time)
+#                if Info.fvalue in algorithm.info and \
+#                        self.info_requested(Info.fvalue):
+#                    _f += algorithm.info_get(Info.fvalue)
 
                 print "l0 :", maths.norm0(w[i]), \
                     ", l1 :", maths.norm1(w[i]), \
                     ", l2²:", maths.norm(w[i]) ** 2.0
 
-            if self.algorithm.info_requested(Info.fvalue):
-                print "f:", fval[-1]
+#            if Info.fvalue in algorithm.info:
+#                print "f:", _f[-1]
 
             for i in xrange(len(w)):
 
@@ -227,13 +222,13 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                                         [w[i] - step * function.grad(w, i)] +
                                         w[i + 1:], i, step)
 
-#                func = mb_losses.MultiblockFunctionWrapper(function, w, i)
-#                step2 = func.step(w[i])
-#                w_tilde2 = func.prox(w[i] - step2 * func.grad(w[i]), step2)
-#
-#                print "diff:", maths.norm(w_tilde - w_tilde2)
+                func = mb_losses.MultiblockFunctionWrapper(function, w, i)
+                step2 = func.step(w[i])
+                w_tilde2 = func.prox(w[i] - step2 * func.grad(w[i]), step2)
 
-#                print "err:", maths.norm(w[i] - w_tilde) * (1.0 / step)
+                print "diff:", maths.norm(w_tilde - w_tilde2)
+
+                print "err:", maths.norm(w[i] - w_tilde) * (1.0 / step)
                 if maths.norm(w[i] - w_tilde) > step * self.eps:
                     all_converged = False
                     break
@@ -246,18 +241,14 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
 
                 break
 
-#            # If all blocks have used max_iter iterations, stop.
-#            if np.all(np.asarray(num_iter) >= self.max_iter):
-#                break
-
-#            it += 1
+            it += 1
 
         if self.info_requested(Info.num_iter):
-            self.info_set(Info.num_iter, num_iter)
+            self.info_set(Info.num_iter, self.num_iter)
         if self.info_requested(Info.time):
-            self.info_set(Info.time, t)
+            self.info_set(Info.time, _t)
         if self.info_requested(Info.fvalue):
-            self.info_set(Info.fvalue, f)
+            self.info_set(Info.fvalue, _f)
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, True)
 
