@@ -49,7 +49,7 @@ def stratified_k_fold(y, K=7):
     n = np.prod(y.shape)
     y = np.reshape(y, (n, 1))
 
-    # Assign the class labels to different folds
+    # Assign the class labels to different folds.
     labels, y_inverse = np.unique(y, return_inverse=True)
     count = np.bincount(y_inverse)
     classes = -np.ones(n)
@@ -59,14 +59,14 @@ def stratified_k_fold(y, K=7):
 
         classes[y_inverse == i] = v
 
-    # Assign any leftovers to existing classes
+    # Assign any leftovers to existing classes.
     m = np.max(classes)
     if m > K - 1:
         ind = np.where(classes == m)[0]
         for i in range(len(ind)):
             classes[ind[i]] = i
 
-    # Loop over the stratified classes and yield the given train and test set
+    # Loop over the stratified classes and yield the given train and test set.
     all_ids = set(range(n))
     for k in range(K):
         test = np.where(classes == k)[0].tolist()

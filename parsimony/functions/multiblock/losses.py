@@ -228,6 +228,39 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
 
         return val
 
+    def fmu(self, w):
+        """Function value of smoothed function.
+
+        Parameters
+        ----------
+        w : List of numpy arrays. The weight vectors.
+        """
+        val = 0.0
+
+        for i in xrange(len(self._f)):
+            fi = self._f[i]
+            for j in xrange(len(fi)):
+                fij = self._f[i][j]
+                for k in xrange(len(fij)):
+                    val += fij[k].f([w[i], w[j]])
+
+        for i in xrange(len(self._p)):
+            pi = self._p[i]
+            for k in xrange(len(pi)):
+                val += pi[k].f(w[i])
+
+        for i in xrange(len(self._N)):
+            Ni = self._N[i]
+            for k in xrange(len(Ni)):
+                val += Ni[k].fmu(w[i])
+
+        for i in xrange(len(self._prox)):
+            proxi = self._prox[i]
+            for k in xrange(len(proxi)):
+                val += proxi[k].f(w[i])
+
+        return val
+
     def grad(self, w, index):
         """Gradient of the differentiable part of the function.
 
@@ -256,13 +289,15 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
         for i in xrange(len(self._f)):
             fij = self._f[i][index]
             if i != index:  # Do not count these twice.
-                if isinstance(fij, properties.Gradient):
-                    # We shouldn't do anything here, right? This means e.g.
-                    # that this (block i) is the y of a logistic regression.
-                    pass
-#                    grad += fij.grad(w[i])
-                elif isinstance(fij, mb_properties.MultiblockGradient):
-                    grad += fij.grad([w[i], w[index]], 1)
+                for k in xrange(len(fij)):
+                    fijk = fij[k]
+                    if isinstance(fijk, properties.Gradient):
+                        # We shouldn't do anything here, right? This means e.g.
+                        # that this (block i) is the y of a logistic regression.
+                        pass
+#                        grad += fij.grad(w[i])
+                    elif isinstance(fijk, mb_properties.MultiblockGradient):
+                        grad += fijk.grad([w[i], w[index]], 1)
 
         # Add gradients from the penalties.
         pi = self._p[index]

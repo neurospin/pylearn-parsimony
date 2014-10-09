@@ -697,7 +697,7 @@ class NesterovFunction(Gradient,
         return old_mu
 
     def alpha(self, beta):
-        """ Dual variable of the Nesterov function.
+        """Dual variable of the Nesterov function.
 
         Parameters
         ----------

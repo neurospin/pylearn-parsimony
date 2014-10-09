@@ -24,11 +24,12 @@ except ValueError:
     import parsimony.algorithms.bases as bases  # When run as a program.import parsimony.utils.maths as maths
 import parsimony.utils.consts as consts
 from parsimony.algorithms.utils import Info
+import parsimony.utils as utils
 import parsimony.utils.maths as maths
 import parsimony.functions.properties as properties
 import parsimony.functions.multiblock.properties as multiblock_properties
 import parsimony.functions.multiblock.losses as mb_losses
-from parsimony.algorithms.proximal import FISTA, ISTA
+#from parsimony.algorithms.proximal import FISTA, ISTA
 
 __all__ = ["MultiblockFISTA"]
 
@@ -107,7 +108,8 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
     INFO_PROVIDED = [Info.ok,
                      Info.num_iter,
                      Info.time,
-                     Info.fvalue,
+                     Info.func_val,
+                     Info.smooth_func_val,
                      Info.converged]
 
     def __init__(self, info=[],
@@ -124,20 +126,6 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
     @bases.check_compatibility
     def run(self, function, w):
 
-        # Copy the allowed info keys for FISTA.
-        fista_info = list()
-        for nfo in self.info_copy():
-            if nfo in FISTA.INFO_PROVIDED:
-                fista_info.append(nfo)
-        if Info.num_iter not in fista_info:
-            fista_info.append(Info.num_iter)
-        if Info.converged not in fista_info:
-            fista_info.append(Info.converged)
-
-        # Create the inner algorithm.
-        algorithm = ISTA(info=fista_info, eps=self.eps,
-                         max_iter=self.max_iter, min_iter=self.min_iter)
-
         # Not ok until the end.
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, False)
@@ -145,16 +133,22 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
         # Initialise info variables. Info variables have the prefix "_".
         if self.info_requested(Info.time):
             _t = []
-        if self.info_requested(Info.fvalue):
+        if self.info_requested(Info.func_val):
             _f = []
+        if self.info_requested(Info.smooth_func_val):
+            _fmu = []
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
 
+        FISTA = True
+        if FISTA:
+            exp = 4.0 + consts.FLOAT_EPSILON
+        else:
+            exp = 2.0 + consts.FLOAT_EPSILON
+        block_iter = [1] * len(w)
+
         it = 0
         while True:
-#        for it in xrange(1, self.outer_iter + 1):
-
-            all_converged = True
 
             for i in xrange(len(w)):
                 print "it: %d, i: %d" % (it, i)
@@ -162,93 +156,101 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                  # Wrap a function around the ith block.
                 func = mb_losses.MultiblockFunctionWrapper(function, w, i)
 
-#                # Set current parameters to algorithm.
-#                algorithm.set_params(max_iter=self.max_iter - self.num_iter)
-#                # Run FISTA.
-#                w[i] = algorithm.run(func, w[i])
+                # Run FISTA.
+                w_old = w[i]
+                for k in xrange(1, self.max_iter - self.num_iter + 1):
 
-                w_new = w_old = w[i]
-                for k in xrange(1, max(self.min_iter, self.max_iter) + 1):
+                    if self.info_requested(Info.time):
+                        time = utils.time_wall()
 
-#                    z = w_new + ((i - 2.0) / (i + 1.0)) * (w_new - w_old)
+                    if FISTA:
+                        # Take the interpolated step.
+                        z = w[i] + ((k - 2.0) / (k + 1.0)) * (w[i] - w_old)
+                    else:
+                        z = w[i]
 
-#                    step = function.step(w[:i] + [w] + w[i + 1:], i)
-                    step = func.step(w_new)
+                    # Compute the step.
+                    step = func.step(z)
+                    # Compute inexact precision.
+                    eps = max(consts.FLOAT_EPSILON,
+                              1.0 / (block_iter[i] ** exp))
 
-                    w_old = w_new
-#                    w_new = w_old - step * function.grad(w[:i] \
-#                                                         + [w_old] \
-#                                                         + w[i + 1:], i)
-                    w_new = w_old - step * func.grad(w_old)
-                    w_new = function.prox(w[:i] + [w_new] + w[i + 1:],
-                                          index=i,
-                                          factor=step,
-                                          eps=consts.TOLERANCE)  # 1.0 / (i ** (4.0 + consts.TOLERANCE)))
-                    w_new_ = func.prox(w_new, factor=step,
-                                       eps=consts.TOLERANCE)
-                    print "diff here:", np.linalg.norm(w_new - w_new_)
+                    w_old = w[i]
+                    # Take a FISTA step.
+                    w[i] = func.prox(z - step * func.grad(z),
+                                     factor=step, eps=eps)
 
-                    print function.f(w[:i] + [w_new] + w[i + 1:]), step, \
-                            (1.0 / step) * maths.norm(w_new - w_old), self.eps
-                    if (1.0 / step) * maths.norm(w_new - w_old) < self.eps \
+                    # Store info variables.
+                    if self.info_requested(Info.time):
+                        _t.append(utils.time_wall() - time)
+                    if self.info_requested(Info.func_val):
+                        _f.append(function.f(w))
+                    if self.info_requested(Info.smooth_func_val):
+                        _fmu.append(function.fmu(w))
+
+                    # Update iteration counts.
+                    self.num_iter += 1
+                    block_iter[i] += 1
+
+                    print i, function.fmu(w), step, \
+                           (1.0 / step) * maths.norm(w[i] - z), self.eps, \
+                           k, self.num_iter, self.max_iter
+                    # Test stopping criterion.
+                    if maths.norm(w[i] - z) < step * self.eps \
                             and k >= self.min_iter:
                         break
-                w[i] = w_new
-
-                # Update global iteration count.
-                self.num_iter += algorithm.num_iter
-                print "algorithm.num_iter: %d, self.num_iter: %d" \
-                        % (self.num_iter, algorithm.num_iter)
-
-#                if Info.time in algorithm.info and \
-#                        self.info_requested(Info.time):
-#                    _t += algorithm.info_get(Info.time)
-#                if Info.fvalue in algorithm.info and \
-#                        self.info_requested(Info.fvalue):
-#                    _f += algorithm.info_get(Info.fvalue)
 
                 print "l0 :", maths.norm0(w[i]), \
                     ", l1 :", maths.norm1(w[i]), \
                     ", l2²:", maths.norm(w[i]) ** 2.0
+#                if self.info_requested(Info.func_val):
+#                    f = _f[-1]
+#                    if self.info_requested(Info.smooth_func_val):
+#                        f = _fmu[-1]
+#                    print "f:", f
 
-#            if Info.fvalue in algorithm.info:
-#                print "f:", _f[-1]
-
+            # Test global stopping criterion.
+            all_converged = True
             for i in xrange(len(w)):
 
-                # Take one ISTA step for use in the stopping criterion.
-                step = function.step(w, i)
-                w_tilde = function.prox(w[:i] +
-                                        [w[i] - step * function.grad(w, i)] +
-                                        w[i + 1:], i, step)
-
+                # Wrap a function around the ith block.
                 func = mb_losses.MultiblockFunctionWrapper(function, w, i)
-                step2 = func.step(w[i])
-                w_tilde2 = func.prox(w[i] - step2 * func.grad(w[i]), step2)
 
-                print "diff:", maths.norm(w_tilde - w_tilde2)
+                # Compute the step.
+                step = func.step(w[i])
+                # Compute inexact precision.
+                eps = max(consts.FLOAT_EPSILON, 1.0 / (block_iter[i] ** exp))
+                # Take one ISTA step for use in the stopping criterion.
+                w_tilde = func.prox(w[i] - step * func.grad(w[i]),
+                                    factor=step, eps=eps)
 
-                print "err:", maths.norm(w[i] - w_tilde) * (1.0 / step)
+                # Test if converged for block i.
                 if maths.norm(w[i] - w_tilde) > step * self.eps:
                     all_converged = False
                     break
 
+            # Converged in all blocks!
             if all_converged:
-                print "All converged!"
-
                 if self.info_requested(Info.converged):
                     self.info_set(Info.converged, True)
 
                 break
 
+            # Stop after maximum number of iterations.
+            if self.num_iter >= self.max_iter:
+                break
+
             it += 1
 
+        # Store information.
         if self.info_requested(Info.num_iter):
             self.info_set(Info.num_iter, self.num_iter)
         if self.info_requested(Info.time):
             self.info_set(Info.time, _t)
-        if self.info_requested(Info.fvalue):
-            self.info_set(Info.fvalue, _f)
+        if self.info_requested(Info.func_val):
+            self.info_set(Info.func_val, _f)
+        if self.info_requested(Info.smooth_func_val):
+            self.info_set(Info.smooth_func_val, _fmu)
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, True)
 

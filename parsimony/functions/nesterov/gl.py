@@ -174,7 +174,15 @@ class GroupLassoOverlap(properties.NesterovFunction,
         return self._lambda_max
 
     def project(self, a):
+        """ Projection onto the compact space of the Nesterov function.
 
+        From the interface "NesterovFunction".
+
+        Parameters
+        ----------
+        alpha : List of numpy arrays (x-by-1). The not-yet-projected dual
+                variable alpha.
+        """
         for i in xrange(len(a)):
             astar = a[i]
             normas = np.sqrt(np.sum(astar ** 2.0))

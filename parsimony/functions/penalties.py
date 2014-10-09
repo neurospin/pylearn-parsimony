@@ -171,7 +171,7 @@ class L1(properties.AtomicFunction,
 
         return prox
 
-    def proj(self, beta):
+    def proj(self, beta, **kwargs):
         """The corresponding projection operator.
 
         From the interface "ProjectionOperator".
@@ -198,17 +198,15 @@ class L1(properties.AtomicFunction,
         phi[p] = suma[p - 1] - self.c
 
         i = np.searchsorted(phi, 0.0)  # First positive (or zero).
-#        assert phi[i] >= 0.0
         if phi[i] < 0.0:
             # TODO: This should not be able to happen! Do we know it doesn't?
             return self.__proj_old(beta)
         i -= 1  # The last negative phi before positive (or zero).
-#        assert phi[i] < 0.0
         if phi[i] >= 0.0:
             # TODO: This should not be able to happen! Do we know it doesn't?
             return self.__proj_old(beta)
 
-        l = a[i] + phi[i] / (i + 1)  # Find the Lagrange multiplier.
+        l = a[i] + phi[i] / float(i + 1)  # Find the Lagrange multiplier.
 
         # The correction by eps is to nudge the L1 norm just below self.c.
         eps = consts.FLOAT_EPSILON
@@ -725,7 +723,7 @@ class L2(properties.AtomicFunction,
 
         return prox
 
-    def proj(self, beta):
+    def proj(self, beta, **kwargs):
         """The corresponding projection operator.
 
         From the interface "ProjectionOperator".
@@ -905,7 +903,7 @@ class L2Squared(properties.AtomicFunction,
 
         return prox
 
-    def proj(self, beta):
+    def proj(self, beta, **kwargs):
         """The corresponding projection operator.
 
         From the interface "ProjectionOperator".
