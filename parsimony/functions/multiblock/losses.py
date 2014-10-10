@@ -411,7 +411,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
                         all_lipschitz = False
                         break
                     else:
-                        L += fijk.L(w, index)
+                        L += fijk.L([w[index], w[j]], 0)
 
             if not all_lipschitz:
                 break
@@ -432,7 +432,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
                             all_lipschitz = False
                             break
                         else:
-                            L += fijk.L(w, index)
+                            L += fijk.L([w[i], w[index]], 1)
 
         # Add Lipschitz constants from the penalties.
         pi = self._p[index]
@@ -452,7 +452,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
                 L += Ni[k].L()  # w[index])
 
         step = 0.0
-        if all_lipschitz and L > 0.0:
+        if all_lipschitz and L >= consts.TOLERANCE:
             step = 1.0 / L
         else:
             # If all functions did not have Lipschitz continuous gradients,
@@ -493,7 +493,8 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
             line_search = BacktrackingLineSearch(
                 condition=penalties.SufficientDescentCondition, max_iter=30)
             a = np.sqrt(1.0 / self.X[index].shape[1])  # Arbitrarily "small".
-            step = line_search.run(func, w[index], p, rho=0.5, a=a, c=1e-4)
+            step = line_search.run(func, w[index], p, rho=0.5, a=a,
+                                   condition_params={"c": 1e-4})
 
         return step
 
@@ -825,6 +826,14 @@ class LatentVariableCovariance(mb_properties.MultiblockFunction,
         Cov(X.w, Y.c) = (1 / (n - 1)) * w'.X'.Y.c,
 
     where X.w and Y.c are latent variables.
+
+    Parameters
+    ----------
+    X : List with two numpy arrays. The two blocks.
+
+    unbiased : Boolean. Whether or not to use biased or unbiased sample
+            covariance. Default is True, the unbiased sample covariance is
+            used.
     """
     def __init__(self, X, unbiased=True):
 
@@ -918,6 +927,14 @@ class LatentVariableCovarianceSquared(mb_properties.MultiblockFunction,
         Cov(X.w, Y.c)² = ((1 / (n - 1)) * w'.X'.Y.c)²,
 
     where X.w and Y.c are latent variables.
+
+    Parameters
+    ----------
+    X : List with two numpy arrays. The two blocks.
+
+    unbiased : Boolean. Whether or not to use biased or unbiased sample
+            covariance. Default is True, the unbiased sample covariance is
+            used.
     """
     def __init__(self, X, unbiased=True):
 

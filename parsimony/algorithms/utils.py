@@ -437,7 +437,7 @@ class BacktrackingLineSearch(bases.ExplicitAlgorithm):
         self.max_iter = max_iter
         self.min_iter = min_iter
 
-    def run(self, function, x, p, rho=0.5, a=1.0, **params):
+    def run(self, function, x, p, rho=0.5, a=1.0, condition_params=dict()):
         """Finds the step length for a descent algorithm.
 
         Parameters
@@ -455,11 +455,11 @@ class BacktrackingLineSearch(bases.ExplicitAlgorithm):
         a : Float. The upper bound on the step length. Defaults to 1.0, which
                 is suitable for e.g. Newton's method.
 
-        params : Dictionary. Parameters for the descent condition.
+        condition_params : Dictionary. Parameters for the descent condition.
         """
         self.check_compatibility(function, self.INTERFACES)
 
-        line_search = self.condition(function, p, **params)
+        line_search = self.condition(function, p, **condition_params)
         it = 0
         while True:
             if line_search.feasible((x, a)):

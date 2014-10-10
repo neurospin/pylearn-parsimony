@@ -1343,7 +1343,11 @@ class RGCCAConstraint(QuadraticConstraint,
                     term1 = (self.tau \
                             / ((1.0 + 2.0 * mu * self.tau) ** 2.0)) * ssdiff
                     term2 = np.sum(atilde2lambdas \
-                                * (1.0 / ((1.0 + (2.0 * mu) * self.S) ** 2.0)))
+                                * (1.0 / ((1.0 + (2.0 * mu) * self.S) ** 2.0))
+                                  )
+#                    term2_ = np.sum(atilde2lambdas * \
+#                             np.reciprocal((1.0 + (2.0 * mu) * self.S) ** 2.0))
+#                    print "diff:", abs(term2 - term2_)
                     return term1 + term2 - self.c
 
                 def grad(self, mu):
@@ -1797,7 +1801,7 @@ class LinearVariableConstraint(properties.IndicatorFunction,
 class SufficientDescentCondition(properties.Function,
                                  properties.Constraint):
 
-    def __init__(self, function, p, c):
+    def __init__(self, function, p, c=1e-4):
         """The sufficient condition
 
             f(x + a * p) <= f(x) + c * a * grad(f(x))'p
@@ -1806,6 +1810,8 @@ class SufficientDescentCondition(properties.Function,
 
         Parameters
         ----------
+        p : Numpy array. The descent direction.
+
         c : Float, 0 < c < 1. A constant for the condition. Should be small.
         """
         self.function = function

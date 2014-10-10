@@ -164,7 +164,7 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                         time = utils.time_wall()
 
                     if FISTA:
-                        # Take the interpolated step.
+                        # Take an interpolated step.
                         z = w[i] + ((k - 2.0) / (k + 1.0)) * (w[i] - w_old)
                     else:
                         z = w[i]
@@ -174,6 +174,7 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                     # Compute inexact precision.
                     eps = max(consts.FLOAT_EPSILON,
                               1.0 / (block_iter[i] ** exp))
+#                    eps = consts.TOLERANCE
 
                     w_old = w[i]
                     # Take a FISTA step.
@@ -200,15 +201,6 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                             and k >= self.min_iter:
                         break
 
-                print "l0 :", maths.norm0(w[i]), \
-                    ", l1 :", maths.norm1(w[i]), \
-                    ", l2²:", maths.norm(w[i]) ** 2.0
-#                if self.info_requested(Info.func_val):
-#                    f = _f[-1]
-#                    if self.info_requested(Info.smooth_func_val):
-#                        f = _fmu[-1]
-#                    print "f:", f
-
             # Test global stopping criterion.
             all_converged = True
             for i in xrange(len(w)):
@@ -219,8 +211,10 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                 # Compute the step.
                 step = func.step(w[i])
                 # Compute inexact precision.
-                eps = max(consts.FLOAT_EPSILON, 1.0 / (block_iter[i] ** exp))
-                # Take one ISTA step for use in the stopping criterion.
+                eps = max(consts.FLOAT_EPSILON,
+                          1.0 / (block_iter[i] ** exp))
+#                eps = consts.TOLERANCE
+               # Take one ISTA step for use in the stopping criterion.
                 w_tilde = func.prox(w[i] - step * func.grad(w[i]),
                                     factor=step, eps=eps)
 
