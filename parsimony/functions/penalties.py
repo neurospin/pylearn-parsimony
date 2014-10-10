@@ -1337,24 +1337,33 @@ class RGCCAConstraint(QuadraticConstraint,
                     self.S = S
                     self.c = c
 
-                # TODO: We can share variables between f and df and speed up
-                # some shared computations.
+                    self.precomp = None
+                    self.precomp_mu = None
+
                 def f(self, mu):
                     term1 = (self.tau \
-                            / ((1.0 + 2.0 * mu * self.tau) ** 2.0)) * ssdiff
-                    term2 = np.sum(atilde2lambdas \
-                                * (1.0 / ((1.0 + (2.0 * mu) * self.S) ** 2.0))
-                                  )
-#                    term2_ = np.sum(atilde2lambdas * \
-#                             np.reciprocal((1.0 + (2.0 * mu) * self.S) ** 2.0))
-#                    print "diff:", abs(term2 - term2_)
+                          / ((1.0 + 2.0 * mu * self.tau) ** 2.0)) * ssdiff
+
+                    self.precomp = 1.0 + (2.0 * mu) * self.S
+                    self.precomp_mu = mu
+
+                    term2 = np.sum(atilde2lambdas * (self.precomp ** -2.0))
+
                     return term1 + term2 - self.c
 
                 def grad(self, mu):
-                    term1 = -4.0 * tau2 \
-                                / ((1.0 + 2.0 * mu * self.tau) ** 3.0) * ssdiff
+                    term1 = (-4.0 * tau2 \
+                          / ((1.0 + 2.0 * mu * self.tau) ** 3.0)) * ssdiff
+
+                    if self.precomp is None or self.precomp_mu != mu:
+                        self.precomp = 1.0 + (2.0 * mu) * self.S
+
                     term2 = -4.0 * np.sum(atilde2lambdas2 \
-                                * (1.0 / ((1.0 + (2.0 * mu) * self.S) ** 3.0)))
+                          * (self.precomp ** -3.0))
+
+                    self.precomp = None
+                    self.precomp_mu = None
+
                     return term1 + term2
 
 #            if max(n, p) >= 1000:
@@ -1387,8 +1396,7 @@ class RGCCAConstraint(QuadraticConstraint,
 
                 a = 1.0 + 2.0 * mu * self.tau
                 b = 2.0 * mu * (1.0 - self.tau) / n_
-                y = np.dot(self._V.T, (np.reciprocal(a + b * l2) \
-                            * atilde.T).T)
+                y = np.dot(self._V.T, (np.reciprocal(a + b * l2) * atilde.T).T)
 
         if self.penalty_start > 0:
             y = np.vstack((beta[:self.penalty_start, :],
