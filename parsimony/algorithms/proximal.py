@@ -470,7 +470,7 @@ class CONESTA(bases.ExplicitAlgorithm,
             converged = False
 
             # Current precision.
-            derived_eps = eps - mu * gM
+            derived_eps = max(eps, self.eps) - mu * gM
 
             # Set current parameters to algorithm.
             algorithm.set_params(eps=derived_eps,
