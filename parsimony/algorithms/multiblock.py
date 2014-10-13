@@ -153,12 +153,16 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
             for i in xrange(len(w)):
                 print "it: %d, i: %d" % (it, i)
 
+#                if True:
+#                    pass
+
                  # Wrap a function around the ith block.
                 func = mb_losses.MultiblockFunctionWrapper(function, w, i)
 
                 # Run FISTA.
                 w_old = w[i]
-                for k in xrange(1, self.max_iter - self.num_iter + 1):
+                for k in xrange(1, max(self.min_iter + 1,
+                                       self.max_iter - self.num_iter + 1)):
 
                     if self.info_requested(Info.time):
                         time = utils.time_wall()
@@ -193,9 +197,9 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                     self.num_iter += 1
                     block_iter[i] += 1
 
-                    print i, function.fmu(w), step, \
-                           (1.0 / step) * maths.norm(w[i] - z), self.eps, \
-                           k, self.num_iter, self.max_iter
+#                    print i, function.fmu(w), step, \
+#                           (1.0 / step) * maths.norm(w[i] - z), self.eps, \
+#                           k, self.num_iter, self.max_iter
                     # Test stopping criterion.
                     if maths.norm(w[i] - z) < step * self.eps \
                             and k >= self.min_iter:
