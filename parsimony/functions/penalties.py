@@ -1173,8 +1173,11 @@ class RGCCAConstraint(QuadraticConstraint,
 
     tau : Non-negative float. The regularisation constant.
 
+    X : Numpy array, n-by-p. The associated data matrix. The first
+            penalty_start columns will be excluded.
+
     unbiased : Boolean. Whether the sample variance should be unbiased or not.
-            Default is unbiased.
+            Default is True, i.e. unbiased.
 
     penalty_start : Non-negative integer. The number of columns, variables
             etc., to be exempt from penalisation. Equivalently, the first index
