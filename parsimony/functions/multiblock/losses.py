@@ -885,8 +885,8 @@ class LatentVariableCovariance(mb_properties.MultiblockFunction,
         >>> cov = LatentVariableCovariance([X, Y])
         >>> grad = cov.grad([w, c], 0)
         >>> approx_grad = cov.approx_grad([w, c], 0)
-        >>> round(np.linalg.norm(grad - approx_grad), 9)
-        1.2e-08
+        >>> np.allclose(grad, approx_grad)
+        True
         """
         index = int(index)
         grad = -np.dot(self.X[index].T,
@@ -989,8 +989,8 @@ class LatentVariableCovarianceSquared(mb_properties.MultiblockFunction,
         >>> cov = LatentVariableCovarianceSquared([X, Y])
         >>> grad = cov.grad([w, c], 0)
         >>> approx_grad = cov.approx_grad([w, c], 0)
-        >>> round(np.linalg.norm(grad - approx_grad), 9)
-        1.0413e-05
+        >>> np.allclose(grad, approx_grad)
+        True
         """
         wX = np.dot(self.X[0], w[0]).T
         Yc = np.dot(self.X[1], w[1])
