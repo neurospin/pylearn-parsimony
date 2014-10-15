@@ -197,6 +197,7 @@ class L1(properties.AtomicFunction,
         phi[:p] += (suma - self.c)
         phi[p] = suma[p - 1] - self.c
 
+        # TODO: BUG: i may be equal to p => IndexError: list index out of range
         i = np.searchsorted(phi, 0.0)  # First positive (or zero).
         if phi[i] < 0.0:
             # TODO: This should not be able to happen! Do we know it doesn't?
@@ -1289,7 +1290,7 @@ class RGCCAConstraint(QuadraticConstraint,
             beta_ = beta
 
         xtMx = self._compute_value(beta_)
-        if xtMx <= self.c:
+        if xtMx <= self.c + consts.FLOAT_EPSILON:
             return beta
 
         n, p = self.X.shape
@@ -1381,6 +1382,10 @@ class RGCCAConstraint(QuadraticConstraint,
 #            else:
             start_mu = 0.0
             mu = newton.run(F(self.tau, self._S, self.c), start_mu)
+
+            # Seems to be possible because of machine precision.
+            if mu <= consts.FLOAT_EPSILON:
+                return beta
 
             if p > n:
                 l2 = ((self._S - self.tau) \

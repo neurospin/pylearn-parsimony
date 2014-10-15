@@ -498,14 +498,16 @@ class DualFunction(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
-    def gap(self, beta, beta_hat=None, eps=consts.TOLERANCE):
+    def gap(self, beta, beta_hat=None,
+            max_iter=consts.MAX_ITER, eps=consts.TOLERANCE):
         """Compute a duality gap.
         """
         raise NotImplementedError('Abstract method "gap" must be '
                                   'specialised!')
 
     @abc.abstractmethod
-    def betahat(self, alpha, beta=None, eps=consts.TOLERANCE):
+    def betahat(self, alpha, beta=None,
+                max_iter=consts.MAX_ITER, eps=consts.TOLERANCE):
         """Return the beta that minimises the dual function.
         """
         raise NotImplementedError('Abstract method "betahat" must be '

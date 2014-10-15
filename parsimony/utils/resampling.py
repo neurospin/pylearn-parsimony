@@ -121,6 +121,9 @@ def stratified_bootstrap(y, B=100, seed=None):
     n = np.prod(y.shape)
     y = np.reshape(y, (n, 1))
 
+    if seed is not None:
+        np.random.seed(seed)
+
     # Assign the class labels to different folds
     labels, y_inverse = np.unique(y, return_inverse=True)
     count = np.bincount(y_inverse).tolist()
