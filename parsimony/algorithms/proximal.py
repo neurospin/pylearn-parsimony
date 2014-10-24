@@ -13,7 +13,8 @@ Created on Mon Jun  2 15:42:13 2014
 Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt, Edouard Duchesnay, Fouad Hadj-Selem
-@email:   lofstedt.tommy@gmail.com, edouard.duchesnay@cea.fr, Fouad.HADJSELEM@cea.fr
+@email:   lofstedt.tommy@gmail.com, edouard.duchesnay@cea.fr,
+          fouad.hadjselem@cea.fr
 @license: BSD 3-clause.
 """
 import numpy as np
@@ -446,8 +447,13 @@ class CONESTA(bases.ExplicitAlgorithm,
             init_time = utils.time_cpu()
 
         # Compute current gap, precision eps (gap decreased by tau) and mu.
+        old_mu = function.set_mu(consts.TOLERANCE)
         gap = function.gap(beta, eps=self.eps, max_iter=self.max_iter)
-        eps = self.tau * gap
+        function.set_mu(old_mu)
+        # Obtain the gap from the last FISTA run. May be small and negative
+        # close to machine epsilon.
+        eps = self.tau * abs(gap)
+        # TODO: Warn if gap < -consts.TOLERANCE.
         mu = function.mu_opt(eps)
         function.set_mu(mu)
         gM = function.eps_max(1.0)

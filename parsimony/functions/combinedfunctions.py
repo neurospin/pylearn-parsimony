@@ -940,10 +940,10 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
 
         From the interface "DualFunction".
         """
-        if self.penalty_start > 0:
-            beta_ = beta[self.penalty_start:, :]
-        else:
-            beta_ = beta
+#        if self.penalty_start > 0:
+#            beta_ = beta[self.penalty_start:, :]
+#        else:
+#            beta_ = beta
 
 #        A = self.A()
 #        alpha = [0] * len(A)
