@@ -821,7 +821,7 @@ class NesterovFunction(Gradient,
 
         return self.l * lmaxA / self.mu
 
-    def prox(self, beta, factor=1.0, eps=consts.TOLERANCE, max_iter=100):
+    def prox(self, beta, factor=1.0, eps=consts.TOLERANCE, max_iter=1000):
         """The proximal operator corresponding to this function.
 
         The proximal operator is computed numerically. This method should be

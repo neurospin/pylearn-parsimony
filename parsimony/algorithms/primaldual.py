@@ -105,6 +105,8 @@ class ExcessiveGapMethod(bases.ExplicitAlgorithm,
         if L < consts.TOLERANCE:
             L = consts.TOLERANCE
         mu = [2.0 * L]
+#        print "[EGM] mu0: ", mu[0]
+#        print "[EGM]   M: ", function.M()
         function.set_mu(mu)
         if beta is not None:
             beta0 = beta

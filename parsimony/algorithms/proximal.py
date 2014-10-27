@@ -142,8 +142,9 @@ class ISTA(bases.ExplicitAlgorithm,
 
             betaold = betanew
             betanew = function.prox(betaold - step * function.grad(betaold),
-                            step,
-                            eps=1.0 / (float(i) ** (2.0 + consts.TOLERANCE)))
+                          step,
+                          eps=1.0 / (float(i) ** (2.0 + consts.FLOAT_EPSILON)),
+                          max_iter=self.max_iter)
 
             if self.info_requested(Info.time):
                 t.append(utils.time_cpu() - tm)
@@ -246,8 +247,7 @@ class FISTA(bases.ExplicitAlgorithm,
                      Info.gap]
 
     def __init__(self, use_gap=False,
-                 info=[], eps=consts.TOLERANCE, max_iter=10000, min_iter=1,
-                 conesta_stop=None):
+                 info=[], eps=consts.TOLERANCE, max_iter=10000, min_iter=1):
 
         super(FISTA, self).__init__(info=info,
                                     max_iter=max_iter,
@@ -255,7 +255,6 @@ class FISTA(bases.ExplicitAlgorithm,
 
         self.use_gap = bool(use_gap)
         self.eps = eps
-        self.conesta_stop = conesta_stop
 
     @bases.force_reset
     @bases.check_compatibility
@@ -293,37 +292,20 @@ class FISTA(bases.ExplicitAlgorithm,
 
             betaold = betanew
             betanew = function.prox(z - step * function.grad(z),
-                            step,
-                            eps=1.0 / (float(i) ** (4.0 + consts.TOLERANCE)))
+                          step,
+                          eps=1.0 / (float(i) ** (4.0 + consts.FLOAT_EPSILON)),
+                          max_iter=self.max_iter)
 
             if self.info_requested(Info.time):
                 t_.append(utils.time_cpu() - tm)
             if self.info_requested(Info.fvalue):
                 f_.append(function.f(betanew))
 
-            if self.conesta_stop is not None:
-                mu_min = self.conesta_stop[0]
-                mu_old = function.set_mu(mu_min)
-                stop_step = function.step(betanew)
-
-                # Take one ISTA step for use in the stopping criterion.
-                stop_z = function.prox(betanew - stop_step \
-                                                    * function.grad(betanew),
-                                  stop_step)
-                function.set_mu(mu_old)
-
-                if (1. / stop_step) * maths.norm(betanew - stop_z) < self.eps \
-                        and i >= self.min_iter:
-
-                    if self.info_requested(Info.converged):
-                        self.info_set(Info.converged, True)
-
-                    break
-
-            elif self.use_gap:
+            if self.use_gap:
 
                 gap = function.gap(betanew,
-                                   eps=self.eps, max_iter=self.max_iter)
+                                   eps=self.eps,
+                                   max_iter=self.max_iter)
 
                 # TODO: Warn if G_new < -consts.TOLERANCE.
                 gap = abs(gap)  # May happen close to machine epsilon.
