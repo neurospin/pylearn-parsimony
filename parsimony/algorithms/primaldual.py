@@ -69,13 +69,15 @@ class ExcessiveGapMethod(bases.ExplicitAlgorithm,
                      Info.beta]
 
     def __init__(self, eps=consts.TOLERANCE,
-                 info=[], max_iter=10000, min_iter=1):
+                 info=[], max_iter=10000, min_iter=1,
+                 simulation=False):
 
         super(ExcessiveGapMethod, self).__init__(info=info,
                                                  max_iter=max_iter,
                                                  min_iter=min_iter)
 
-        self.eps = eps
+        self.eps = max(consts.FLOAT_EPSILON, float(eps))
+        self.simulation = bool(simulation)
 
     @bases.force_reset
     @bases.check_compatibility
@@ -162,13 +164,13 @@ class ExcessiveGapMethod(bases.ExplicitAlgorithm,
             if self.info_requested(Info.gap):
                 gap.append(Gamma)
 
-            if Gamma < self.eps and k >= self.min_iter - 1:
+            if not self.simulation:
+                if Gamma < self.eps and k >= self.min_iter - 1:
 
-                if self.info_requested(Info.converged):
-                    self.info_set(Info.converged, True)
+                    if self.info_requested(Info.converged):
+                        self.info_set(Info.converged, True)
 
-                break
-#                pass
+                    break
 
             if k >= self.max_iter - 1 and k >= self.min_iter - 1:
                 break

@@ -247,14 +247,17 @@ class FISTA(bases.ExplicitAlgorithm,
                      Info.gap]
 
     def __init__(self, use_gap=False,
-                 info=[], eps=consts.TOLERANCE, max_iter=10000, min_iter=1):
+                 info=[], eps=consts.TOLERANCE, max_iter=10000, min_iter=1,
+                 simulation=False):
 
         super(FISTA, self).__init__(info=info,
                                     max_iter=max_iter,
                                     min_iter=min_iter)
 
         self.use_gap = bool(use_gap)
-        self.eps = eps
+        self.eps = max(consts.FLOAT_EPSILON, float(eps))
+
+        self.simulation = bool(simulation)
 
     @bases.force_reset
     @bases.check_compatibility
@@ -312,29 +315,31 @@ class FISTA(bases.ExplicitAlgorithm,
                 if self.info_requested(Info.gap):
                     gap_.append(gap)
 
-                if gap < self.eps:
-                    if self.info_requested(Info.converged):
-                        self.info_set(Info.converged, True)
+                if not self.simulation:
+                    if gap < self.eps:
+                        if self.info_requested(Info.converged):
+                            self.info_set(Info.converged, True)
 
-                    break
+                        break
             else:
-                if step > 0.0:
-                    if (1.0 / step) * maths.norm(betanew - z) < self.eps \
-                            and i >= self.min_iter:
+                if not self.simulation:
+                    if step > 0.0:
+                        if (1.0 / step) * maths.norm(betanew - z) < self.eps \
+                                and i >= self.min_iter:
 
-                        if self.info_requested(Info.converged):
-                            self.info_set(Info.converged, True)
+                            if self.info_requested(Info.converged):
+                                self.info_set(Info.converged, True)
 
-                        break
+                            break
 
-                else:  # TODO: Fix this!
-                    if maths.norm(betanew - z) < self.eps \
-                            and i >= self.min_iter:
+                    else:  # TODO: Fix this!
+                        if maths.norm(betanew - z) < self.eps \
+                                and i >= self.min_iter:
 
-                        if self.info_requested(Info.converged):
-                            self.info_set(Info.converged, True)
+                            if self.info_requested(Info.converged):
+                                self.info_set(Info.converged, True)
 
-                        break
+                            break
 
         self.num_iter = i
 
@@ -344,10 +349,10 @@ class FISTA(bases.ExplicitAlgorithm,
             self.info_set(Info.time, t_)
         if self.info_requested(Info.fvalue):
             self.info_set(Info.fvalue, f_)
-        if self.info_requested(Info.ok):
-            self.info_set(Info.ok, True)
         if self.info_requested(Info.gap):
             self.info_set(Info.gap, gap_)
+        if self.info_requested(Info.ok):
+            self.info_set(Info.ok, True)
 
         return betanew
 
@@ -393,7 +398,8 @@ class CONESTA(bases.ExplicitAlgorithm,
                      Info.mu]
 
     def __init__(self, mu_min=consts.TOLERANCE, tau=0.5,
-                 info=[], eps=consts.TOLERANCE, max_iter=10000, min_iter=1):
+                 info=[], eps=consts.TOLERANCE, max_iter=10000, min_iter=1,
+                 simulation=False):
 
         super(CONESTA, self).__init__(info=info,
                                       max_iter=max_iter, min_iter=min_iter)
@@ -402,6 +408,7 @@ class CONESTA(bases.ExplicitAlgorithm,
         self.tau = max(consts.TOLERANCE,
                        min(float(tau), 1.0 - consts.TOLERANCE))
         self.eps = max(consts.TOLERANCE, float(eps))
+        self.simulation = bool(simulation)
 
     @bases.force_reset
     @bases.check_compatibility
@@ -490,18 +497,22 @@ class CONESTA(bases.ExplicitAlgorithm,
             gap = abs(algorithm.info_get(Info.gap)[-1])
             # TODO: Warn if gap < -consts.TOLERANCE.
 
-            if gap < self.eps - mu * gM:
-                if self.info_requested(Info.converged):
-                    self.info_set(Info.converged, True)
-                converged = True
+            if not self.simulation:
+                if gap < self.eps - mu * gM:
+
+                    if self.info_requested(Info.converged):
+                        self.info_set(Info.converged, True)
+
+                    converged = True
 
             # Stopping criteria.
-            if converged or self.num_iter >= self.max_iter or \
-                    (eps < consts.TOLERANCE and mu < consts.TOLERANCE):
+            if (converged or self.num_iter >= self.max_iter) \
+                    and self.num_iter >= self.min_iter:
                 break
 
             # Update the precision eps.
-            eps = self.tau * (gap + mu * gM)
+#            eps = self.tau * (gap + mu * gM)
+            eps = max(self.eps, self.tau * (gap + mu * gM))
             # Compute and update mu.
             mu = max(self.mu_min, min(function.mu_opt(eps), mu))
             function.set_mu(mu)
@@ -772,7 +783,8 @@ class ADMM(bases.ExplicitAlgorithm,
 
     def __init__(self, rho=1.0, mu=10.0, tau=2.0,
                  info=[],
-                 eps=consts.TOLERANCE, max_iter=1000, min_iter=1):
+                 eps=consts.TOLERANCE, max_iter=consts.MAX_ITER, min_iter=1,
+                 simulation=False):
                  # TODO: Investigate what is a good default value here!
 
         super(ADMM, self).__init__(info=info,
@@ -784,6 +796,8 @@ class ADMM(bases.ExplicitAlgorithm,
         self.tau = max(1.0, float(tau))
 
         self.eps = max(consts.FLOAT_EPSILON, float(eps))
+
+        self.simulation = bool(simulation)
 
     @bases.force_reset
     @bases.check_compatibility
@@ -845,21 +859,23 @@ class ADMM(bases.ExplicitAlgorithm,
                 fval = funcs[0].f(z_new) + funcs[1].f(z_new)
                 f.append(fval)
 
-            if i == 1:
-                if maths.norm(x_new - x_old) < self.eps and i >= self.min_iter:
-#                    print "Stopping criterion kicked in!"
-                    if self.info_requested(Info.converged):
-                        self.info_set(Info.converged, True)
+            if not self.simulation:
+                if i == 1:
+                    if maths.norm(x_new - x_old) < self.eps \
+                            and i >= self.min_iter:
+#                        print "Stopping criterion kicked in!"
+                        if self.info_requested(Info.converged):
+                            self.info_set(Info.converged, True)
 
-                    break
-            else:
-                if maths.norm(x_new - x_old) / maths.norm(x_old) < self.eps \
-                        and i >= self.min_iter:
-#                    print "Stopping criterion kicked in!"
-                    if self.info_requested(Info.converged):
-                        self.info_set(Info.converged, True)
+                        break
+                else:
+                    if maths.norm(x_new - x_old) / maths.norm(x_old) < self.eps \
+                            and i >= self.min_iter:
+#                        print "Stopping criterion kicked in!"
+                        if self.info_requested(Info.converged):
+                            self.info_set(Info.converged, True)
 
-                    break
+                        break
 
             # Update the penalty parameter, rho, dynamically.
             if self.mu > 1.0:
