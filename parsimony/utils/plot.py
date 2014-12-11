@@ -10,7 +10,6 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 import numpy as np
 import scipy.stats as ss
-import matplotlib.pyplot as plot
 
 __all__ = ["plot_map2d", "plot_classes"]
 
@@ -100,6 +99,8 @@ def plot_errorbars(X, classes=None, means=None, alpha=0.05,
                    title=None, xlabel=None, ylabel=None,
                    colors=None,
                    show=True, latex=True):
+
+    import matplotlib.pyplot as plot
 
     B, n = X.shape
     if classes is None:

@@ -52,6 +52,8 @@ class Info(object):
     parameter = "parameter"  # Parameter(s), at e.g. every iteration.
     bound = "bound"  # Upper bound at e.g. every iteration.
     beta = "beta"  # E.g. the start vector used.
+    betak = "betak"  # The final found vector.
+    beta_start = "beta_start"  # The start vector used.
     continuations = "continuations"  # In continuation: Number of continuations
 
 

@@ -939,7 +939,7 @@ class NesterovFunction(Gradient,
 #            z = alpha
 
 #            # FISTA
-            if it == 1:  # Since we do few iterations, this speeds up slightly
+            if it == 1:  # Since we do few iterations, this speeds up slightly.
                 z = alpha
             else:
                 z = [0] * len(alpha)
