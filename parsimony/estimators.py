@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Estimators encapsulates a loss function with penalties and a corresponding
-algorithm.
+"""Estimators encapsulates an algorithm with (possibly) a corresponding loss
+function and penalties.
 
 Created on Sat Nov  2 15:19:17 2013
 
@@ -24,6 +24,7 @@ import parsimony.functions.penalties as penalties
 import parsimony.utils.start_vectors as start_vectors
 import parsimony.utils.linalgs as linalgs
 import parsimony.algorithms.bases as bases
+import parsimony.algorithms.cluster as cluster
 import parsimony.algorithms.gradient as gradient
 import parsimony.algorithms.proximal as proximal
 import parsimony.algorithms.primaldual as primaldual
@@ -60,21 +61,23 @@ class BaseEstimator(object):
 
         self.algorithm = algorithm
 
-    def fit(self, X):
-        """Fit the estimator to the data.
-        """
-        raise NotImplementedError('Abstract method "fit" must be '
-                                  'specialised!')
-
     def set_params(self, **kwargs):
+        """Set the given input parameters in the estimator.
+        """
         for k in kwargs:
             self.__setattr__(k, kwargs[k])
 
     @abc.abstractmethod
     def get_params(self):
-        """Return a dictionary containing the estimator's own parameters.
+        """Return a dictionary containing the estimator's own input parameters.
         """
         raise NotImplementedError('Abstract method "get_params" must be '
+                                  'specialised!')
+
+    def fit(self, X):
+        """Fit the estimator to the data.
+        """
+        raise NotImplementedError('Abstract method "fit" must be '
                                   'specialised!')
 
     @abc.abstractmethod
@@ -84,12 +87,25 @@ class BaseEstimator(object):
         raise NotImplementedError('Abstract method "predict" must be '
                                   'specialised!')
 
+    # TODO: Make all estimators implement this method!
+    # @abc.abstractmethod
+    def parameters(self):
+        """Returns the estimator's fitted parameters, e.g. the regression
+        coefficients.
+
+        What is returned depends on the estimator. See the estimator's
+        documentation.
+        """
+        raise NotImplementedError('Abstract method "parameters" must be '
+                                  'specialised!')
+
     # TODO: Is this a good name?
     @abc.abstractmethod
     def score(self, X, y):
         raise NotImplementedError('Abstract method "score" must be '
                                   'specialised!')
 
+    # TODO: Why is this here? Move to InformationAlgorithm?
     def get_info(self):
         """If an InformationAlgorithm, returns the information dictionary.
         """
@@ -2263,6 +2279,124 @@ class SparsePLSRegression(RegressionEstimator):
             err /= float(n)
 
         return err
+
+
+class Clustering(BaseEstimator):
+    """Estimator for the clustering problem, i.e. for
+
+        f(C, mu) = sum_{i=1}^K sum_{x in C_i} |x - mu_i|²,
+
+    where C = {C_1, ..., C_K} is a set of sets of points, mu_i is the mean of
+    C_i and |.|² is the squared Euclidean norm.
+
+    This loss function is known as the within-cluster sum of squares.
+
+    Parameters
+    ----------
+    K : Positive integer. The number of clusters to find.
+
+    algorithm : Currently only the K-means algorithm (Lloyd's algorithm). The
+            algorithm that should be used. Should be one of:
+                1. KMeans(...)
+
+            Default is KMeans(...).
+
+    algorithm_params : A dictionary. The dictionary algorithm_params contains
+            parameters that should be set in the algorithm. Passing
+            algorithm=MyAlgorithm(**params) is equivalent to passing
+            algorithm=MyAlgorithm() and algorithm_params=params. Default
+            is an empty dictionary.
+
+    Examples
+    --------
+    >>> import parsimony.estimators as estimators
+    >>> import parsimony.algorithms.cluster as cluster
+    >>> import numpy as np
+    >>> np.random.seed(1337)
+    >>>
+    >>> K = 3
+    >>> n, p = 150, 2
+    >>> X = np.vstack((2 * np.random.rand(n / 3, 2) - 2,
+    ...                0.5 * np.random.rand(n / 3, 2),
+    ...                np.hstack([0.5 * np.random.rand(n / 3, 1) - 1,
+    ...                           0.5 * np.random.rand(n / 3, 1)])))
+    >>> lloyds = cluster.KMeans(K, max_iter=100, repeat=10)
+    >>> KMeans = estimators.Clustering(K, algorithm=lloyds)
+    >>> error = KMeans.fit(X).score(X)
+    >>> print error
+    27.6675491884
+    >>>
+    >>> #import matplotlib.pyplot as plot
+    >>> #mus = KMeans._means
+    >>> #plot.plot(X[:, 0], X[:, 1], '*')
+    >>> #plot.plot(mus[:, 0], mus[:, 1], 'rs')
+    >>> #plot.show()
+    """
+    def __init__(self, K, algorithm=None, algorithm_params=dict()):
+
+        self.K = max(1, int(K))
+
+        if algorithm is None:
+            algorithm = cluster.KMeans(**algorithm_params)
+        else:
+            algorithm.set_params(**algorithm_params)
+
+        super(Clustering, self).__init__(algorithm=algorithm)
+
+    def get_params(self):
+        """Return a dictionary containing the estimator's own input parameters.
+        """
+        return {"K": self.K}
+
+    def fit(self, X, means=None):
+        """Fit the estimator to the data.
+        """
+        X = check_arrays(X)
+
+        self._means = self.algorithm.run(X)
+
+        return self
+
+    def predict(self, X):
+        """Perform prediction using the fitted parameters.
+
+        Finds the closest cluster centre to each point. I.e. assigns a class to
+        each point.
+
+        Returns
+        -------
+        closest : A list. A list with p elements: The cluster indices.
+        """
+        X = check_arrays(X)
+
+        dists = np.zeros((X.shape[0], self.K))
+        i = 0
+        for mu in self._means:
+            dist = np.sum((X - mu) ** 2.0, axis=1)
+            dists[:, i] = dist
+            i += 1
+
+        closest = np.argmin(dists, axis=1).tolist()
+
+        return closest
+
+    def parameters(self):
+        """Returns the estimator's fitted means.
+        """
+        return self._means
+
+    def score(self, X):
+        """Computes the within-cluster sum of squares.
+        """
+        X = check_arrays(X)
+
+        closest = np.array(self.predict(X))
+        wcss = 0.0
+        for i in xrange(self.K):
+            idx = closest == i
+            wcss += np.sum((X[idx, :] - self._means[i, :]) ** 2.0)
+
+        return wcss
 
 
 if __name__ == "__main__":

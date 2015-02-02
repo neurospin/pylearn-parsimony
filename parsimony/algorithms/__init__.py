@@ -9,6 +9,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @license: BSD 3-clause.
 """
 from . import bases
+from . import cluster
 from . import deflation
 from . import gradient
 from . import multiblock
@@ -17,5 +18,5 @@ from . import primaldual
 from . import proximal
 from . import utils
 
-__all__ = ["bases", "deflation", "gradient", "multiblock", "nipals",
+__all__ = ["bases", "cluster", "deflation", "gradient", "multiblock", "nipals",
            "primaldual", "proximal", "utils"]
