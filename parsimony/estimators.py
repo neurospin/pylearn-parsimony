@@ -687,20 +687,20 @@ class LinearRegressionL1L2TV(RegressionEstimator):
 
     algorithm : ExplicitAlgorithm. The algorithm that should be applied.
             Should be one of:
-                1. StaticCONESTA(...)
-                2. DynamicCONESTA(...)
+                1. CONESTA(...)
+                2. StaticCONESTA(...)
                 3. FISTA(...)
                 4. ISTA(...)
                 5. ADMM(...)
                 6. NaiveCONESTA(...)
 
-            Default is StaticCONESTA(...).
+            Default is CONESTA(...).
 
     algorithm_params : A dict. The dictionary algorithm_params contains
             parameters that should be set in the algorithm. Passing
-            algorithm=StaticCONESTA(**params) is equivalent to passing
-            algorithm=StaticCONESTA() and algorithm_params=params. Default is
-            an empty dictionary.
+            algorithm=CONESTA(**params) is equivalent to passing
+            algorithm=CONESTA() and algorithm_params=params. Default is an
+            empty dictionary.
 
     penalty_start : Non-negative integer. The number of columns, variables
             etc., to be exempt from penalisation. Equivalently, the first
@@ -774,16 +774,20 @@ class LinearRegressionL1L2TV(RegressionEstimator):
                  mean=True,
                  rho=1.0):
 
+        self.l1 = max(consts.TOLERANCE, float(l1))
+        self.l2 = max(consts.TOLERANCE, float(l2))
+        self.tv = max(consts.FLOAT_EPSILON, float(tv))
+
         if algorithm is None:
-            algorithm = proximal.StaticCONESTA(**algorithm_params)
+            algorithm = proximal.CONESTA(**algorithm_params)
         else:
             algorithm.set_params(**algorithm_params)
 
-        super(LinearRegressionL1L2TV, self).__init__(algorithm=algorithm)
+        if isinstance(algorithm, proximal.CONESTA) \
+                and self.tv < consts.TOLERANCE:
+            algorithm = proximal.FISTA(**algorithm_params)
 
-        self.l1 = float(l1)
-        self.l2 = float(l2)
-        self.tv = float(tv)
+        super(LinearRegressionL1L2TV, self).__init__(algorithm=algorithm)
 
         if A is None:
             raise TypeError("A may not be None.")
@@ -904,18 +908,17 @@ class LinearRegressionL1L2GL(RegressionEstimator):
 
     algorithm : ExplicitAlgorithm. The algorithm that should be applied.
             Should be one of:
-                1. StaticCONESTA(...)
-                2. DynamicCONESTA(...)
-                3. FISTA(...)
-                4. ISTA(...)
+                1. FISTA(...)
+                2. ISTA(...)
+                3. StaticCONESTA(...)
 
-            Default is StaticCONESTA(...).
+            Default is FISTA(...).
 
     algorithm_params : A dict. The dictionary algorithm_params contains
             parameters that should be set in the algorithm. Passing
-            algorithm=StaticCONESTA(**params) is equivalent to passing
-            algorithm=StaticCONESTA() and algorithm_params=params. Default is
-            an empty dictionary.
+            algorithm=FISTA(**params) is equivalent to passing
+            algorithm=FISTA() and algorithm_params=params. Default is an empty
+            dictionary.
 
     penalty_start : Non-negative integer. The number of columns, variables
             etc., to be exempt from penalisation. Equivalently, the first
@@ -980,16 +983,20 @@ class LinearRegressionL1L2GL(RegressionEstimator):
                  penalty_start=0,
                  mean=True):
 
+        self.l1 = max(consts.TOLERANCE, float(l1))
+        self.l2 = max(consts.TOLERANCE, float(l2))
+        self.gl = max(consts.FLOAT_EPSILON, float(gl))
+
         if algorithm is None:
-            algorithm = proximal.StaticCONESTA(**algorithm_params)
+            algorithm = proximal.FISTA(**algorithm_params)
         else:
             algorithm.set_params(**algorithm_params)
 
-        super(LinearRegressionL1L2GL, self).__init__(algorithm=algorithm)
+        if isinstance(algorithm, proximal.CONESTA) \
+                and self.gl < consts.TOLERANCE:
+            algorithm = proximal.FISTA(**algorithm_params)
 
-        self.l1 = float(l1)
-        self.l2 = float(l2)
-        self.gl = float(gl)
+        super(LinearRegressionL1L2GL, self).__init__(algorithm=algorithm)
 
         if A is None:
             raise TypeError("A may not be None.")
@@ -1437,17 +1444,18 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
 
     algorithm : ExplicitAlgorithm. The algorithm that should be applied.
             Should be one of:
-                1. StaticCONESTA(...)
-                2. FISTA(...)
-                3. ISTA(...)
+                1. CONESTA(...)
+                2. StaticCONESTA(...)
+                3. FISTA(...)
+                4. ISTA(...)
 
-            Default is StaticCONESTA(...).
+            Default is CONESTA(...).
 
     algorithm_params : A dict. The dictionary algorithm_params contains
             parameters that should be set in the algorithm. Passing
-            algorithm=StaticCONESTA(**params) is equivalent to passing
-            algorithm=StaticCONESTA() and algorithm_params=params. Default is
-            an empty dictionary.
+            algorithm=CONESTA(**params) is equivalent to passing
+            algorithm=CONESTA() and algorithm_params=params. Default is an
+            empty dictionary.
 
     class_weight : Dict, 'auto' or None. If 'auto', class weights will be
             given inverse proportional to the frequency of the class in
@@ -1508,14 +1516,14 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
                  penalty_start=0,
                  mean=True):
 
-        if algorithm is None:
-            algorithm = proximal.StaticCONESTA(**algorithm_params)
-        else:
-            algorithm.set_params(**algorithm_params)
-
         self.l1 = max(consts.TOLERANCE, float(l1))
         self.l2 = max(consts.TOLERANCE, float(l2))
         self.tv = max(consts.FLOAT_EPSILON, float(tv))
+
+        if algorithm is None:
+            algorithm = proximal.CONESTA(**algorithm_params)
+        else:
+            algorithm.set_params(**algorithm_params)
 
         if isinstance(algorithm, proximal.CONESTA) \
                 and self.tv < consts.TOLERANCE:
@@ -1611,17 +1619,17 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
 
     algorithm : ExplicitAlgorithm. The algorithm that should be applied.
             Should be one of:
-                1. StaticCONESTA(...)
-                2. FISTA(...)
-                3. ISTA(...)
+                1. FISTA(...)
+                2. ISTA(...)
+                3. StaticCONESTA(...)
 
-            Default is StaticCONESTA(...).
+            Default is FISTA(...).
 
     algorithm_params : A dict. The dictionary algorithm_params contains
             parameters that should be set in the algorithm. Passing
-            algorithm=StaticCONESTA(**params) is equivalent to passing
-            algorithm=StaticCONESTA() and algorithm_params=params. Default is
-            an empty dictionary.
+            algorithm=FISTA(**params) is equivalent to passing
+            algorithm=FISTA() and algorithm_params=params. Default is an empty
+            dictionary.
 
     class_weight : Dict, 'auto' or None. If 'auto', class weights will be
             given inverse proportional to the frequency of the class in
@@ -1686,17 +1694,21 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
                  penalty_start=0,
                  mean=True):
 
+        self.l1 = max(consts.TOLERANCE, float(l1))
+        self.l2 = max(consts.TOLERANCE, float(l2))
+        self.gl = max(consts.FLOAT_EPSILON, float(gl))
+
         if algorithm is None:
-            algorithm = proximal.StaticCONESTA(**algorithm_params)
+            algorithm = proximal.FISTA(**algorithm_params)
         else:
             algorithm.set_params(**algorithm_params)
 
+        if isinstance(algorithm, proximal.CONESTA) \
+                and self.gl < consts.TOLERANCE:
+            algorithm = proximal.FISTA(**algorithm_params)
+
         super(LogisticRegressionL1L2GL, self).__init__(algorithm=algorithm,
                                                      class_weight=class_weight)
-
-        self.l1 = float(l1)
-        self.l2 = float(l2)
-        self.gl = float(gl)
 
         if isinstance(algorithm, proximal.CONESTA) \
                 and self.gl < consts.TOLERANCE:
