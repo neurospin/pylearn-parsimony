@@ -1513,16 +1513,16 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
         else:
             algorithm.set_params(**algorithm_params)
 
-        super(LogisticRegressionL1L2TV, self).__init__(algorithm=algorithm,
-                                                     class_weight=class_weight)
-
-        self.l1 = float(l1)
-        self.l2 = float(l2)
-        self.tv = float(tv)
+        self.l1 = max(consts.TOLERANCE, float(l1))
+        self.l2 = max(consts.TOLERANCE, float(l2))
+        self.tv = max(consts.FLOAT_EPSILON, float(tv))
 
         if isinstance(algorithm, proximal.CONESTA) \
                 and self.tv < consts.TOLERANCE:
-            warnings.warn("The TV parameter should be positive.")
+            algorithm = proximal.FISTA(**algorithm_params)
+
+        super(LogisticRegressionL1L2TV, self).__init__(algorithm=algorithm,
+                                                     class_weight=class_weight)
 
         if A is None:
             raise TypeError("A may not be None.")
