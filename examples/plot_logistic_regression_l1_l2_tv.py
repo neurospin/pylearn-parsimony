@@ -20,16 +20,14 @@ from sklearn.linear_model import LogisticRegression
 
 ###########################################################################
 ## Dataset
-n_samples = 500
-shape = (300, 300, 1)
-shape = (100, 100, 1)
+n_samples = 200
+shape = (50, 50, 1)
 
 X3d, y, beta3d, proba = datasets.classification.dice5.load(n_samples=n_samples,
 shape=shape, snr=10, random_seed=1, obj_pix_ratio=2.)
 X = X3d.reshape((n_samples, np.prod(beta3d.shape)))
-#plt.plot(proba[y.ravel() == 1], "ro", proba[y.ravel() == 0], "bo")
-#plt.show()
 
+###
 n_train = 100
 
 Xtr = X[:n_train, :]
@@ -37,19 +35,18 @@ ytr = y[:n_train]
 Xte = X[n_train:, :]
 yte = y[n_train:]
 
-alpha = .5  # global penalty
+alpha = .1  # global penalty
 
 ###########################################################################
 ## Use sklearn l2 penalized LogisticRegression
 # Minimize:
 # f(beta) = - C loglik+ 1/2 * ||beta||^2_2
-ridge_sklrn = LogisticRegression(C=alpha / n_train, fit_intercept=False)
+ridge_sklrn = LogisticRegression(C=1. / (alpha * n_train), fit_intercept=False)
+
 yte_pred_ridge = ridge_sklrn.fit(Xtr, ytr.ravel()).predict(Xte)
 _, recall_ridge_sklrn, _, _ = precision_recall_fscore_support(yte, yte_pred_ridge, average=None)
 
-###########################################################################
-## Limit the number of iteration to 500
-algorithm = algorithms.proximal.CONESTA(max_iter=500)
+
 #algorithm = algorithms.proximal.StaticCONESTA(max_iter=5000)
 #algorithm = algorithms.primaldual.StaticCONESTA(max_iter=500)
 #A, _ = nesterov_tv.A_from_shape(beta3d.shape)
@@ -59,7 +56,9 @@ algorithm = algorithms.proximal.CONESTA(max_iter=500)
 # Minimize:
 #    f(beta, X, y) = - loglik/n_train + k/2 * ||beta||^2_2
 A, n_compacts = nesterov_tv.linear_operator_from_shape(beta3d.shape)
-ridge_prsmy = estimators.LogisticRegressionL1L2TV(0, alpha, 0, A, algorithm=algorithm)
+ridge_prsmy = estimators.RidgeLogisticRegression(alpha)
+#ridge_prsmy = estimators.RidgeRegression(alpha)
+
 yte_pred_ridge_prsmy = ridge_prsmy.fit(Xtr, ytr).predict(Xte)
 _, recall_ridge_prsmy, _, _ = precision_recall_fscore_support(yte, yte_pred_ridge_prsmy, average=None)
 
@@ -70,12 +69,16 @@ _, recall_ridge_prsmy, _, _ = precision_recall_fscore_support(yte, yte_pred_ridg
 #                    + k/2 * ||beta||^2_2
 #                    + l * ||beta||_1
 #                    + g * TV(beta)
-l1, l2, tv = alpha * np.array((.01, .49, .49)) #/ 10 # l2, l1, tv penalties
-l1, l2, tv = alpha * np.array((.05, .45, 5)) #/ 10 # l2, l1, tv penalties
-
+#l1, l2, tv = alpha * np.array((.01, .49, .49)) #/ 10 # l2, l1, tv penalties
+#l1, l2, tv = alpha * np.array((.05, .45, 5)) #/ 10 # l2, l1, tv penalties
+#l1, l2, tv = alpha * np.array((.01, .69, .3)) #/ 10 # l2, l1, tv penalties
+#alpha = .1
+l1, l2, tv = alpha * np.array((.1, .1, 10.)) #/ 10 # l2, l1, tv penalties
+## Limit the number of iteration to 500
+conesta = algorithms.proximal.CONESTA(max_iter=500)
 
 A, n_compacts = nesterov_tv.linear_operator_from_shape(beta3d.shape)
-enettv = estimators.LogisticRegressionL1L2TV(l1, l2, tv, A, algorithm=algorithm)
+enettv = estimators.LogisticRegressionL1L2TV(l1, l2, tv, A, algorithm=conesta)
 yte_pred_enettv = enettv.fit(Xtr, ytr).predict(Xte)
 _, recall_enettv, _, _ = precision_recall_fscore_support(yte, yte_pred_enettv, average=None)
 

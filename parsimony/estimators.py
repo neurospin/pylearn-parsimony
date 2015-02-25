@@ -1363,7 +1363,7 @@ class RidgeLogisticRegression(LogisticRegressionEstimator):
         self.l = max(0.0, float(l))
 
         if algorithm is None:
-            algorithm = proximal.GradientDescent(**algorithm_params)
+            algorithm = gradient.GradientDescent(**algorithm_params)
         else:
             algorithm.set_params(**algorithm_params)
 
