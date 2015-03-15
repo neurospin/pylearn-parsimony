@@ -17,6 +17,6 @@ from . import estimators
 from . import functions
 from . import utils
 
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 
 __all__ = ["algorithms", "datasets", "estimators", "functions", "utils"]
