@@ -14,8 +14,8 @@ from ..regression import dice5 as dice5regression
 
 ############################################################################
 def load(n_samples=100, shape=(30, 30, 1),
-                           snr=2., sigma_logit=5., random_seed=None,
-                           **kwargs):
+         snr=2., sigma_logit=5., random_seed=None,
+         **kwargs):
     """Generate classification samples (images + target variable) and beta.
     Call make_regression_struct then apply the logistic function:
     proba = 1. / (1 + exp(-(X * beta + noise)), then
@@ -23,15 +23,7 @@ def load(n_samples=100, shape=(30, 30, 1),
 
     Parameters
     ----------
-    See make_regression_struct, exept for r2 which is replaced by snr.
-
-    snr: Float. Default 2. Signal to noise ratio: std(X * beta) / std(noise)
-            in 1. / (1 + exp(-(X * beta + noise))
-
-    sigma_logit: Float. Default is 5. The standard deviation of
-        logit = X * beta + noise. Large sigma_logit promotes sharp shape of
-        logistic function, ie: probabilities are close to 0 or 1, which
-        increases likekihood.
+    See datasets.regression.dice5.
 
     Returns
     -------
@@ -47,7 +39,7 @@ def load(n_samples=100, shape=(30, 30, 1),
 
     See also
     --------
-    make_regression_struct
+    regression.dice5.load()
 
     Examples
     --------
@@ -55,36 +47,13 @@ def load(n_samples=100, shape=(30, 30, 1),
     >>> np.random.seed(42)
     >>> import matplotlib.pyplot as plot
     >>> from  parsimony import datasets
-    >>> n_samples = 100
-    >>> shape = (11, 11, 1)
     >>> X3d, y, beta3d, proba = datasets.classification.dice5.load(
-    ...     n_samples=n_samples, shape=shape, snr=5, random_seed=1)
-    >>> print "Likelihood = %f" % (np.prod(proba[y.ravel()==1])
-    ...                          * np.prod(1-proba[y.ravel()==0]))
-    Likelihood = 0.000004
-    >>> X3d, y, beta3d, proba = datasets.classification.dice5.load(
-    ...     n_samples=n_samples, shape=shape, sigma_logit=5., random_seed=1)
-    >>> print "Likelihood = %f" % (np.prod(proba[y.ravel()==1])
-    ...                          * np.prod(1-proba[y.ravel()==0]))
-    Likelihood = 0.000001
+    ...     n_samples=100, shape=(11, 11, 1), random_seed=1)
     """
     X3d, y, beta3d = dice5regression.load(n_samples=n_samples, shape=shape,
-                                          r2=1.0, random_seed=random_seed,
+                                          random_seed=random_seed,
                                           **kwargs)
-    X = X3d.reshape((n_samples, np.prod(shape)))
-    beta = beta3d.ravel()
-    coef = float(sigma_logit) / np.sqrt(snr ** 2 + 1)
-    beta *= coef * snr / np.std(np.dot(X, beta))
-    if random_seed is not None:  # If random seed, save current random state
-        rnd_state = np.random.get_state()
-        np.random.seed(random_seed)
-    noise = coef * np.random.normal(0, 1, X.shape[0])
-    if random_seed is not None:   # If random seed, restore random state
-        np.random.set_state(rnd_state)
-    logit = np.dot(X, beta) + noise
-    #np.std(np.dot(X, beta)) / np.std(noise)
-    #np.std(logit)
-#    proba = 1.0 / (1.0 + np.exp(-logit))
+    logit = y
     proba = np.reciprocal(1.0 + np.exp(-logit))
     y = np.ones(y.shape)
     y[proba < 0.5] = 0
