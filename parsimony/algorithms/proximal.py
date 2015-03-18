@@ -18,6 +18,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @license: BSD 3-clause.
 """
 import numpy as np
+from scipy.interpolate import PchipInterpolator as interp1
 
 try:
     from . import bases  # Only works when imported as a package.
@@ -70,8 +71,8 @@ class ISTA(bases.ExplicitAlgorithm,
     >>> ista = ISTA(max_iter=10000)
     >>> beta1 = ista.run(function, np.random.rand(50, 1))
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
-    >>> round(np.linalg.norm(beta1 - beta2), 14)
-    0.00031215576326
+    >>> round(np.linalg.norm(beta1 - beta2), 13)
+    0.0003121557633
     >>>
     >>> np.random.seed(42)
     >>> X = np.random.rand(100, 50)
@@ -82,8 +83,8 @@ class ISTA(bases.ExplicitAlgorithm,
     >>> ista = ISTA(max_iter=10000)
     >>> beta1 = ista.run(function, np.random.rand(50, 1))
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
-    >>> round(np.linalg.norm(beta1 - beta2), 14)
-    0.82723303104583
+    >>> round(np.linalg.norm(beta1 - beta2), 13)
+    0.8272330310458
     >>> np.linalg.norm(beta2.ravel(), 0)
     50
     >>> np.linalg.norm(beta1.ravel(), 0)
@@ -551,6 +552,10 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
     tau : Float, 0 < tau < 1. The rate at which eps is decreasing. Default
             is 0.5.
 
+    exponent : Float, in [1.001, 2.0]. The assumed convergence rate of
+            ||beta* - beta_k||_2 for k=1,2,... is O(1 / k^exponent). Default
+            is 1.5.
+
     eps : Positive float. Tolerance for the stopping criterion.
 
     info : List or tuple of utils.Info. What, if any, extra run information
@@ -561,6 +566,54 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
 
     min_iter : Non-negative integer less than or equal to max_iter. Minimum
             number of iterations that must be performed. Default is 1.
+
+    Example
+    -------
+    >>> from parsimony.algorithms.proximal import StaticCONESTA
+    >>> from parsimony.functions.nesterov import l1tv
+    >>> from parsimony.functions import LinearRegressionL1L2TV
+    >>> import scipy.sparse as sparse
+    >>> import numpy as np
+    >>>
+    >>> np.random.seed(42)
+    >>> X = np.random.rand(100, 50)
+    >>> y = np.random.rand(100, 1)
+    >>> A = sparse.csr_matrix((50, 50))  # Unused here
+    >>> function = LinearRegressionL1L2TV(X, y, 0.0, 0.0, 0.0,
+    ...                                   A=[A], mu=0.0)
+    >>> static_conesta = StaticCONESTA(max_iter=10000)
+    >>> beta1 = static_conesta.run(function, np.random.rand(50, 1))
+    >>> beta2 = np.dot(np.linalg.pinv(X), y)
+    >>> round(np.linalg.norm(beta1 - beta2), 13)
+    3.0183961e-06
+    >>>
+    >>> np.random.seed(42)
+    >>> X = np.random.rand(100, 50)
+    >>> y = np.random.rand(100, 1)
+    >>> A = sparse.csr_matrix((50, 50))
+    >>> function = LinearRegressionL1L2TV(X, y, 0.1, 0.0, 0.0,
+    ...                                   A=[A], mu=0.0)
+    >>> static_conesta = StaticCONESTA(max_iter=10000)
+    >>> beta1 = static_conesta.run(function, np.random.rand(50, 1))
+    >>> beta2 = np.dot(np.linalg.pinv(X), y)
+    >>> round(np.linalg.norm(beta1 - beta2), 13)
+    0.8272329573827
+    >>> np.linalg.norm(beta2.ravel(), 0)
+    50
+    >>> np.linalg.norm(beta1.ravel(), 0)
+    7
+    >>>
+    >>> np.random.seed(42)
+    >>> X = np.random.rand(100, 50)
+    >>> y = np.random.rand(100, 1)
+    >>> A = l1tv.linear_operator_from_shape((1, 1, 50), 50)
+    >>> function = LinearRegressionL1L2TV(X, y, 0.1, 0.1, 0.1,
+    ...                                   A=A, mu=0.0)
+    >>> static_conesta = StaticCONESTA(max_iter=10000)
+    >>> beta1 = static_conesta.run(function, np.zeros((50, 1)))
+    >>> beta2 = np.dot(np.linalg.pinv(X), y)
+    >>> round(np.linalg.norm(beta1 - beta2), 13)
+    0.9662907379987
     """
     INTERFACES = [properties.NesterovFunction,
                   properties.StepSize,
@@ -574,32 +627,66 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
                      Info.continuations,
                      Info.time,
                      Info.fvalue,
+                     Info.func_val,
                      Info.mu]
 
-    def __init__(self, mu_min=consts.TOLERANCE, tau=0.5,
-                 info=[], eps=consts.TOLERANCE, max_iter=10000, min_iter=1):
+    def __init__(self, mu_min=consts.TOLERANCE, tau=0.5, exponent=1.5,
+                 info=[], eps=consts.TOLERANCE, max_iter=10000, min_iter=1,
+                 simulation=False):
 
         super(StaticCONESTA, self).__init__(info=info,
                                             max_iter=max_iter,
                                             min_iter=min_iter)
 
-        self.mu_min = max(consts.TOLERANCE, float(mu_min))
+        self.mu_min = max(consts.FLOAT_EPSILON, float(mu_min))
         self.tau = max(consts.TOLERANCE,
                        min(float(tau), 1.0 - consts.TOLERANCE))
+        self.exponent = max(1.001, min(float(exponent), 2.0))
         self.eps = max(consts.TOLERANCE, float(eps))
+        self.simulation = bool(simulation)
+
+        self._harmonic = None
+
+    def _harmonic_number_approx(self):
+
+        if self._harmonic is None:
+            x = [1.001, 1.005, 1.01, 1.025, 1.05, 1.075, 1.1, 1.2, 1.3, 1.4,
+                 1.5, 1.6, 1.7, 1.8, 1.9, 2.0]
+            y = [1000.58, 200.578, 100.578, 40.579, 20.5808, 13.916, 10.5844,
+                 5.59158, 3.93195, 3.10555, 2.61238, 2.28577, 2.05429, 1.88223,
+                 1.74975, 1.64493]
+
+            f = interp1(x, y)
+
+            self._harmonic = f(self.exponent)
+
+        return self._harmonic
+
+    def _approximate_eps(self, function, beta0):
+        old_mu = function.set_mu(self.mu_min)
+
+        step = function.step(beta0)
+        D1 = maths.norm(function.prox(-step * function.grad(beta0),
+                                      step,
+                                      # Arbitrary eps ...
+                                      eps=np.sqrt(consts.TOLERANCE),
+                                      max_iter=self.max_iter))
+        function.set_mu(old_mu)
+
+        return (2.0 / step) * D1 * self._harmonic_number_approx()
 
     @bases.force_reset
     @bases.check_compatibility
     def run(self, function, beta):
 
-        # Copy the allowed info keys for FISTA. CONESTA always ask the gap.
-        fista_info = [Info.gap]
+        # Copy the allowed info keys for FISTA.
+        fista_info = list()
         for nfo in self.info_copy():
             if nfo in FISTA.INFO_PROVIDED:
                 fista_info.append(nfo)
 
         # Create the inner algorithm.
-        algorithm = FISTA(use_gap=True, info=fista_info, eps=self.eps,
+        algorithm = FISTA(info=fista_info, eps=self.eps,
                           max_iter=self.max_iter, min_iter=self.min_iter)
 
         # Not ok until the end.
@@ -608,71 +695,90 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
 
         # Time the init computation.
         if self.info_requested(Info.time):
-            init_time = utils.time_cpu()
+            init_time = utils.time()
 
-        # Compute current gap and decrease by tau.
-        gap = function.gap(beta, eps=self.eps / 2.0, max_iter=self.max_iter)
-        eps = self.tau * gap
-        # Compute and set mu. We use 1/2 as in Chen et al. (2012).
-        gM = function.eps_max(1.0)
-        mu = 0.5 * eps / gM
+        # Estimate the initial precision, eps, and the smoothing parameter mu.
+        gM = function.eps_max(1.0)  # gamma * M
+        if maths.norm(beta) > 0.0:
+            A = function.A()
+            normAg = np.zeros((A[0].shape[0], 1))
+            for Ai in A:
+                normAg += Ai.dot(beta) ** 2.0
+            normAg = np.sqrt(normAg)
+            mu = np.max(normAg)
+
+            eps = mu * gM
+
+        else:
+            eps = self._approximate_eps(function, beta)
+            mu = eps / gM
+
         function.set_mu(mu)
 
-        # Initialise info variables.
+        # Initialise info variables. Info variables have the suffix "_".
         if self.info_requested(Info.time):
             t_ = []
-        if self.info_requested(Info.fvalue):
+            init_time = utils.time() - init_time
+        if self.info_requested(Info.fvalue) \
+                or self.info_requested(Info.func_val):
             f_ = []
-        if self.info_requested(Info.gap):
-            gap_ = []
-        if self.info_requested(Info.mu):
-            mu_ = []
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
+        if self.info_requested(Info.mu):
+            mu_ = []
 
         i = 0  # Iteration counter.
         while True:
             converged = False
 
-            # Set current parameters to algorithm.
-            algorithm.set_params(eps=eps / 2.0,
+            # Give current parameters to the algorithm.
+            algorithm.set_params(eps=eps,
                                  max_iter=self.max_iter - self.num_iter)
-            beta = algorithm.run(function, beta)
+            # Run FISTA.
+            beta_new = algorithm.run(function, beta)
+
+            # Update global iteration count.
+            self.num_iter += algorithm.num_iter
 
             # Get info from algorithm.
             if Info.time in algorithm.info and \
-               self.info_requested(Info.time):
+                    self.info_requested(Info.time):
                 t_ += algorithm.info_get(Info.time)
-                if i == 0:  # add init time to first iteration
+                if i == 0:  # Add init time to first iteration.
                     t_[0] += init_time
-            if Info.fvalue in algorithm.info and \
-                self.info_requested(Info.fvalue):
+            if Info.func_val in algorithm.info \
+                    and self.info_requested(Info.func_val):
+                f_ += algorithm.info_get(Info.func_val)
+            elif Info.fvalue in algorithm.info \
+                    and self.info_requested(Info.fvalue):
                 f_ += algorithm.info_get(Info.fvalue)
             if self.info_requested(Info.mu):
                 mu_ += [mu] * algorithm.num_iter
-            if self.info_requested(Info.gap):
-                gap_ += algorithm.info_get(Info.gap)
 
-            # Update iteration counter.
-            self.num_iter += algorithm.num_iter
+            # Unless this is a simulation, you want the algorithm to stop when
+            # it has converged.
+            if not self.simulation:
 
-            # get gap from last FISTA run
-            gap = algorithm.info_get(Info.gap)[-1]
+                # Stopping criterion.
+                step = function.step(beta_new)
+                if maths.norm(beta_new - beta) < step * self.eps:
 
-            if gap < self.eps / 2.0:
-                converged = True
-                if self.info_requested(Info.converged):
-                    self.info_set(Info.converged, True)
+                    if self.info_requested(Info.converged):
+                        self.info_set(Info.converged, True)
 
-            # Stopping criteria
-            if converged or self.num_iter >= self.max_iter or \
-                mu < consts.TOLERANCE:
+                    converged = True
+
+            beta = beta_new
+
+            # All combined stopping criteria.
+            if (converged or self.num_iter >= self.max_iter) \
+                    and self.num_iter >= self.min_iter:
                 break
 
             # Update the precision eps.
             eps = self.tau * eps
             # Compute and update mu.
-            mu = max(self.mu_min, 0.5 * eps / gM)
+            mu = max(self.mu_min, eps / gM)
             function.set_mu(mu)
 
             i = i + 1
@@ -685,8 +791,6 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
             self.info_set(Info.time, t_)
         if self.info_requested(Info.fvalue):
             self.info_set(Info.fvalue, f_)
-        if self.info_requested(Info.gap):
-            self.info_set(Info.gap, gap_)
         if self.info_requested(Info.mu):
             self.info_set(Info.mu, mu_)
         if self.info_requested(Info.ok):
@@ -883,7 +987,8 @@ class ADMM(bases.ExplicitAlgorithm,
                 s = (z_new - z_old) * -self.rho
                 norm_r = maths.norm(r)
                 norm_s = maths.norm(s)
-#                print "norm(r): ", norm_r, ", norm(s): ", norm_s, ", rho:", self.rho
+#                print "norm(r): ", norm_r, ", norm(s): ", norm_s, ", rho:", \
+#                    self.rho
 
                 if norm_r > self.mu * norm_s:
                     self.rho *= self.tau

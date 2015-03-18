@@ -24,8 +24,9 @@ import numpy as np
 #TODO: This depends on the OS. We should try to be clever here ...
 time_cpu = clock  # UNIX-based system measures CPU time used.
 time_wall = time  # UNIX-based system measures time in seconds since the epoch.
+time = time_cpu  # TODO: Make it so that this can be changed by settings.
 
-__all__ = ["time_cpu", "time_wall", "deprecated",
+__all__ = ["time_cpu", "time_wall", "time", "deprecated",
            "optimal_shrinkage", "AnonymousClass"]
 
 #_DEBUG = True
