@@ -103,6 +103,8 @@ class CombinedFunction(properties.CompositeFunction,
 
         if not isinstance(penalty, properties.Penalty):
             raise ValueError("Not a penalty.")
+        elif isinstance(penalty, properties.Gradient):
+            self._p.append(penalty)
         elif isinstance(penalty, properties.ProximalOperator):
             if len(self._c) > 0:
                 # TODO: Yes we can! Fix this!
@@ -111,8 +113,6 @@ class CombinedFunction(properties.CompositeFunction,
             else:
                 # TODO: We currently only allow one proximal operator. Fix!
                 self._prox[0] = penalty
-        elif isinstance(penalty, properties.Gradient):
-            self._p.append(penalty)
         else:
             raise ValueError("The penalty is not smooth, nor has it a "
                              "proximal operator.")
