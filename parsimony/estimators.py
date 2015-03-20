@@ -602,8 +602,8 @@ class ElasticNet(RegressionEstimator):
     ...                            algorithm_params=dict(max_iter=1000),
     ...                            mean=False)
     >>> error = en.fit(X, y).score(X, y)
-    >>> print "error = ", error
-    error =  0.492096328053
+    >>> print "error = ", round(error, 13)
+    error =  0.395494642796
     """
     def __init__(self, l, alpha=1.0, algorithm=None, algorithm_params=dict(),
                  start_vector=start_vectors.RandomStartVector(),

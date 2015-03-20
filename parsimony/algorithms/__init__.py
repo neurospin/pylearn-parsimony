@@ -8,7 +8,10 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
-from . import bases
+try:
+    from . import bases  # Only works when imported as a package.
+except ValueError:
+    import parsimony.algorithms.bases as bases  # When run as a program.
 from . import cluster
 from . import deflation
 from . import gradient
