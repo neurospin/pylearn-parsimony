@@ -952,7 +952,7 @@ class LinearRegressionL1L2GL(RegressionEstimator):
     ...                                   mean=False)
     >>> res = lr.fit(X, y)
     >>> round(lr.score(X, y), 13)
-    0.6101844897175
+    0.6101838224235
     >>>
     >>> lr = estimators.LinearRegressionL1L2GL(l1, l2, gl, A,
     ...                                  algorithm=proximal.CONESTA(),

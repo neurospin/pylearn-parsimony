@@ -777,7 +777,6 @@ class NesterovFunction(Gradient,
         raise NotImplementedError('Abstract method "M" must be '
                                   'specialised!')
 
-    @abc.abstractmethod
     def estimate_mu(self, beta):
         """ Compute a "good" value of mu with respect to the given beta.
 
@@ -786,8 +785,17 @@ class NesterovFunction(Gradient,
         beta : Numpy array (p-by-1). The primal variable at which to compute a
                 feasible value of mu.
         """
-        raise NotImplementedError('Abstract method "estimate_mu" must be '
-                                  'specialised!')
+        if self.penalty_start > 0:
+            beta_ = beta[self.penalty_start:, :]
+        else:
+            beta_ = beta
+
+        SS = 0.0
+        A = self.A()
+        for i in xrange(len(A)):
+            SS = max(SS, maths.norm(A[i].dot(beta_)))
+
+        return SS
 
     def lambda_max(self):
         """ Largest eigenvalue of the corresponding covariance matrix.
