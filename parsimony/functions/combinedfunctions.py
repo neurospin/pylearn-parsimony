@@ -242,7 +242,8 @@ class CombinedFunction(properties.CompositeFunction,
             p = -self.grad(x)
             line_search = BacktrackingLineSearch(
                 condition=penalties.SufficientDescentCondition, max_iter=30)
-            step = line_search.run(self, x, p, rho=0.5, a=0.1, c=1e-4)
+            step = line_search.run(self, x, p, rho=0.5, a=0.1,
+                                   condition_params=dict(c=1e-4))
 
         return step
 
