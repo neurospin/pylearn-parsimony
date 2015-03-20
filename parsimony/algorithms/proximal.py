@@ -18,7 +18,10 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @license: BSD 3-clause.
 """
 import numpy as np
-from scipy.interpolate import PchipInterpolator as interp1
+try:
+    from scipy.interpolate import PchipInterpolator as interp1
+except ImportError:
+    from scipy.interpolate import interp1d as interp1
 
 try:
     from . import bases  # Only works when imported as a package.
