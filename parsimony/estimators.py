@@ -734,8 +734,8 @@ class LinearRegressionL1L2TV(RegressionEstimator):
     ...                      algorithm=proximal.StaticCONESTA(max_iter=1000),
     ...                      mean=False)
     >>> res = lr.fit(X, y)
-    >>> round(lr.score(X, y), 15)
-    0.068359831130674
+    >>> round(lr.score(X, y), 13)
+    0.0683842576534
     >>>
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                     algorithm=proximal.CONESTA(max_iter=1000),
@@ -951,8 +951,8 @@ class LinearRegressionL1L2GL(RegressionEstimator):
     ...                                   algorithm_params=dict(max_iter=1000),
     ...                                   mean=False)
     >>> res = lr.fit(X, y)
-    >>> round(lr.score(X, y), 14)
-    0.61051885664889
+    >>> round(lr.score(X, y), 13)
+    0.6101844897175
     >>>
     >>> lr = estimators.LinearRegressionL1L2GL(l1, l2, gl, A,
     ...                                  algorithm=proximal.CONESTA(),
