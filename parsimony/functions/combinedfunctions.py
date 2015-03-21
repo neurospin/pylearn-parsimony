@@ -1111,12 +1111,58 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
                                           mean=mean)
         self.l1 = L1(l1, penalty_start=penalty_start)
         self.tv = TotalVariation(tv, A=A, mu=mu, penalty_start=penalty_start)
-
+        if weights is None:
+            weights = np.ones(y.shape)  # .reshape(y.shape)
+        self.weights = weights
         self.penalty_start = penalty_start
         self.mean = mean
 
         self.reset()
 
+    def gap(self, beta, beta_hat=None,
+            eps=consts.TOLERANCE, max_iter=consts.MAX_ITER):
+        """Compute the duality gap for the logistic function.
+
+        From the interface "DualFunction".
+        """
+        if self.penalty_start > 0:
+            beta_ = beta[self.penalty_start:, :]
+        else:
+            beta_ = beta
+
+        n = float(self.X.shape[0])
+        alpha = self.tv.alpha(beta_)
+        g = self.fmu(beta_)
+        Xbeta = np.dot(self.X, beta_)
+        pi = np.reciprocal(1.0 + np.exp(-Xbeta))
+        #if weights is None:
+        #   weights = np.ones(self.y.shape)
+        scale = 1.0 / n if self.mean else 1.
+
+        # a  in the next line is the gradient of l at xbeta following the ols
+        # paper notations
+        a = (pi - self.y) * (self.weights * scale)
+        b = ((1. / (self.weights * scale)) * a) + self.y
+        f_ = np.sum((b * np.log(b) + (1 - b)
+                * np.log(1 - b)) * (self.weights * scale))
+
+        lAta = self.tv.l * self.tv.Aa(alpha)
+        if self.penalty_start > 0:
+            lAta = np.vstack((np.zeros((self.penalty_start, 1)),
+                              lAta))
+
+        alpha_sqsum = 0.0
+        for a_ in alpha:
+            alpha_sqsum += np.sum(a_ ** 2.0)
+
+        z = -np.dot(self.X.T, a)
+        h_ = (1.0 / (2 * self.rr.k)) \
+           * np.sum(maths.positive(np.abs(z - lAta) - self.l1.l) ** 2.0) \
+           + (0.5 * self.tv.l * self.tv.get_mu() * alpha_sqsum)
+
+        gap = g + f_ + h_
+
+        return gap
 
 class LogisticRegressionL1L2GL(LinearRegressionL1L2GL):
     """Combination (sum) of RidgeLogisticRegression, L1 and TotalVariation.
