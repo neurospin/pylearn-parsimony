@@ -1498,7 +1498,7 @@ class ElasticNetLogisticRegression(LogisticRegressionEstimator):
         y, sample_weight = check_arrays(y, sample_weight)
 
         function = functions.CombinedFunction()
-        function.add_function(losses.LogisticRegression(X, y, mean=self.mean))
+        function.add_loss(losses.LogisticRegression(X, y, mean=self.mean))
         function.add_penalty(penalties.L2Squared(l=self.alpha * (1.0 - self.l),
                                              penalty_start=self.penalty_start))
         function.add_prox(penalties.L1(l=self.alpha * self.l,
