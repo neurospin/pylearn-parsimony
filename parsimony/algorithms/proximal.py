@@ -18,7 +18,10 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @license: BSD 3-clause.
 """
 import numpy as np
-from scipy.interpolate import PchipInterpolator as interp1
+try:
+    from scipy.interpolate import PchipInterpolator as interp1
+except ImportError:
+    from scipy.interpolate import interp1d as interp1
 
 try:
     from . import bases  # Only works when imported as a package.
@@ -700,15 +703,8 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
         # Estimate the initial precision, eps, and the smoothing parameter mu.
         gM = function.eps_max(1.0)  # gamma * M
         if maths.norm(beta) > 0.0:
-            A = function.A()
-            normAg = np.zeros((A[0].shape[0], 1))
-            for Ai in A:
-                normAg += Ai.dot(beta) ** 2.0
-            normAg = np.sqrt(normAg)
-            mu = np.max(normAg)
-
+            mu = function.estimate_mu(beta)
             eps = mu * gM
-
         else:
             eps = self._approximate_eps(function, beta)
             mu = eps / gM

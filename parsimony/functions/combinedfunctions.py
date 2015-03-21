@@ -30,6 +30,7 @@ from .losses import LatentVariableVariance
 import parsimony.utils.linalgs as linalgs
 import parsimony.utils.consts as consts
 import parsimony.utils.maths as maths
+from parsimony.utils import deprecated
 
 __all__ = ["CombinedFunction",
            "LinearRegressionL1L2TV", "LinearRegressionL1L2GL",
@@ -86,19 +87,56 @@ class CombinedFunction(properties.CompositeFunction,
         for c in self._c:
             c.reset()
 
-    def add_function(self, function):
+    def add_loss(self, function):
 
         if not isinstance(function, properties.Gradient):
-            raise ValueError("Functions must have gradients.")
+            raise ValueError("Loss functions must have gradients.")
 
         self._f.append(function)
+
+    @deprecated("add_loss")
+    def add_function(self, function):
+
+        return self.add_loss(function)
 
     def add_penalty(self, penalty):
 
         if not isinstance(penalty, properties.Penalty):
             raise ValueError("Not a penalty.")
+        elif isinstance(penalty, properties.Gradient):
+            self._p.append(penalty)
+        elif isinstance(penalty, properties.ProximalOperator):
+            if len(self._c) > 0:
+                # TODO: Yes we can! Fix this!
+                raise ValueError("Cannot have both ProximalOperator and "
+                                 "ProjectionOperator.")
+            else:
+                # TODO: We currently only allow one proximal operator. Fix!
+                self._prox[0] = penalty
+        else:
+            raise ValueError("The penalty is not smooth, nor has it a "
+                             "proximal operator.")
+
+    def add_constraint(self, constraint):
+
+        if not isinstance(constraint, properties.Constraint):
+            raise ValueError("Not a constraint.")
+        elif not isinstance(constraint, properties.ProjectionOperator):
+            raise ValueError("Constraints must have projection operators.")
+        elif not isinstance(self._prox[0], ZeroFunction):
+            # TODO: Yes we can! Fix this!
+            raise ValueError("Cannot have both ProjectionOperator and "
+                             "ProximalOperator.")
+        else:
+            self._c.append(constraint)
+
+    def add_smooth_penalty(self, penalty):
+
+        if not isinstance(penalty, properties.Penalty):
+            raise ValueError("Not a penalty.")
         elif not isinstance(penalty, properties.Gradient):
-            raise ValueError("Penalties must have gradients.")
+            raise ValueError("The penalty is not smooth, nor has it a "
+                             "proximal operator.")
         else:
             self._p.append(penalty)
 
@@ -107,23 +145,19 @@ class CombinedFunction(properties.CompositeFunction,
         if not isinstance(penalty, properties.ProximalOperator):
             raise ValueError("Not a proximal operator.")
         elif len(self._c) > 0:
-            raise ValueError("Cannot have both ProximalOperator and " \
+            # TODO: Yes we can! Fix this!
+            raise ValueError("Cannot have both ProximalOperator and "
                              "ProjectionOperator.")
         else:
             # TODO: We currently only allow one proximal operator. Fix this!
             self._prox[0] = penalty
 
-    def add_constraint(self, constraint):
+    def add_nesterov(self, penalty):
 
-        if not isinstance(constraint, properties.Constraint):
-            raise ValueError("Not a constraint.")
-        elif not isinstance(constraint, properties.ProjectionOperator):
-            raise ValueError("Constraints must have projection operators.")
-        elif not isinstance(self._prox, ZeroFunction):
-            raise ValueError("Cannot have both ProjectionOperator and " \
-                             "ProximalOperator.")
+        if not isinstance(penalty, properties.NesterovFunction):
+            raise ValueError("Not a Nesterov function.")
         else:
-            self._c.append(constraint)
+            self._p.append(penalty)
 
     def f(self, x):
         """Function value.
@@ -208,7 +242,8 @@ class CombinedFunction(properties.CompositeFunction,
             p = -self.grad(x)
             line_search = BacktrackingLineSearch(
                 condition=penalties.SufficientDescentCondition, max_iter=30)
-            step = line_search.run(self, x, p, rho=0.5, a=0.1, c=1e-4)
+            step = line_search.run(self, x, p, rho=0.5, a=0.1,
+                                   condition_params=dict(c=1e-4))
 
         return step
 
