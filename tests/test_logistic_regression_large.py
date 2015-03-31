@@ -33,6 +33,8 @@ n_samples = 500
 shape = (50, 50, 1)
 n_train = 300
 
+np.random.seed(42)
+
 base_ftp_url = "ftp://ftp.cea.fr/pub/dsv/anatomist/parsimony/%s"
 dataset_basename = "data_logistic_%ix%ix%i_%i.npz" % \
     tuple(list(shape) + [n_samples])
