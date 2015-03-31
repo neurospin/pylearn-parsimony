@@ -1522,7 +1522,7 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
 
         f(beta) = -loglik / n_samples
                   + l1 * ||beta||_1
-                  + (l2 / (2 * n)) * ||beta||²_2
+                  + (l2 / 2) * ||beta||²_2
                   + tv * TV(beta)
     where
         loglik = Sum wi * (yi * log(pi) + (1 − yi) * log(1 − pi)),
