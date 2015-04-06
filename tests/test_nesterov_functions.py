@@ -68,7 +68,7 @@ class TestL1(TestCase):
         beta = fista.run(function, beta)
 
         berr = np.linalg.norm(beta - beta_star)
-        print "berr:", berr
+#        print "berr:", berr
         assert berr < 5e-2
 
         # Test proximal operator
@@ -151,12 +151,12 @@ class TestL1(TestCase):
         function.add_prox(nesterov.l1.L1(l, A=A, mu=5e-5,
                                          penalty_start=0))
 
-        fista = proximal.FISTA(eps=consts.TOLERANCE, max_iter=1760)
+        fista = proximal.FISTA(eps=consts.TOLERANCE, max_iter=800)
         beta = fista.run(function, beta)
 
         berr = np.linalg.norm(beta - beta_star)
 #        print "berr:", berr
-        assert berr < 5e-1
+        assert berr < 5e-0
 
 
 class TestL1TV(TestCase):
