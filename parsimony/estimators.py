@@ -602,7 +602,7 @@ class ElasticNet(RegressionEstimator):
     ...                            algorithm_params=dict(max_iter=1000),
     ...                            mean=False)
     >>> error = en.fit(X, y).score(X, y)
-    >>> print "error = ", error
+    >>> print "error = ", round(error, 13)
     error =  0.492096328053
     """
     def __init__(self, l, alpha=1.0, algorithm=None, algorithm_params=dict(),
@@ -734,8 +734,8 @@ class LinearRegressionL1L2TV(RegressionEstimator):
     ...                      algorithm=proximal.StaticCONESTA(max_iter=1000),
     ...                      mean=False)
     >>> res = lr.fit(X, y)
-    >>> round(lr.score(X, y), 15)
-    0.068359831130674
+    >>> round(lr.score(X, y), 13)
+    0.0683842576534
     >>>
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                     algorithm=proximal.CONESTA(max_iter=1000),
@@ -951,8 +951,8 @@ class LinearRegressionL1L2GL(RegressionEstimator):
     ...                                   algorithm_params=dict(max_iter=1000),
     ...                                   mean=False)
     >>> res = lr.fit(X, y)
-    >>> round(lr.score(X, y), 14)
-    0.61051885664889
+    >>> round(lr.score(X, y), 13)
+    0.6101838224235
     >>>
     >>> lr = estimators.LinearRegressionL1L2GL(l1, l2, gl, A,
     ...                                  algorithm=proximal.CONESTA(),
@@ -1498,7 +1498,7 @@ class ElasticNetLogisticRegression(LogisticRegressionEstimator):
         y, sample_weight = check_arrays(y, sample_weight)
 
         function = functions.CombinedFunction()
-        function.add_function(losses.LogisticRegression(X, y, mean=self.mean))
+        function.add_loss(losses.LogisticRegression(X, y, mean=self.mean))
         function.add_penalty(penalties.L2Squared(l=self.alpha * (1.0 - self.l),
                                              penalty_start=self.penalty_start))
         function.add_prox(penalties.L1(l=self.alpha * self.l,
@@ -1522,7 +1522,7 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
 
         f(beta) = -loglik / n_samples
                   + l1 * ||beta||_1
-                  + (l2 / (2 * n)) * ||beta||²_2
+                  + (l2 / 2) * ||beta||²_2
                   + tv * TV(beta)
     where
         loglik = Sum wi * (yi * log(pi) + (1 − yi) * log(1 − pi)),

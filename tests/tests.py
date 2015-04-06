@@ -127,7 +127,7 @@ def test_all():
         parsimonydir = testdir + "/../parsimony"
 
     exec_string = "nosetests --with-doctest --doctest-tests " + \
-                  "--with-coverage -vv -w %s" \
+                  "--with-coverage --verbosity=3 -w %s" \
                   % (parsimonydir,)
 
     # First run doctests in parsimony.
@@ -137,7 +137,7 @@ def test_all():
 #    print "testdir:", testdir
 #    print "__file__:", __file__
     exec_string = "nosetests --with-doctest --doctest-tests " + \
-                  "--with-coverage -vv -w %s" \
+                  "--with-coverage --verbosity=3 -w %s" \
                   % (testdir,)
     # Then run unit tests in test directory.
     print

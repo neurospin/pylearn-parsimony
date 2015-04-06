@@ -275,12 +275,14 @@ class TotalVariation(properties.NesterovFunction,
         else:
             beta_ = beta
 
-        SS = 0.0
         A = self.A()
-        for i in xrange(len(A)):
-            SS = max(SS, maths.norm(A[i].dot(beta_)))
+        normAg = np.zeros((A[0].shape[0], 1))
+        for Ai in A:
+            normAg += Ai.dot(beta_) ** 2.0
+        normAg = np.sqrt(normAg)
+        mu = np.max(normAg)
 
-        return np.max(np.sqrt(SS))
+        return mu
 
 
 @utils.deprecated("linear_operator_from_mask")

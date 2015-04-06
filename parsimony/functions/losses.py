@@ -471,8 +471,8 @@ class LogisticRegression(properties.AtomicFunction,
         >>> L_ = lr.approx_L((15, 1), 10000)
         >>> L >= L_
         True
-        >>> (L - L_) / L
-        0.43030668361201979
+        >>> round((L - L_) / L, 13)
+        0.430306683612
         """
         if self._L == None:
             # pi(x) * (1 - pi(x)) <= 0.25 = 0.5 * 0.5
