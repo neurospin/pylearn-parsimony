@@ -11,9 +11,14 @@
 #
 #     $ sudo apt-get install python-epydoc
 #
+# and that dvipng is installed:
+#
+#    $ sudo apt-get install dvipng
+#
 # and that Parsimony is in your PYTHONPATH:
 #
 #    export PYTHONPATH=$PYTHONPATH:/path/to/pylearn-parsimony/
+#
 
 # Build html page on your machine:
 make html
