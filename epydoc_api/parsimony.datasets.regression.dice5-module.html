@@ -96,7 +96,7 @@
         <span class="summary-sig-arg">shape</span>=<span class="summary-sig-default"><code class="variable-group">(</code>30<code class="variable-op">, </code>30<code class="variable-op">, </code>1<code class="variable-group">)</code></span>,
         <span class="summary-sig-arg">r2</span>=<span class="summary-sig-default">0.75</span>,
         <span class="summary-sig-arg">sigma_spatial_smoothing</span>=<span class="summary-sig-default">1</span>,
-        <span class="summary-sig-arg">signal_std_pixel_obj_ratio</span>=<span class="summary-sig-default">1.0</span>,
+        <span class="summary-sig-arg">obj_pix_ratio</span>=<span class="summary-sig-default">2.0</span>,
         <span class="summary-sig-arg">model</span>=<span class="summary-sig-default"><code class="variable-quote">'</code><code class="variable-string">independant</code><code class="variable-quote">'</code></span>,
         <span class="summary-sig-arg">random_seed</span>=<span class="summary-sig-default">None</span>)</span><br />
       Generates regression samples (images + target variable) and beta.</td>
@@ -181,7 +181,7 @@
         <span class="sig-arg">shape</span>=<span class="sig-default"><code class="variable-group">(</code>30<code class="variable-op">, </code>30<code class="variable-op">, </code>1<code class="variable-group">)</code></span>,
         <span class="sig-arg">r2</span>=<span class="sig-default">0.75</span>,
         <span class="sig-arg">sigma_spatial_smoothing</span>=<span class="sig-default">1</span>,
-        <span class="sig-arg">signal_std_pixel_obj_ratio</span>=<span class="sig-default">1.0</span>,
+        <span class="sig-arg">obj_pix_ratio</span>=<span class="sig-default">2.0</span>,
         <span class="sig-arg">model</span>=<span class="sig-default"><code class="variable-quote">'</code><code class="variable-string">independant</code><code class="variable-quote">'</code></span>,
         <span class="sig-arg">random_seed</span>=<span class="sig-default">None</span>)</span>
   </h3>
@@ -193,8 +193,8 @@
   <pre class="literalblock">
 Generates regression samples (images + target variable) and beta.
 
-Input features (X) covariance structure is controled both at a pixel
-level (spatial smoothing) and object level. Objects are component
+The covariance structure is controlled both at a pixel
+level (spatial smoothing) and object level. Objects are groups
 of pixels sharing a covariance that stem from a latent variable.
 beta is non null within objects (default is five dots).
 Then y is obtained with y = X * beta + noise, where beta is scalled such
@@ -204,9 +204,7 @@ Parameters
 ----------
 n_samples: Integer. Number of samples. Default is 100.
 
-# TODO: This is wrong. Shape should be Z, Y, X.
-shape: Tuple or list with three integers. Order x, y, z shape each samples
-        Default is (30, 30, 1).
+shape: Tuple or list of sample shape. Default is (30, 30, 1).
 
 r2: Float. The desire R-squared (explained variance) ie.:
         r_square(y, X * beta) = r2 (Default is .75)
@@ -216,11 +214,11 @@ sigma_spatial_smoothing: Float. Standard deviation for Gaussian kernel
 
 model:  string or a dict (default &quot;independant&quot;)
     If model is &quot;independant&quot;:
-        # All points has an independant latent
+        # Each point has an independant latent
         l1=1., l2=1., l3=1., l4=1., l5=1.,
-        # No shared variance:
+        # No shared variance
         l12=0., l45=0., l12345=0.,
-        # Five dots contribute equally:
+        # Five dots contribute equally
         b1=1., b2=1., b3=1., b4=-1., b5=-1.
 
     if model is a dictionary:
@@ -229,27 +227,27 @@ model:  string or a dict (default &quot;independant&quot;)
         dict(b4=1., b5=1.)
 
     If model is &quot;redundant&quot;:
-        # Point-level signal in dots 1 an 2 stem from shared latent:
+        # Point-level signal in dots 1 an 2 stem from shared latent
         l1=0., l2=0., l12 =1.,
-        # l3 is independant:
+        # l3 is independant
         l3=1.,
-        # Point-level signal in dots 4 an 5 stem from shared latent:
+        # Point-level signal in dots 4 an 5 stem from shared latent
         l4=0., l5=0., l45=1.,
-        # No global shared variance:
+        # No global shared variance
         l12345 = 0.,
-        # Five dots contribute equally:
+        # Five dots contribute equally
         b1=1., b2=1., b3=1., b4=-1., b5=-1.
 
     If model is &quot;suppressor&quot;:
-        # Point-level signal in dot 2 stem only from shared latent:
+        # Point-level signal in dot 2 stem only from shared latent
         l1=1, l2=0., l12=1.,
-        # l3 is independant:
+        # l3 is independant
         l3 = 1.,
-        # Point-level signal in dot 5 stem from shared latent:
+        # Point-level signal in dot 5 stem from shared latent
         l4=1., l5=0., l45=1.,
-        # No global shared variance:
+        # No global shared variance
         l12345 = 0.,
-        # Dot 2 suppresses shared signal with dot 1, dot 5 suppresses dot 4:
+        # Dot 2 suppresses shared signal with dot 1, dot 5 suppresses dot 4
         b1=1., b2=-1., b3=1., b4=1., b5=-1.
 
         y = X1       - X2  + X3 + X4       - X5  + noise
@@ -260,12 +258,12 @@ model:  string or a dict (default &quot;independant&quot;)
         are usefull since they are suppressing unwilling variance that stem
         from latents l12 and l45.
 
-signal_std_pixel_obj_ratio: Float. Controls the ratio between object-level signal
+obj_pix_ratio: Float. Controls the ratio between object-level signal
         and pixel-level signal for pixels within objects. If
-        signal_std_pixel_obj_ratio == 1 then 100% of the signal of pixels within
+        obj_pix_ratio == 1 then 100% of the signal of pixels within
         the same object is shared (ie.: no pixel level) signal. If
-        signal_std_pixel_obj_ratio == 0 then all the signal is pixel specific.
-        High signal_std_pixel_obj_ratio promotes spatial correlation between
+        obj_pix_ratio == 0 then all the signal is pixel specific.
+        High obj_pix_ratio promotes spatial correlation between
         pixels of the same object.
 
 random_seed: None or integer. See numpy.random.seed(). If not None, it can
@@ -287,13 +285,15 @@ The general procedure is:
     1) For each pixel i, Generate independant variables Xi ~ N(0, 1)
 
     2) Add object level structure corresponding to the five dots:
-       - Sample five latent variables ~ N(0, 1): l1, l3, l4, l12, l45, l12345.
+       - Sample five latent variables ~ N(0, 1): l1, l3, l4, l12, l45,
+       l12345.
        l1: latent (shared variance) for all pixels of point 1.
        ...
        l5: latent (shared variance) for all pixels of point 5.
        l12: latent (shared variance) for all pixels of point 1 and 2.
        l45: latent (shared variance) for all pixels of point 4 and 5 .
-       l12345: latent (shared variance) for all pixels of point 1, 2, 3, 4 and 5.
+       l12345: latent (shared variance) for all pixels of point 1, 2, 3, 4
+       and 5.
 
        - Pixel i of dots X1, X2, X3, X4, X5 are sampled as:
          X1i = l1 + l12 + l12345 + Xi
@@ -302,8 +302,10 @@ The general procedure is:
          X4i = l4 + l45 + l12345 + Xi
          X5i = l5 + l45 + l12345 + Xi
          Note that:
-         Pixels of dot X1 share a common variance that stem from l1, l12 and l12345
-         Pixels of dot X2 share a common variance that stem from l1, l12 and l12345
+         Pixels of dot X1 share a common variance that stem from l1, l12
+         and l12345
+         Pixels of dot X2 share a common variance that stem from l1, l12
+         and l12345
          Pixels of dot X1 and pixel of dot X2 share a common variance that
          stem from l12.
          etc.
@@ -392,7 +394,7 @@ plt.show()
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Thu Oct  2 23:35:45 2014
+    Generated by Epydoc 3.0.1 on Mon Apr  6 23:52:10 2015
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

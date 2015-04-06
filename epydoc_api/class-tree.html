@@ -103,8 +103,8 @@ or CONESTA for short.</em>
 the inner minimisation.</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.multiblock.MultiblockFISTA-class.html">parsimony.algorithms.multiblock.MultiblockFISTA</a></strong>:
-      <em class="summary">The projected gradient algorithm with alternating minimisations in a
-multiblock setting.</em>
+      <em class="summary">The projected or proximal gradient algorithm with alternating
+minimisations in a multiblock setting.</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.utils.NewtonRaphson-class.html">parsimony.algorithms.utils.NewtonRaphson</a></strong>:
       <em class="summary">Finds a root of the function assumed to be in the vicinity of a given
@@ -127,15 +127,12 @@ or CONESTA for short, with a statically decreasing sequence of eps and mu.</em>
     <ul>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.nipals.FastSVD-class.html">parsimony.algorithms.nipals.FastSVD</a></strong>
     </li>
-    <li> <strong class="uidlink"><a href="parsimony.algorithms._implicit.FastSVD-class.html">parsimony.algorithms._implicit.FastSVD</a></strong>
-    </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.nipals.FastSVDProduct-class.html">parsimony.algorithms.nipals.FastSVDProduct</a></strong>
     </li>
-    <li> <strong class="uidlink"><a href="parsimony.algorithms._implicit.FastSVDProduct-class.html">parsimony.algorithms._implicit.FastSVDProduct</a></strong>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.algorithms._implicit.FastSparseSVD-class.html">parsimony.algorithms._implicit.FastSparseSVD</a></strong>
-    </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.nipals.FastSparseSVD-class.html">parsimony.algorithms.nipals.FastSparseSVD</a></strong>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.algorithms.cluster.KMeans-class.html">parsimony.algorithms.cluster.KMeans</a></strong>:
+      <em class="summary">The K-means clustering algorithm.</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.coordinate.LassoCoordinateDescent-class.html">parsimony.algorithms.coordinate.LassoCoordinateDescent</a></strong>:
       <em class="summary">A coordinate descent algorithm for the lasso.</em>
@@ -156,9 +153,15 @@ or CONESTA for short, with a statically decreasing sequence of eps and mu.</em>
     <li> <strong class="uidlink"><a href="parsimony.estimators.BaseEstimator-class.html">parsimony.estimators.BaseEstimator</a></strong>:
       <em class="summary">Base class for estimators.</em>
     <ul>
+    <li> <strong class="uidlink"><a href="parsimony.estimators.Clustering-class.html" onclick="show_private();">parsimony.estimators.Clustering</a></strong>:
+      <em class="summary">Estimator for the clustering problem, i.e.</em>
+    </li>
     <li> <strong class="uidlink"><a href="parsimony.estimators.LogisticRegressionEstimator-class.html">parsimony.estimators.LogisticRegressionEstimator</a></strong>:
       <em class="summary">Base estimator for logistic regression estimation</em>
     <ul>
+    <li> <strong class="uidlink"><a href="parsimony.estimators.ElasticNetLogisticRegression-class.html">parsimony.estimators.ElasticNetLogisticRegression</a></strong>:
+      <em class="summary">Logistic regression (re-weighted log-likelihood aka.</em>
+    </li>
     <li> <strong class="uidlink"><a href="parsimony.estimators.LogisticRegression-class.html">parsimony.estimators.LogisticRegression</a></strong>:
       <em class="summary">Logistic regression (re-weighted log-likelihood aka.</em>
     </li>
@@ -240,11 +243,11 @@ penalties:</em>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.L0-class.html">parsimony.functions.penalties.L0</a></strong>:
       <em class="summary">The proximal operator of the &quot;pseudo&quot; L0 function</em>
     </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.penalties.L1-class.html">parsimony.functions.penalties.L1</a></strong>:
-      <em class="summary">The proximal operator of the L1 function with a penalty formulation</em>
-    </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.l1.L1-class.html">parsimony.functions.nesterov.l1.L1</a></strong>:
       <em class="summary">The proximal operator of the smoothed L1 function</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.penalties.L1-class.html">parsimony.functions.penalties.L1</a></strong>:
+      <em class="summary">The proximal operator of the L1 function with a penalty formulation</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.L2-class.html">parsimony.functions.penalties.L2</a></strong>:
       <em class="summary">The proximal operator of the L2 function with a penalty formulation</em>
@@ -348,8 +351,6 @@ L1 and TotalVariation.</em>
     <ul>
     <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.l1tv.L1TV-class.html">parsimony.functions.nesterov.l1tv.L1TV</a></strong>:
       <em class="summary">The proximal operator of the smoothed sum of the TV and L1 functions</em>
-    </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.multiblock.losses.LatentVariableCovariance-class.html">parsimony.functions.multiblock.losses.LatentVariableCovariance</a></strong>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.properties.NesterovFunction-class.html" onclick="show_private();">parsimony.functions.properties.NesterovFunction</a></strong>:
       <em class="summary">Abstract superclass of Nesterov functions.</em>
@@ -488,7 +489,11 @@ or one proximal operator.</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.multiblock.losses.GeneralisedMultiblock-class.html" onclick="show_private();">parsimony.functions.multiblock.losses.GeneralisedMultiblock</a></strong>
     </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.multiblock.losses.LatentVariableCovariance-class.html">parsimony.functions.multiblock.losses.LatentVariableCovariance</a></strong>
+    <li> <strong class="uidlink"><a href="parsimony.functions.multiblock.losses.LatentVariableCovariance-class.html">parsimony.functions.multiblock.losses.LatentVariableCovariance</a></strong>:
+      <em class="summary">Represents</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.multiblock.losses.LatentVariableCovarianceSquared-class.html" onclick="show_private();">parsimony.functions.multiblock.losses.LatentVariableCovarianceSquared</a></strong>:
+      <em class="summary">Represents</em>
     </li>
     </ul>
     </li>
@@ -667,6 +672,8 @@ L1 and TotalVariation.</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.properties.Hessian-class.html">parsimony.functions.properties.Hessian</a></strong>
     </li>
+    <li> <strong class="uidlink"><a href="parsimony.algorithms.cluster.KMeans.INIT-class.html">parsimony.algorithms.cluster.KMeans.INIT</a></strong>
+    </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.utils.Info-class.html">parsimony.algorithms.utils.Info</a></strong>:
       <em class="summary">Enum-like class for information constants.</em>
     </li>
@@ -704,8 +711,8 @@ or CONESTA for short.</em>
 the inner minimisation.</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.multiblock.MultiblockFISTA-class.html">parsimony.algorithms.multiblock.MultiblockFISTA</a></strong>:
-      <em class="summary">The projected gradient algorithm with alternating minimisations in a
-multiblock setting.</em>
+      <em class="summary">The projected or proximal gradient algorithm with alternating
+minimisations in a multiblock setting.</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.utils.NewtonRaphson-class.html">parsimony.algorithms.utils.NewtonRaphson</a></strong>:
       <em class="summary">Finds a root of the function assumed to be in the vicinity of a given
@@ -754,8 +761,8 @@ or CONESTA for short.</em>
 the inner minimisation.</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.multiblock.MultiblockFISTA-class.html">parsimony.algorithms.multiblock.MultiblockFISTA</a></strong>:
-      <em class="summary">The projected gradient algorithm with alternating minimisations in a
-multiblock setting.</em>
+      <em class="summary">The projected or proximal gradient algorithm with alternating
+minimisations in a multiblock setting.</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.algorithms.utils.NewtonRaphson-class.html">parsimony.algorithms.utils.NewtonRaphson</a></strong>:
       <em class="summary">Finds a root of the function assumed to be in the vicinity of a given
@@ -859,13 +866,21 @@ or one proximal operator.</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.multiblock.losses.GeneralisedMultiblock-class.html" onclick="show_private();">parsimony.functions.multiblock.losses.GeneralisedMultiblock</a></strong>
     </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.multiblock.losses.LatentVariableCovariance-class.html">parsimony.functions.multiblock.losses.LatentVariableCovariance</a></strong>
+    <li> <strong class="uidlink"><a href="parsimony.functions.multiblock.losses.LatentVariableCovariance-class.html">parsimony.functions.multiblock.losses.LatentVariableCovariance</a></strong>:
+      <em class="summary">Represents</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.multiblock.losses.LatentVariableCovarianceSquared-class.html" onclick="show_private();">parsimony.functions.multiblock.losses.LatentVariableCovarianceSquared</a></strong>:
+      <em class="summary">Represents</em>
     </li>
     </ul>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.multiblock.properties.MultiblockLipschitzContinuousGradient-class.html">parsimony.functions.multiblock.properties.MultiblockLipschitzContinuousGradient</a></strong>
     <ul>
-    <li> <strong class="uidlink"><a href="parsimony.functions.multiblock.losses.LatentVariableCovariance-class.html">parsimony.functions.multiblock.losses.LatentVariableCovariance</a></strong>
+    <li> <strong class="uidlink"><a href="parsimony.functions.multiblock.losses.LatentVariableCovariance-class.html">parsimony.functions.multiblock.losses.LatentVariableCovariance</a></strong>:
+      <em class="summary">Represents</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.multiblock.losses.LatentVariableCovarianceSquared-class.html" onclick="show_private();">parsimony.functions.multiblock.losses.LatentVariableCovarianceSquared</a></strong>:
+      <em class="summary">Represents</em>
     </li>
     </ul>
     </li>
@@ -924,11 +939,11 @@ mask: ???</em>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.L0-class.html">parsimony.functions.penalties.L0</a></strong>:
       <em class="summary">The proximal operator of the &quot;pseudo&quot; L0 function</em>
     </li>
-    <li> <strong class="uidlink"><a href="parsimony.functions.penalties.L1-class.html">parsimony.functions.penalties.L1</a></strong>:
-      <em class="summary">The proximal operator of the L1 function with a penalty formulation</em>
-    </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.nesterov.l1.L1-class.html">parsimony.functions.nesterov.l1.L1</a></strong>:
       <em class="summary">The proximal operator of the smoothed L1 function</em>
+    </li>
+    <li> <strong class="uidlink"><a href="parsimony.functions.penalties.L1-class.html">parsimony.functions.penalties.L1</a></strong>:
+      <em class="summary">The proximal operator of the L1 function with a penalty formulation</em>
     </li>
     <li> <strong class="uidlink"><a href="parsimony.functions.penalties.L1L2Squared-class.html">parsimony.functions.penalties.L1L2Squared</a></strong>:
       <em class="summary">The proximal operator of the L1 function with an L2 constraint.</em>
@@ -1263,7 +1278,7 @@ L1 and TotalVariation.</em>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Thu Oct  2 23:35:45 2014
+    Generated by Epydoc 3.0.1 on Mon Apr  6 23:52:09 2015
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

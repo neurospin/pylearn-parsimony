@@ -140,7 +140,7 @@ You can combine :math:`\ell_1` and :math:`\ell_2` penalties with coefficients :m
 
 .. math::
 
-   \min\left(\frac{1}{2 n}\|y - X\beta\|_2^2 + \alpha (\frac{(1 - l)}{2}\|\beta\|_2^2 + l\cdot \|\beta\|_1))\right).
+   \min\left(\frac{1}{2 n}\|y - X\beta\|_2^2 + \alpha\left(\frac{(1 - l)}{2}\|\beta\|_2^2 + l\cdot \|\beta\|_1\right)\right).
 
 .. code-block:: python
 
@@ -185,7 +185,7 @@ constraint, :math:`\mathrm{GL}`, and instead minimise
 .. code-block:: python
 
     import parsimony.estimators as estimators
-    import parsimony.algorithms.explicit as algorithms
+    import parsimony.algorithms as algorithms
     import parsimony.functions.nesterov.gl as gl
     k = 0.0  # l2 ridge regression coefficient
     l = 0.1  # l1 lasso coefficient
@@ -194,7 +194,7 @@ constraint, :math:`\mathrm{GL}`, and instead minimise
     A = gl.linear_operator_from_groups(num_ft, groups)
     estimator = estimators.LinearRegressionL1L2GL(
                                           k, l, g, A=A,
-                                          algorithm=algorithms.FISTA(),
+                                          algorithm=algorithms.proximal.FISTA(),
                                           algorithm_params=dict(max_iter=1000))
     res = estimator.fit(X, y)
     print "Estimated beta error =", np.linalg.norm(estimator.beta - beta)
@@ -315,7 +315,7 @@ constraint and instead minimise
 .. code-block:: python
 
     import parsimony.estimators as estimators
-    import parsimony.algorithms.explicit as algorithms
+    import parsimony.algorithms as algorithms
     import parsimony.functions.nesterov.gl as gl
     k = 0.0  # l2 ridge regression coefficient
     l = 0.1  # l1 lasso coefficient
@@ -324,7 +324,7 @@ constraint and instead minimise
     A = gl.linear_operator_from_groups(num_ft, groups)
     estimator = estimators.LogisticRegressionL1L2GL(
                                           k, l, g, A=A,
-                                          algorithm=algorithms.FISTA(),
+                                          algorithm=algorithms.proximal.FISTA(),
                                           algorithm_params=dict(max_iter=1000))
     res = estimator.fit(X, y)
     print "Estimated prediction rate =", estimator.score(X, y)
@@ -344,7 +344,7 @@ switch to CONESTA to minimise the function.
 .. code-block:: python
 
     import parsimony.estimators as estimators
-    import parsimony.algorithms.explicit as algorithms
+    import parsimony.algorithms as algorithms
     import parsimony.functions.nesterov.tv as tv
     k = 0.0  # l2 ridge regression coefficient
     l = 0.1  # l1 lasso coefficient
@@ -352,7 +352,7 @@ switch to CONESTA to minimise the function.
     Atv, n_compacts = tv.linear_operator_from_shape(shape)
     tvl1l2_conesta = estimators.LinearRegressionL1L2TV(
                                           k, l, g, A=Atv,
-                                          algorithm=algorithms.CONESTA())
+                                          algorithm=algorithms.proximal.CONESTA())
     res = tvl1l2_conesta.fit(X, y)
     print "Estimated beta error =", np.linalg.norm(tvl1l2_conesta.beta - beta)
 
@@ -367,16 +367,18 @@ positive.
 
     import scipy.sparse as sparse
     import parsimony.functions.nesterov.l1tv as l1tv
+    import parsimony.algorithms.primaldual as primaldual
     #Atv, n_compacts = tv.linear_operator_from_shape(shape)
     #Al1 = sparse.eye(num_ft, num_ft)
-    Atv, Al1 = l1tv.linear_operator_from_shape(shape, num_ft, penalty_start=0)
+    A = l1tv.linear_operator_from_shape(shape, num_ft, penalty_start=0)
+    Al1 = A[0]
+    Atv = A[1:]
     k = 0.05  # ridge regression coefficient
     l = 0.05  # l1 coefficient
     g = 0.05  # tv coefficient
     rr_smoothed_l1_tv = estimators.LinearRegressionL2SmoothedL1TV(
-                        k, l, g,
-                        Atv=Atv, Al1=Al1,
-                        algorithm=algorithms.ExcessiveGapMethod(max_iter=1000))
+                        k, l, g, A=A,
+                        algorithm=primaldual.ExcessiveGapMethod(max_iter=1000))
     res = rr_smoothed_l1_tv.fit(X, y)
     print "Estimated beta error =", np.linalg.norm(rr_smoothed_l1_tv.beta - beta)
 

@@ -89,6 +89,10 @@ mu_min : Non-negative float. A &quot;very small&quot; mu to use as a lower bound
 tau : Float, 0 &lt; tau &lt; 1. The rate at which eps is decreasing. Default
         is 0.5.
 
+exponent : Float, in [1.001, 2.0]. The assumed convergence rate of
+        ||beta* - beta_k||_2 for k=1,2,... is O(1 / k^exponent). Default
+        is 1.5.
+
 eps : Positive float. Tolerance for the stopping criterion.
 
 info : List or tuple of utils.Info. What, if any, extra run information
@@ -99,6 +103,54 @@ max_iter : Non-negative integer. Maximum allowed number of iterations.
 
 min_iter : Non-negative integer less than or equal to max_iter. Minimum
         number of iterations that must be performed. Default is 1.
+
+Example
+-------
+&gt;&gt;&gt; from parsimony.algorithms.proximal import StaticCONESTA
+&gt;&gt;&gt; from parsimony.functions.nesterov import l1tv
+&gt;&gt;&gt; from parsimony.functions import LinearRegressionL1L2TV
+&gt;&gt;&gt; import scipy.sparse as sparse
+&gt;&gt;&gt; import numpy as np
+&gt;&gt;&gt;
+&gt;&gt;&gt; np.random.seed(42)
+&gt;&gt;&gt; X = np.random.rand(100, 50)
+&gt;&gt;&gt; y = np.random.rand(100, 1)
+&gt;&gt;&gt; A = sparse.csr_matrix((50, 50))  # Unused here
+&gt;&gt;&gt; function = LinearRegressionL1L2TV(X, y, 0.0, 0.0, 0.0,
+...                                   A=[A], mu=0.0)
+&gt;&gt;&gt; static_conesta = StaticCONESTA(max_iter=10000)
+&gt;&gt;&gt; beta1 = static_conesta.run(function, np.random.rand(50, 1))
+&gt;&gt;&gt; beta2 = np.dot(np.linalg.pinv(X), y)
+&gt;&gt;&gt; round(np.linalg.norm(beta1 - beta2), 13)
+3.0183961e-06
+&gt;&gt;&gt;
+&gt;&gt;&gt; np.random.seed(42)
+&gt;&gt;&gt; X = np.random.rand(100, 50)
+&gt;&gt;&gt; y = np.random.rand(100, 1)
+&gt;&gt;&gt; A = sparse.csr_matrix((50, 50))
+&gt;&gt;&gt; function = LinearRegressionL1L2TV(X, y, 0.1, 0.0, 0.0,
+...                                   A=[A], mu=0.0)
+&gt;&gt;&gt; static_conesta = StaticCONESTA(max_iter=10000)
+&gt;&gt;&gt; beta1 = static_conesta.run(function, np.random.rand(50, 1))
+&gt;&gt;&gt; beta2 = np.dot(np.linalg.pinv(X), y)
+&gt;&gt;&gt; round(np.linalg.norm(beta1 - beta2), 13)
+0.8272329573827
+&gt;&gt;&gt; np.linalg.norm(beta2.ravel(), 0)
+50
+&gt;&gt;&gt; np.linalg.norm(beta1.ravel(), 0)
+7
+&gt;&gt;&gt;
+&gt;&gt;&gt; np.random.seed(42)
+&gt;&gt;&gt; X = np.random.rand(100, 50)
+&gt;&gt;&gt; y = np.random.rand(100, 1)
+&gt;&gt;&gt; A = l1tv.linear_operator_from_shape((1, 1, 50), 50)
+&gt;&gt;&gt; function = LinearRegressionL1L2TV(X, y, 0.1, 0.1, 0.1,
+...                                   A=A, mu=0.0)
+&gt;&gt;&gt; static_conesta = StaticCONESTA(max_iter=10000)
+&gt;&gt;&gt; beta1 = static_conesta.run(function, np.zeros((50, 1)))
+&gt;&gt;&gt; beta2 = np.dot(np.linalg.pinv(X), y)
+&gt;&gt;&gt; round(np.linalg.norm(beta1 - beta2), 13)
+0.9662907379987
 
 </pre>
 
@@ -128,13 +180,49 @@ min_iter : Non-negative integer less than or equal to max_iter. Minimum
           <td><span class="summary-sig"><a href="parsimony.algorithms.proximal.StaticCONESTA-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">mu_min</span>=<span class="summary-sig-default">5e-08</span>,
         <span class="summary-sig-arg">tau</span>=<span class="summary-sig-default">0.5</span>,
+        <span class="summary-sig-arg">exponent</span>=<span class="summary-sig-default">1.5</span>,
         <span class="summary-sig-arg">info</span>=<span class="summary-sig-default"><code class="variable-group">[</code><code class="variable-group">]</code></span>,
         <span class="summary-sig-arg">eps</span>=<span class="summary-sig-default">5e-08</span>,
         <span class="summary-sig-arg">max_iter</span>=<span class="summary-sig-default">10000</span>,
-        <span class="summary-sig-arg">min_iter</span>=<span class="summary-sig-default">1</span>)</span><br />
+        <span class="summary-sig-arg">min_iter</span>=<span class="summary-sig-default">1</span>,
+        <span class="summary-sig-arg">simulation</span>=<span class="summary-sig-default">False</span>)</span><br />
       x.__init__(...) initializes x; see help(type(x)) for signature</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="parsimony.algorithms.proximal-pysrc.html#StaticCONESTA.__init__">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_harmonic_number_approx"></a><span class="summary-sig-name">_harmonic_number_approx</span>(<span class="summary-sig-arg">self</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.algorithms.proximal-pysrc.html#StaticCONESTA._harmonic_number_approx">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a name="_approximate_eps"></a><span class="summary-sig-name">_approximate_eps</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">function</span>,
+        <span class="summary-sig-arg">beta0</span>)</span></td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.algorithms.proximal-pysrc.html#StaticCONESTA._approximate_eps">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -260,6 +348,7 @@ min_iter : Non-negative integer less than or equal to max_iter. Minimum
  'continuations',
  'time',
  'fvalue',
+ 'func_val',
  'mu']"><code class="variable-group">[</code><code class="variable-quote">'</code><code class="variable-string">ok</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">converged</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">num_iter</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">continuations</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
@@ -270,6 +359,13 @@ min_iter : Non-negative integer less than or equal to max_iter. Minimum
         <a name="__abstractmethods__"></a><span class="summary-name">__abstractmethods__</span> = <code title="frozenset([])"><code class="variable-group">frozenset([</code><code class="variable-group">])</code></code>
     </td>
   </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="_abc_negative_cache_version"></a><span class="summary-name">_abc_negative_cache_version</span> = <code title="14">14</code>
+    </td>
+  </tr>
   <tr>
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.algorithms.bases.ExplicitAlgorithm-class.html">bases.ExplicitAlgorithm</a></code></b>:
@@ -278,7 +374,6 @@ min_iter : Non-negative integer less than or equal to max_iter. Minimum
     <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html">bases.BaseAlgorithm</a></code></b> (private):
       <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_cache" onclick="show_private();">_abc_cache</a></code>,
       <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_negative_cache" onclick="show_private();">_abc_negative_cache</a></code>,
-      <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_negative_cache_version" onclick="show_private();">_abc_negative_cache_version</a></code>,
       <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_registry" onclick="show_private();">_abc_registry</a></code>
       </p></div>
     </td>
@@ -337,10 +432,12 @@ min_iter : Non-negative integer less than or equal to max_iter. Minimum
   <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
         <span class="sig-arg">mu_min</span>=<span class="sig-default">5e-08</span>,
         <span class="sig-arg">tau</span>=<span class="sig-default">0.5</span>,
+        <span class="sig-arg">exponent</span>=<span class="sig-default">1.5</span>,
         <span class="sig-arg">info</span>=<span class="sig-default"><code class="variable-group">[</code><code class="variable-group">]</code></span>,
         <span class="sig-arg">eps</span>=<span class="sig-default">5e-08</span>,
         <span class="sig-arg">max_iter</span>=<span class="sig-default">10000</span>,
-        <span class="sig-arg">min_iter</span>=<span class="sig-default">1</span>)</span>
+        <span class="sig-arg">min_iter</span>=<span class="sig-default">1</span>,
+        <span class="sig-arg">simulation</span>=<span class="sig-default">False</span>)</span>
     <br /><em class="fname">(Constructor)</em>
   </h3>
   </td><td align="right" valign="top"
@@ -456,6 +553,7 @@ x : A starting point.
  <code class="variable-quote">'</code><code class="variable-string">continuations</code><code class="variable-quote">'</code><code class="variable-op">,</code>
  <code class="variable-quote">'</code><code class="variable-string">time</code><code class="variable-quote">'</code><code class="variable-op">,</code>
  <code class="variable-quote">'</code><code class="variable-string">fvalue</code><code class="variable-quote">'</code><code class="variable-op">,</code>
+ <code class="variable-quote">'</code><code class="variable-string">func_val</code><code class="variable-quote">'</code><code class="variable-op">,</code>
  <code class="variable-quote">'</code><code class="variable-string">mu</code><code class="variable-quote">'</code><code class="variable-group">]</code>
 </pre></td></tr></table>
 </dd>
@@ -489,7 +587,7 @@ x : A starting point.
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Thu Oct  2 23:35:46 2014
+    Generated by Epydoc 3.0.1 on Mon Apr  6 23:52:10 2015
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

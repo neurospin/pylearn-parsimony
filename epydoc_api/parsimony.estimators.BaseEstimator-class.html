@@ -66,7 +66,7 @@ object --+
 <dl><dt>Known Subclasses:</dt>
 <dd>
       <ul class="subclass-list">
-<li><a href="parsimony.estimators.RegressionEstimator-class.html">RegressionEstimator</a></li><li>, <a href="parsimony.estimators.LogisticRegressionEstimator-class.html">LogisticRegressionEstimator</a></li>  </ul>
+<li class="private"><a href="parsimony.estimators.Clustering-class.html" onclick="show_private();">Clustering</a></li><li>, <a href="parsimony.estimators.RegressionEstimator-class.html">RegressionEstimator</a></li><li>, <a href="parsimony.estimators.LogisticRegressionEstimator-class.html">LogisticRegressionEstimator</a></li>  </ul>
 </dd></dl>
 
 <hr />
@@ -146,6 +146,41 @@ algorithm : BaseAlgorithm. The algorithm that will be used.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
+          <td><span class="summary-sig"><a name="set_params"></a><span class="summary-sig-name">set_params</span>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">**kwargs</span>)</span><br />
+      Set the given input parameters in the estimator.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.estimators-pysrc.html#BaseEstimator.set_params">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.estimators.BaseEstimator-class.html#get_params" class="summary-sig-name">get_params</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Return a dictionary containing the estimator's own input parameters.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.estimators-pysrc.html#BaseEstimator.get_params">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
           <td><span class="summary-sig"><a name="fit"></a><span class="summary-sig-name">fit</span>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">X</span>)</span><br />
       Fit the estimator to the data.</td>
@@ -164,45 +199,28 @@ algorithm : BaseAlgorithm. The algorithm that will be used.
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td><span class="summary-sig"><a name="set_params"></a><span class="summary-sig-name">set_params</span>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">**kwargs</span>)</span></td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="parsimony.estimators-pysrc.html#BaseEstimator.set_params">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td><span class="summary-sig"><a href="parsimony.estimators.BaseEstimator-class.html#get_params" class="summary-sig-name">get_params</a>(<span class="summary-sig-arg">self</span>)</span><br />
-      Return a dictionary containing the estimator's own parameters.</td>
-          <td align="right" valign="top">
-            <span class="codelink"><a href="parsimony.estimators-pysrc.html#BaseEstimator.get_params">source&nbsp;code</a></span>
-            
-          </td>
-        </tr>
-      </table>
-      
-    </td>
-  </tr>
-<tr>
-    <td width="15%" align="right" valign="top" class="summary">
-      <span class="summary-type">&nbsp;</span>
-    </td><td class="summary">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
-        <tr>
           <td><span class="summary-sig"><a href="parsimony.estimators.BaseEstimator-class.html#predict" class="summary-sig-name">predict</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">X</span>)</span><br />
       Perform prediction using the fitted parameters.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="parsimony.estimators-pysrc.html#BaseEstimator.predict">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.estimators.BaseEstimator-class.html#parameters" class="summary-sig-name">parameters</a>(<span class="summary-sig-arg">self</span>)</span><br />
+      Returns the estimator's fitted parameters, e.g.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.estimators-pysrc.html#BaseEstimator.parameters">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -292,28 +310,28 @@ algorithm : BaseAlgorithm. The algorithm that will be used.
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x3fbcf90&gt;">&lt;_weakrefset.WeakSet object at 0x3fbcf90&gt;</code>
+        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x3378390&gt;">&lt;_weakrefset.WeakSet object at 0x3378390&gt;</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x403f050&gt;">&lt;_weakrefset.WeakSet object at 0x403f050&gt;</code>
+        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x3378410&gt;">&lt;_weakrefset.WeakSet object at 0x3378410&gt;</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_negative_cache_version"></a><span class="summary-name">_abc_negative_cache_version</span> = <code title="15">15</code>
+        <a name="_abc_negative_cache_version"></a><span class="summary-name">_abc_negative_cache_version</span> = <code title="14">14</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x3fbced0&gt;">&lt;_weakrefset.WeakSet object at 0x3fbced0&gt;</code>
+        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x33782d0&gt;">&lt;_weakrefset.WeakSet object at 0x33782d0&gt;</code>
     </td>
   </tr>
 </table>
@@ -399,7 +417,8 @@ algorithm : BaseAlgorithm. The algorithm that will be used.
     </td>
   </tr></table>
   
-  <p>Return a dictionary containing the estimator's own parameters.</p>
+  <p>Return a dictionary containing the estimator's own input 
+  parameters.</p>
   <dl class="fields">
     <dt>Decorators:</dt>
     <dd><ul class="nomargin-top">
@@ -429,6 +448,28 @@ algorithm : BaseAlgorithm. The algorithm that will be used.
     <dd><ul class="nomargin-top">
         <li><code>@abc.abstractmethod</code></li>
     </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="parameters"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">parameters</span>(<span class="sig-arg">self</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.estimators-pysrc.html#BaseEstimator.parameters">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <p>Returns the estimator's fitted parameters, e.g. the regression 
+  coefficients.</p>
+  <p>What is returned depends on the estimator. See the estimator's 
+  documentation.</p>
+  <dl class="fields">
   </dl>
 </td></tr></table>
 </div>
@@ -521,7 +562,7 @@ algorithm : BaseAlgorithm. The algorithm that will be used.
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Thu Oct  2 23:35:46 2014
+    Generated by Epydoc 3.0.1 on Mon Apr  6 23:52:10 2015
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

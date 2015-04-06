@@ -167,7 +167,7 @@ Example
         <span class="summary-sig-arg">eps</span>=<span class="summary-sig-default">5e-08</span>,
         <span class="summary-sig-arg">max_iter</span>=<span class="summary-sig-default">10000</span>,
         <span class="summary-sig-arg">min_iter</span>=<span class="summary-sig-default">1</span>,
-        <span class="summary-sig-arg">conesta_stop</span>=<span class="summary-sig-default">None</span>)</span><br />
+        <span class="summary-sig-arg">simulation</span>=<span class="summary-sig-default">False</span>)</span><br />
       x.__init__(...) initializes x; see help(type(x)) for signature</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="parsimony.algorithms.proximal-pysrc.html#FISTA.__init__">source&nbsp;code</a></span>
@@ -289,7 +289,7 @@ Example
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="INFO_PROVIDED"></a><span class="summary-name">INFO_PROVIDED</span> = <code title="['ok', 'num_iter', 'time', 'fvalue', 'converged']"><code class="variable-group">[</code><code class="variable-quote">'</code><code class="variable-string">ok</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">num_iter</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">time</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">fvalue</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">converged</code><code class="variable-quote">'</code><code class="variable-group">]</code></code>
+        <a href="parsimony.algorithms.proximal.FISTA-class.html#INFO_PROVIDED" class="summary-name">INFO_PROVIDED</a> = <code title="['ok', 'num_iter', 'time', 'fvalue', 'converged', 'gap']"><code class="variable-group">[</code><code class="variable-quote">'</code><code class="variable-string">ok</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">num_iter</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">time</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">fvalue</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">converge</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
@@ -297,6 +297,13 @@ Example
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="__abstractmethods__"></a><span class="summary-name">__abstractmethods__</span> = <code title="frozenset([])"><code class="variable-group">frozenset([</code><code class="variable-group">])</code></code>
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="_abc_negative_cache_version"></a><span class="summary-name">_abc_negative_cache_version</span> = <code title="14">14</code>
     </td>
   </tr>
   <tr>
@@ -307,7 +314,6 @@ Example
     <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html">bases.BaseAlgorithm</a></code></b> (private):
       <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_cache" onclick="show_private();">_abc_cache</a></code>,
       <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_negative_cache" onclick="show_private();">_abc_negative_cache</a></code>,
-      <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_negative_cache_version" onclick="show_private();">_abc_negative_cache_version</a></code>,
       <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_registry" onclick="show_private();">_abc_registry</a></code>
       </p></div>
     </td>
@@ -369,7 +375,7 @@ Example
         <span class="sig-arg">eps</span>=<span class="sig-default">5e-08</span>,
         <span class="sig-arg">max_iter</span>=<span class="sig-default">10000</span>,
         <span class="sig-arg">min_iter</span>=<span class="sig-default">1</span>,
-        <span class="sig-arg">conesta_stop</span>=<span class="sig-default">None</span>)</span>
+        <span class="sig-arg">simulation</span>=<span class="sig-default">False</span>)</span>
     <br /><em class="fname">(Constructor)</em>
   </h3>
   </td><td align="right" valign="top"
@@ -465,6 +471,24 @@ beta : Numpy array. The start vector.
   </dl>
 </td></tr></table>
 </div>
+<a name="INFO_PROVIDED"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">INFO_PROVIDED</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-group">[</code><code class="variable-quote">'</code><code class="variable-string">ok</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">num_iter</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">time</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">fvalue</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">converged</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">gap</code><code class="variable-quote">'</code><code class="variable-group">]</code>
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
 <br />
 <!-- ==================== NAVIGATION BAR ==================== -->
 <table class="navbar" border="0" width="100%" cellpadding="0"
@@ -492,7 +516,7 @@ beta : Numpy array. The start vector.
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Thu Oct  2 23:35:46 2014
+    Generated by Epydoc 3.0.1 on Mon Apr  6 23:52:10 2015
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

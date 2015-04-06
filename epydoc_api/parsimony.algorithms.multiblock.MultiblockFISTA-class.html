@@ -78,21 +78,19 @@
 
 <hr />
 <pre class="literalblock">
-The projected gradient algorithm with alternating minimisations in a
-multiblock setting.
+The projected or proximal gradient algorithm with alternating
+minimisations in a multiblock setting.
 
 Parameters
 ----------
-info : List or tuple of utils.consts.Info. What, if any, extra run
-        information should be stored. Default is an empty list, which means
-        that no run information is computed nor returned.
+info : List or tuple of utils.Info. What, if any, extra run information
+        should be stored. Default is an empty list, which means that no
+        run information is computed nor returned.
 
 eps : Positive float. Tolerance for the stopping criterion.
 
-outer_iter : Non-negative integer. Maximum allowed number of outer loop
+max_iter : Non-negative integer. Maximum total allowed number of
         iterations.
-
-max_iter : Non-negative integer. Maximum allowed number of iterations.
 
 min_iter : Non-negative integer less than or equal to max_iter. Minimum
         number of iterations that must be performed. Default is 1.
@@ -124,7 +122,6 @@ min_iter : Non-negative integer less than or equal to max_iter. Minimum
         <tr>
           <td><span class="summary-sig"><a href="parsimony.algorithms.multiblock.MultiblockFISTA-class.html#__init__" class="summary-sig-name">__init__</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">info</span>=<span class="summary-sig-default"><code class="variable-group">[</code><code class="variable-group">]</code></span>,
-        <span class="summary-sig-arg">outer_iter</span>=<span class="summary-sig-default">20</span>,
         <span class="summary-sig-arg">eps</span>=<span class="summary-sig-default">5e-08</span>,
         <span class="summary-sig-arg">max_iter</span>=<span class="summary-sig-default">10000</span>,
         <span class="summary-sig-arg">min_iter</span>=<span class="summary-sig-default">1</span>)</span><br />
@@ -243,17 +240,16 @@ min_iter : Non-negative integer less than or equal to max_iter. Minimum
 &gt;,
  &lt;class 'parsimony.functions.multiblock.properties.MultiblockGradient'\
 &gt;,
- &lt;class 'parsimony.functions.multiblock.properties.MultiblockProjectio\
-nOperator'&gt;,
  &lt;class 'parsimony.functions.multiblock.properties.MultiblockStepSize'\
-&gt;]"><code class="variable-group">[</code>&lt;class 'parsimony.functions.multiblock.propertie<code class="variable-ellipsis">...</code></code>
+&gt;,
+ &lt;parsimony.functions.properties.OR object at 0x31dbd90&gt;]"><code class="variable-group">[</code>&lt;class 'parsimony.functions.multiblock.propertie<code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="INFO_PROVIDED"></a><span class="summary-name">INFO_PROVIDED</span> = <code title="['ok', 'num_iter', 'time', 'fvalue', 'converged']"><code class="variable-group">[</code><code class="variable-quote">'</code><code class="variable-string">ok</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">num_iter</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">time</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">fvalue</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">converged</code><code class="variable-quote">'</code><code class="variable-group">]</code></code>
+        <a href="parsimony.algorithms.multiblock.MultiblockFISTA-class.html#INFO_PROVIDED" class="summary-name">INFO_PROVIDED</a> = <code title="['ok', 'num_iter', 'time', 'func_val', 'smooth_func_val', 'converged']"><code class="variable-group">[</code><code class="variable-quote">'</code><code class="variable-string">ok</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">num_iter</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">time</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">func_val</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">smooth</code><code class="variable-ellipsis">...</code></code>
     </td>
   </tr>
 <tr>
@@ -261,6 +257,13 @@ nOperator'&gt;,
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
         <a name="__abstractmethods__"></a><span class="summary-name">__abstractmethods__</span> = <code title="frozenset([])"><code class="variable-group">frozenset([</code><code class="variable-group">])</code></code>
+    </td>
+  </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="_abc_negative_cache_version"></a><span class="summary-name">_abc_negative_cache_version</span> = <code title="14">14</code>
     </td>
   </tr>
   <tr>
@@ -271,7 +274,6 @@ nOperator'&gt;,
     <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html">bases.BaseAlgorithm</a></code></b> (private):
       <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_cache" onclick="show_private();">_abc_cache</a></code>,
       <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_negative_cache" onclick="show_private();">_abc_negative_cache</a></code>,
-      <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_negative_cache_version" onclick="show_private();">_abc_negative_cache_version</a></code>,
       <code><a href="parsimony.algorithms.bases.BaseAlgorithm-class.html#_abc_registry" onclick="show_private();">_abc_registry</a></code>
       </p></div>
     </td>
@@ -329,7 +331,6 @@ nOperator'&gt;,
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">__init__</span>(<span class="sig-arg">self</span>,
         <span class="sig-arg">info</span>=<span class="sig-default"><code class="variable-group">[</code><code class="variable-group">]</code></span>,
-        <span class="sig-arg">outer_iter</span>=<span class="sig-default">20</span>,
         <span class="sig-arg">eps</span>=<span class="sig-default">5e-08</span>,
         <span class="sig-arg">max_iter</span>=<span class="sig-default">10000</span>,
         <span class="sig-arg">min_iter</span>=<span class="sig-default">1</span>)</span>
@@ -424,10 +425,27 @@ x : A starting point.
 &gt;<code class="variable-op">,</code>
  &lt;class 'parsimony.functions.multiblock.properties.MultiblockGradient'<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
 &gt;<code class="variable-op">,</code>
- &lt;class 'parsimony.functions.multiblock.properties.MultiblockProjectio<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-nOperator'&gt;<code class="variable-op">,</code>
  &lt;class 'parsimony.functions.multiblock.properties.MultiblockStepSize'<span class="variable-linewrap"><img src="crarr.png" alt="\" /></span>
-&gt;<code class="variable-group">]</code>
+&gt;<code class="variable-op">,</code>
+ &lt;parsimony.functions.properties.OR object at 0x31dbd90&gt;<code class="variable-group">]</code>
+</pre></td></tr></table>
+</dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="INFO_PROVIDED"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <h3 class="epydoc">INFO_PROVIDED</h3>
+  
+  <dl class="fields">
+  </dl>
+  <dl class="fields">
+    <dt>Value:</dt>
+      <dd><table><tr><td><pre class="variable">
+<code class="variable-group">[</code><code class="variable-quote">'</code><code class="variable-string">ok</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">num_iter</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">time</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">func_val</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">smooth_func_val</code><code class="variable-quote">'</code><code class="variable-op">, </code><code class="variable-quote">'</code><code class="variable-string">converged</code><code class="variable-quote">'</code><code class="variable-group">]</code>
 </pre></td></tr></table>
 </dd>
   </dl>
@@ -460,7 +478,7 @@ nOperator'&gt;<code class="variable-op">,</code>
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Thu Oct  2 23:35:45 2014
+    Generated by Epydoc 3.0.1 on Mon Apr  6 23:52:10 2015
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

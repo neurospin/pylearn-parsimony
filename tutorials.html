@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>General framework &mdash; Parsimony 0.2.1 documentation</title>
+    <title>General framework &mdash; Parsimony 0.2.2 documentation</title>
     
     <link rel="stylesheet" href="static/default.css" type="text/css" />
     <link rel="stylesheet" href="static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.2.1',
+        VERSION:     '0.2.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="static/jquery.js"></script>
     <script type="text/javascript" src="static/underscore.js"></script>
     <script type="text/javascript" src="static/doctools.js"></script>
-    <link rel="top" title="Parsimony 0.2.1 documentation" href="index.html" />
+    <link rel="top" title="Parsimony 0.2.2 documentation" href="index.html" />
     <link rel="prev" title="Getting the dependencies" href="installing.html" /> 
   </head>
   <body>
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="installing.html" title="Getting the dependencies"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Parsimony 0.2.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Parsimony 0.2.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -167,7 +167,7 @@ minimizing the OLS loss function. Note that the defaulyt option is to minimize t
 <h2>Elastic net regression (L1 + L2 penalties)<a class="headerlink" href="#elastic-net-regression-l1-l2-penalties" title="Permalink to this headline">¶</a></h2>
 <p>You can combine <img class="math" src="images/math/3ff9d2add1273f7f294d4f0318b0ed4340c07768.png" alt="\ell_1"/> and <img class="math" src="images/math/970a3f7a0a3b548d0684d391994a6366f8d71ce9.png" alt="\ell_2"/> penalties with coefficients <img class="math" src="images/math/7a473fdbefd00dea993863513e15ec9c2f457eab.png" alt="\alpha=0.1"/> (global penalty) and <img class="math" src="images/math/b7b1886aab59119d24824e218afebf7c97bdaa54.png" alt="l=0.1"/> (<img class="math" src="images/math/3ff9d2add1273f7f294d4f0318b0ed4340c07768.png" alt="\ell_1"/> ratio) and minimise</p>
 <div class="math">
-<p><img src="images/math/d36a063e3355ebe6be126bb89e61984165ba4375.png" alt="\min\left(\frac{1}{2 n}\|y - X\beta\|_2^2 + \alpha (\frac{(1 - l)}{2}\|\beta\|_2^2 + l\cdot \|\beta\|_1))\right)."/></p>
+<p><img src="images/math/e0e0ab2e1d0676e88515c9560c863f73b22d5152.png" alt="\min\left(\frac{1}{2 n}\|y - X\beta\|_2^2 + \alpha\left(\frac{(1 - l)}{2}\|\beta\|_2^2 + l\cdot \|\beta\|_1\right)\right)."/></p>
 </div><div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">parsimony.estimators</span> <span class="kn">as</span> <span class="nn">estimators</span>
 <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c"># global penalty</span>
 <span class="n">l</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c"># l1 ratio (lasso)</span>
@@ -201,7 +201,7 @@ constraint, <img class="math" src="images/math/8b9c2dc7b393fc8d4314b46b44b5e4e0a
 <div class="math">
 <p><img src="images/math/725b78edad7cad79e150fa833d09d754b346fb7b.png" alt="\min\left(\frac{1}{2 n}\|y - X\beta\|_2^2 + \frac{k}{2}\|\beta\|_2^2 + l\|\beta\|_1 + g\cdot GL(\beta)\right)."/></p>
 </div><div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">parsimony.estimators</span> <span class="kn">as</span> <span class="nn">estimators</span>
-<span class="kn">import</span> <span class="nn">parsimony.algorithms.explicit</span> <span class="kn">as</span> <span class="nn">algorithms</span>
+<span class="kn">import</span> <span class="nn">parsimony.algorithms</span> <span class="kn">as</span> <span class="nn">algorithms</span>
 <span class="kn">import</span> <span class="nn">parsimony.functions.nesterov.gl</span> <span class="kn">as</span> <span class="nn">gl</span>
 <span class="n">k</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c"># l2 ridge regression coefficient</span>
 <span class="n">l</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c"># l1 lasso coefficient</span>
@@ -210,7 +210,7 @@ constraint, <img class="math" src="images/math/8b9c2dc7b393fc8d4314b46b44b5e4e0a
 <span class="n">A</span> <span class="o">=</span> <span class="n">gl</span><span class="o">.</span><span class="n">linear_operator_from_groups</span><span class="p">(</span><span class="n">num_ft</span><span class="p">,</span> <span class="n">groups</span><span class="p">)</span>
 <span class="n">estimator</span> <span class="o">=</span> <span class="n">estimators</span><span class="o">.</span><span class="n">LinearRegressionL1L2GL</span><span class="p">(</span>
                                       <span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">A</span><span class="p">,</span>
-                                      <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithms</span><span class="o">.</span><span class="n">FISTA</span><span class="p">(),</span>
+                                      <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithms</span><span class="o">.</span><span class="n">proximal</span><span class="o">.</span><span class="n">FISTA</span><span class="p">(),</span>
                                       <span class="n">algorithm_params</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">))</span>
 <span class="n">res</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 <span class="k">print</span> <span class="s">&quot;Estimated beta error =&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">estimator</span><span class="o">.</span><span class="n">beta</span> <span class="o">-</span> <span class="n">beta</span><span class="p">)</span>
@@ -307,7 +307,7 @@ constraint and instead minimise</p>
 <div class="math">
 <p><img src="images/math/2ffa0f29abfd8378feb4cd2630fd2af2eefce70e.png" alt="\min\left(\frac{1}{n}\sum_{i=1}^n\log(1 + e^{-y_i(\beta^Tx_i)}) + \frac{k}{2}\|\beta\|_2^2 + l\|\beta\|_1 + g\cdot GL(\beta)\right)"/></p>
 </div><div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">parsimony.estimators</span> <span class="kn">as</span> <span class="nn">estimators</span>
-<span class="kn">import</span> <span class="nn">parsimony.algorithms.explicit</span> <span class="kn">as</span> <span class="nn">algorithms</span>
+<span class="kn">import</span> <span class="nn">parsimony.algorithms</span> <span class="kn">as</span> <span class="nn">algorithms</span>
 <span class="kn">import</span> <span class="nn">parsimony.functions.nesterov.gl</span> <span class="kn">as</span> <span class="nn">gl</span>
 <span class="n">k</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c"># l2 ridge regression coefficient</span>
 <span class="n">l</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c"># l1 lasso coefficient</span>
@@ -316,7 +316,7 @@ constraint and instead minimise</p>
 <span class="n">A</span> <span class="o">=</span> <span class="n">gl</span><span class="o">.</span><span class="n">linear_operator_from_groups</span><span class="p">(</span><span class="n">num_ft</span><span class="p">,</span> <span class="n">groups</span><span class="p">)</span>
 <span class="n">estimator</span> <span class="o">=</span> <span class="n">estimators</span><span class="o">.</span><span class="n">LogisticRegressionL1L2GL</span><span class="p">(</span>
                                       <span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">A</span><span class="p">,</span>
-                                      <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithms</span><span class="o">.</span><span class="n">FISTA</span><span class="p">(),</span>
+                                      <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithms</span><span class="o">.</span><span class="n">proximal</span><span class="o">.</span><span class="n">FISTA</span><span class="p">(),</span>
                                       <span class="n">algorithm_params</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">))</span>
 <span class="n">res</span> <span class="o">=</span> <span class="n">estimator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 <span class="k">print</span> <span class="s">&quot;Estimated prediction rate =&quot;</span><span class="p">,</span> <span class="n">estimator</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
@@ -334,7 +334,7 @@ constraint and instead minimise</p>
 <p>We applied FISTA (<a class="reference internal" href="#fista2009">[FISTA2009]</a>) in the previous sections. In this section, we
 switch to CONESTA to minimise the function.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">parsimony.estimators</span> <span class="kn">as</span> <span class="nn">estimators</span>
-<span class="kn">import</span> <span class="nn">parsimony.algorithms.explicit</span> <span class="kn">as</span> <span class="nn">algorithms</span>
+<span class="kn">import</span> <span class="nn">parsimony.algorithms</span> <span class="kn">as</span> <span class="nn">algorithms</span>
 <span class="kn">import</span> <span class="nn">parsimony.functions.nesterov.tv</span> <span class="kn">as</span> <span class="nn">tv</span>
 <span class="n">k</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c"># l2 ridge regression coefficient</span>
 <span class="n">l</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c"># l1 lasso coefficient</span>
@@ -342,7 +342,7 @@ switch to CONESTA to minimise the function.</p>
 <span class="n">Atv</span><span class="p">,</span> <span class="n">n_compacts</span> <span class="o">=</span> <span class="n">tv</span><span class="o">.</span><span class="n">linear_operator_from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
 <span class="n">tvl1l2_conesta</span> <span class="o">=</span> <span class="n">estimators</span><span class="o">.</span><span class="n">LinearRegressionL1L2TV</span><span class="p">(</span>
                                       <span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">Atv</span><span class="p">,</span>
-                                      <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithms</span><span class="o">.</span><span class="n">CONESTA</span><span class="p">())</span>
+                                      <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithms</span><span class="o">.</span><span class="n">proximal</span><span class="o">.</span><span class="n">CONESTA</span><span class="p">())</span>
 <span class="n">res</span> <span class="o">=</span> <span class="n">tvl1l2_conesta</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 <span class="k">print</span> <span class="s">&quot;Estimated beta error =&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">tvl1l2_conesta</span><span class="o">.</span><span class="n">beta</span> <span class="o">-</span> <span class="n">beta</span><span class="p">)</span>
 </pre></div>
@@ -355,16 +355,18 @@ switch to CONESTA to minimise the function.</p>
 positive.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="kn">as</span> <span class="nn">sparse</span>
 <span class="kn">import</span> <span class="nn">parsimony.functions.nesterov.l1tv</span> <span class="kn">as</span> <span class="nn">l1tv</span>
+<span class="kn">import</span> <span class="nn">parsimony.algorithms.primaldual</span> <span class="kn">as</span> <span class="nn">primaldual</span>
 <span class="c">#Atv, n_compacts = tv.linear_operator_from_shape(shape)</span>
 <span class="c">#Al1 = sparse.eye(num_ft, num_ft)</span>
-<span class="n">Atv</span><span class="p">,</span> <span class="n">Al1</span> <span class="o">=</span> <span class="n">l1tv</span><span class="o">.</span><span class="n">linear_operator_from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">num_ft</span><span class="p">,</span> <span class="n">penalty_start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">l1tv</span><span class="o">.</span><span class="n">linear_operator_from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">num_ft</span><span class="p">,</span> <span class="n">penalty_start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">Al1</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">Atv</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
 <span class="n">k</span> <span class="o">=</span> <span class="mf">0.05</span>  <span class="c"># ridge regression coefficient</span>
 <span class="n">l</span> <span class="o">=</span> <span class="mf">0.05</span>  <span class="c"># l1 coefficient</span>
 <span class="n">g</span> <span class="o">=</span> <span class="mf">0.05</span>  <span class="c"># tv coefficient</span>
 <span class="n">rr_smoothed_l1_tv</span> <span class="o">=</span> <span class="n">estimators</span><span class="o">.</span><span class="n">LinearRegressionL2SmoothedL1TV</span><span class="p">(</span>
-                    <span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span>
-                    <span class="n">Atv</span><span class="o">=</span><span class="n">Atv</span><span class="p">,</span> <span class="n">Al1</span><span class="o">=</span><span class="n">Al1</span><span class="p">,</span>
-                    <span class="n">algorithm</span><span class="o">=</span><span class="n">algorithms</span><span class="o">.</span><span class="n">ExcessiveGapMethod</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">))</span>
+                    <span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">A</span><span class="o">=</span><span class="n">A</span><span class="p">,</span>
+                    <span class="n">algorithm</span><span class="o">=</span><span class="n">primaldual</span><span class="o">.</span><span class="n">ExcessiveGapMethod</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">))</span>
 <span class="n">res</span> <span class="o">=</span> <span class="n">rr_smoothed_l1_tv</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 <span class="k">print</span> <span class="s">&quot;Estimated beta error =&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">rr_smoothed_l1_tv</span><span class="o">.</span><span class="n">beta</span> <span class="o">-</span> <span class="n">beta</span><span class="p">)</span>
 </pre></div>
@@ -455,7 +457,7 @@ positive.</p>
         <li class="right" >
           <a href="installing.html" title="Getting the dependencies"
              >previous</a> |</li>
-        <li><a href="index.html">Parsimony 0.2.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Parsimony 0.2.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

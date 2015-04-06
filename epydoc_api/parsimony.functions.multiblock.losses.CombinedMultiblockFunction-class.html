@@ -106,7 +106,7 @@ differentiable penalties, h_k are a ProximalOperators and N_l are
 NesterovFunctions. All functions and penalties must thus have Gradients,
 unless they are ProximalOperators.
 
-If no ProximalOperator is given, prox is the identity.
+If no ProximalOperator is given, prox will be the identity.
 
 Parameters
 ----------
@@ -299,6 +299,24 @@ constraints : A list of lists. Element i of the outer list is also a list
     </td><td class="summary">
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.multiblock.losses.CombinedMultiblockFunction-class.html#fmu" class="summary-sig-name">fmu</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">w</span>)</span><br />
+      Function value of smoothed function.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#CombinedMultiblockFunction.fmu">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
           <td><span class="summary-sig"><a href="parsimony.functions.multiblock.losses.CombinedMultiblockFunction-class.html#grad" class="summary-sig-name">grad</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">w</span>,
         <span class="summary-sig-arg">index</span>)</span><br />
@@ -321,7 +339,9 @@ constraints : A list of lists. Element i of the outer list is also a list
           <td><span class="summary-sig"><a href="parsimony.functions.multiblock.losses.CombinedMultiblockFunction-class.html#prox" class="summary-sig-name">prox</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">w</span>,
         <span class="summary-sig-arg">index</span>,
-        <span class="summary-sig-arg">factor</span>=<span class="summary-sig-default">1.0</span>)</span><br />
+        <span class="summary-sig-arg">factor</span>=<span class="summary-sig-default">1.0</span>,
+        <span class="summary-sig-arg">eps</span>=<span class="summary-sig-default">5e-08</span>,
+        <span class="summary-sig-arg">max_iter</span>=<span class="summary-sig-default">100</span>)</span><br />
       The proximal operator of the non-differentiable part of the
 function with the given index.</td>
           <td align="right" valign="top">
@@ -341,7 +361,9 @@ function with the given index.</td>
         <tr>
           <td><span class="summary-sig"><a href="parsimony.functions.multiblock.losses.CombinedMultiblockFunction-class.html#proj" class="summary-sig-name">proj</a>(<span class="summary-sig-arg">self</span>,
         <span class="summary-sig-arg">w</span>,
-        <span class="summary-sig-arg">index</span>)</span><br />
+        <span class="summary-sig-arg">index</span>,
+        <span class="summary-sig-arg">eps</span>=<span class="summary-sig-default">5e-08</span>,
+        <span class="summary-sig-arg">max_iter</span>=<span class="summary-sig-default">100</span>)</span><br />
       The projection operator of a constraint that corresponds to the
 function with the given index.</td>
           <td align="right" valign="top">
@@ -380,6 +402,9 @@ function with the given index.</td>
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.Function-class.html">properties.Function</a></code></b>:
       <code><a href="parsimony.functions.properties.Function-class.html#get_params">get_params</a></code>,
       <code><a href="parsimony.functions.properties.Function-class.html#set_params">set_params</a></code>
+      </p>
+    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.multiblock.properties.MultiblockGradient-class.html">properties.MultiblockGradient</a></code></b>:
+      <code><a href="parsimony.functions.multiblock.properties.MultiblockGradient-class.html#approx_grad">approx_grad</a></code>
       </p>
     <p class="indent-wrapped-lines"><b>Inherited from <code>object</code></b>:
       <code>__delattr__</code>,
@@ -422,6 +447,13 @@ function with the given index.</td>
         <a name="__abstractmethods__"></a><span class="summary-name">__abstractmethods__</span> = <code title="frozenset([])"><code class="variable-group">frozenset([</code><code class="variable-group">])</code></code>
     </td>
   </tr>
+<tr class="private">
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+        <a name="_abc_negative_cache_version"></a><span class="summary-name">_abc_negative_cache_version</span> = <code title="14">14</code>
+    </td>
+  </tr>
   <tr>
     <td colspan="2" class="summary">
     <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.multiblock.properties.MultiblockFunction-class.html">properties.MultiblockFunction</a></code></b>:
@@ -431,7 +463,6 @@ function with the given index.</td>
     <div class="private">    <p class="indent-wrapped-lines"><b>Inherited from <code><a href="parsimony.functions.properties.Function-class.html">properties.Function</a></code></b> (private):
       <code><a href="parsimony.functions.properties.Function-class.html#_abc_cache" onclick="show_private();">_abc_cache</a></code>,
       <code><a href="parsimony.functions.properties.Function-class.html#_abc_negative_cache" onclick="show_private();">_abc_negative_cache</a></code>,
-      <code><a href="parsimony.functions.properties.Function-class.html#_abc_negative_cache_version" onclick="show_private();">_abc_negative_cache_version</a></code>,
       <code><a href="parsimony.functions.properties.Function-class.html#_abc_registry" onclick="show_private();">_abc_registry</a></code>
       </p></div>
     </td>
@@ -623,6 +654,33 @@ w : List of numpy arrays. The weight vectors.
   </dl>
 </td></tr></table>
 </div>
+<a name="fmu"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">fmu</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">w</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#CombinedMultiblockFunction.fmu">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+Function value of smoothed function.
+
+Parameters
+----------
+w : List of numpy arrays. The weight vectors.
+
+</pre>
+  <dl class="fields">
+  </dl>
+</td></tr></table>
+</div>
 <a name="grad"></a>
 <div>
 <table class="details" border="1" cellpadding="3"
@@ -669,7 +727,9 @@ index : Non-negative integer. Which variable the step is for.
   <h3 class="epydoc"><span class="sig"><span class="sig-name">prox</span>(<span class="sig-arg">self</span>,
         <span class="sig-arg">w</span>,
         <span class="sig-arg">index</span>,
-        <span class="sig-arg">factor</span>=<span class="sig-default">1.0</span>)</span>
+        <span class="sig-arg">factor</span>=<span class="sig-default">1.0</span>,
+        <span class="sig-arg">eps</span>=<span class="sig-default">5e-08</span>,
+        <span class="sig-arg">max_iter</span>=<span class="sig-default">100</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#CombinedMultiblockFunction.prox">source&nbsp;code</a></span>&nbsp;
@@ -708,7 +768,9 @@ factor : Positive float. A factor by which the Lagrange multiplier is
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">proj</span>(<span class="sig-arg">self</span>,
         <span class="sig-arg">w</span>,
-        <span class="sig-arg">index</span>)</span>
+        <span class="sig-arg">index</span>,
+        <span class="sig-arg">eps</span>=<span class="sig-default">5e-08</span>,
+        <span class="sig-arg">max_iter</span>=<span class="sig-default">100</span>)</span>
   </h3>
   </td><td align="right" valign="top"
     ><span class="codelink"><a href="parsimony.functions.multiblock.losses-pysrc.html#CombinedMultiblockFunction.proj">source&nbsp;code</a></span>&nbsp;
@@ -797,7 +859,7 @@ index : Non-negative integer. The variable which the step is for.
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Thu Oct  2 23:35:46 2014
+    Generated by Epydoc 3.0.1 on Mon Apr  6 23:52:11 2015
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"

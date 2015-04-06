@@ -68,7 +68,7 @@ object --+
 <dl><dt>Known Subclasses:</dt>
 <dd>
       <ul class="subclass-list">
-<li><a href="parsimony.functions.multiblock.losses.CombinedMultiblockFunction-class.html">losses.CombinedMultiblockFunction</a></li><li class="private">, <a href="parsimony.functions.multiblock.losses.GeneralisedMultiblock-class.html" onclick="show_private();">losses.GeneralisedMultiblock</a></li><li>, <a href="parsimony.functions.multiblock.losses.LatentVariableCovariance-class.html">losses.LatentVariableCovariance</a></li>  </ul>
+<li><a href="parsimony.functions.multiblock.losses.CombinedMultiblockFunction-class.html">losses.CombinedMultiblockFunction</a></li><li class="private">, <a href="parsimony.functions.multiblock.losses.GeneralisedMultiblock-class.html" onclick="show_private();">losses.GeneralisedMultiblock</a></li><li>, <a href="parsimony.functions.multiblock.losses.LatentVariableCovariance-class.html">losses.LatentVariableCovariance</a></li><li class="private">, <a href="parsimony.functions.multiblock.losses.LatentVariableCovarianceSquared-class.html" onclick="show_private();">losses.LatentVariableCovarianceSquared</a></li>  </ul>
 </dd></dl>
 
 <hr />
@@ -122,11 +122,31 @@ object --+
       <table width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
           <td><span class="summary-sig"><a href="parsimony.functions.multiblock.properties.MultiblockGradient-class.html#grad" class="summary-sig-name">grad</a>(<span class="summary-sig-arg">self</span>,
-        <span class="summary-sig-arg">w</span>,
+        <span class="summary-sig-arg">x</span>,
         <span class="summary-sig-arg">index</span>)</span><br />
       Gradient of the function.</td>
           <td align="right" valign="top">
             <span class="codelink"><a href="parsimony.functions.multiblock.properties-pysrc.html#MultiblockGradient.grad">source&nbsp;code</a></span>
+            
+          </td>
+        </tr>
+      </table>
+      
+    </td>
+  </tr>
+<tr>
+    <td width="15%" align="right" valign="top" class="summary">
+      <span class="summary-type">&nbsp;</span>
+    </td><td class="summary">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td><span class="summary-sig"><a href="parsimony.functions.multiblock.properties.MultiblockGradient-class.html#approx_grad" class="summary-sig-name">approx_grad</a>(<span class="summary-sig-arg">self</span>,
+        <span class="summary-sig-arg">x</span>,
+        <span class="summary-sig-arg">index</span>,
+        <span class="summary-sig-arg">eps</span>=<span class="summary-sig-default">0.0001</span>)</span><br />
+      Numerical approximation of the gradient.</td>
+          <td align="right" valign="top">
+            <span class="codelink"><a href="parsimony.functions.multiblock.properties-pysrc.html#MultiblockGradient.approx_grad">source&nbsp;code</a></span>
             
           </td>
         </tr>
@@ -182,28 +202,28 @@ object --+
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x3f10410&gt;">&lt;_weakrefset.WeakSet object at 0x3f10410&gt;</code>
+        <a name="_abc_cache"></a><span class="summary-name">_abc_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x318a3d0&gt;">&lt;_weakrefset.WeakSet object at 0x318a3d0&gt;</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x3f10490&gt;">&lt;_weakrefset.WeakSet object at 0x3f10490&gt;</code>
+        <a name="_abc_negative_cache"></a><span class="summary-name">_abc_negative_cache</span> = <code title="&lt;_weakrefset.WeakSet object at 0x318a450&gt;">&lt;_weakrefset.WeakSet object at 0x318a450&gt;</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_negative_cache_version"></a><span class="summary-name">_abc_negative_cache_version</span> = <code title="15">15</code>
+        <a name="_abc_negative_cache_version"></a><span class="summary-name">_abc_negative_cache_version</span> = <code title="10">10</code>
     </td>
   </tr>
 <tr class="private">
     <td width="15%" align="right" valign="top" class="summary">
       <span class="summary-type">&nbsp;</span>
     </td><td class="summary">
-        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x3f10350&gt;">&lt;_weakrefset.WeakSet object at 0x3f10350&gt;</code>
+        <a name="_abc_registry"></a><span class="summary-name">_abc_registry</span> = <code title="&lt;_weakrefset.WeakSet object at 0x318a310&gt;">&lt;_weakrefset.WeakSet object at 0x318a310&gt;</code>
     </td>
   </tr>
 </table>
@@ -258,7 +278,7 @@ object --+
   <table width="100%" cellpadding="0" cellspacing="0" border="0">
   <tr valign="top"><td>
   <h3 class="epydoc"><span class="sig"><span class="sig-name">grad</span>(<span class="sig-arg">self</span>,
-        <span class="sig-arg">w</span>,
+        <span class="sig-arg">x</span>,
         <span class="sig-arg">index</span>)</span>
   </h3>
   </td><td align="right" valign="top"
@@ -271,10 +291,10 @@ Gradient of the function.
 
 Parameters
 ----------
-w : List of numpy arrays. The weight vectors, w[index] is the point at
+x : List of numpy arrays. The weight vectors, x[index] is the point at
         which to evaluate the gradient.
 
-index : Non-negative integer. Which variable the step is for.
+index : Non-negative integer. Which variable the gradient is for.
 
 </pre>
   <dl class="fields">
@@ -282,6 +302,42 @@ index : Non-negative integer. Which variable the step is for.
     <dd><ul class="nomargin-top">
         <li><code>@abc.abstractmethod</code></li>
     </ul></dd>
+  </dl>
+</td></tr></table>
+</div>
+<a name="approx_grad"></a>
+<div>
+<table class="details" border="1" cellpadding="3"
+       cellspacing="0" width="100%" bgcolor="white">
+<tr><td>
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+  <tr valign="top"><td>
+  <h3 class="epydoc"><span class="sig"><span class="sig-name">approx_grad</span>(<span class="sig-arg">self</span>,
+        <span class="sig-arg">x</span>,
+        <span class="sig-arg">index</span>,
+        <span class="sig-arg">eps</span>=<span class="sig-default">0.0001</span>)</span>
+  </h3>
+  </td><td align="right" valign="top"
+    ><span class="codelink"><a href="parsimony.functions.multiblock.properties-pysrc.html#MultiblockGradient.approx_grad">source&nbsp;code</a></span>&nbsp;
+    </td>
+  </tr></table>
+  
+  <pre class="literalblock">
+Numerical approximation of the gradient.
+
+Parameters
+----------
+x : List of numpy arrays. The weight vectors, x[index] is the point at
+        which to evaluate the gradient.
+
+index : Non-negative integer. Which variable the gradient is for.
+
+eps : Positive integer. The precision of the numerical solution.
+        Smaller is better, but too small may result in floating point
+        precision errors.
+
+</pre>
+  <dl class="fields">
   </dl>
 </td></tr></table>
 </div>
@@ -312,7 +368,7 @@ index : Non-negative integer. Which variable the step is for.
 <table border="0" cellpadding="0" cellspacing="0" width="100%%">
   <tr>
     <td align="left" class="footer">
-    Generated by Epydoc 3.0.1 on Thu Oct  2 23:35:46 2014
+    Generated by Epydoc 3.0.1 on Mon Apr  6 23:52:11 2015
     </td>
     <td align="right" class="footer">
       <a target="mainFrame" href="http://epydoc.sourceforge.net"
