@@ -17,7 +17,7 @@ import inspect
 import warnings
 import ConfigParser
 
-__all__ = ["get", "set", "flush"]
+__all__ = ["get", "get_boolean", "set", "flush"]
 
 __config__ = None
 __ini_file__ = "config.ini"

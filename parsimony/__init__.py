@@ -12,6 +12,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @license: BSD 3-clause.
 """
 from . import algorithms
+from . import config
 from . import datasets
 from . import estimators
 from . import functions
@@ -19,4 +20,5 @@ from . import utils
 
 __version__ = "0.2.2"
 
-__all__ = ["algorithms", "datasets", "estimators", "functions", "utils"]
+__all__ = ["algorithms", "config", "datasets", "estimators", "functions",
+           "utils"]
