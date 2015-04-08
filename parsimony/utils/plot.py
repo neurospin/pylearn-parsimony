@@ -11,7 +11,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 import numpy as np
 import scipy.stats as ss
 
-__all__ = ["plot_map2d", "plot_classes"]
+__all__ = ["plot_map2d", "plot_map2d_of_models", "plot_classes"]
 
 COLORS = ["b", "g", "r", "c", "m", "y", "k", "w"]
 COLORS_FULL = ["blue", "green", "red", "cyan", "magenta", "yellow", "black",
@@ -58,6 +58,26 @@ def plot_map2d(map2d, plot=None, title=None, limits=None,
     if title is not None:
         plt.title(title)
 
+def plot_map2d_of_models(models_dict, nrow, ncol, shape, times_dict=None, scores_dict=None):
+    """Plot 2 weight maps of models"""
+    #from .plot import plot_map2d
+    import matplotlib.pyplot as plt
+    ax_i = 1
+    for k in models_dict.keys():
+        mod = models_dict[k]
+        if  hasattr(mod, "beta"):
+            w = mod.beta
+        elif hasattr(mod, "coef_"): # to work with sklean
+            w = mod.coef_
+        if  (hasattr(mod, "penalty_start") and mod.penalty_start != 0):
+            w = w[mod.penalty_start:]
+        t = times_dict[k] if  times_dict else 0
+        score = scores_dict[k] if scores_dict else 0
+        ax = plt.subplot(nrow, ncol, ax_i)
+        plot_map2d(w.reshape(shape), ax,
+                   title="%s\nScore:%.2f, T:%.1f" %(k, score, t))
+        ax_i += 1
+    plt.show()
 
 def plot_classes(X, classes, title=None, xlabel=None, ylabel=None, show=True):
 
