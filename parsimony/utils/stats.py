@@ -289,6 +289,8 @@ def accuracy(cond, test):
     >>> round(stats.accuracy(cond, test), 2)
     0.91
     """
+    test = np.reshape(test, cond.shape)
+
     true_pos = np.logical_and((cond == 1), (test == 1))
     true_neg = np.logical_and((cond == 0), (test == 0))
 
