@@ -61,6 +61,7 @@ if not _DOWNLOAD:
     filename = os.path.join(tmp_dir, dataset_basename)
     print "Save dataset in:", filename
     np.savez_compressed(filename, X3d=X3d, y=y, beta3d=beta3d, proba=proba)
+    weights = None
 else:
     tmp_dir = tempfile.gettempdir()
     # dataset
@@ -119,7 +120,7 @@ if has_sklearn:
     ypred = ridge_sklrn.predict(Xte)
     acc_ridge_sklrn = utils.stats.accuracy(yte, ypred)
 else:
-    beta = data["lasso_sklrn_beta"]
+    beta = data["ridge_sklrn_beta"]
     ridge_sklrn = utils.AnonymousClass(coef_=beta)
     acc_ridge_sklrn = 0.745
 
@@ -149,8 +150,8 @@ if has_sklearn:
     ypred = lasso_sklrn.predict(Xte)
     acc_lasso_sklrn = utils.stats.accuracy(yte, ypred)
 else:
-    beta = data["ridge_sklrn_beta"]
-    ridge_sklrn = utils.AnonymousClass(coef_=beta)
+    beta = data["lasso_sklrn_beta"]
+    lasso_sklrn = utils.AnonymousClass(coef_=beta)
     acc_lasso_sklrn = 0.735
 
 # Parsimony: minimize f(beta, X, y) = - loglik + alpha/2 * ||beta||_1
@@ -187,7 +188,7 @@ if has_sklearn:
     acc_enet_sklrn = utils.stats.accuracy(yte, enet_sklrn.predict(Xte))
 else:
     beta = data["enet_sklrn_beta"]
-    ridge_sklrn = utils.AnonymousClass(coef_=beta)
+    enet_sklrn = utils.AnonymousClass(coef_=beta)
     acc_enet_sklrn = 0.7
 
 # parsimony
@@ -332,9 +333,10 @@ def test_RidgeLogisticRegression_GradientDescent():
     # Parsimony vs sklearn
     assert_close_vectors(ridge_sklrn.coef_, ridge_prsmy.beta,
                          "Ridge, sklearn vs prsmy")
-    # Calculated vs downloaded
-    assert_close_vectors(ridge_prsmy.beta, weights["ridge_prsmy_beta"],
-                         "Ridge, calculated vs downloaded")
+    if weights is not None:
+        # Calculated vs downloaded
+        assert_close_vectors(ridge_prsmy.beta, weights["ridge_prsmy_beta"],
+                             "Ridge, calculated vs downloaded")
 
 
 def test_ElasticNetLogisticRegression_FISTA():
@@ -345,27 +347,31 @@ def test_ElasticNetLogisticRegression_FISTA():
     assert_close_vectors(enet_sklrn.coef_, enet_prsmy.beta,
                          "Enet, sklearn vs prsmy",
                          corr_tol=.5,  n2_tol=np.Inf)
-    # Calculated vs downloaded
-    assert_close_vectors(lasso_prsmy.beta, weights["lasso_prsmy_beta"],
-                         "Lasso, calculated vs downloaded")
-    assert_close_vectors(enet_prsmy.beta, weights["enet_prsmy_beta"],
-                         "Enet, calculated vs downloaded")
+    if weights is not None:
+        # Calculated vs downloaded
+        assert_close_vectors(lasso_prsmy.beta, weights["lasso_prsmy_beta"],
+                             "Lasso, calculated vs downloaded")
+        assert_close_vectors(enet_prsmy.beta, weights["enet_prsmy_beta"],
+                             "Enet, calculated vs downloaded")
 
 
 def test_LogisticRegressionL1L2TV_FISTA():
-    assert_close_vectors(enettv_fsta.beta, weights["enettv_fsta_beta"],
-                         "EnetTV(FISTA), calculated vs downloaded")
+    if weights is not None:
+        assert_close_vectors(enettv_fsta.beta, weights["enettv_fsta_beta"],
+                             "EnetTV(FISTA), calculated vs downloaded")
 
 
 def test_LogisticRegressionL1L2TV_StaticCONESTA():
-    assert np.allclose(enettv_stc_cnsta.beta,
-                       weights["enettv_stc_cnsta_beta"]), \
-                       "EnetTV(StaticCONESTA), calculated vs downloaded"
+    if weights is not None:
+        assert np.allclose(enettv_stc_cnsta.beta,
+                           weights["enettv_stc_cnsta_beta"]), \
+                           "EnetTV(StaticCONESTA), calculated vs downloaded"
 
 
 def test_LogisticRegressionL1L2TV_CONESTA():
-    assert np.allclose(enettv_cnsta.beta, weights["enettv_cnsta_beta"]), \
-        "EnetTV(CONESTA), calculated vs downloaded"
+    if weights is not None:
+        assert np.allclose(enettv_cnsta.beta, weights["enettv_cnsta_beta"]), \
+            "EnetTV(CONESTA), calculated vs downloaded"
 
 
 def test_LogisticRegressionL1L2TV_FISTA_vs_StaticCONESTA():
