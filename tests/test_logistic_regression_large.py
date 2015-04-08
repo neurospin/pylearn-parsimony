@@ -19,6 +19,7 @@ import parsimony.functions.nesterov.tv as nesterov_tv
 import parsimony.estimators as estimators
 import parsimony.algorithms as algorithms
 import parsimony.utils as utils
+import parsimony.config as config
 #from sklearn.metrics import accuracy_score
 try:
     import sklearn.linear_model
@@ -26,7 +27,7 @@ try:
 except ImportError:
     has_sklearn = False
 
-_DOWNLOAD = False
+_DOWNLOAD = config.get_boolean("tests", "allow_downloads", False)
 _PLOT_WEIGHTS = False
 _SAVE_WEIGHTS = False
 _SAVE_COEFFS = False
