@@ -97,7 +97,10 @@ yte = y[n_train:]
 alpha = 1.  # global penalty
 
 cdir = os.path.dirname(__file__)
-data_file = cdir + "/data/test_logistic_regression_large.npz"
+if _DOWNLOAD:
+    data_file = cdir + "/data/test_logistic_regression_large_dl.npz"
+else:
+    data_file = cdir + "/data/test_logistic_regression_large.npz"
 if not has_sklearn:
     try:
         data = np.load(data_file)
