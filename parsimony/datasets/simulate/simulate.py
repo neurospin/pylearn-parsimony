@@ -91,11 +91,11 @@ class LinearRegressionData(SimulatedData):
                 def f(x):
                     X, y, _ = self.load(x * beta)
 
-                    print "snr = %.5f = %.5f = |X.b| / |e| = %.5f / %.5f" \
-                       % (old_snr, np.linalg.norm(np.dot(X, x * beta)) \
-                                                   / np.linalg.norm(self.e),
-                          np.linalg.norm(np.dot(X, x * beta)),
-                          np.linalg.norm(self.e))
+#                    print "snr = %.5f = %.5f = |X.b| / |e| = %.5f / %.5f" \
+#                       % (old_snr, np.linalg.norm(np.dot(X, x * beta)) \
+#                                                   / np.linalg.norm(self.e),
+#                          np.linalg.norm(np.dot(X, x * beta)),
+#                          np.linalg.norm(self.e))
 
                     return (np.linalg.norm(np.dot(X, x * beta)) \
                             / np.linalg.norm(self.e)) - old_snr

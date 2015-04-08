@@ -104,7 +104,7 @@ l = 0.0  # l1 lasso coefficient
 g = 1.0  # tv coefficient
 A, n_compacts = tv.linear_operator_from_shape(shape)  # Memory allocation for TV
 olstv = estimators.LinearRegressionL1L2TV(k, l, g, A, mu=0.0001,
-                                         algorithm=algorithms.explicit.FISTA(),
+                                         algorithm=algorithms.proximal.FISTA(),
                                          algorithm_params=dict(max_iter=1000))
 ```
 We fit the model, estimate beta, and predict on the test set.
