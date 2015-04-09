@@ -21,44 +21,175 @@ import ConfigParser
 
 __all__ = ["get", "get_boolean", "get_float", "get_int", "set", "flush"]
 
-__config__ = None
-__ini_file__ = "config.ini"
-__flush_dry_run__ = False
+#__config__ = None
+#__ini_file__ = "config.ini"
+#__flush_dry_run__ = False
 
 
-def __ini_file_name__():
-    """Extracts the directory of this module.
-    """
-    fname = inspect.currentframe()  # This module.
-    fname = inspect.getfile(fname)  # Filename of this module.
-    fname = os.path.abspath(fname)  # Absolute path of this module.
-    fname = os.path.dirname(fname)  # Directory of this module.
-    if fname[-1] != "/":
-        fname = fname + "/"  # Should be there, but just in case ...
-    fname = fname + __ini_file__  # The ini file.
+class __Config(object):
 
-    return fname
+    __flush_dry_run__ = False
+
+    def __init__(self, ini_file):
+
+        self._ini_file = str(ini_file)
+        self._config = ConfigParser.ConfigParser()
+
+        fname = self._ini_file_name()
+        if os.path.exists(fname):
+            try:
+                self._config.read(fname)
+
+            except ConfigParser.ParsingError:
+                warnings.warn("Could not parse the config file.",
+                              RuntimeWarning)
+        else:
+            warnings.warn("Could not locate the config file.", RuntimeWarning)
+
+    def __del__(self):
+        self.flush()  # Save updates to configuration file.
+
+    def _ini_file_name(self):
+        """Extracts the directory of this module.
+        """
+        fname = inspect.currentframe()  # This module.
+        fname = inspect.getfile(fname)  # Filename of this module.
+        fname = os.path.abspath(fname)  # Absolute path of this module.
+        fname = os.path.dirname(fname)  # Directory of this module.
+        if fname[-1] != "/":
+            fname = fname + "/"  # Should be there, but just in case ...
+        fname = fname + self._ini_file  # The ini file.
+
+        return fname
+
+    def get(self, section, option, default=None):
+        """Fetches a configuration option from a section of the ini file. If
+        not found, returns the default value.
+        """
+        section = str(section)
+        option = str(option)
+
+        if not self._config.has_section(section):  # Subsumed by the below?
+            return default
+        if not self._config.has_option(section, option):
+            return default
+
+        value = self._config.get(section, option)
+
+        return value
+
+    def get_boolean(self, section, option, default=False):
+        """Fetches a boolean configuration option from a section of the ini
+        file. If not found, returns the default value False.
+        """
+        section = str(section)
+        option = str(option)
+
+        if not self._config.has_section(section):  # Subsumed by the below?
+            return default
+        if not self._config.has_option(section, option):
+            return default
+
+        value = self._config.getboolean(section, option)
+
+        return value
+
+    def get_float(self, section, option, default=0.0):
+        """Fetches a floating point configuration option from a section of the
+        ini file. If not found, returns the default value 0.0.
+        """
+        section = str(section)
+        option = str(option)
+
+        if not self._config.has_section(section):  # Subsumed by the below?
+            return default
+        if not self._config.has_option(section, option):
+            return default
+
+        value = self._config.getfloat(section, option)
+
+        return value
+
+    def get_int(self, section, option, default=0):
+        """Fetches an integer configuration option from a section of the ini
+        file. If not found, returns the default value 0.
+        """
+        section = str(section)
+        option = str(option)
+
+        if not self._config.has_section(section):  # Subsumed by the below?
+            return default
+        if not self._config.has_option(section, option):
+            return default
+
+        value = self._config.getint(section, option)
+
+        return value
+
+    def set(self, section, option, value, flush_file=False):
+        """Sets a configuration option.
+        """
+        section = str(section)
+        option = str(option)
+        value = str(value)
+
+        if not self._config.has_section(section):
+            self._config.add_section(section)
+
+        self._config.set(section, option, value)
+
+        if flush_file:
+            self.flush()
+
+    def flush(self):
+        """Saves the current configuration to disk.
+        """
+        fname = self._ini_file_name()
+
+        if os.path.exists(fname):
+            if not self.__flush_dry_run__:
+                with open(fname, "wb") as fid:
+                    self._config.write(fid)
+        else:
+            warnings.warn("Could not locate the config file.", RuntimeWarning)
 
 
-def __load_config__():
-    """Loads the configuration settings from the ini file.
-    """
-    global __config__
-    __config__ = ConfigParser.ConfigParser()
+__config__ = __Config("config.ini")
 
-    fname = __ini_file_name__()
-    if os.path.exists(fname):
-        try:
-            __config__.read(fname)
 
-            return True
+#def __ini_file_name__():
+#    """Extracts the directory of this module.
+#    """
+#    fname = inspect.currentframe()  # This module.
+#    fname = inspect.getfile(fname)  # Filename of this module.
+#    fname = os.path.abspath(fname)  # Absolute path of this module.
+#    fname = os.path.dirname(fname)  # Directory of this module.
+#    if fname[-1] != "/":
+#        fname = fname + "/"  # Should be there, but just in case ...
+#    fname = fname + __ini_file__  # The ini file.
+#
+#    return fname
 
-        except ConfigParser.ParsingError:
-            warnings.warn("Could not parse the config file.", RuntimeWarning)
-    else:
-        warnings.warn("Could not locate the config file.", RuntimeWarning)
 
-    return False
+#def __load_config__():
+#    """Loads the configuration settings from the ini file.
+#    """
+#    global __config__
+#    __config__ = ConfigParser.ConfigParser()
+#
+#    fname = __ini_file_name__()
+#    if os.path.exists(fname):
+#        try:
+#            __config__.read(fname)
+#
+#            return True
+#
+#        except ConfigParser.ParsingError:
+#            warnings.warn("Could not parse the config file.", RuntimeWarning)
+#    else:
+#        warnings.warn("Could not locate the config file.", RuntimeWarning)
+#
+#    return False
 
 
 def get(section, option, default=None):
@@ -86,19 +217,21 @@ def get(section, option, default=None):
     >>> config.get("test_section", "testing_get")
     'value'
     """
-    if __config__ is None:
-        if not __load_config__():
-            return default
+#    if __config__ is None:
+#        if not __load_config__():
+#            return default
+#
+#    section = str(section)
+#    option = str(option)
+#
+#    if not __config__.has_section(section):  # Subsumed by the below?
+#        return default
+#    if not __config__.has_option(section, option):
+#        return default
+#
+#    value = __config__.get(section, option)
 
-    section = str(section)
-    option = str(option)
-
-    if not __config__.has_section(section):  # Subsumed by the below?
-        return default
-    if not __config__.has_option(section, option):
-        return default
-
-    value = __config__.get(section, option)
+    value = __config__.get(section, option, default=default)
 
     return value
 
@@ -150,19 +283,21 @@ def get_boolean(section, option, default=False):
     >>> config.get_boolean("test_section", "testing_non_existent", True)
     True
     """
-    if __config__ is None:
-        if not __load_config__():
-            return default
+#    if __config__ is None:
+#        if not __load_config__():
+#            return default
+#
+#    section = str(section)
+#    option = str(option)
+#
+#    if not __config__.has_section(section):  # Subsumed by the below?
+#        return default
+#    if not __config__.has_option(section, option):
+#        return default
+#
+#    value = __config__.getboolean(section, option)
 
-    section = str(section)
-    option = str(option)
-
-    if not __config__.has_section(section):  # Subsumed by the below?
-        return default
-    if not __config__.has_option(section, option):
-        return default
-
-    value = __config__.getboolean(section, option)
+    value = __config__.get_boolean(section, option, default=default)
 
     return value
 
@@ -197,19 +332,21 @@ def get_float(section, option, default=0.0):
     >>> config.get_float("test_section", "testing_non_existent", 2.71828182845)
     2.71828182845
     """
-    if __config__ is None:
-        if not __load_config__():
-            return default
+#    if __config__ is None:
+#        if not __load_config__():
+#            return default
+#
+#    section = str(section)
+#    option = str(option)
+#
+#    if not __config__.has_section(section):  # Subsumed by the below?
+#        return default
+#    if not __config__.has_option(section, option):
+#        return default
+#
+#    value = __config__.getfloat(section, option)
 
-    section = str(section)
-    option = str(option)
-
-    if not __config__.has_section(section):  # Subsumed by the below?
-        return default
-    if not __config__.has_option(section, option):
-        return default
-
-    value = __config__.getfloat(section, option)
+    value = __config__.get_float(section, option, default=default)
 
     return value
 
@@ -243,19 +380,21 @@ def get_int(section, option, default=0):
     >>> config.get_float("test_section", "testing_non_existent", 12407)
     12407
     """
-    if __config__ is None:
-        if not __load_config__():
-            return default
+#    if __config__ is None:
+#        if not __load_config__():
+#            return default
+#
+#    section = str(section)
+#    option = str(option)
+#
+#    if not __config__.has_section(section):  # Subsumed by the below?
+#        return default
+#    if not __config__.has_option(section, option):
+#        return default
+#
+#    value = __config__.getint(section, option)
 
-    section = str(section)
-    option = str(option)
-
-    if not __config__.has_section(section):  # Subsumed by the below?
-        return default
-    if not __config__.has_option(section, option):
-        return default
-
-    value = __config__.getint(section, option)
+    value = __config__.get_int(section, option, default=default)
 
     return value
 
@@ -283,20 +422,22 @@ def set(section, option, value, flush_file=False):
     >>> config.get("test_section", "testing_set")
     'Theorem VI'
     """
-    if __config__ is None:
-        __load_config__()
+#    if __config__ is None:
+#        __load_config__()
+#
+#    section = str(section)
+#    option = str(option)
+#    value = str(value)
+#
+#    if not __config__.has_section(section):
+#        __config__.add_section(section)
+#
+#    __config__.set(section, option, value)
+#
+#    if flush_file:
+#        flush()
 
-    section = str(section)
-    option = str(option)
-    value = str(value)
-
-    if not __config__.has_section(section):
-        __config__.add_section(section)
-
-    __config__.set(section, option, value)
-
-    if flush_file:
-        flush()
+    __config__.set(section, option, value, flush_file=flush_file)
 
 
 def flush():
@@ -308,23 +449,25 @@ def flush():
     >>>
     >>> config.set("test_section", "testing_flush", "243000000")
     >>> try:
-    ...     config.__flush_dry_run__ = True
+    ...     config.__config__.__flush_dry_run__ = True
     ...     config.flush()
     ... finally:
-    ...     config.__flush_dry_run__ = False
+    ...     config.__config__.__flush_dry_run__ = False
     """
-    if __config__ is None:
-        if not __load_config__():
-            return  # Nothing to save.
+#    if __config__ is None:
+#        if not __load_config__():
+#            return  # Nothing to save.
+#
+#    fname = __ini_file_name__()
+#
+#    if os.path.exists(fname):
+#        if not __flush_dry_run__:
+#            with open(fname, "wb") as fid:
+#                __config__.write(fid)
+#    else:
+#        warnings.warn("Could not locate the config file.", RuntimeWarning)
 
-    fname = __ini_file_name__()
-
-    if os.path.exists(fname):
-        if not __flush_dry_run__:
-            with open(fname, "wb") as fid:
-                __config__.write(fid)
-    else:
-        warnings.warn("Could not locate the config file.", RuntimeWarning)
+    __config__.flush()
 
 
 if __name__ == "__main__":
