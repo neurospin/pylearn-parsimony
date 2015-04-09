@@ -10,13 +10,17 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 import numpy as np
 
+import parsimony.config as config
+
 __all__ = ["TOLERANCE", "MAX_ITER", "FLOAT_EPSILON", "FLOAT_INF"]
 
 # Settings
-TOLERANCE = 5e-8
+TOLERANCE = config.get_float("utils.consts", "tolerance", 5e-8)
+
 # TODO: MAX_ITER is heavily algorithm-dependent, so we have to think about if
 # we should include a package-wide maximum at all.
-MAX_ITER = 10000
+MAX_ITER = config.get_int("utils.consts", "max_iter", 10000)
+
 #mu_zero = 5e-8
 
 FLOAT_EPSILON = np.finfo(float).eps
