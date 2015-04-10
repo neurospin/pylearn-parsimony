@@ -19,7 +19,8 @@ import inspect
 import warnings
 import ConfigParser
 
-__all__ = ["get", "get_boolean", "get_float", "get_int", "set", "flush"]
+__all__ = ["get_option", "get_boolean", "get_float", "get_int", "set_option",
+           "flush"]
 
 #__config__ = None
 #__ini_file__ = "config.ini"
@@ -32,13 +33,12 @@ class __Config(object):
 
     def __init__(self, ini_file):
 
-        self._ini_file = str(ini_file)
+        self._ini_file = self._ini_file_name(str(ini_file))
         self._config = ConfigParser.ConfigParser()
 
-        fname = self._ini_file_name()
-        if os.path.exists(fname):
+        if os.path.exists(self._ini_file):
             try:
-                self._config.read(fname)
+                self._config.read(self._ini_file)
 
             except ConfigParser.ParsingError:
                 warnings.warn("Could not parse the config file.",
@@ -47,9 +47,12 @@ class __Config(object):
             warnings.warn("Could not locate the config file.", RuntimeWarning)
 
     def __del__(self):
-        self.flush()  # Save updates to configuration file.
+        # Save updates to configuration file. Cannot call flush here.
+        if not self.__flush_dry_run__:
+            with open(self._ini_file, "wb") as fid:
+                self._config.write(fid)
 
-    def _ini_file_name(self):
+    def _ini_file_name(self, ini_file):
         """Extracts the directory of this module.
         """
         fname = inspect.currentframe()  # This module.
@@ -58,11 +61,11 @@ class __Config(object):
         fname = os.path.dirname(fname)  # Directory of this module.
         if fname[-1] != "/":
             fname = fname + "/"  # Should be there, but just in case ...
-        fname = fname + self._ini_file  # The ini file.
+        fname = fname + ini_file  # The ini file.
 
         return fname
 
-    def get(self, section, option, default=None):
+    def get_option(self, section, option, default=None):
         """Fetches a configuration option from a section of the ini file. If
         not found, returns the default value.
         """
@@ -126,7 +129,7 @@ class __Config(object):
 
         return value
 
-    def set(self, section, option, value, flush_file=False):
+    def set_option(self, section, option, value, flush_file=False):
         """Sets a configuration option.
         """
         section = str(section)
@@ -144,11 +147,9 @@ class __Config(object):
     def flush(self):
         """Saves the current configuration to disk.
         """
-        fname = self._ini_file_name()
-
-        if os.path.exists(fname):
+        if os.path.exists(self._ini_file):
             if not self.__flush_dry_run__:
-                with open(fname, "wb") as fid:
+                with open(self._ini_file, "wb") as fid:
                     self._config.write(fid)
         else:
             warnings.warn("Could not locate the config file.", RuntimeWarning)
@@ -192,7 +193,7 @@ __config__ = __Config("config.ini")
 #    return False
 
 
-def get(section, option, default=None):
+def get_option(section, option, default=None):
     """Fetches a configuration option from a section of the ini file. If not
     found, returns the default value.
 
@@ -213,8 +214,9 @@ def get(section, option, default=None):
     --------
     >>> import parsimony.config as config
     >>>
-    >>> config.set("test_section", "testing_get", "value")
-    >>> config.get("test_section", "testing_get")
+    >>> config.__config__.__flush_dry_run__ = True  # Only for the doctests.
+    >>> config.set_option("test_section", "testing_get", "value")
+    >>> config.get_option("test_section", "testing_get")
     'value'
     """
 #    if __config__ is None:
@@ -229,9 +231,9 @@ def get(section, option, default=None):
 #    if not __config__.has_option(section, option):
 #        return default
 #
-#    value = __config__.get(section, option)
+#    value = __config__.get_option(section, option)
 
-    value = __config__.get(section, option, default=default)
+    value = __config__.get_option(section, option, default=default)
 
     return value
 
@@ -257,27 +259,28 @@ def get_boolean(section, option, default=False):
     --------
     >>> import parsimony.config as config
     >>>
-    >>> config.set("test_section", "testing_get_boolean", "False")
-    >>> config.get("test_section", "testing_get_boolean")
+    >>> config.__config__.__flush_dry_run__ = True  # Only for the doctests.
+    >>> config.set_option("test_section", "testing_get_boolean", "False")
+    >>> config.get_option("test_section", "testing_get_boolean")
     'False'
     >>> config.get_boolean("test_section", "testing_get_boolean")
     False
-    >>> config.set("test_section", "testing_get_boolean", 0)
+    >>> config.set_option("test_section", "testing_get_boolean", 0)
     >>> config.get_boolean("test_section", "testing_get_boolean")
     False
-    >>> config.set("test_section", "testing_get_boolean", 1)
+    >>> config.set_option("test_section", "testing_get_boolean", 1)
     >>> config.get_boolean("test_section", "testing_get_boolean")
     True
-    >>> config.set("test_section", "testing_get_boolean", "off")
+    >>> config.set_option("test_section", "testing_get_boolean", "off")
     >>> config.get_boolean("test_section", "testing_get_boolean")
     False
-    >>> config.set("test_section", "testing_get_boolean", "on")
+    >>> config.set_option("test_section", "testing_get_boolean", "on")
     >>> config.get_boolean("test_section", "testing_get_boolean")
     True
-    >>> config.set("test_section", "testing_get_boolean", "no")
+    >>> config.set_option("test_section", "testing_get_boolean", "no")
     >>> config.get_boolean("test_section", "testing_get_boolean")
     False
-    >>> config.set("test_section", "testing_get_boolean", "yes")
+    >>> config.set_option("test_section", "testing_get_boolean", "yes")
     >>> config.get_boolean("test_section", "testing_get_boolean")
     True
     >>> config.get_boolean("test_section", "testing_non_existent", True)
@@ -324,11 +327,12 @@ def get_float(section, option, default=0.0):
     --------
     >>> import parsimony.config as config
     >>>
-    >>> config.set("test_section", "testing_get_float", "3.141592653589793238")
-    >>> config.get("test_section", "testing_get_float")
-    '3.141592653589793238'
+    >>> config.__config__.__flush_dry_run__ = True  # Only for the doctests.
+    >>> config.set_option("test_section", "testing_get_float", "3.14159265358")
+    >>> config.get_option("test_section", "testing_get_float")
+    '3.14159265358'
     >>> config.get_float("test_section", "testing_get_float")
-    3.141592653589793
+    3.14159265358
     >>> config.get_float("test_section", "testing_non_existent", 2.71828182845)
     2.71828182845
     """
@@ -372,8 +376,9 @@ def get_int(section, option, default=0):
     --------
     >>> import parsimony.config as config
     >>>
-    >>> config.set("test_section", "testing_get_int", "11630")
-    >>> config.get("test_section", "testing_get_int")
+    >>> config.__config__.__flush_dry_run__ = True  # Only for the doctests.
+    >>> config.set_option("test_section", "testing_get_int", "11630")
+    >>> config.get_option("test_section", "testing_get_int")
     '11630'
     >>> config.get_int("test_section", "testing_get_int")
     11630
@@ -399,7 +404,7 @@ def get_int(section, option, default=0):
     return value
 
 
-def set(section, option, value, flush_file=False):
+def set_option(section, option, value, flush_file=False):
     """Sets a configuration option.
 
     Parameters
@@ -418,8 +423,9 @@ def set(section, option, value, flush_file=False):
     --------
     >>> import parsimony.config as config
     >>>
-    >>> config.set("test_section", "testing_set", "Theorem VI")
-    >>> config.get("test_section", "testing_set")
+    >>> config.__config__.__flush_dry_run__ = True  # Only for the doctests.
+    >>> config.set_option("test_section", "testing_set", "Theorem VI")
+    >>> config.get_option("test_section", "testing_set")
     'Theorem VI'
     """
 #    if __config__ is None:
@@ -432,12 +438,12 @@ def set(section, option, value, flush_file=False):
 #    if not __config__.has_section(section):
 #        __config__.add_section(section)
 #
-#    __config__.set(section, option, value)
+#    __config__.set_option(section, option, value)
 #
 #    if flush_file:
 #        flush()
 
-    __config__.set(section, option, value, flush_file=flush_file)
+    __config__.set_option(section, option, value, flush_file=flush_file)
 
 
 def flush():
@@ -447,12 +453,9 @@ def flush():
     --------
     >>> import parsimony.config as config
     >>>
-    >>> config.set("test_section", "testing_flush", "243000000")
-    >>> try:
-    ...     config.__config__.__flush_dry_run__ = True
-    ...     config.flush()
-    ... finally:
-    ...     config.__config__.__flush_dry_run__ = False
+    >>> config.__config__.__flush_dry_run__ = True  # Only for the doctests.
+    >>> config.set_option("test_section", "testing_flush", "243000000")
+    >>> config.flush()
     """
 #    if __config__ is None:
 #        if not __load_config__():
