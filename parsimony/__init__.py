@@ -11,12 +11,12 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
-from . import algorithms
-from . import config
-from . import datasets
-from . import estimators
-from . import functions
-from . import utils
+from parsimony import utils
+from parsimony import config
+from parsimony import datasets
+from parsimony import functions
+from parsimony import algorithms
+from parsimony import estimators
 
 __version__ = "0.2.2"
 

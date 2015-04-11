@@ -8,18 +8,15 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
-try:
-    from . import bases  # Only works when imported as a package.
-except ValueError:
-    import parsimony.algorithms.bases as bases  # When run as a program.
-from . import cluster
-from . import deflation
-from . import gradient
-from . import multiblock
-from . import nipals
-from . import primaldual
-from . import proximal
-from . import utils
+from parsimony.algorithms import utils
+from parsimony.algorithms import bases
+from parsimony.algorithms import cluster
+from parsimony.algorithms import deflation
+from parsimony.algorithms import gradient
+from parsimony.algorithms import nipals
+from parsimony.algorithms import primaldual
+from parsimony.algorithms import proximal
+from parsimony.algorithms import multiblock
 
 __all__ = ["bases", "cluster", "deflation", "gradient", "multiblock", "nipals",
            "primaldual", "proximal", "utils"]
