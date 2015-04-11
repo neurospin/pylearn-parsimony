@@ -63,9 +63,9 @@ def multivariate_normal(mu, Sigma, n=1):
     if len(Sigma.shape) != 2 or Sigma.shape[0] != Sigma.shape[1]:
         raise ValueError("Sigma must be a square matrix.")
     p = Sigma.shape[0]
-    if not (len(mu.shape) == 1 or \
+    if not (len(mu.shape) == 1 or
             (len(mu.shape) == 2 and min(mu.shape) == 1)):
-        raise ValueError("The mean 'mu' must be 1 dimensional or " \
+        raise ValueError("The mean 'mu' must be 1 dimensional or "
                          "p-by-1 dimensional")
     mu = mu.reshape((max(mu.shape),))
     if mu.shape[0] != Sigma.shape[0]:
@@ -289,6 +289,8 @@ def accuracy(cond, test):
     >>> round(stats.accuracy(cond, test), 2)
     0.91
     """
+    test = np.reshape(test, cond.shape)
+
     true_pos = np.logical_and((cond == 1), (test == 1))
     true_neg = np.logical_and((cond == 0), (test == 0))
 
@@ -547,3 +549,8 @@ def fleiss_kappa(W, k):
         kappa = 1.0
 
     return kappa
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

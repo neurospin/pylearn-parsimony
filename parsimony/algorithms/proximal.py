@@ -101,7 +101,8 @@ class ISTA(bases.ExplicitAlgorithm,
     INFO_PROVIDED = [Info.ok,
                      Info.num_iter,
                      Info.time,
-                     Info.fvalue,
+                     Info.fvalue,  # <-- To be deprecated!
+                     Info.func_val,
                      Info.converged]
 
     def __init__(self, eps=consts.TOLERANCE,
@@ -132,7 +133,8 @@ class ISTA(bases.ExplicitAlgorithm,
 
         if self.info_requested(Info.time):
             t = []
-        if self.info_requested(Info.fvalue):
+        if self.info_requested(Info.fvalue) \
+                or self.info_requested(Info.func_val):
             f = []
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
@@ -152,7 +154,8 @@ class ISTA(bases.ExplicitAlgorithm,
 
             if self.info_requested(Info.time):
                 t.append(utils.time_cpu() - tm)
-            if self.info_requested(Info.fvalue):
+            if self.info_requested(Info.fvalue) \
+                    or self.info_requested(Info.func_val):
                 f.append(function.f(betanew))
 
             if (1.0 / step) * maths.norm(betanew - betaold) < self.eps \
@@ -171,6 +174,8 @@ class ISTA(bases.ExplicitAlgorithm,
             self.info_set(Info.time, t)
         if self.info_requested(Info.fvalue):
             self.info_set(Info.fvalue, f)
+        if self.info_requested(Info.func_val):
+            self.info_set(Info.func_val, f)
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, True)
 
@@ -246,7 +251,8 @@ class FISTA(bases.ExplicitAlgorithm,
     INFO_PROVIDED = [Info.ok,
                      Info.num_iter,
                      Info.time,
-                     Info.fvalue,
+                     Info.fvalue,  # <-- To be deprecated!
+                     Info.func_val,
                      Info.converged,
                      Info.gap]
 
@@ -281,7 +287,8 @@ class FISTA(bases.ExplicitAlgorithm,
 
         if self.info_requested(Info.time):
             t_ = []
-        if self.info_requested(Info.fvalue):
+        if self.info_requested(Info.fvalue) \
+                or self.info_requested(Info.func_val):
             f_ = []
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
@@ -305,7 +312,8 @@ class FISTA(bases.ExplicitAlgorithm,
 
             if self.info_requested(Info.time):
                 t_.append(utils.time_cpu() - tm)
-            if self.info_requested(Info.fvalue):
+            if self.info_requested(Info.fvalue) \
+                    or self.info_requested(Info.func_val):
                 f_.append(function.f(betanew))
 
             if self.use_gap:
@@ -353,6 +361,8 @@ class FISTA(bases.ExplicitAlgorithm,
             self.info_set(Info.time, t_)
         if self.info_requested(Info.fvalue):
             self.info_set(Info.fvalue, f_)
+        if self.info_requested(Info.func_val):
+            self.info_set(Info.func_val, f_)
         if self.info_requested(Info.gap):
             self.info_set(Info.gap, gap_)
         if self.info_requested(Info.ok):
@@ -398,6 +408,7 @@ class CONESTA(bases.ExplicitAlgorithm,
                      Info.continuations,
                      Info.time,
                      Info.fvalue,
+                     Info.func_val,
                      Info.gap,
                      Info.mu]
 
@@ -455,7 +466,8 @@ class CONESTA(bases.ExplicitAlgorithm,
         if self.info_requested(Info.time):
             t_ = []
             init_time = utils.time_cpu() - init_time
-        if self.info_requested(Info.fvalue):
+        if self.info_requested(Info.fvalue) \
+                or self.info_requested(Info.func_val):
             f_ = []
         if self.info_requested(Info.gap):
             gap_ = []
@@ -486,7 +498,10 @@ class CONESTA(bases.ExplicitAlgorithm,
                 t_ += algorithm.info_get(Info.time)
                 if i == 0:  # Add init time to first iteration.
                     t_[0] += init_time
-            if Info.fvalue in algorithm.info and \
+            if Info.func_val in algorithm.info and \
+                    self.info_requested(Info.func_val):
+                f_ += algorithm.info_get(Info.func_val)
+            elif Info.fvalue in algorithm.info and \
                     self.info_requested(Info.fvalue):
                 f_ += algorithm.info_get(Info.fvalue)
             if self.info_requested(Info.mu):
@@ -529,6 +544,8 @@ class CONESTA(bases.ExplicitAlgorithm,
             self.info_set(Info.continuations, i + 1)
         if self.info_requested(Info.time):
             self.info_set(Info.time, t_)
+        if self.info_requested(Info.func_val):
+            self.info_set(Info.func_val, f_)
         if self.info_requested(Info.fvalue):
             self.info_set(Info.fvalue, f_)
         if self.info_requested(Info.gap):
@@ -616,7 +633,7 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
     >>> beta1 = static_conesta.run(function, np.zeros((50, 1)))
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
     >>> round(np.linalg.norm(beta1 - beta2), 13)
-    0.9662907379987
+    0.966290704311
     """
     INTERFACES = [properties.NesterovFunction,
                   properties.StepSize,
@@ -633,7 +650,7 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
                      Info.func_val,
                      Info.mu]
 
-    def __init__(self, mu_min=consts.TOLERANCE, tau=0.5, exponent=1.5,
+    def __init__(self, mu_min=consts.TOLERANCE, tau=0.5, exponent=1.52753,
                  info=[], eps=consts.TOLERANCE, max_iter=10000, min_iter=1,
                  simulation=False):
 
@@ -653,11 +670,11 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
     def _harmonic_number_approx(self):
 
         if self._harmonic is None:
-            x = [1.001, 1.005, 1.01, 1.025, 1.05, 1.075, 1.1, 1.2, 1.3, 1.4,
-                 1.5, 1.6, 1.7, 1.8, 1.9, 2.0]
-            y = [1000.58, 200.578, 100.578, 40.579, 20.5808, 13.916, 10.5844,
-                 5.59158, 3.93195, 3.10555, 2.61238, 2.28577, 2.05429, 1.88223,
-                 1.74975, 1.64493]
+            x = [1.001, 1.00125, 1.0025, 1.005, 1.01, 1.025, 1.05, 1.075, 1.1,
+                 1.2, 1.3, 1.4, 1.5, 1.52753, 1.6, 1.7, 1.8, 1.9, 1.95, 2.0]
+            y = [1000.58, 800.577, 400.577, 200.578, 100.578, 40.579, 20.5808,
+                 13.916, 10.5844, 5.59158, 3.93195, 3.10555, 2.61238, 2.50988,
+                 2.28577, 2.05429, 1.88223, 1.74975, 1.69443, 1.6449340668]
 
             f = interp1(x, y)
 
@@ -785,6 +802,8 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
             self.info_set(Info.continuations, i + 1)
         if self.info_requested(Info.time):
             self.info_set(Info.time, t_)
+        if self.info_requested(Info.func_val):
+            self.info_set(Info.func_val, f_)
         if self.info_requested(Info.fvalue):
             self.info_set(Info.fvalue, f_)
         if self.info_requested(Info.mu):
