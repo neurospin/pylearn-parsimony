@@ -14,17 +14,18 @@ from ..utils import Dot, ObjImage, spatial_smoothing, corr_to_coef
 
 
 def load(n_samples=100, shape=(30, 30, 1),
-                           r2=.75,
-                           sigma_spatial_smoothing=1,
-                           obj_pix_ratio=2.,
-                           model="independant",
-                           random_seed=None):
+         r2=.75,
+         sigma_spatial_smoothing=1,
+         obj_pix_ratio=2.,
+         model="independant",
+         random_seed=None):
     """Generates regression samples (images + target variable) and beta.
 
     The covariance structure is controlled both at a pixel
     level (spatial smoothing) and object level. Objects are groups
-    of pixels sharing a covariance that stem from a latent variable.
-    beta is non null within objects (default is five dots).
+    of pixels sharing a covariance that stem from a latent variable. Here
+    objects are the dice's dots.
+    Beta is non null within objects (default is five dots).
     Then y is obtained with y = X * beta + noise, where beta is scalled such
     that r_square(y, X * beta) = r2 and noise is sampled according to N(0, 1).
 
@@ -38,28 +39,29 @@ def load(n_samples=100, shape=(30, 30, 1),
             r_square(y, X * beta) = r2 (Default is .75)
 
     sigma_spatial_smoothing: Float. Standard deviation for Gaussian kernel
-            (default is 1). High value promotes spatial correlation pixels.
+            (default is 1). High value promotes spatial correlation bewteen
+            pixels.
 
     model:  string or a dict (default "independant")
         If model is "independant":
-            # Each point has an independant latent
+            # Each dice dot has an independant latent variable:
             l1=1., l2=1., l3=1., l4=1., l5=1.,
-            # No shared variance
+            # with no shared variance:
             l12=0., l45=0., l12345=0.,
-            # Five dots contribute equally
+            # The five dots contribute equally, 4 and 5 have negative coef:
             b1=1., b2=1., b3=1., b4=-1., b5=-1.
 
         if model is a dictionary:
-            update (overwrite) independant model by dictionnary parameter
+            Update (overwrite) independant model by dictionnary parameter
             Example set betas of points 4 and 5 to 1
             dict(b4=1., b5=1.)
 
         If model is "redundant":
-            # Point-level signal in dots 1 an 2 stem from shared latent
+            # Dot-level signal in dots 1 an 2 fully stem from a shared latent:
             l1=0., l2=0., l12 =1.,
             # l3 is independant
             l3=1.,
-            # Point-level signal in dots 4 an 5 stem from shared latent
+            # Dot-level signal in dots 4 an 5 fully stem from a shared latent:
             l4=0., l5=0., l45=1.,
             # No global shared variance
             l12345 = 0.,
@@ -67,27 +69,27 @@ def load(n_samples=100, shape=(30, 30, 1),
             b1=1., b2=1., b3=1., b4=-1., b5=-1.
 
         If model is "suppressor":
-            # Point-level signal in dot 2 stem only from shared latent
+            # Dot-level signal in dot 2 fully stem from shared latent:
             l1=1, l2=0., l12=1.,
             # l3 is independant
             l3 = 1.,
-            # Point-level signal in dot 5 stem from shared latent
+            # Dot-level signal in dot 5 fully stem from shared latent:
             l4=1., l5=0., l45=1.,
             # No global shared variance
             l12345 = 0.,
             # Dot 2 suppresses shared signal with dot 1, dot 5 suppresses dot 4
             b1=1., b2=-1., b3=1., b4=1., b5=-1.
-
-            y = X1       - X2  + X3 + X4       - X5  + noise
-            y = l1 + l12 - l12 + l3 + l4 + l45 - l45 + noise
-            y = l1 + l3 + l4 + noise
+            Indeed, if X1 is dot 1, X2 dot 2, then y is roughly:
+            y = X1       - X2  + X3 + X4       - X5  + noise,
+            y = l1 + l12 - l12 + l3 + l4 + l45 - l45 + noise,
+            y = l1 + l3 + l4 + noise.
             So pixels of X2 and X5 are not correlated with the target y so they
             will not be detected by univariate analysis. However, they
             are usefull since they are suppressing unwilling variance that stem
             from latents l12 and l45.
 
     obj_pix_ratio: Float. Controls the ratio between object-level signal
-            and pixel-level signal for pixels within objects. If
+            and pixel-level signal for pixels within objects (dots). If
             obj_pix_ratio == 1 then 100% of the signal of pixels within
             the same object is shared (ie.: no pixel level) signal. If
             obj_pix_ratio == 0 then all the signal is pixel specific.
@@ -114,14 +116,14 @@ def load(n_samples=100, shape=(30, 30, 1),
 
         2) Add object level structure corresponding to the five dots:
            - Sample five latent variables ~ N(0, 1): l1, l3, l4, l12, l45,
-           l12345.
-           l1: latent (shared variance) for all pixels of point 1.
-           ...
-           l5: latent (shared variance) for all pixels of point 5.
-           l12: latent (shared variance) for all pixels of point 1 and 2.
-           l45: latent (shared variance) for all pixels of point 4 and 5 .
-           l12345: latent (shared variance) for all pixels of point 1, 2, 3, 4
-           and 5.
+             l12345.
+             l1: latent (shared variance) for all pixels of dot 1.
+             ...
+             l5: latent (shared variance) for all pixels of dot 5.
+             l12: latent (shared variance) for all pixels of dot 1 and 2.
+             l45: latent (shared variance) for all pixels of dot 4 and 5 .
+             l12345: latent (shared variance) for all pixels of dot 1, 2, 3, 4
+             and 5.
 
            - Pixel i of dots X1, X2, X3, X4, X5 are sampled as:
              X1i = l1 + l12 + l12345 + Xi
@@ -141,9 +143,10 @@ def load(n_samples=100, shape=(30, 30, 1),
         4) Spatial Smoothing.
 
         5) Model: y = X beta + noise
-        - Betas are null outside dots, and b1, b2, b3, b4, b5 within dots
-        - Sample noise ~ N(0, 1)
-        - Compute X beta then scale beta such that: r_squared(y, X beta) = r2
+           - Betas are null outside dots, and b1, b2, b3, b4, b5 within dots
+           - Sample noise ~ N(0, 1)
+           - Compute X beta then scale beta such that:
+             r_squared(y, X beta) = r2
         Return X, y, beta
 
 
@@ -157,7 +160,9 @@ def load(n_samples=100, shape=(30, 30, 1),
     >>> X3d, y, beta3d = datasets.regression.dice5.load(n_samples=n_samples,
     ...     shape=shape, r2=.5, random_seed=1)
     """
-    signal_std_pix = 1.  # items std-dev
+    # Pixel-level signal std-dev
+    signal_std_pix = 1.
+    # Object-level signal std-dev, from object/pixel signal ratio
     signal_std_obj = float(obj_pix_ratio) / signal_std_pix
     mu_e = 0
     if shape[0] < 5 or shape[1] < 5:
@@ -191,11 +196,11 @@ def load(n_samples=100, shape=(30, 30, 1),
         model_.update(model)
     elif model is "redundant":
         model_ = dict(
-            # Point-level signal in dots 1 an 2 stem from shared latent
+            # Dot-level signal in dots 1 an 2 fully stem from the shared latent
             l1=0., l2=0., l12=1.,
             # l3 is independant
             l3=1.,
-            # Point-level signal in dots 4 an 5 stem from shared latent
+            # Dot-level signal in dots 4 an 5 fully stem from the shared latent
             l4=0., l5=0., l45=1.,
             # No global shared variance
             l12345=0.,
@@ -203,11 +208,11 @@ def load(n_samples=100, shape=(30, 30, 1),
             b1=1., b2=1., b3=1., b4=-1., b5=-1.)
     elif model is "suppressor":
         model_ = dict(
-            # Point-level signal in dot 2 stem only from shared latent
+            # Dot-level signal in dot 2 stem only from shared latent
             l1=1, l2=0., l12=1.,
             # l3 is independant
             l3=1.,
-            # Point-level signal in dot 5 stem from shared latent
+            # Dot-level signal in dot 5 stem from shared latent
             l4=1., l5=0., l45=1.,
             # No global shared variance
             l12345=0.,
@@ -242,7 +247,7 @@ def load(n_samples=100, shape=(30, 30, 1),
     union12345.std = model_["l12345"]
     union12345.beta = 0.
     #########################################################################
-    ## 3. Object-level structured signal
+    ## 3. Object-level signal: sample object's latent and add it to images
     X3d, support = ObjImage.object_model(objects, X3d)
     #########################################################################
     ## 4. Pixel-level signal structure: spatial smoothing
@@ -262,7 +267,7 @@ def load(n_samples=100, shape=(30, 30, 1),
         beta3d[o.get_mask()] += o.beta
     beta3d = ndimage.gaussian_filter(beta3d, sigma=sigma_spatial_smoothing)
     beta = beta3d.ravel()
-    # Fix a scaling to get the desire r2, ie.:
+    # Fix a scaling applaying on beta to obtain the desire r2, ie.:
     # y = coef * X * beta + noise
     # Fix coef such r2(y, coef * X * beta) = r2
     X = X3d.reshape(n_samples, np.prod(shape))
