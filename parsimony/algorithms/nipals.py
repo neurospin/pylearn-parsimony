@@ -17,117 +17,191 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @license: BSD 3-clause.
 """
 import numpy as np
+import scipy.linalg
 
 try:
-    from . import bases  # Only works when imported as a package.
+    from . import bases  # When imported as a package.
 except ValueError:
-    import parsimony.algorithms.bases as bases  # When run as a program
+    import parsimony.algorithms.bases as bases  # When run as a program.
 import parsimony.utils.maths as maths
 import parsimony.utils.consts as consts
+try:
+    from . import utils  # When imported as a package.
+except ValueError:
+    import parsimony.algorithms.utils as utils  # When run as a program.
 import parsimony.utils.start_vectors as start_vectors
 import parsimony.functions.penalties as penalties
 
-__all__ = ["FastSVD", "FastSparseSVD", "FastSVDProduct", "PLSR"]
+try:
+    import scipy.sparse.linalg as sparse_linalg
+    if sparse_linalg.svds:
+        has_svds = True
+    else:
+        has_svds = False
+except:
+    has_svds = False
 
-# TODO: Add information about the run.
+
+__all__ = ["RankOneSVD", "FastSparseSVD", "FastSVDProduct", "PLSR"]
+
+# TODO: Add information about the runs.
 
 
-class FastSVD(bases.ImplicitAlgorithm):
+class RankOneSVD(bases.ImplicitAlgorithm,
+                 bases.InformationAlgorithm):
+    """An implementation of a rank-one SVD that's faster than numpy's SVD.
 
-    def run(self, X, max_iter=100, eps=consts.TOLERANCE, start_vector=None):
-        """A kernel SVD implementation.
+    The rank-one SVD corresponds to the following optimization problem:
 
-        Performs SVD of given matrix. This is always faster than np.linalg.svd.
-        Particularly, this is a lot faster than np.linalg.svd when M << N or
-        M >> N, for an M-by-N matrix.
+        max. ||Xv||_2 = sigma_max(X)
+        s.t. ||v||_2 = 1,
+
+    where ||.||_2 is the 2-norm.
+
+    This method is faster than np.linalg.svd.
+
+    Parameters
+    ----------
+    eps : Positive float. The tolerance used by the stopping criterion.
+
+    max_iter : Non-negative integer. Maximum allowed number of iterations.
+            Default is 100.
+
+    start_vector : BaseStartVector. A start vector generator. Default is to use
+            a random start vector.
+
+    Returns
+    -------
+    v : The right singular vector of X that corresponds to the largest singular
+            value.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from parsimony.algorithms.nipals import RankOneSVD
+    >>>
+    >>> np.random.seed(0)
+    >>> X = np.random.random((10, 10))
+    >>> fast_svd = RankOneSVD()
+    >>> fast_svd.run(X)
+    array([[ 0.3522974 ],
+           [ 0.35647707],
+           [ 0.35190104],
+           [ 0.34715338],
+           [ 0.19594198],
+           [ 0.24103104],
+           [ 0.25578904],
+           [ 0.29501092],
+           [ 0.42311297],
+           [ 0.27656382]])
+    >>>
+    >>> np.random.seed(0)
+    >>> X = np.random.random((100, 150))
+    >>> fast_svd = RankOneSVD()
+    >>> v = fast_svd.run(X)
+    >>> us = np.linalg.norm(np.dot(X, v))
+    >>> s = np.linalg.svd(X, full_matrices=False, compute_uv=False)
+    >>> abs(np.sum(us ** 2.0) - np.max(s) ** 2.0) < 5e-12
+    True
+    >>>
+    >>> np.random.seed(0)
+    >>> X = np.random.random((100, 50))
+    >>> fast_svd = RankOneSVD()
+    >>> v = fast_svd.run(X)
+    >>> us = np.linalg.norm(np.dot(X, v))
+    >>> s = np.linalg.svd(X, full_matrices=False, compute_uv=False)
+    >>> abs(np.sum(us ** 2.0) - np.max(s) ** 2.0) < 5e-12
+    True
+    """
+    INFO_PROVIDED = [utils.Info.ok,
+                     utils.Info.time,
+                     utils.Info.func_val]
+
+    def __init__(self, eps=consts.TOLERANCE,
+                 max_iter=100, min_iter=1, info=[]):
+
+        super(RankOneSVD, self).__init__(info=info)
+        self.max_iter = max_iter
+        self.min_iter = min_iter
+        self.eps = eps
+
+    def run(self, X, start_vector=None):
+        """Find the right-singular vector of the given matrix.
 
         Parameters
         ----------
         X : Numpy array. The matrix to decompose.
 
-        max_iter : Non-negative integer. Maximum allowed number of iterations.
-                Default is 100.
-
-        eps : Positive float. The tolerance used by the stopping criterion.
-
         start_vector : BaseStartVector. A start vector generator. Default is
                 to use a random start vector.
-
-        Returns
-        -------
-        v : The right singular vector of X that corresponds to the largest
-                singular value.
-
-        Examples
-        --------
-        >>> import numpy as np
-        >>> from parsimony.algorithms.nipals import FastSVD
-        >>>
-        >>> np.random.seed(0)
-        >>> X = np.random.random((10, 10))
-        >>> fast_svd = FastSVD()
-        >>> fast_svd.run(X)
-        array([[-0.3522974 ],
-               [-0.35647707],
-               [-0.35190104],
-               [-0.34715338],
-               [-0.19594198],
-               [-0.24103104],
-               [-0.25578904],
-               [-0.29501092],
-               [-0.42311297],
-               [-0.27656382]])
-        >>>
-        >>> np.random.seed(0)
-        >>> X = np.random.random((100, 150))
-        >>> fast_svd = FastSVD()
-        >>> v = fast_svd.run(X)
-        >>> us = np.linalg.norm(np.dot(X, v))
-        >>> s = np.linalg.svd(X, full_matrices=False, compute_uv=False)
-        >>> abs(np.sum(us ** 2.0) - np.max(s) ** 2.0) < 5e-13
-        True
-        >>>
-        >>> np.random.seed(0)
-        >>> X = np.random.random((100, 50))
-        >>> fast_svd = FastSVD()
-        >>> v = fast_svd.run(X)
-        >>> us = np.linalg.norm(np.dot(X, v))
-        >>> s = np.linalg.svd(X, full_matrices=False, compute_uv=False)
-        >>> abs(np.sum(us ** 2.0) - np.max(s) ** 2.0)
-        4.5474735088646412e-13
         """
-        if start_vector is None:
-            start_vector = start_vectors.RandomStartVector(normalise=True)
-        M, N = X.shape
-        if M < 80 and N < 80:  # Very arbitrary threshold for my computer ;-)
-            _, _, V = np.linalg.svd(X, full_matrices=True)
-            v = V[[0], :].T
-        elif M < N:
-            K = np.dot(X, X.T)
-            t = start_vector.get_vector(X.shape[0])
-            for it in xrange(max_iter):
-                t_ = t
-                t = np.dot(K, t_)
-                t *= 1.0 / np.sqrt(np.sum(t ** 2.0))
+        if self.info_requested(utils.Info.ok):
+            self.info_set(utils.Info.ok, False)
 
-                if maths.norm(t_ - t) / maths.norm(t) < eps:
-                    break
+        if self.info_requested(utils.Info.time):
+            _t = utils.time()
 
-            v = np.dot(X.T, t)
-            v *= 1.0 / np.sqrt(np.sum(v ** 2.0))
+        if has_svds:
+            if start_vector is not None:
+                v0 = start_vector.get_vector(np.min(X.shape))
+            else:
+                v0 = None
+
+            [_, _, v] = sparse_linalg.svds(X, k=1, v0=v0,
+                                           tol=self.eps, maxiter=self.max_iter,
+                                           return_singular_vectors=True)
+            v = v.T
 
         else:
-            K = np.dot(X.T, X)
-            v = start_vector.get_vector(X.shape[1])
-            for it in xrange(max_iter):
-                v_ = v
-                v = np.dot(K, v_)
-                v *= 1.0 / np.sqrt(np.sum(v ** 2.0))
+            if start_vector is None:
+                start_vector = start_vectors.RandomStartVector(normalise=True)
 
-                if maths.norm(v_ - v) / maths.norm(v) < eps:
-                    break
+            M, N = X.shape
 
-        return v
+            if M < 80 and N < 80:  # Very arbitrary threshold from one computer
+
+                _, _, V = scipy.linalg.svd(X, full_matrices=True)
+                v = V[[0], :].T
+
+            elif M < N:
+
+                K = np.dot(X, X.T)
+                t = start_vector.get_vector(X.shape[0])
+                for it in xrange(self.max_iter):
+                    t_ = t
+                    t = np.dot(K, t_)
+                    t *= 1.0 / maths.norm(t)
+
+                    if maths.norm(t_ - t) / maths.norm(t) < self.eps:
+                        break
+
+                v = np.dot(X.T, t)
+                v *= 1.0 / maths.norm(v)
+
+            else:
+
+                K = np.dot(X.T, X)
+                v = start_vector.get_vector(X.shape[1])
+                for it in xrange(self.max_iter):
+                    v_ = v
+                    v = np.dot(K, v_)
+                    v *= 1.0 / maths.norm(v)
+
+                    if maths.norm(v_ - v) / maths.norm(v) < self.eps:
+                        break
+
+        if self.info_requested(utils.Info.time):
+            self.info_set(utils.Info.time, utils.time() - _t)
+        if self.info_requested(utils.Info.func_val):
+            _f = maths.norm(np.dot(X, v))  # Largest singular value.
+            self.info_set(utils.Info.func_val, _f)
+        if self.info_requested(utils.Info.ok):
+            self.info_set(utils.Info.ok, True)
+
+        return utils.direct_vector(v)
+
+
+FastSVD = RankOneSVD
 
 
 class FastSparseSVD(bases.ImplicitAlgorithm):
@@ -210,7 +284,7 @@ class FastSparseSVD(bases.ImplicitAlgorithm):
 class FastSVDProduct(bases.ImplicitAlgorithm):
 
     def run(self, X, Y, start_vector=None,
-                 eps=consts.TOLERANCE, max_iter=100, min_iter=1):
+            eps=consts.TOLERANCE, max_iter=100, min_iter=1):
         """A kernel SVD implementation of a product of two matrices, X and Y.
         I.e. the SVD of np.dot(X, Y), but the SVD is computed without actually
         computing the matrix product.

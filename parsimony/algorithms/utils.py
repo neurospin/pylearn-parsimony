@@ -25,7 +25,7 @@ import parsimony.utils.consts as consts
 import parsimony.functions.penalties as penalties
 import parsimony.functions.properties as properties
 
-__all__ = ["Info",
+__all__ = ["Info", "direct_vector",
 
            "Bisection", "NewtonRaphson",
            "BacktrackingLineSearch"]
@@ -55,6 +55,24 @@ class Info(object):
     betak = "betak"  # The final found vector.
     beta_start = "beta_start"  # The start vector used.
     continuations = "continuations"  # In continuation: Number of continuations
+
+
+def direct_vector(v):
+    """In some algorithms (e.g. the SVD), the vectors are not deterministic,
+    but may flip sign and still return the same optimal function value.
+
+    This method flips them such that they are always positively correlated with
+    a vector of ones.
+
+    Parameters
+    ----------
+    v : Numpy array, shape p-by-1. The vector to direct.
+    """
+    i = np.ones(v.shape)
+    if np.dot(v.T, i) < 0.0:
+        v = -v
+
+    return v
 
 
 class Bisection(bases.ExplicitAlgorithm,

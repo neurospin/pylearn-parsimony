@@ -3,56 +3,50 @@
 
 ./parsimony/estimators.py:
 -------------------------
-87: # TODO: Is this a good name?
+91: # TODO: Make all estimators implement this method!
+92: # @abc.abstractmethod
 
-283: # TODO: Should we use a seed here so that we get deterministic results?
+103: # TODO: Is this a good name?
 
-395: # TODO: Should we use a seed somewhere so that we get deterministic results?
+109: # TODO: Why is this here? Move to InformationAlgorithm?
 
-510: # TODO: Should we use a seed here so that we get deterministic results?
+300: # TODO: Should we use a seed here so that we get deterministic results?
 
-630: # TODO: Should we use a seed here so that we get deterministic results?
+412: # TODO: Should we use a seed somewhere so that we get deterministic results?
 
-809: # TODO: Should we use a seed here so that we get deterministic
-810: # results?
+527: # TODO: Should we use a seed here so that we get deterministic results?
 
-838: # TODO: Should we use a seed here so that we get deterministic
-839: # results?
+647: # TODO: Should we use a seed here so that we get deterministic results?
 
-1010: # TODO: Should we use a seed here so that we get deterministic results?
+830: # TODO: Should we use a seed here so that we get deterministic
+831: # results?
 
-1260: # TODO: Should we use a seed here so that we get deterministic results?
+859: # TODO: Should we use a seed here so that we get deterministic
+860: # results?
 
-1381: # TODO: Should we use a seed here so that we get deterministic results?
+1035: # TODO: Should we use a seed here so that we get deterministic results?
 
-1548: # TODO: Should we use a seed here so that we get deterministic results?
+1285: # TODO: Should we use a seed here so that we get deterministic results?
 
-1723: # TODO: Should we use a seed here so that we get deterministic results?
+1406: # TODO: Should we use a seed here so that we get deterministic results?
 
-1987: # TODO: Should we use a seed here so that we get deterministic
-1988: # results?
-1989: #                if w is None or k > 0:
+1510: # TODO: Should we use a seed here so that we get deterministic results?
 
-2205: # TODO: Should we use a seed here so that we get deterministic
-2206: # results?
-2207: #                if w is None or k > 0:
+1678: # TODO: Should we use a seed here so that we get deterministic results?
+
+1858: # TODO: Should we use a seed here so that we get deterministic results?
+
+2122: # TODO: Should we use a seed here so that we get deterministic
+2123: # results?
+2124: #                if w is None or k > 0:
+
+2340: # TODO: Should we use a seed here so that we get deterministic
+2341: # results?
+2342: #                if w is None or k > 0:
 
 ./parsimony/utils/plot.py:
 -------------------------
-72: # TODO: Add the other cases.
-
-./parsimony/utils/utils.py:
---------------------------
-24: #TODO: This depends on the OS. We should try to be clever here ...
-
-./parsimony/utils/stats.py:
---------------------------
-122: value = 1.0  # TODO: Is this really correct?
-
-./parsimony/utils/consts.py:
----------------------------
-17: # TODO: MAX_ITER is heavily algorithm-dependent, so we have to think about if
-18: # we should include a package-wide maximum at all.
+71: # TODO: Add the other cases.
 
 ./parsimony/utils/linalgs.py:
 ----------------------------
@@ -63,31 +57,83 @@
 
 546: # TODO: Use algorithm for banded matrices instead!
 
+./parsimony/utils/consts.py:
+---------------------------
+20: # TODO: MAX_ITER is heavily algorithm-dependent, so we have to think about if
+21: # we should include a package-wide maximum at all.
+
+./parsimony/utils/stats.py:
+--------------------------
+122: value = 1.0  # TODO: Is this really correct?
+
+./parsimony/utils/utils.py:
+--------------------------
+24: #TODO: This depends on the OS. We should try to be clever here ...
+
+27: time = time_cpu  # TODO: Make it so that this can be changed by settings.
+
+./parsimony/algorithms/proximal.py:
+----------------------------------
+325: # TODO: Warn if G_new < -consts.TOLERANCE.
+
+347: else:  # TODO: Fix this!
+
+460: # TODO: Warn if gap < -consts.TOLERANCE.
+
+517: # TODO: Warn if gap < -consts.TOLERANCE.
+
+907: # TODO: Investigate what is a good default value here!
+
+965: y_new = x_new  # TODO: Allow a linear operator here.
+
+1043: # TODO: Investigate what is a good default value here!
+
+1095: # TODO: Investigate what is a good default value here!
+
+1146: # TODO: Investigate what is a good default value here!
+
+1184: # TODO: Does the weights really matter when the function is the
+1185: # indicator function?
+
+1218: # TODO: Investigate what is a good default value here!
+
+./parsimony/algorithms/nipals.py:
+--------------------------------
+47: # TODO: Add information about the runs.
+
+./parsimony/algorithms/utils.py:
+-------------------------------
+34: # TODO: This class should be replaced with Enum.
+
+289: # TODO: We already have f_mid, so we can return a better approximation
+290: # here!
+
+380: # TODO: Handle the other cases!
+
+392: # TODO: We seek a root, i.e. where f(x) = 0. The stopping criterion
+393: #       should (could?) thus be abs(f(x)) <= eps!
+
+412: if abs(x - x_) <= self.eps:  # TODO: Stopping criterion. See above!
+
+./parsimony/algorithms/cluster.py:
+---------------------------------
+110: # TODO: Warn if repeat > 1?
+
+152: mu = global_mean  # TODO: Correct solution?
+
+./parsimony/algorithms/bases.py:
+-------------------------------
+61: # TODO: Replace the one in BaseAlgorithm.
+
 ./parsimony/functions/penalties.py:
 ----------------------------------
+200: # TODO: BUG: i may be equal to p => IndexError: list index out of range
+
 203: # TODO: This should not be able to happen! Do we know it doesn't?
 
-208: # TODO: This should not be able to happen! Do we know it doesn't?
+207: # TODO: This should not be able to happen! Do we know it doesn't?
 
-576: # TODO: Check if this is correct!
-
-1342: # TODO: We can share variables between f and df and speed up
-1343: # some shared computations.
-
-./parsimony/functions/properties.py:
------------------------------------
-145: # TODO: Should all constraints have the projection operator?
-
-433: # TODO: Should L by default take a weight vector as argument?
-
-795: # TODO: This only work if the elements of self._A are scipy.sparse. We
-796: # should allow dense matrices as well.
-
-802: # TODO: Add max_iter here!
-
-870: # TODO: Avoid stacking here.
-
-872: # TODO: Add max_iter here!
+575: # TODO: Check if this is correct!
 
 ./parsimony/functions/losses.py:
 -------------------------------
@@ -98,7 +144,7 @@
 
 372: # TODO: Allow the weight vector to be a list.
 
-480: # TODO: Use FastSVD for speedup!
+480: # TODO: Use RankOneSVD for speedup!
 
 482: self._L = np.max(s) ** 2.0  # TODO: CHECK
 
@@ -106,7 +152,7 @@
 647: # PW = 0.5 * np.eye(self.X.shape[0]) ## miss np.sqrt(self.W)
 648: #PW = 0.5 * np.sqrt(self.W)
 649: #PWX = np.dot(PW, self.X)
-650: # TODO: Use FastSVD for speedup!
+650: # TODO: Use RankOneSVD for speedup!
 
 652: self._L = np.max(s) ** 2.0  # TODO: CHECK
 
@@ -116,28 +162,49 @@
 
 ./parsimony/functions/combinedfunctions.py:
 ------------------------------------------
-41: # TODO: Add penalty_start and mean to all of these!
+42: # TODO: Add penalty_start and mean to all of these!
 
-113: # TODO: We currently only allow one proximal operator. Fix this!
+110: # TODO: Yes we can! Fix this!
 
-166: # TODO: We currently only allow one proximal operator. Fix this!
+114: # TODO: We currently only allow one proximal operator. Fix!
 
-682: # TODO: This is not good. Solve this better!
+127: # TODO: Yes we can! Fix this!
 
-1238: # TODO: This is not a good solution. Can we solve this in a better way?
+148: # TODO: Yes we can! Fix this!
 
-1290: # TODO: Use max_iter here!!
+152: # TODO: We currently only allow one proximal operator. Fix this!
 
-1340: # TODO: Kernelise this function! See how I did in
-1341: # LinearRegressionL1L2TV._beta_hat.
+200: # TODO: We currently only allow one proximal operator. Fix this!
 
-1392: # TODO: Add this function or refactor API!
+717: # TODO: This is not good. Solve this better!
 
-1648: # TODO: This is not a nice solution. Can we solve it better?
+1319: # TODO: This is not a good solution. Can we solve this in a better way?
 
-./parsimony/functions/multiblock/losses.py:
-------------------------------------------
-900: # TODO: Check instead if it is a numpy array.
+1371: # TODO: Use max_iter here!!
+
+1421: # TODO: Kernelise this function! See how I did in
+1422: # LinearRegressionL1L2TV._beta_hat.
+
+1473: # TODO: Add this function or refactor API!
+
+1729: # TODO: This is not a nice solution. Can we solve it better?
+
+./parsimony/functions/properties.py:
+-----------------------------------
+145: # TODO: Should all constraints have the projection operator?
+
+251: # TODO: Remove.
+
+434: # TODO: Should L by default take a weight vector as argument?
+
+806: # TODO: This only work if the elements of self._A are scipy.sparse. We
+807: # should allow dense matrices as well.
+
+813: # TODO: Add max_iter here!
+
+881: # TODO: Avoid stacking here.
+
+883: # TODO: Add max_iter here!
 
 ./parsimony/functions/nesterov/tv.py:
 ------------------------------------
@@ -148,6 +215,13 @@
 166: # rows of A.
 
 176: # TODO: Add max_iter here!
+
+./parsimony/functions/nesterov/grouptv.py:
+-----------------------------------------
+157: # TODO: This only work if the elements of self._A are scipy.sparse. We
+158: # should allow dense matrices as well.
+
+164: # TODO: Add max_iter here!
 
 ./parsimony/functions/nesterov/l1tv.py:
 --------------------------------------
@@ -164,61 +238,7 @@
 306: # TODO: Do we need to take the number of variables here?
 307: # Why not use np.prod(shape) + penalty_start instead and save a parameter?
 
-./parsimony/functions/nesterov/grouptv.py:
------------------------------------------
-157: # TODO: This only work if the elements of self._A are scipy.sparse. We
-158: # should allow dense matrices as well.
-
-164: # TODO: Add max_iter here!
-
-./parsimony/datasets/regression/dice5.py:
-----------------------------------------
-36: # TODO: This is wrong. Shape should be Z, Y, X.
-
-./parsimony/algorithms/nipals.py:
---------------------------------
-32: # TODO: Add information about the run.
-
-./parsimony/algorithms/utils.py:
--------------------------------
-34: # TODO: This class should be replaced with Enum.
-
-266: # TODO: We already have f_mid, so we can return a better approximation
-267: # here!
-
-357: # TODO: Handle the other cases!
-
-369: # TODO: We seek a root, i.e. where f(x) = 0. The stopping criterion
-370: #       should (could?) thus be abs(f(x)) <= eps!
-
-389: if abs(x - x_) <= self.eps:  # TODO: Stopping criterion. See above!
-
-./parsimony/algorithms/bases.py:
--------------------------------
-61: # TODO: Replace the one in BaseAlgorithm.
-
-./parsimony/algorithms/proximal.py:
-----------------------------------
-329: # TODO: Warn if G_new < -consts.TOLERANCE.
-
-352: else:  # TODO: Fix this!
-
-500: # TODO: Warn if Gamma < -consts.TOLERANCE.
-
-679: # TODO: Warn if Gamma < -consts.TOLERANCE.
-
-827: # TODO: Investigate what is a good default value here!
-
-883: y_new = x_new  # TODO: Allow a linear operator here.
-
-959: # TODO: Investigate what is a good default value here!
-
-1013: # TODO: Investigate what is a good default value here!
-
-1066: # TODO: Investigate what is a good default value here!
-
-1105: # TODO: Does the weights really matter when the function is the
-1106: # indicator function?
-
-1140: # TODO: Investigate what is a good default value here!
+./parsimony/functions/multiblock/losses.py:
+------------------------------------------
+1063: # TODO: Check instead if it is a numpy array.
 

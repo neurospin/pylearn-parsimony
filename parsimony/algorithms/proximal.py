@@ -185,7 +185,7 @@ class ISTA(bases.ExplicitAlgorithm,
 class FISTA(bases.ExplicitAlgorithm,
             bases.IterativeAlgorithm,
             bases.InformationAlgorithm):
-    """ The fast iterative shrinkage-thresholding algorithm.
+    """The fast iterative shrinkage-thresholding algorithm.
 
     Parameters
     ----------

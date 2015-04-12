@@ -42,7 +42,7 @@ class BaseAlgorithm(object):
             for prop in required_properties:
                 if isinstance(prop, properties.OR):
                     if not prop.evaluate(f):
-                        raise ValueError("%s does not implement all " \
+                        raise ValueError("%s does not implement all "
                                          "properties %s" % (str(f), str(prop)))
                 elif not isinstance(f, prop):
                     raise ValueError("%s does not implement interface %s" %
@@ -54,7 +54,7 @@ class BaseAlgorithm(object):
             self.__setattr__(k, kwargs[k])
 
     def get_params(self):
-        raise NotImplementedError('Method "get_params" has not been ' \
+        raise NotImplementedError('Method "get_params" has not been '
                                   'implemented.')
 
 
@@ -106,7 +106,7 @@ class ImplicitAlgorithm(BaseAlgorithm):
 
     @abc.abstractmethod
     def run(X, **kwargs):
-        raise NotImplementedError('Abstract method "run" must be ' \
+        raise NotImplementedError('Abstract method "run" must be '
                                   'specialised!')
 
 
@@ -133,7 +133,7 @@ class ExplicitAlgorithm(BaseAlgorithm):
 
         x : A starting point.
         """
-        raise NotImplementedError('Abstract method "run" must be ' \
+        raise NotImplementedError('Abstract method "run" must be '
                                   'specialised!')
 
 
@@ -159,6 +159,7 @@ class IterativeAlgorithm(object):
     min_iter : Non-negative integer. The minimum number of required iterations.
     """
     def __init__(self, max_iter=consts.MAX_ITER, min_iter=1, **kwargs):
+
         super(IterativeAlgorithm, self).__init__(**kwargs)
 
         self.max_iter = max_iter

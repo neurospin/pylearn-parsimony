@@ -140,15 +140,15 @@ def test_all():
 
     exec_string = "nosetests --with-doctest --doctest-tests" + \
                   "%s --verbosity=3 -w %s" \
-                  % (extras, parsimonydir,)
+                  % (extras, parsimonydir)
 
     # First run doctests in parsimony.
     print "Running: " + exec_string
     os.system(exec_string)
 
     exec_string = "nosetests --with-doctest --doctest-tests " + \
-                  "--with-coverage --verbosity=3 -w %s" \
-                  % (testdir,)
+                  "%s --verbosity=3 -w %s" \
+                  % (extras, testdir)
     # Then run unit tests in test directory.
     print
     print "Running: " + exec_string

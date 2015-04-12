@@ -12,7 +12,7 @@ import unittest
 
 import numpy as np
 
-from parsimony.algorithms.nipals import FastSVD
+from parsimony.algorithms.nipals import RankOneSVD
 from parsimony.algorithms.nipals import FastSparseSVD
 import parsimony.utils as utils
 
@@ -63,8 +63,8 @@ class TestSVD(TestCase):
         np.random.seed(0)
         X = np.random.random((nrow, ncol))
         # svd from parsimony
-        fast_svd = FastSVD()
-        parsimony_v = fast_svd.run(X, max_iter=1000)
+        fast_svd = RankOneSVD(max_iter=1000)
+        parsimony_v = fast_svd.run(X)
         return self.get_err_by_np_linalg_svd(parsimony_v, X)
 
     def test_fast_svd(self):
