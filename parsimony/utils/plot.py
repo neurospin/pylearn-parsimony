@@ -58,7 +58,7 @@ def plot_map2d(map2d, plot=None, title=None, limits=None,
     if title is not None:
         plt.title(title)
 
-def plot_map2d_of_models(models_dict, nrow, ncol, shape, times_dict=None, scores_dict=None):
+def plot_map2d_of_models(models_dict, nrow, ncol, shape, title_attr=None):
     """Plot 2 weight maps of models"""
     #from .plot import plot_map2d
     import matplotlib.pyplot as plt
@@ -71,11 +71,13 @@ def plot_map2d_of_models(models_dict, nrow, ncol, shape, times_dict=None, scores
             w = mod.coef_
         if  (hasattr(mod, "penalty_start") and mod.penalty_start != 0):
             w = w[mod.penalty_start:]
-        t = times_dict[k] if  times_dict else 0
-        score = scores_dict[k] if scores_dict else 0
+        if (title_attr is not None and hasattr(mod, title_attr)):
+            title = getattr(mod, title_attr)
+        else:
+            title = None
         ax = plt.subplot(nrow, ncol, ax_i)
         plot_map2d(w.reshape(shape), ax,
-                   title="%s\nScore:%.2f, T:%.1f" %(k, score, t))
+                   title=title)
         ax_i += 1
     plt.show()
 
