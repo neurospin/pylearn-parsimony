@@ -56,10 +56,10 @@ def deprecated(*replaced_by):
             if replaced_by is not None:
                 string = " Use %s instead." % replaced_by
 
-            warnings.warn("Function " + str(func.__name__) + \
+            warnings.warn("Function " + str(func.__name__) +
                           " is deprecated." + string,
-                    category=DeprecationWarning,
-                    stacklevel=2)
+                          category=DeprecationWarning,
+                          stacklevel=2)
             return func(*args, **kwargs)
 
         with_warning.__name__ = func.__name__
@@ -227,7 +227,7 @@ def optimal_shrinkage(X, T=None):
         else:
             T = [T[0]] * len(X)
 
-    import sys
+#    import sys
     for i in xrange(len(X)):
         Xi = X[i]
         Ti = T[i]

@@ -16,6 +16,16 @@ try:
 except ImportError:
     import sys
     sys.exit('You must install "nose" in order to run the unit tests.')
+try:
+    import coverage
+    has_coverage = True
+except ImportError:
+    has_coverage = False
+try:
+    import nosetimer
+    has_timer = True
+except ImportError:
+    has_timer = False
 import unittest
 import abc
 import os
@@ -112,12 +122,14 @@ class TestCase(unittest.TestCase):
 @nottest
 def test_all():
 
-#    testdir = os.path.dirname(__file__)
-    testdir = os.path.dirname(os.path.abspath(__file__))
-#    print "testdir:", testdir
-#    print "__file__:", __file__
+    extras = ""
+    if has_coverage:
+        extras += " --with-coverage"
+    if has_timer:
+        extras += " --with-timer"
 
     # Find parsimony directory.
+    testdir = os.path.dirname(os.path.abspath(__file__))
     # TODO: Is there a better way to do this?
     if len(testdir) == 0:
         parsimonydir = "../parsimony"
@@ -126,19 +138,17 @@ def test_all():
     else:
         parsimonydir = testdir + "/../parsimony"
 
-    exec_string = "nosetests --with-doctest --doctest-tests " + \
-                  "--with-coverage --verbosity=3 -w %s" \
-                  % (parsimonydir,)
+    exec_string = "nosetests --with-doctest --doctest-tests" + \
+                  "%s --verbosity=3 -w %s" \
+                  % (extras, parsimonydir)
 
     # First run doctests in parsimony.
     print "Running: " + exec_string
     os.system(exec_string)
 
-#    print "testdir:", testdir
-#    print "__file__:", __file__
     exec_string = "nosetests --with-doctest --doctest-tests " + \
-                  "--with-coverage --verbosity=3 -w %s" \
-                  % (testdir,)
+                  "%s --verbosity=3 -w %s" \
+                  % (extras, testdir)
     # Then run unit tests in test directory.
     print
     print "Running: " + exec_string

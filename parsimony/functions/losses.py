@@ -137,21 +137,21 @@ class LinearRegression(properties.CompositeFunction,
         """
         if self._L is None:
 
-            from parsimony.algorithms.nipals import FastSVD
+            from parsimony.algorithms.nipals import RankOneSVD
 
-            # Rough limits for when FastSVD is faster than np.linalg.svd.
+            # Rough limits for when RankOneSVD is faster than np.linalg.svd.
             n, p = self.X.shape
-            if (max(n, p) > 500 and max(n, p) <= 1000 \
+            if (max(n, p) > 500 and max(n, p) <= 1000
                     and float(max(n, p)) / min(n, p) <= 1.3) \
-               or (max(n, p) > 1000 and max(n, p) <= 5000 \
+               or (max(n, p) > 1000 and max(n, p) <= 5000
                     and float(max(n, p)) / min(n, p) <= 5.0) \
-               or (max(n, p) > 5000 and max(n, p) <= 10000 \
-                       and float(max(n, p)) / min(n, p) <= 15.0) \
-               or (max(n, p) > 10000 and max(n, p) <= 20000 \
-                       and float(max(n, p)) / min(n, p) <= 200.0) \
+               or (max(n, p) > 5000 and max(n, p) <= 10000
+                    and float(max(n, p)) / min(n, p) <= 15.0) \
+               or (max(n, p) > 10000 and max(n, p) <= 20000
+                    and float(max(n, p)) / min(n, p) <= 200.0) \
                or max(n, p) > 10000:
 
-                v = FastSVD().run(self.X, max_iter=1000)
+                v = RankOneSVD(max_iter=1000).run(self.X)
                 us = np.dot(self.X, v)
                 self._L = np.sum(us ** 2.0)
 
@@ -474,10 +474,10 @@ class LogisticRegression(properties.AtomicFunction,
         >>> round((L - L_) / L, 13)
         0.430306683612
         """
-        if self._L == None:
+        if self._L is None:
             # pi(x) * (1 - pi(x)) <= 0.25 = 0.5 * 0.5
             PWX = 0.5 * np.sqrt(self.weights) * self.X
-            # TODO: Use FastSVD for speedup!
+            # TODO: Use RankOneSVD for speedup!
             s = np.linalg.svd(PWX, full_matrices=False, compute_uv=False)
             self._L = np.max(s) ** 2.0  # TODO: CHECK
 
@@ -647,7 +647,7 @@ class RidgeLogisticRegression(properties.CompositeFunction,
             # PW = 0.5 * np.eye(self.X.shape[0]) ## miss np.sqrt(self.W)
             #PW = 0.5 * np.sqrt(self.W)
             #PWX = np.dot(PW, self.X)
-            # TODO: Use FastSVD for speedup!
+            # TODO: Use RankOneSVD for speedup!
             s = np.linalg.svd(PWX, full_matrices=False, compute_uv=False)
             self._L = np.max(s) ** 2.0  # TODO: CHECK
 
@@ -695,7 +695,7 @@ class LatentVariableVariance(properties.Function,
         Examples
         --------
         >>> import numpy as np
-        >>> from parsimony.algorithms.nipals import FastSVD
+        >>> from parsimony.algorithms.nipals import RankOneSVD
         >>> from parsimony.functions.losses import LatentVariableVariance
         >>>
         >>> np.random.seed(1337)
@@ -747,7 +747,7 @@ class LatentVariableVariance(properties.Function,
         Examples
         --------
         >>> import numpy as np
-        >>> from parsimony.algorithms.nipals import FastSVD
+        >>> from parsimony.algorithms.nipals import RankOneSVD
         >>> from parsimony.functions.losses import LatentVariableVariance
         >>>
         >>> np.random.seed(1337)
@@ -761,8 +761,8 @@ class LatentVariableVariance(properties.Function,
         47025.0809786841
         """
         if self._lambda_max is None:
-            from parsimony.algorithms.nipals import FastSVD
-            v = FastSVD().run(self.X, max_iter=1000)
+            from parsimony.algorithms.nipals import RankOneSVD
+            v = RankOneSVD(max_iter=1000).run(self.X)
             us = np.dot(self.X, v)
 
             self._lambda_max = np.linalg.norm(us) ** 2.0
@@ -779,15 +779,15 @@ class LatentVariableVariance(properties.Function,
         Examples
         --------
         >>> import numpy as np
-        >>> from parsimony.algorithms.nipals import FastSVD
+        >>> from parsimony.algorithms.nipals import RankOneSVD
         >>> from parsimony.functions.losses import LatentVariableVariance
         >>>
         >>> np.random.seed(42)
         >>> X = np.random.rand(50, 150)
         >>> w = np.random.rand(150, 1)
         >>> var = LatentVariableVariance(X)
-        >>> var.step(w)
-        2.1979627581251385e-05
+        >>> round(var.step(w), 15)
+        2.1979627581e-05
         >>> _, S, _ = np.linalg.svd(np.dot(X.T, X))
         >>> round(1.0 / (np.max(S) * 49 / 2.0), 15)
         2.1979627581e-05
