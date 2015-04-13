@@ -1166,9 +1166,9 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
             beta_ = beta
 
         n = float(self.X.shape[0])
-        alpha = self.tv.alpha(beta_)
-        g = self.fmu(beta_)
-        Xbeta = np.dot(self.X, beta_)
+        alpha = self.tv.alpha(beta)
+        g = self.fmu(beta)
+        Xbeta = np.dot(self.X, beta)
         pi = np.reciprocal(1.0 + np.exp(-Xbeta))
         #if weights is None:
         #   weights = np.ones(self.y.shape)
