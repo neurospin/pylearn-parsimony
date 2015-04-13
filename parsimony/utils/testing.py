@@ -31,7 +31,7 @@ import tempfile
 #from numpy.testing import assert_array_less
 
 
-#'assert_array_almost_equal', 
+#'assert_array_almost_equal',
 __all__ = ["orth_matrix"]
 #           'check_ortho']
            #"assert_equal", "assert_not_equal", "assert_raises", "raises",
@@ -65,64 +65,15 @@ def orth_matrix(n=10):
 ## Test utils
 ###############################################################################
 
-def download_dataset(prefix, shape, n_samples):
-    import urllib
-    """Download datasets and estimated weights for testing"""
-    base_ftp_url = "ftp://ftp.cea.fr/pub/dsv/anatomist/parsimony/%s"
-    dataset_basename = "%s_%ix%ix%i_%i.npz" % \
-        tuple([prefix] + list(shape) + [n_samples])
-    weights_basename = "%s_%ix%ix%i_%i_weights.npz" % \
-        tuple([prefix] + list(shape) + [n_samples])
-    tmp_dir = tempfile.gettempdir()
-    # dataset
-    dataset_url = base_ftp_url % dataset_basename
-    dataset_filename = os.path.join(tmp_dir, os.path.basename(dataset_url))
-    if not os.path.exists(dataset_filename):
-        print "Download dataset from: %s => %s" % (dataset_url, dataset_filename)
-        urllib.urlretrieve(dataset_url, dataset_filename)
-    d = np.load(dataset_filename)
-    X3d, y, beta3d, proba = d['X3d'], d['y'], d['beta3d'], d['proba']
-    # weights map
-    weights_url = base_ftp_url % weights_basename
-    weights_filename = os.path.join(tmp_dir, os.path.basename(weights_url))
-    if not os.path.exists(weights_filename):
-        print "Download weights from: %s => %s" % (weights_url, weights_filename)
-        urllib.urlretrieve(weights_url, weights_filename)
-    weights = np.load(weights_filename)
-    return X3d, y, beta3d, proba, weights
-
-
-def build_dataset(prefix, shape, n_samples, type_="classif"):
-    """Build / save dataset """
-    import parsimony.datasets as datasets
-    if type_ == "classif":
-        X3d, y, beta3d, proba = datasets.classification.dice5.load(
-            n_samples=n_samples,
-            shape=shape, snr=10, random_seed=1, obj_pix_ratio=2.)
-    tmp_dir = tempfile.gettempdir()
-    dataset_basename = "%s_%ix%ix%i_%i.npz" % \
-        tuple(prefix, list(shape) + [n_samples])
-    filename = os.path.join(tmp_dir, dataset_basename)
-    print "Save dataset in:", filename
-    np.savez_compressed(filename, X3d=X3d, y=y, beta3d=beta3d, proba=proba)
-    return X3d, y, beta3d, proba
-
-
-def save_weights(models_dict, prefix, shape, n_samples):
+def save_weights(models_dict, filename):
     """Save weight maps into npz given a dictionary of fitted models"""
-    weights_basename = "%s_%ix%ix%i_%i_weights.npz" % \
-        tuple([prefix] + list(shape) + [n_samples])
-    tmp_dir = tempfile.gettempdir()
-    weights_filename = os.path.join(tmp_dir, weights_basename)
-    #print "Save weights map in:", weights_filename
     weights_dict = dict()
     for k in models_dict:
         mod = models_dict[k]
         # work with parsimony and sklearn
         w = mod.beta if hasattr(mod, "beta") else mod.coef_
         weights_dict[k] = w
-    np.savez_compressed(weights_filename, **weights_dict)
-    return weights_filename
+    np.savez_compressed(filename, **weights_dict)
 
 # Tests utils
 def assert_close_vectors(a, b, msg="",
