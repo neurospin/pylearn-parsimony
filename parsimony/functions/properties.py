@@ -853,6 +853,8 @@ class NesterovFunction(Gradient,
                 for inexact proximal methods, where the proximal operator is
                 approximated numerically.
         """
+        eps = max(eps, consts.FLOAT_EPSILON)
+
         # Define the function to minimise
         class F(Function, Gradient, ProximalOperator, StepSize):
             def __init__(self, v, A, t, proj):
