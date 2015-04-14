@@ -8,395 +8,301 @@ Copyright (c) 2013-2015, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   edouard.duchesnay@cea.fr
 @license: BSD 3-clause.
 """
-
-import numpy as np
 import os.path
-import tempfile
+import argparse
+import numpy as np
+import collections
 import time
-import urllib
-import parsimony.datasets as datasets
 import parsimony.functions.nesterov.tv as nesterov_tv
 import parsimony.estimators as estimators
 import parsimony.algorithms as algorithms
 import parsimony.utils as utils
+import sklearn.linear_model
 import parsimony.config as config
-#from sklearn.metrics import accuracy_score
+
+if not config.get_boolean("tests", "allow_downloads", False):
+    raise Exception("Download of weight map is not authorized and it is "
+        "required to complete this test.\n"
+        "Please set allow_downloads = True in the file: config.ini")
+
 try:
     import sklearn.linear_model
     has_sklearn = True
 except ImportError:
     has_sklearn = False
 
-_DOWNLOAD = config.get_boolean("tests", "allow_downloads", False)
-_PLOT_WEIGHTS = False
-_SAVE_WEIGHTS = False
-_SAVE_COEFFS = False
-
-if _PLOT_WEIGHTS:
-    try:
-        import matplotlib.pyplot as plt
-    except ImportError:
-        _PLOT_WEIGHTS = False
-
-###############################################################################
-## Dataset
-###############################################################################
 n_samples = 500
 shape = (50, 50, 1)
 n_train = 300
 
 np.random.seed(42)
 
-base_ftp_url = "ftp://ftp.cea.fr/pub/dsv/anatomist/parsimony/%s"
-dataset_basename = "data_logistic_%ix%ix%i_%i.npz" % \
-    tuple(list(shape) + [n_samples])
-weights_basename = "data_logistic_%ix%ix%i_%i_weights.npz" % \
-    tuple(list(shape) + [n_samples])
+###############################################################################
+## Utils
+###############################################################################
 
-if not _DOWNLOAD:
-    X3d, y, beta3d, proba = datasets.classification.dice5.load(
-        n_samples=n_samples,
-        shape=shape, snr=10, random_seed=1, obj_pix_ratio=2.)
-    tmp_dir = tempfile.gettempdir()
-    filename = os.path.join(tmp_dir, dataset_basename)
-    print "Save dataset in:", filename
-    np.savez_compressed(filename, X3d=X3d, y=y, beta3d=beta3d, proba=proba)
-    weights = None
-else:
-    tmp_dir = tempfile.gettempdir()
-    # dataset
-    dataset_url = base_ftp_url % dataset_basename
-    dataset_filename = os.path.join(tmp_dir, os.path.basename(dataset_url))
-    if os.path.exists(dataset_filename):
-        print "Dataset %s downloaded already. Using previous version." \
-            % (dataset_filename,)
+def fit_model(model_key):
+    global MODELS
+    mod = MODELS[model_key]
+    # Parsimony deal with intercept with a unpenalized column of 1
+    if (hasattr(mod, "penalty_start") and mod.penalty_start > 0):
+        Xtr_, Xte_ = Xtr_i, Xte_i
     else:
-        print "Downloading dataset from: %s => %s" \
-            % (dataset_url, dataset_filename)
-        urllib.urlretrieve(dataset_url, dataset_filename)
-    d = np.load(dataset_filename)
-    X3d, y, beta3d, proba = d['X3d'], d['y'], d['beta3d'], d['proba']
-    # weights map
-    weights_url = base_ftp_url % weights_basename
-    weights_filename = os.path.join(tmp_dir, os.path.basename(weights_url))
-    if os.path.exists(weights_filename):
-        print "Weights %s downloaded already. Using previous version." \
-            % (weights_filename,)
-    else:
-        print "Download weights from: %s => %s" \
-            % (weights_url, weights_filename)
-        urllib.urlretrieve(weights_url, weights_filename)
-    weights = np.load(weights_filename)
+        Xtr_, Xte_ = Xtr, Xte
+    ret = True
+    try:
+        start_time = time.time()
+        mod.fit(Xtr_, ytr.ravel())
+        time_ellapsed = time.time() - start_time
+        print model_key, "(%.3f seconds)" % time_ellapsed
+        score = utils.stats.accuracy(mod.predict(Xte_), yte)
+        mod.__title__ = "%s\nScore:%.2f, T:%.1f" %(model_key, score, time_ellapsed)
+        mod.__info__ = dict(score=score, time_ellapsed=time_ellapsed)
+    except:
+        ret = False
+    assert ret
+
+
+def fit_all(MODELS):
+    for model_key in MODELS:
+        fit_model(model_key)
+
+
+def weights_filename(shape, n_samples):
+    import parsimony
+    filename = os.path.abspath(os.path.join(os.path.dirname(
+            parsimony.__file__), "..", "tests" , "data",
+            "dice5_classif_weights_%ix%ix%i_%i.npz" %
+                tuple(list(shape) + [n_samples])))
+    return filename
+
+###############################################################################
+## Datasets
+###############################################################################
+import parsimony.datasets as datasets
+X3d, y, beta3d, proba = datasets.classification.dice5.load(
+            n_samples=n_samples, shape=shape,
+            sigma_spatial_smoothing=1, obj_pix_ratio=2., snr=10, random_seed=1)
+
+## TODO: REMOVE THIS DOWNLOAD when Git Large File Storage is released
+import urllib
+ftp_url = "ftp://ftp.cea.fr/pub/dsv/anatomist/parsimony/%s" %\
+    os.path.basename(weights_filename(shape, n_samples))
+urllib.urlretrieve(ftp_url, weights_filename(shape, n_samples))
+## TO BE REMOVED END
+
+# Load true weights
+WEIGHTS_TRUTH = np.load(weights_filename(shape, n_samples))
+
+# Ensure that train dataset is balanced
+tr = np.hstack([np.where(y.ravel() == 1)[0][:int(n_train / 2)],
+                np.where(y.ravel() == 0)[0][:int(n_train / 2)]])
+te = np.setdiff1d(np.arange(y.shape[0]), tr)
 
 X = X3d.reshape((n_samples, np.prod(beta3d.shape)))
-Xtr = X[:n_train, :]
-ytr = y[:n_train]
-Xte = X[n_train:, :]
-yte = y[n_train:]
+Xtr = X[tr, :]
+ytr = y[tr]
+Xte = X[te, :]
+yte = y[te]
 
-alpha = 1.  # global penalty
+# check that ytr is balanced
+assert ytr.sum() / ytr.shape[0] == 0.5
+assert yte.sum() / yte.shape[0] == 0.53500000000000003
 
-cdir = os.path.dirname(__file__)
-if _DOWNLOAD:
-    data_file = cdir + "/data/test_logistic_regression_large_dl.npz"
-else:
-    data_file = cdir + "/data/test_logistic_regression_large.npz"
-if not has_sklearn:
-    try:
-        data = np.load(data_file)
-    except IOError:
-        raise RuntimeError("Could not load data file and no scikit-learn.")
+# Dataset with intercept
+Xtr_i = np.c_[np.ones((Xtr.shape[0], 1)), Xtr]
+Xte_i = np.c_[np.ones((Xte.shape[0], 1)), Xte]
+
+# global penalty
+alpha = 1.
+
 
 ###############################################################################
-## Ridge
+## Models
 ###############################################################################
-# Sklearn,  minimize f(beta) = - C loglik+ 1/2 * ||beta||^2_2
+MODELS = collections.OrderedDict()
+
+
+## l2 + grad_descnt
 if has_sklearn:
-    ridge_sklrn = sklearn.linear_model.LogisticRegression(C=1. / alpha,
-                                                          fit_intercept=False,
-#                                                          class_weight=None,
-                                                          dual=False)
-    start_time = time.time()
-    ridge_sklrn.fit(Xtr, ytr.ravel())
-    time_ridge_sklrn = time.time() - start_time
-#    acc_ridge_sklrn = accuracy_score(ridge_sklrn.predict(Xte), yte)
-    ypred = ridge_sklrn.predict(Xte)
-    acc_ridge_sklrn = utils.stats.accuracy(yte, ypred)
-else:
-    beta = data["ridge_sklrn_beta"]
-    ridge_sklrn = utils.AnonymousClass(coef_=beta)
-    acc_ridge_sklrn = 0.745
-
-# Parsimony: minimize f(beta, X, y) = - loglik + alpha/2 * ||beta||^2_2
-ridge_prsmy = estimators.RidgeLogisticRegression(alpha,
-                                                 class_weight=None,
-                                                 mean=False)
-start_time = time.time()
-ridge_prsmy.fit(Xtr, ytr)
-time_ridge_prsmy = time.time() - start_time
-#acc_ridge_prsmy = accuracy_score(ridge_prsmy.predict(Xte), yte)
-acc_ridge_prsmy = utils.stats.accuracy(yte, ridge_prsmy.predict(Xte))
-
-###############################################################################
-## Lasso
-###############################################################################
-if has_sklearn:
-    lasso_sklrn = sklearn.linear_model.LogisticRegression(C=1. / alpha,
-                                                          penalty="l1",
-                                                          fit_intercept=False,
-    #                                                      class_weight=None,
-                                                          dual=False)
-    start_time = time.time()
-    lasso_sklrn.fit(Xtr, ytr.ravel())
-    time_lasso_sklrn = time.time() - start_time
-#    acc_lasso_sklrn = accuracy_score(lasso_sklrn.predict(Xte), yte)
-    ypred = lasso_sklrn.predict(Xte)
-    acc_lasso_sklrn = utils.stats.accuracy(yte, ypred)
-else:
-    beta = data["lasso_sklrn_beta"]
-    lasso_sklrn = utils.AnonymousClass(coef_=beta)
-    acc_lasso_sklrn = 0.735
+    MODELS["l2__sklearn"] = \
+        sklearn.linear_model.LogisticRegression(C=1. / alpha,
+                                                fit_intercept=False,
+                                                class_weight=None,
+                                                dual=False)
 
 # Parsimony: minimize f(beta, X, y) = - loglik + alpha/2 * ||beta||_1
-lasso_prsmy = estimators.ElasticNetLogisticRegression(alpha=alpha, l=1.,
-                                                      class_weight=None,
-                                                      mean=False)
-start_time = time.time()
-lasso_prsmy.fit(Xtr, ytr)
-time_lasso_prsmy = time.time() - start_time
-#acc_lasso_prsmy = accuracy_score(lasso_prsmy.predict(Xte), yte)
-acc_lasso_prsmy = utils.stats.accuracy(yte, lasso_prsmy.predict(Xte))
+MODELS["l2__grad_descnt"] = \
+    estimators.RidgeLogisticRegression(alpha, class_weight=None,
+                                       mean=False)
 
-###############################################################################
-## Elasticnet
-###############################################################################
-# sklearn
 if has_sklearn:
-    try:
-        enet_sklrn = sklearn.linear_model.SGDClassifier(loss='log',
-                                                  penalty='elasticnet',
-                                                  alpha=alpha / 5000 * n_train,
-                                                  l1_ratio=.5,
-                                                  fit_intercept=False)
-    except TypeError:
-        enet_sklrn = sklearn.linear_model.SGDClassifier(loss='log',
-                                                  penalty='elasticnet',
-                                                  alpha=alpha / 5000 * n_train,
-                                                  rho=.5,
-                                                  fit_intercept=False)
-    start_time = time.time()
-    enet_sklrn.fit(Xtr, ytr.ravel())
-    time_enet_sklrn = time.time() - start_time
-    #acc_enet_sklrn = accuracy_score(enet_sklrn.predict(Xte), yte)
-    acc_enet_sklrn = utils.stats.accuracy(yte, enet_sklrn.predict(Xte))
-else:
-    beta = data["enet_sklrn_beta"]
-    enet_sklrn = utils.AnonymousClass(coef_=beta)
-    acc_enet_sklrn = 0.7
+    MODELS["l2_inter__sklearn"] = \
+        sklearn.linear_model.LogisticRegression(C=1. / alpha,
+                                                fit_intercept=True,
+                                                class_weight=None,
+                                                dual=False)
 
-# parsimony
-enet_prsmy = estimators.ElasticNetLogisticRegression(alpha=alpha / 10, l=.5)
+MODELS["l2_inter__grad_descnt"] = \
+    estimators.RidgeLogisticRegression(alpha, class_weight=None,
+                                       mean=False,
+                                       penalty_start=1)
 
-start_time = time.time()
-enet_prsmy.fit(Xtr, ytr)
-time_enet_prsmy = time.time() - start_time
-#acc_enet_prsmy = accuracy_score(enet_prsmy.predict(Xte), yte)
-acc_enet_prsmy = utils.stats.accuracy(yte, enet_prsmy.predict(Xte))
 
-if _SAVE_COEFFS:
-    np.savez_compressed(data_file,
-                        ridge_sklrn_beta=ridge_sklrn.coef_,
-                        lasso_sklrn_beta=lasso_sklrn.coef_,
-                        enet_sklrn_beta=enet_sklrn.coef_)
+if has_sklearn:
+    MODELS["l1__sklearn"] = \
+        sklearn.linear_model.LogisticRegression(C=1. / alpha, penalty="l1",
+                                                fit_intercept=False,
+                                                class_weight=None,
+                                                dual=False)
+MODELS["l1__fista"] = \
+    estimators.ElasticNetLogisticRegression(alpha=alpha, l=1.,
+                                            class_weight=None,
+                                            mean=False)
+if has_sklearn:
+    MODELS["l1_inter__sklearn"] = \
+        sklearn.linear_model.LogisticRegression(C=1. / alpha, penalty="l1",
+                                                fit_intercept=True,
+                                                class_weight=None,
+                                                dual=False)
 
-###############################################################################
+MODELS["l1_inter__fista"] = \
+    estimators.ElasticNetLogisticRegression(alpha=alpha, l=1.,
+                                            class_weight=None,
+                                            mean=False,
+                                            penalty_start=1)
+
+
+## Enet + fista
+if has_sklearn:
+    MODELS["l1l2__sklearn"] = \
+        sklearn.linear_model.SGDClassifier(loss='log', penalty='elasticnet',
+                                           alpha=alpha / 5000 * n_train,
+                                           l1_ratio=.5,
+                                           fit_intercept=False)
+MODELS["l1l2__fista"] = \
+    estimators.ElasticNetLogisticRegression(alpha=alpha / 10, l=.5)
+
+
+MODELS["l1l2_inter__sklearn"] = \
+    sklearn.linear_model.SGDClassifier(loss='log', penalty='elasticnet',
+                                       alpha=alpha / 5000 * n_train,
+                                       l1_ratio=.5,
+                                       fit_intercept=True)
+
+MODELS["l1l2_inter__fista"] = \
+    estimators.ElasticNetLogisticRegression(alpha=alpha / 10, l=.5,
+                                            penalty_start=1)
+
 ## LogisticRegressionL1L2TV, Parsimony only
 # Minimize:
 #    f(beta, X, y) = - loglik/n_train
 #                    + k/2 * ||beta||^2_2
 #                    + l * ||beta||_1
 #                    + g * TV(beta)
-###############################################################################
 A, n_compacts = nesterov_tv.linear_operator_from_shape(beta3d.shape)
 l1, l2, tv = alpha * np.array((.05, .65, .3))  # l2, l1, tv penalties
 
-# FISTA with default mu (consts.TOLERANCE = 5e-08)  10k iterations
-nite_fsta = 50000
-enettv_fsta = estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
-    algorithm=algorithms.proximal.FISTA(max_iter=nite_fsta))
+nite_fsta = 70000
+MODELS["l1l2tv__fista"] = \
+    estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
+            algorithm=algorithms.proximal.FISTA(max_iter=nite_fsta))
 
-start_time = time.time()
-enettv_fsta.fit(Xtr, ytr)
-time_enettv_fsta = time.time() - start_time
-#acc_enettv_fsta = accuracy_score(enettv_fsta.predict(Xte), yte)
-acc_enettv_fsta = utils.stats.accuracy(yte, enettv_fsta.predict(Xte))
+MODELS["l1l2tv_inter__fista"] = \
+    estimators.LogisticRegressionL1L2TV(l1, l2, tv, A, penalty_start=1,
+            algorithm=algorithms.proximal.FISTA(max_iter=nite_fsta))
 
-## StaticCONESTA
-nite_stc_cnsta = 6000
-enettv_stc_cnsta = estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
-    algorithm=algorithms.proximal.StaticCONESTA(max_iter=nite_stc_cnsta))
-start_time = time.time()
-enettv_stc_cnsta.fit(Xtr, ytr)
-time_enettv_stc_cnsta = time.time() - start_time
-#acc_enettv_stc_cnsta = accuracy_score(enettv_stc_cnsta.predict(Xte), yte)
-acc_enettv_stc_cnsta = utils.stats.accuracy(yte, enettv_stc_cnsta.predict(Xte))
+nite_stc_cnsta = 10000
+MODELS["l1l2tv__static_conesta"] = \
+    estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
+            algorithm=algorithms.proximal.StaticCONESTA(max_iter=nite_stc_cnsta))
 
-# CONESTA
+MODELS["l1l2tv_inter__static_conesta"] = \
+    estimators.LogisticRegressionL1L2TV(l1, l2, tv, A, penalty_start=1,
+            algorithm=algorithms.proximal.StaticCONESTA(max_iter=nite_stc_cnsta))
+
 nite_cnsta = 5000
-enettv_cnsta = estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
-    algorithm=algorithms.proximal.CONESTA(max_iter=nite_cnsta))
-start_time = time.time()
-enettv_cnsta.fit(Xtr, ytr)
-time_enettv_cnsta = time.time() - start_time
-#acc_enettv_cnsta = accuracy_score(enettv_cnsta.predict(Xte), yte)
-acc_enettv_cnsta = utils.stats.accuracy(yte, enettv_cnsta.predict(Xte))
+MODELS["l1l2tv__conesta"] = \
+    estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
+            algorithm=algorithms.proximal.CONESTA(max_iter=nite_cnsta))
+
+
+MODELS["l1l2tv_inter__conesta"] = \
+    estimators.LogisticRegressionL1L2TV(l1, l2, tv, A, penalty_start=1,
+            algorithm=algorithms.proximal.CONESTA(max_iter=nite_cnsta))
+
+"""
+Al1tv = l1tv.linear_operator_from_shape(shape, np.prod(shape), penalty_start=0)
+MODELS["l1l2tv_inter__inexactfista"] = \
+    LogisticRegressionL1L2TVInexactFISTA(l1, l2, tv, Al1tv, 
+        algorithm_params=dict(eps=5e-16, max_iter=100000))
+"""
 
 ###############################################################################
-## Plot
+## tests
 ###############################################################################
-if _PLOT_WEIGHTS:
-    plt.rc("text", usetex=True)
-    plt.rc("font", **{"family": "serif", "serif": ["Computer Modern"]})
+def test_fit_all():
+    global MODELS
+    for model_key in MODELS:
+        yield fit_model, model_key
 
-    # Ridge
-    plot = plt.subplot(2, 6, 1)
-    utils.plot_map2d(ridge_sklrn.coef_.reshape(shape), plot,
-                     title="Ridge(sklrn)\nAcc:%.2f, T:%.1f" %
-                     (acc_ridge_sklrn, time_ridge_sklrn))
-    plot = plt.subplot(2, 6, 2)
-    utils.plot_map2d(ridge_prsmy.beta.reshape(shape), plot,
-                     title="Ridge(prsmy)\nAcc:%.2f, T:%.1f" %
-                     (acc_ridge_prsmy, time_ridge_prsmy))
+def test_weights_calculated_vs_precomputed():
+    global MODELS
+    for model_key in MODELS:
+        if hasattr(MODELS[model_key], "beta"):
+            yield assert_weights_calculated_vs_precomputed, model_key
 
-    # lasso
-    plot = plt.subplot(2, 6, 3)
-    utils.plot_map2d(lasso_sklrn.coef_.reshape(shape), plot,
-                     title="lasso(sklrn)\nAcc:%.2f, T:%.1f" %
-                     (acc_lasso_sklrn, time_lasso_sklrn))
-    plot = plt.subplot(2, 6, 4)
-    utils.plot_map2d(lasso_prsmy.beta.reshape(shape), plot,
-                     title="lasso(prsmy)\nAcc:%.2f, T:%.1f" %
-                     (acc_lasso_prsmy, time_lasso_prsmy))
+def assert_weights_calculated_vs_precomputed(model_key):
+    utils.testing.assert_close_vectors(
+        MODELS[model_key].beta ,
+        WEIGHTS_TRUTH[model_key],
+        "%s: calculated weights differ from precomputed" % model_key)
 
-    # Enet
-    plot = plt.subplot(2, 6, 5)
-    utils.plot_map2d(enet_sklrn.coef_.reshape(shape), plot,
-                     title="Enet(sklrn)\nAcc:%.2f, T:%.1f" %
-                     (acc_enet_sklrn, time_enet_sklrn))
-    plot = plt.subplot(2, 6, 6)
-    utils.plot_map2d(enet_prsmy.beta.reshape(shape), plot,
-                     title="Enet(prsmy)\nAcc:%.2f, T:%.1f" %
-                     (acc_enet_prsmy, time_enet_prsmy))
+def test_weights_vs_sklearn():
+    if "l2__sklearn" in MODELS:
+        utils.testing.assert_close_vectors(
+            MODELS["l2__sklearn"].coef_,
+            MODELS["l2__grad_descnt"].beta,
+            "l2, sklearn vs prsmy")
 
-    # Ground truth
-    plot = plt.subplot(2, 6, 7)
-    utils.plot_map2d(beta3d.reshape(shape), plot, title="beta star")
-
-    # EnetTV
-    plot = plt.subplot(2, 6, 8)
-    utils.plot_map2d(enettv_fsta.beta.reshape(shape), plot,
-                     title="EnetTV(FISTA %ik)\nAcc:%.2f, T:%.1f" %
-                     (nite_fsta / 1000, acc_enettv_fsta, time_enettv_fsta))
-
-    plot = plt.subplot(2, 6, 9)
-    utils.plot_map2d(enettv_stc_cnsta.beta.reshape(shape), plot,
-                     title="EnetTV(StaticCONESTA %ik)\nAcc:%.2f, T:%.1f" %
-                     (nite_stc_cnsta / 1000, acc_enettv_stc_cnsta,
-                      time_enettv_stc_cnsta))
-
-    plot = plt.subplot(2, 6, 10)
-    utils.plot_map2d(enettv_cnsta.beta.reshape(shape), plot,
-                     title="EnetTV(CONESTA %ik)\nAcc:%.2f, T:%.1f" %
-                     (nite_cnsta / 1000, acc_enettv_cnsta, time_enettv_cnsta))
-    plt.show()
+    if "l2_inter__sklearn" in MODELS:
+        utils.testing.assert_close_vectors(
+            MODELS["l2_inter__sklearn"].coef_,
+            MODELS["l2_inter__grad_descnt"].beta[1:],
+            "l2, sklearn vs prsmy")
 
 
-###############################################################################
-## Tests
-###############################################################################
-def assert_close_vectors(a, b, msg="",
-                         slope_tol=1e-2, corr_tol=1e-3, n2_tol=.05):
-    a, b = a.ravel(), b.ravel()
-    # 1 - abs(slope(a, b)) < slope_tol
-    slope_ = np.dot(a, b) / np.dot(b, b)
-    assert (1 - np.abs(slope_) < slope_tol), \
-        "%s: slope differ from one, slope: %f" % (msg, slope_)
-    # 1 - cor(a, b) < corr_tol
-    corr_ = np.corrcoef(a, b)[0, 1]
-    assert (1 - corr_ < corr_tol), \
-        "%s: correlation differ from one, correlation %f" % (msg, corr_)
-    # |a - b| / min(|a|, |b|) > n2_tol
-    diff_n2 = np.sqrt(np.sum((a - b) ** 2))
-    diff_n2_ratio = diff_n2 / min(np.sqrt(np.dot(a, a)), np.sqrt(np.dot(b, b)))
-    assert (diff_n2_ratio < n2_tol), \
-        "%s: |a-b|/min(|a|,|b|)=%f > n2 tolerance" % (msg, diff_n2_ratio)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-t', '--test', action='store_true', default=False,
+                        help="Run tests")
+    parser.add_argument('-p', '--plot', action='store_true', default=False,
+                        help="Fit models and plot weight maps")
+    parser.add_argument('-s', '--save_weights', action='store_true', default=False,
+                        help="Fit models, plot weight maps and save it into npz file")
+    parser.add_argument('-m', '--models', help="test only models listed as args."
+                        "Possible models:" + ",".join(MODELS.keys()))
+    options = parser.parse_args()
 
+    if options.test:
+        import nose
+        result = nose.run(argv=['-s -v', __file__])
 
-def test_RidgeLogisticRegression_GradientDescent():
-    # Parsimony vs sklearn
-    assert_close_vectors(ridge_sklrn.coef_, ridge_prsmy.beta,
-                         "Ridge, sklearn vs prsmy")
-    if weights is not None:
-        # Calculated vs downloaded
-        assert_close_vectors(ridge_prsmy.beta, weights["ridge_prsmy_beta"],
-                             "Ridge, calculated vs downloaded")
+    if options.models:
+        import string
+        models = string.split(options.models, ",")
+        for model_key in MODELS:
+            if model_key not in models:
+                MODELS.pop(model_key)
 
+    if options.save_weights:
+        fit_all(MODELS)
+        utils.plot.plot_map2d_of_models(MODELS, nrow=3, ncol=6, shape=shape,
+                                        title_attr="__title__")
+        if raw_input("Save weights ? [n]/y") == "y":
+            utils.testing.save_weights(MODELS, weights_filename(shape, n_samples))
+            print "Weights saved in", weights_filename(shape, n_samples)
 
-def test_ElasticNetLogisticRegression_FISTA():
-    # Parsimony vs sklearn
-    assert_close_vectors(lasso_sklrn.coef_, lasso_prsmy.beta,
-                         "Lasso, sklearn vs prsmy",
-                         slope_tol=.2, corr_tol=.1, n2_tol=.5)
-    assert_close_vectors(enet_sklrn.coef_, enet_prsmy.beta,
-                         "Enet, sklearn vs prsmy",
-                         corr_tol=.5,  n2_tol=np.Inf)
-    if weights is not None:
-        # Calculated vs downloaded
-        assert_close_vectors(lasso_prsmy.beta, weights["lasso_prsmy_beta"],
-                             "Lasso, calculated vs downloaded")
-        assert_close_vectors(enet_prsmy.beta, weights["enet_prsmy_beta"],
-                             "Enet, calculated vs downloaded")
-
-
-def test_LogisticRegressionL1L2TV_FISTA():
-    if weights is not None:
-        assert_close_vectors(enettv_fsta.beta, weights["enettv_fsta_beta"],
-                             "EnetTV(FISTA), calculated vs downloaded")
-
-
-def test_LogisticRegressionL1L2TV_StaticCONESTA():
-    if weights is not None:
-        assert np.allclose(enettv_stc_cnsta.beta,
-                           weights["enettv_stc_cnsta_beta"]), \
-                           "EnetTV(StaticCONESTA), calculated vs downloaded"
-
-
-def test_LogisticRegressionL1L2TV_CONESTA():
-    if weights is not None:
-        assert np.allclose(enettv_cnsta.beta, weights["enettv_cnsta_beta"]), \
-            "EnetTV(CONESTA), calculated vs downloaded"
-
-
-def test_LogisticRegressionL1L2TV_FISTA_vs_StaticCONESTA():
-    assert_close_vectors(enettv_fsta.beta, enettv_stc_cnsta.beta,
-                         "EnetTV FISTA vs (CONESTA)")
-
-
-def test_LogisticRegressionL1L2TV_StaticCONESTA_vs_CONESTA():
-    assert_close_vectors(enettv_stc_cnsta.beta, enettv_cnsta.beta,
-                         "EnetTV StaticCONESTA vs (CONESTA)")
-
-###############################################################################
-## Save weights map
-###############################################################################
-if _SAVE_WEIGHTS:
-    tmp_dir = tempfile.gettempdir()
-    weights_filename = os.path.join(tmp_dir, weights_basename)
-    print "Save weights map in:", weights_filename
-    np.savez_compressed(weights_filename,
-                        ridge_prsmy_beta=ridge_prsmy.beta,
-                        lasso_prsmy_beta=lasso_prsmy.beta,
-                        enet_prsmy_beta=enet_prsmy.beta,
-                        enettv_fsta_beta=enettv_fsta.beta,
-                        enettv_stc_cnsta_beta=enettv_stc_cnsta.beta,
-                        enettv_cnsta_beta=enettv_cnsta.beta)
+    if options.plot:
+        fit_all(MODELS)
+        utils.plot.plot_map2d_of_models(MODELS, nrow=3, ncol=6, shape=shape, title_attr="__title__")
