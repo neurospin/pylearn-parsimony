@@ -14,7 +14,7 @@ from . import consts
 from . import deprecated
 
 __all__ = ["multivariate_normal", "sensitivity", "precision", "specificity",
-           "npv", "F_score", "fleiss_kappa"]
+           "npv", "F_score", "fleiss_kappa", "r2_score"]
 
 
 def multivariate_normal(mu, Sigma, n=1):
@@ -550,6 +550,55 @@ def fleiss_kappa(W, k):
 
     return kappa
 
+def r2_score(y_true, y_pred):
+    """R squared (coefficient of determination) regression score function.
+
+    Best possible score is 1.0, lower values are worse.
+
+    Parameters
+    ----------
+    y_true : array-like of shape = [n_samples] or [n_samples, n_outputs]
+        Ground truth (correct) target values.
+
+    y_pred : array-like of shape = [n_samples] or [n_samples, n_outputs]
+        Estimated target values.
+
+    Returns
+    -------
+    z : float
+        The R^2 score.
+
+    Notes
+    -----
+    This is not a symmetric function.
+
+    Unlike most other scores, R^2 score may be negative (it need not actually
+    be the square of a quantity R).
+
+    References
+    ----------
+    .. [1] `Wikipedia entry on the Coefficient of determination
+            <http://en.wikipedia.org/wiki/Coefficient_of_determination>`_
+
+    Examples
+    --------
+    >>> from parsimony.utils.stats import r2_score
+    >>> y_true = [3, -0.5, 2, 7]
+    >>> y_pred = [2.5, 0.0, 2, 8]
+    >>> r2_score(y_true, y_pred)  # doctest: +ELLIPSIS
+    0.948...
+    """
+    y_true, y_pred = np.asarray(y_true).ravel(), np.asarray(y_pred).ravel()
+    numerator = np.sum((y_true - y_pred) ** 2)
+    denominator = np.sum((y_true - np.mean(y_true)) ** 2)
+
+    if denominator == 0.0:
+        if numerator == 0.0:
+            return 1.0
+        else:
+            return 0.0
+
+    return 1 - numerator / denominator
 
 if __name__ == "__main__":
     import doctest
