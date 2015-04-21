@@ -515,7 +515,6 @@ class CONESTA(bases.ExplicitAlgorithm,
             # close to machine epsilon.
             gap = abs(algorithm.info_get(Info.gap)[-1])
             # TODO: Warn if gap < -consts.TOLERANCE.
-
             if not self.simulation:
                 if gap < self.eps - mu * gM:
 
@@ -533,7 +532,8 @@ class CONESTA(bases.ExplicitAlgorithm,
 #            eps = self.tau * (gap + mu * gM)
             eps = max(self.eps, self.tau * (gap + mu * gM))
             # Compute and update mu.
-            mu = max(self.mu_min, min(function.mu_opt(eps), mu))
+#            mu = max(self.mu_min, min(function.mu_opt(eps), mu))
+            mu =  min(function.mu_opt(eps), mu)
             function.set_mu(mu)
 
             i = i + 1
