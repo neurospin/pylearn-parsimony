@@ -17,8 +17,11 @@ import parsimony.functions.nesterov.tv as nesterov_tv
 import parsimony.estimators as estimators
 import parsimony.algorithms as algorithms
 import parsimony.utils as utils
+from parsimony.utils.penalties import l1_max_logistic_loss
 import sklearn.linear_model
 import parsimony.config as config
+import parsimony.functions.nesterov.l1tv as l1tv
+import parsimony.utils.start_vectors as start_vectors
 
 if not config.get_boolean("tests", "allow_downloads", False):
     raise Exception("Download of weight map is not authorized and it is "
@@ -38,6 +41,8 @@ n_train = 300
 np.random.seed(42)
 
 ###############################################################################
+
+###############################################################################
 ## Utils
 ###############################################################################
 
@@ -47,21 +52,32 @@ def fit_model(model_key):
     # Parsimony deal with intercept with a unpenalized column of 1
     if (hasattr(mod, "penalty_start") and mod.penalty_start > 0):
         Xtr_, Xte_ = Xtr_i, Xte_i
+        beta_start_ = beta_start_i
     else:
         Xtr_, Xte_ = Xtr, Xte
+        beta_start_ = beta_start
     ret = True
     try:
         start_time = time.time()
-        mod.fit(Xtr_, ytr.ravel())
+        #print mod, hasattr(mod, "penalty_start")
+        if hasattr(mod, "penalty_start"):
+            mod.fit(Xtr_, ytr.ravel())#, beta=beta_start_)
+        else:
+            mod.fit(Xtr_, ytr.ravel())
         time_ellapsed = time.time() - start_time
         print model_key, "(%.3f seconds)" % time_ellapsed
         score = utils.stats.accuracy(mod.predict(Xte_), yte)
-        mod.__title__ = "%s\nScore:%.2f, T:%.1f" %(model_key, score, time_ellapsed)
+        mod.__title__ = "%s\nS:%.2f, T:%.1f" % (model_key, score, time_ellapsed)
         mod.__info__ = dict(score=score, time_ellapsed=time_ellapsed)
-    except:
+        try:
+            mod.__title__ +=\
+                "(%i,%i)" % (int(mod.get_info()['converged']), mod.get_info()['num_iter'])
+        except:
+            pass
+    except Exception, e:
+        print e
         ret = False
     assert ret
-
 
 def fit_all(MODELS):
     for model_key in MODELS:
@@ -104,6 +120,7 @@ Xtr = X[tr, :]
 ytr = y[tr]
 Xte = X[te, :]
 yte = y[te]
+beta_start = start_vectors.RandomStartVector().get_vector(Xtr.shape[1])
 
 # check that ytr is balanced
 assert ytr.sum() / ytr.shape[0] == 0.5
@@ -112,9 +129,11 @@ assert yte.sum() / yte.shape[0] == 0.53500000000000003
 # Dataset with intercept
 Xtr_i = np.c_[np.ones((Xtr.shape[0], 1)), Xtr]
 Xte_i = np.c_[np.ones((Xte.shape[0], 1)), Xte]
+beta_start_i = start_vectors.RandomStartVector().get_vector(Xtr_i.shape[1])
 
 # global penalty
-alpha = 1.
+alpha = l1_max_logistic_loss(Xtr, ytr)
+#alpha = 1.
 
 
 ###############################################################################
@@ -177,7 +196,7 @@ MODELS["l1_inter__fista"] = \
 if has_sklearn:
     MODELS["l1l2__sklearn"] = \
         sklearn.linear_model.SGDClassifier(loss='log', penalty='elasticnet',
-                                           alpha=alpha / 5000 * n_train,
+                                           alpha=alpha / 1000 * n_train,
                                            l1_ratio=.5,
                                            fit_intercept=False)
 MODELS["l1l2__fista"] = \
@@ -186,13 +205,19 @@ MODELS["l1l2__fista"] = \
 
 MODELS["l1l2_inter__sklearn"] = \
     sklearn.linear_model.SGDClassifier(loss='log', penalty='elasticnet',
-                                       alpha=alpha / 5000 * n_train,
+                                       alpha=alpha / 1000 * n_train,
                                        l1_ratio=.5,
                                        fit_intercept=True)
 
 MODELS["l1l2_inter__fista"] = \
     estimators.ElasticNetLogisticRegression(alpha=alpha / 10, l=.5,
                                             penalty_start=1)
+
+from parsimony.algorithms.utils import Info
+info = [Info.converged,
+        Info.num_iter,
+        Info.time,
+        Info.fvalue]
 
 ## LogisticRegressionL1L2TV, Parsimony only
 # Minimize:
@@ -203,40 +228,54 @@ MODELS["l1l2_inter__fista"] = \
 A, n_compacts = nesterov_tv.linear_operator_from_shape(beta3d.shape)
 l1, l2, tv = alpha * np.array((.05, .65, .3))  # l2, l1, tv penalties
 
-nite_fsta = 70000
+nite_fsta = 20000
 MODELS["l1l2tv__fista"] = \
     estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
-            algorithm=algorithms.proximal.FISTA(max_iter=nite_fsta))
+            algorithm=algorithms.proximal.FISTA(
+                eps=1e-2, max_iter=nite_fsta, info=info))
 
 MODELS["l1l2tv_inter__fista"] = \
     estimators.LogisticRegressionL1L2TV(l1, l2, tv, A, penalty_start=1,
-            algorithm=algorithms.proximal.FISTA(max_iter=nite_fsta))
+            algorithm=algorithms.proximal.FISTA(
+                eps=1e-2, max_iter=nite_fsta, info=info))
+
 
 nite_stc_cnsta = 10000
 MODELS["l1l2tv__static_conesta"] = \
     estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
-            algorithm=algorithms.proximal.StaticCONESTA(max_iter=nite_stc_cnsta))
+            algorithm=algorithms.proximal.StaticCONESTA(
+            eps=1e-2, max_iter=nite_stc_cnsta, info=info))
 
 MODELS["l1l2tv_inter__static_conesta"] = \
     estimators.LogisticRegressionL1L2TV(l1, l2, tv, A, penalty_start=1,
-            algorithm=algorithms.proximal.StaticCONESTA(max_iter=nite_stc_cnsta))
+            algorithm=algorithms.proximal.StaticCONESTA(
+            eps=1e-2, max_iter=nite_stc_cnsta, info=info))
 
-nite_cnsta = 5000
+nite_cnsta = 10000
 MODELS["l1l2tv__conesta"] = \
     estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
-            algorithm=algorithms.proximal.CONESTA(max_iter=nite_cnsta))
+            algorithm=algorithms.proximal.CONESTA(
+            eps=1e-3, max_iter=nite_cnsta,  info=info))
 
 
 MODELS["l1l2tv_inter__conesta"] = \
     estimators.LogisticRegressionL1L2TV(l1, l2, tv, A, penalty_start=1,
-            algorithm=algorithms.proximal.CONESTA(max_iter=nite_cnsta))
+            algorithm=algorithms.proximal.CONESTA(
+            eps=1e-3, max_iter=nite_cnsta, info=info))
 
-"""
-Al1tv = l1tv.linear_operator_from_shape(shape, np.prod(shape), penalty_start=0)
-MODELS["l1l2tv_inter__inexactfista"] = \
-    LogisticRegressionL1L2TVInexactFISTA(l1, l2, tv, Al1tv, 
-        algorithm_params=dict(eps=5e-16, max_iter=100000))
-"""
+nite_inexact = 1000
+Al1tv = l1tv.linear_operator_from_shape(shape, np.prod(shape))
+MODELS["l1l2tv_inexactfista"] = \
+    estimators.LogisticRegressionL1L2TVInexactFISTA(l1, l2, tv, Al1tv,
+        algorithm_params=dict(eps=1e-3, max_iter=nite_inexact, info=info))
+
+
+#Al1tv_i = l1tv.linear_operator_from_shape(shape, np.prod(shape), penalty_start=0)
+MODELS["l1l2tv__inter_inexactfista"] = \
+    estimators.LogisticRegressionL1L2TVInexactFISTA(l1, l2, tv, Al1tv,
+        penalty_start=1,
+        algorithm_params=dict(eps=1e-3, max_iter=nite_inexact, info=info))
+
 
 ###############################################################################
 ## tests
@@ -263,13 +302,13 @@ def test_weights_vs_sklearn():
         utils.testing.assert_close_vectors(
             MODELS["l2__sklearn"].coef_,
             MODELS["l2__grad_descnt"].beta,
-            "l2, sklearn vs prsmy")
+            "l2, sklearn vs prsmy", slope_tol=5e-2, corr_tol=5e-2, n2_tol=.2)
 
     if "l2_inter__sklearn" in MODELS:
         utils.testing.assert_close_vectors(
             MODELS["l2_inter__sklearn"].coef_,
             MODELS["l2_inter__grad_descnt"].beta[1:],
-            "l2, sklearn vs prsmy")
+            "l2_inter, sklearn vs prsmy", slope_tol=5e-2, corr_tol=5e-2, n2_tol=.2)
 
 
 if __name__ == "__main__":
@@ -297,12 +336,22 @@ if __name__ == "__main__":
 
     if options.save_weights:
         fit_all(MODELS)
-        utils.plot.plot_map2d_of_models(MODELS, nrow=3, ncol=6, shape=shape,
+        utils.plot.plot_map2d_of_models(MODELS, nrow=3, ncol=7, shape=shape,
                                         title_attr="__title__")
         if raw_input("Save weights ? [n]/y") == "y":
             utils.testing.save_weights(MODELS, weights_filename(shape, n_samples))
+            import string
             print "Weights saved in", weights_filename(shape, n_samples)
+            dataset_filename = string.replace(weights_filename(shape, n_samples), 
+                                              "weights", "dataset")
+            np.savez_compressed(file=dataset_filename,
+                                X3d=X3d, y=y, beta3d=beta3d, proba=proba)
+            print "Dataset saved in", dataset_filename
+            # reload an check
+            WEIGHTS_TRUTH = np.load(weights_filename(shape, n_samples))
+            for test_func, model_key in test_weights_calculated_vs_precomputed():
+                test_func(model_key)
 
     if options.plot:
         fit_all(MODELS)
-        utils.plot.plot_map2d_of_models(MODELS, nrow=3, ncol=6, shape=shape, title_attr="__title__")
+        utils.plot.plot_map2d_of_models(MODELS, nrow=3, ncol=7, shape=shape, title_attr="__title__")

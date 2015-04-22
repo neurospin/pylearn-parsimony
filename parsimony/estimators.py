@@ -21,6 +21,7 @@ import parsimony.functions as functions
 import parsimony.functions.losses as losses
 import parsimony.functions.multiblock.losses as mb_losses
 import parsimony.functions.penalties as penalties
+import parsimony.functions.nesterov.l1tv as l1tv
 import parsimony.utils.start_vectors as start_vectors
 import parsimony.utils.linalgs as linalgs
 import parsimony.algorithms.bases as bases
@@ -44,6 +45,7 @@ __all__ = ["BaseEstimator",
            "LogisticRegression",
            "ElasticNetLogisticRegression",
            "LogisticRegressionL1L2TV",
+           "LogisticRegressionL1L2TVInexactFISTA",
            "LogisticRegressionL1L2GL",
 
            "LinearRegressionL2SmoothedL1TV"]
@@ -1689,6 +1691,61 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
 
         return self
 
+###############################################################################
+## LogisticRegressionL1L2TVInexactFISTA
+###############################################################################
+#from parsimony.utils import check_arrays
+#from parsimony.utils import class_weight_to_sample_weight, check_labels
+#import parsimony.functions as functions
+
+class LogisticRegressionL1L2TVInexactFISTA(LogisticRegressionL1L2TV):
+    """Logistic regression (re-weighted log-likelihood aka. cross-entropy)
+    with L1, L2 and TV penalties optimized with Inexact FISTA
+    (a.k.a. FISTA-FISTA).
+
+    See also
+    --------
+    LogisticRegressionL1L2TV
+    """
+    def __init__(self, l1, l2, tv,
+                 Al1tv,
+                 algorithm_params=dict(),
+                 class_weight=None,
+                 penalty_start=0,
+                 mean=True, max_iter=1000):
+
+        if not ("max_iter" in algorithm_params):
+            algorithm_params["max_iter"] = max_iter
+
+        algorithm = proximal.FISTA(**algorithm_params)
+
+        super(LogisticRegressionL1L2TVInexactFISTA, self).__init__(l1, l2, tv, algorithm=algorithm,
+                                                     A=Al1tv, 
+                                                     class_weight=class_weight,
+                                                     penalty_start=penalty_start,
+                                                     mean=mean)
+
+    def fit(self, X, y, beta=None, sample_weight=None):
+        """Fit the estimator to the data.
+        """
+        X, y = check_arrays(X, check_labels(y))
+        if sample_weight is None:
+            sample_weight = class_weight_to_sample_weight(self.class_weight, y)
+        y, sample_weight = check_arrays(y, sample_weight)
+        function = functions.CombinedFunction()
+        #function.add_function(functions.losses.RidgeLogisticRegression(X, y, k=l2))
+        function.add_loss(functions.losses.LogisticRegression(X, y, mean=self.mean))
+        function.add_penalty(functions.penalties.L2Squared(l=self.l2, penalty_start=self.penalty_start))
+        function.add_prox(l1tv.L1TV(l1=self.l1, tv=self.tv, A=self.A, penalty_start=self.penalty_start))
+
+        self.algorithm.check_compatibility(function,
+                                           self.algorithm.INTERFACES)
+        # TODO: Should we use a seed here so that we get deterministic results?
+        if beta is None:
+            beta = self.start_vector.get_vector(X.shape[1])
+        self.beta = self.algorithm.run(function, beta)
+
+        return self
 
 class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
     """Logistic regression (re-weighted log-likelihood aka. cross-entropy)
