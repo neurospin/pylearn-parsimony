@@ -1691,12 +1691,6 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
 
         return self
 
-###############################################################################
-## LogisticRegressionL1L2TVInexactFISTA
-###############################################################################
-#from parsimony.utils import check_arrays
-#from parsimony.utils import class_weight_to_sample_weight, check_labels
-#import parsimony.functions as functions
 
 class LogisticRegressionL1L2TVInexactFISTA(LogisticRegressionL1L2TV):
     """Logistic regression (re-weighted log-likelihood aka. cross-entropy)
@@ -1706,6 +1700,26 @@ class LogisticRegressionL1L2TVInexactFISTA(LogisticRegressionL1L2TV):
     See also
     --------
     LogisticRegressionL1L2TV
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import parsimony.estimators as estimators
+    >>> import parsimony.algorithms.proximal as proximal
+    >>> import parsimony.functions.nesterov.l1tv as l1tv
+    >>> shape = (1, 4, 4)
+    >>> n = 10
+    >>> p = shape[0] * shape[1] * shape[2]
+    >>> np.random.seed(42)
+    >>> X = np.random.rand(n, p)
+    >>> y = np.random.randint(0, 2, (n, 1))
+    >>> l1 = 0.1  # L1 coefficient
+    >>> l2 = 0.9  # Ridge coefficient
+    >>> tv = 1.0  # TV coefficient
+    >>> Al1tv = l1tv.linear_operator_from_shape(shape, num_variables=p)
+    >>> lr = estimators.LogisticRegressionL1L2TVInexactFISTA(l1, l2, tv, Al1tv, mean=False)
+    >>> print lr.fit(X, y).score(X, y)
+    0.7
     """
     def __init__(self, l1, l2, tv,
                  Al1tv,
@@ -1719,11 +1733,12 @@ class LogisticRegressionL1L2TVInexactFISTA(LogisticRegressionL1L2TV):
 
         algorithm = proximal.FISTA(**algorithm_params)
 
-        super(LogisticRegressionL1L2TVInexactFISTA, self).__init__(l1, l2, tv, algorithm=algorithm,
-                                                     A=Al1tv, 
-                                                     class_weight=class_weight,
-                                                     penalty_start=penalty_start,
-                                                     mean=mean)
+        super(LogisticRegressionL1L2TVInexactFISTA, self).__init__(
+                l1, l2, tv, algorithm=algorithm,
+                A=Al1tv, 
+                class_weight=class_weight,
+                penalty_start=penalty_start,
+                mean=mean)
 
     def fit(self, X, y, beta=None, sample_weight=None):
         """Fit the estimator to the data.
@@ -1733,10 +1748,12 @@ class LogisticRegressionL1L2TVInexactFISTA(LogisticRegressionL1L2TV):
             sample_weight = class_weight_to_sample_weight(self.class_weight, y)
         y, sample_weight = check_arrays(y, sample_weight)
         function = functions.CombinedFunction()
-        #function.add_function(functions.losses.RidgeLogisticRegression(X, y, k=l2))
-        function.add_loss(functions.losses.LogisticRegression(X, y, mean=self.mean))
-        function.add_penalty(functions.penalties.L2Squared(l=self.l2, penalty_start=self.penalty_start))
-        function.add_prox(l1tv.L1TV(l1=self.l1, tv=self.tv, A=self.A, penalty_start=self.penalty_start))
+        function.add_loss(functions.losses.LogisticRegression(X, y,
+                                                              mean=self.mean))
+        function.add_penalty(functions.penalties.L2Squared(l=self.l2, 
+            penalty_start=self.penalty_start))
+        function.add_prox(l1tv.L1TV(l1=self.l1, tv=self.tv, A=self.A,
+            penalty_start=self.penalty_start))
 
         self.algorithm.check_compatibility(function,
                                            self.algorithm.INTERFACES)
