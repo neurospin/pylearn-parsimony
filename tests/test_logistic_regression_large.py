@@ -101,10 +101,11 @@ X3d, y, beta3d, proba = datasets.classification.dice5.load(
             sigma_spatial_smoothing=1, obj_pix_ratio=2., snr=10, random_seed=1)
 
 ## TODO: REMOVE THIS DOWNLOAD when Git Large File Storage is released
-import urllib
-ftp_url = "ftp://ftp.cea.fr/pub/dsv/anatomist/parsimony/%s" %\
-    os.path.basename(weights_filename(shape, n_samples))
-urllib.urlretrieve(ftp_url, weights_filename(shape, n_samples))
+if not os.path.exists(weights_filename(shape, n_samples)):
+    import urllib
+    ftp_url = "ftp://ftp.cea.fr/pub/dsv/anatomist/parsimony/%s" %\
+        os.path.basename(weights_filename(shape, n_samples))
+    urllib.urlretrieve(ftp_url, weights_filename(shape, n_samples))
 ## TO BE REMOVED END
 
 # Load true weights
@@ -323,16 +324,19 @@ if __name__ == "__main__":
                         "Possible models:" + ",".join(MODELS.keys()))
     options = parser.parse_args()
 
-    if options.test:
-        import nose
-        result = nose.run(argv=['-s -v', __file__])
-
     if options.models:
         import string
         models = string.split(options.models, ",")
         for model_key in MODELS:
             if model_key not in models:
                 MODELS.pop(model_key)
+
+    if options.test:
+        #import nose
+        #result = nose.run(argv=['-s -v', __file__])
+        fit_all(MODELS)
+        for test_func, model_key in test_weights_calculated_vs_precomputed():
+            test_func(model_key)
 
     if options.save_weights:
         fit_all(MODELS)

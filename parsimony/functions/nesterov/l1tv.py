@@ -64,10 +64,8 @@ class L1TV(properties.NesterovFunction,
 
         # WARNING: Number of non-zero rows may differ from p.
         self._p = A[0].shape[1]
-        A = [l1 * A[0],
-             tv * A[1],
-             tv * A[2],
-             tv * A[3]]
+        # Put lambda and gamma in A matrices.
+        A = [l1 * A[0]] + [tv * A[i] for i in xrange(1, len(A))]
 
         super(L1TV, self).__init__(l1, A=A, mu=mu, penalty_start=penalty_start)
 
@@ -90,10 +88,11 @@ class L1TV(properties.NesterovFunction,
 
         # lambda and gamma are in A.
         A = self.A()
-        return maths.norm1(A[0].dot(beta_)) + \
-               np.sum(np.sqrt(A[1].dot(beta_) ** 2.0 +
-                              A[2].dot(beta_) ** 2.0 +
-                              A[3].dot(beta_) ** 2.0))
+        abeta_tv = A[1].dot(beta_) ** 2.0
+        for k in xrange(2, len(A)):
+            abeta_tv += A[k].dot(beta_) ** 2
+
+        return maths.norm1(A[0].dot(beta_)) + np.sum(np.sqrt(abeta_tv))
 
     def fmu(self, beta, mu=None):
         """Returns the smoothed function value.
@@ -209,19 +208,13 @@ class L1TV(properties.NesterovFunction,
             beta_ = beta[self.penalty_start:, :]
         else:
             beta_ = beta
-
-        a = [0] * len(A)
-        a[0] = (1.0 / self.mu) * A[0].dot(beta_)
-        a[1] = (1.0 / self.mu) * A[1].dot(beta_)
-        a[2] = (1.0 / self.mu) * A[2].dot(beta_)
-        a[3] = (1.0 / self.mu) * A[3].dot(beta_)
         # Remember: lambda and gamma are already in the A matrices.
+        a = [(1.0 / self.mu) * A[i].dot(beta_) for i in xrange(len(A))]
 
         return self.project(a)
 
     def project(self, a):
         """ Projection onto the compact space of the Nesterov function.
-
         From the interface "NesterovFunction".
         """
         # L1
@@ -229,21 +222,19 @@ class L1TV(properties.NesterovFunction,
         anorm_l1 = np.abs(al1)
         i_l1 = anorm_l1 > 1.0
         anorm_l1_i = anorm_l1[i_l1]
-        al1[i_l1] = np.divide(al1[i_l1], anorm_l1_i)
+        a[0][i_l1] = np.divide(al1[i_l1], anorm_l1_i)
 
         # TV
-        ax = a[1]
-        ay = a[2]
-        az = a[3]
-        anorm_tv = ax ** 2.0 + ay ** 2.0 + az ** 2.0
+        anorm_tv = a[1] ** 2.0
+        for k in xrange(2, len(a)):
+            anorm_tv += a[k] ** 2
         i_tv = anorm_tv > 1.0
 
-        anorm_tv_i = anorm_tv[i_tv] ** 0.5  # Square root taken here. Faster.
-        ax[i_tv] = np.divide(ax[i_tv], anorm_tv_i)
-        ay[i_tv] = np.divide(ay[i_tv], anorm_tv_i)
-        az[i_tv] = np.divide(az[i_tv], anorm_tv_i)
+        anorm_tv_i = anorm_tv[i_tv] ** 0.5  # Square root is taken here. Faster.
+        for k in xrange(1, len(a)):
+            a[k][i_tv] = np.divide(a[k][i_tv], anorm_tv_i)
 
-        return [al1, ax, ay, az]
+        return a
 
     def estimate_mu(self, beta):
         """Computes a "good" value of mu with respect to the given beta.
@@ -262,7 +253,7 @@ class L1TV(properties.NesterovFunction,
         """
         A = self.A()
 
-        # A[0] is L1, A[1-3] is TV.
+        # A[0] is L1, A[1:] is TV.
         return (A[0].shape[0] / 2.0) \
              + (A[1].shape[0] / 2.0)
 
@@ -291,10 +282,10 @@ def linear_operator_from_mask(mask, num_variables, penalty_start=0):
             from penalisation. Equivalently, the first index to be penalised.
             Default is 0, all variables are included.
     """
-    Atv, _ = tv.A_from_mask(mask)
+    Atv, _ = tv.linear_operator_from_mask(mask)
     Al1 = l1.A_from_variables(num_variables, penalty_start=penalty_start)
 
-    return Al1[0], Atv[0], Atv[1], Atv[2]
+    return [Al1[0]] + Atv
 
 
 @utils.deprecated("linear_operator_from_shape")
@@ -323,7 +314,7 @@ def linear_operator_from_shape(shape, num_variables, penalty_start=0):
             from penalisation. Equivalently, the first index to be penalised.
             Default is 0, all variables are included.
     """
-    Atv, _ = tv.A_from_shape(shape)
+    Atv, _ = tv.linear_operator_from_shape(shape)
     Al1 = l1.A_from_variables(num_variables, penalty_start=penalty_start)
 
-    return Al1[0], Atv[0], Atv[1], Atv[2]
+    return [Al1[0]] + Atv
