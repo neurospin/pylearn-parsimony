@@ -22,6 +22,7 @@ import sklearn.linear_model
 import parsimony.config as config
 import parsimony.functions.nesterov.l1tv as l1tv
 import parsimony.utils.start_vectors as start_vectors
+import hashlib
 
 if not config.get_boolean("tests", "allow_downloads", False):
     raise Exception("Download of weight map is not authorized and it is "
@@ -98,7 +99,10 @@ def weights_filename(shape, n_samples):
 import parsimony.datasets as datasets
 X3d, y, beta3d, proba = datasets.classification.dice5.load(
             n_samples=n_samples, shape=shape,
-            sigma_spatial_smoothing=1, obj_pix_ratio=2., snr=10, random_seed=1)
+            sigma_spatial_smoothing=1, snr=10, random_seed=1)
+
+if hashlib.sha1(X3d).hexdigest() != '5286c0cee52be789948a9e83e22b1e46704305ce':
+    raise Exception("Generated dataset differs from the original one")
 
 ## TODO: REMOVE THIS DOWNLOAD when Git Large File Storage is released
 if not os.path.exists(weights_filename(shape, n_samples)):
@@ -296,7 +300,8 @@ def assert_weights_calculated_vs_precomputed(model_key):
     utils.testing.assert_close_vectors(
         MODELS[model_key].beta ,
         WEIGHTS_TRUTH[model_key],
-        "%s: calculated weights differ from precomputed" % model_key)
+        "%s: calculated weights differ from precomputed" % model_key,
+        slope_tol=2e-2, corr_tol=1e-2)
 
 def test_weights_vs_sklearn():
     if "l2__sklearn" in MODELS:
@@ -346,7 +351,7 @@ if __name__ == "__main__":
             utils.testing.save_weights(MODELS, weights_filename(shape, n_samples))
             import string
             print "Weights saved in", weights_filename(shape, n_samples)
-            dataset_filename = string.replace(weights_filename(shape, n_samples), 
+            dataset_filename = string.replace(weights_filename(shape, n_samples),
                                               "weights", "dataset")
             np.savez_compressed(file=dataset_filename,
                                 X3d=X3d, y=y, beta3d=beta3d, proba=proba)

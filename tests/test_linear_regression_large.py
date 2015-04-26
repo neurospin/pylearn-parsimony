@@ -83,7 +83,7 @@ def weights_filename(shape, n_samples):
 import parsimony.datasets as datasets
 X3d, y, beta3d = datasets.regression.dice5.load(
             n_samples=n_samples, shape=shape,
-            sigma_spatial_smoothing=1, obj_pix_ratio=2., r2=.8, random_seed=1)
+            sigma_spatial_smoothing=1, r2=.8, random_seed=1)
 
 
 ## TODO: REMOVE THIS DOWNLOAD when Git Large File Storage is released
@@ -216,7 +216,7 @@ MODELS["l1l2tv_inter__conesta"] = \
 """
 Al1tv = l1tv.linear_operator_from_shape(shape, np.prod(shape), penalty_start=0)
 MODELS["l1l2tv_inter__inexactfista"] = \
-    LinearRegressionL1L2TVInexactFISTA(l1, l2, tv, Al1tv, 
+    LinearRegressionL1L2TVInexactFISTA(l1, l2, tv, Al1tv,
         algorithm_params=dict(eps=5e-16, max_iter=100000))
 """
 

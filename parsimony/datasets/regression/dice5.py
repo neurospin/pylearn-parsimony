@@ -16,7 +16,6 @@ from ..utils import Dot, ObjImage, spatial_smoothing, corr_to_coef
 def load(n_samples=100, shape=(30, 30, 1),
          r2=.75,
          sigma_spatial_smoothing=1,
-         obj_pix_ratio=2.,
          model="independant",
          random_seed=None):
     """Generates regression samples (images + target variable) and beta.
@@ -43,9 +42,14 @@ def load(n_samples=100, shape=(30, 30, 1),
             pixels.
 
     model:  string or a dict (default "independant")
+        The dictionary contains the std-dev of each latent variables. It can be
+        used to control the signal that stem from dot's latent over the noise.
+        Since noise std-dev=1, model=dict(l1=2, l2=2) will create 2 latents
+        associated to dot 1 and 2 with std-dev=2, ie.: dot/noise signal=2.
+
         If model is "independant":
             # Each dice dot has an independant latent variable:
-            l1=1., l2=1., l3=1., l4=1., l5=1.,
+            l1=2., l2=2., l3=2., l4=2., l5=2.,
             # with no shared variance:
             l12=0., l45=0., l12345=0.,
             # The five dots contribute equally, 4 and 5 have negative coef:
@@ -58,11 +62,11 @@ def load(n_samples=100, shape=(30, 30, 1),
 
         If model is "redundant":
             # Dot-level signal in dots 1 an 2 fully stem from a shared latent:
-            l1=0., l2=0., l12 =1.,
+            l1=0., l2=0., l12 =2.,
             # l3 is independant
-            l3=1.,
+            l3=2.,
             # Dot-level signal in dots 4 an 5 fully stem from a shared latent:
-            l4=0., l5=0., l45=1.,
+            l4=0., l5=0., l45=2.,
             # No global shared variance
             l12345 = 0.,
             # Five dots contribute equally
@@ -70,11 +74,11 @@ def load(n_samples=100, shape=(30, 30, 1),
 
         If model is "suppressor":
             # Dot-level signal in dot 2 fully stem from shared latent:
-            l1=1, l2=0., l12=1.,
+            l1=1, l2=0., l12=2.,
             # l3 is independant
-            l3 = 1.,
+            l3 = 2.,
             # Dot-level signal in dot 5 fully stem from shared latent:
-            l4=1., l5=0., l45=1.,
+            l4=2., l5=0., l45=2.,
             # No global shared variance
             l12345 = 0.,
             # Dot 2 suppresses shared signal with dot 1, dot 5 suppresses dot 4
@@ -87,14 +91,6 @@ def load(n_samples=100, shape=(30, 30, 1),
             will not be detected by univariate analysis. However, they
             are usefull since they are suppressing unwilling variance that stem
             from latents l12 and l45.
-
-    obj_pix_ratio: Float. Controls the ratio between object-level signal
-            and pixel-level signal for pixels within objects (dots). If
-            obj_pix_ratio == 1 then 100% of the signal of pixels within
-            the same object is shared (ie.: no pixel level) signal. If
-            obj_pix_ratio == 0 then all the signal is pixel specific.
-            High obj_pix_ratio promotes spatial correlation between
-            pixels of the same object.
 
     random_seed: None or integer. See numpy.random.seed(). If not None, it can
             be used to obtain reproducable samples.
@@ -160,11 +156,6 @@ def load(n_samples=100, shape=(30, 30, 1),
     >>> X3d, y, beta3d = datasets.regression.dice5.load(n_samples=n_samples,
     ...     shape=shape, r2=.5, random_seed=1)
     """
-    # Pixel-level signal std-dev
-    signal_std_pix = 1.
-    # Object-level signal std-dev, from object/pixel signal ratio
-    signal_std_obj = float(obj_pix_ratio) / signal_std_pix
-    mu_e = 0
     if shape[0] < 5 or shape[1] < 5:
         raise ValueError("Shape too small. The minimun is (5, 5, 0)")
 
@@ -180,14 +171,14 @@ def load(n_samples=100, shape=(30, 30, 1),
     if random_seed is not None:  # If random seed, save current random state
         rnd_state = np.random.get_state()
         np.random.seed(random_seed)
-    X = np.random.normal(mu_e, signal_std_pix, n_samples * n_features)
+    X = np.random.normal(0, 1., n_samples * n_features)
     X3d = X.reshape(n_samples, nx, ny, nz)
     #########################################################################
     ## 2. Tune points parameters latent and beta
     # Default model independant points
     model_ = dict(
             # All points has an independant latent
-            l1=1., l2=1., l3=1., l4=1., l5=1.,
+            l1=2., l2=2., l3=2., l4=2., l5=2.,
             # No shared variance
             l12=0., l45=0., l12345=0.,
             # Five dots contribute equally
@@ -197,11 +188,11 @@ def load(n_samples=100, shape=(30, 30, 1),
     elif model is "redundant":
         model_ = dict(
             # Dot-level signal in dots 1 an 2 fully stem from the shared latent
-            l1=0., l2=0., l12=1.,
+            l1=0., l2=0., l12=2.,
             # l3 is independant
-            l3=1.,
+            l3=2.,
             # Dot-level signal in dots 4 an 5 fully stem from the shared latent
-            l4=0., l5=0., l45=1.,
+            l4=0., l5=0., l45=2.,
             # No global shared variance
             l12345=0.,
             # Five dots contribute equally
@@ -209,23 +200,15 @@ def load(n_samples=100, shape=(30, 30, 1),
     elif model is "suppressor":
         model_ = dict(
             # Dot-level signal in dot 2 stem only from shared latent
-            l1=1, l2=0., l12=1.,
+            l1=2., l2=0., l12=2.,
             # l3 is independant
-            l3=1.,
+            l3=2.,
             # Dot-level signal in dot 5 stem from shared latent
-            l4=1., l5=0., l45=1.,
+            l4=2., l5=0., l45=2.,
             # No global shared variance
             l12345=0.,
             # Dot 2 suppresses shared signal with dot 1, dot 5 suppresses dot 4
             b1=1., b2=-1., b3=1., b4=1., b5=-1.)
-    model_["l1"] *= signal_std_obj
-    model_["l2"] *= signal_std_obj
-    model_["l3"] *= signal_std_obj
-    model_["l4"] *= signal_std_obj
-    model_["l5"] *= signal_std_obj
-    model_["l12"] *= signal_std_obj
-    model_["l45"] *= signal_std_obj
-    model_["l12345"] *= signal_std_obj
     #########################################################################
     ## 3. Build Objects
     objects = dice_five_with_union_of_pairs(shape)
@@ -252,8 +235,7 @@ def load(n_samples=100, shape=(30, 30, 1),
     #########################################################################
     ## 4. Pixel-level signal structure: spatial smoothing
     if sigma_spatial_smoothing != 0:
-        X3d = spatial_smoothing(X3d, sigma_spatial_smoothing, mu_e,
-                                  obj_pix_ratio)
+        X3d = spatial_smoothing(X3d, sigma_spatial_smoothing)
     X = X3d.reshape((X3d.shape[0], np.prod(X3d.shape[1:])))
     X -= X.mean(axis=0)
     X /= X.std(axis=0)
