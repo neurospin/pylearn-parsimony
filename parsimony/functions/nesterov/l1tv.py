@@ -27,7 +27,8 @@ import l1
 
 __all__ = ["L1TV",
            "linear_operator_from_mask", "A_from_mask",
-           "linear_operator_from_shape", "A_from_shape"]
+           "linear_operator_from_shape", "A_from_shape",
+           "linear_operator_from_mesh"]
 
 
 class L1TV(properties.NesterovFunction,
@@ -315,6 +316,61 @@ def linear_operator_from_shape(shape, num_variables, penalty_start=0):
             Default is 0, all variables are included.
     """
     Atv, _ = tv.linear_operator_from_shape(shape)
-    Al1 = l1.A_from_variables(num_variables, penalty_start=penalty_start)
+    Al1 = l1.linear_operator_from_variables(num_variables, penalty_start=penalty_start)
+
+    return [Al1[0]] + Atv
+
+def linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0,
+                              weights=None):
+    """Generates the linear operator for the total variation Nesterov function
+    from a mesh.
+
+    Parameters
+    ----------
+    mesh_coord : Numpy array [n, 3] of float.
+
+    mesh_triangles : Numpy array, n_triangles-by-3. The (integer) indices of
+            the three nodes forming the triangle.
+
+    mask : Numpy array (shape (n,)) of integers/boolean. Non-null values
+            correspond to columns of X. Groups may be defined using different
+            values in the mask. TV will be applied within groups of the same
+            value in the mask.
+
+    offset : Non-negative integer. The index of the first column, variable,
+            where TV applies. This is different from penalty_start which
+            define where the penalty applies. The offset defines where TV
+            applies within the penalised variables.
+
+                Example: X := [Intercept, Age, Weight, Image]. Intercept is
+                not penalized, TV does not apply on Age and Weight but only on
+                Image. Thus: penalty_start = 1, offset = 2 (skip Age and
+                Weight).
+
+    weights : Numpy array. The weight put on the gradient of every point.
+            Default is weight 1 for each point, or equivalently, no weight. The
+            weights is a numpy array of the same shape as mask.
+
+    Returns
+    -------
+    out1 : List or sparse matrices. Linear operator for the total variation
+           Nesterov function computed over a mesh.
+
+    out2 : Integer. The number of compacts.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import parsimony.functions.nesterov.l1tv as tv_helper
+    >>> mesh_coord = np.array([[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2]])
+    >>> mesh_triangles = np.array([[0 ,1, 3], [0, 2 ,3], [2, 3, 5], [2, 4, 5]])
+    >>> A = tv_helper.linear_operator_from_mesh(mesh_coord,mesh_triangles)
+    """
+    Atv, _ = tv.linear_operator_from_mesh(mesh_coord=mesh_coord,
+                                           mesh_triangles=mesh_triangles,
+                                           mask=mask, offset=offset,
+                                           weights=weights)
+    Al1 = l1.linear_operator_from_variables(mesh_coord.shape[0],
+                                            penalty_start=offset)
 
     return [Al1[0]] + Atv
