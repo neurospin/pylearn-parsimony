@@ -62,7 +62,7 @@ def fit_model(model_key):
         start_time = time.time()
         #print mod, hasattr(mod, "penalty_start")
         if hasattr(mod, "penalty_start"):
-            mod.fit(Xtr_, ytr.ravel())#, beta=beta_start_)
+            mod.fit(Xtr_, ytr.ravel(), beta=beta_start_)
         else:
             mod.fit(Xtr_, ytr.ravel())
         time_ellapsed = time.time() - start_time
@@ -138,14 +138,19 @@ beta_start_i = start_vectors.RandomStartVector().get_vector(Xtr_i.shape[1])
 
 # global penalty
 alpha = l1_max_logistic_loss(Xtr, ytr)
-#alpha = 1.
 
+from parsimony.algorithms.utils import Info
+info = [Info.converged,
+        Info.num_iter,
+        Info.time,
+        Info.fvalue]
 
 ###############################################################################
 ## Models
 ###############################################################################
 MODELS = collections.OrderedDict()
 
+algorithm_params = dict(eps=1e-4, max_iter=20000, info=info)
 
 ## l2 + grad_descnt
 if has_sklearn:
@@ -158,7 +163,8 @@ if has_sklearn:
 # Parsimony: minimize f(beta, X, y) = - loglik + alpha/2 * ||beta||_1
 MODELS["l2__grad_descnt"] = \
     estimators.RidgeLogisticRegression(alpha, class_weight=None,
-                                       mean=False)
+                                       mean=False,
+                                       algorithm_params=algorithm_params)
 
 if has_sklearn:
     MODELS["l2_inter__sklearn"] = \
@@ -170,8 +176,8 @@ if has_sklearn:
 MODELS["l2_inter__grad_descnt"] = \
     estimators.RidgeLogisticRegression(alpha, class_weight=None,
                                        mean=False,
-                                       penalty_start=1)
-
+                                       penalty_start=1,
+                                       algorithm_params=algorithm_params)
 
 if has_sklearn:
     MODELS["l1__sklearn"] = \
@@ -182,7 +188,9 @@ if has_sklearn:
 MODELS["l1__fista"] = \
     estimators.ElasticNetLogisticRegression(alpha=alpha, l=1.,
                                             class_weight=None,
-                                            mean=False)
+                                            mean=False,
+                                            algorithm_params=algorithm_params)
+
 if has_sklearn:
     MODELS["l1_inter__sklearn"] = \
         sklearn.linear_model.LogisticRegression(C=1. / alpha, penalty="l1",
@@ -194,8 +202,8 @@ MODELS["l1_inter__fista"] = \
     estimators.ElasticNetLogisticRegression(alpha=alpha, l=1.,
                                             class_weight=None,
                                             mean=False,
-                                            penalty_start=1)
-
+                                            penalty_start=1,
+                                            algorithm_params=algorithm_params)
 
 ## Enet + fista
 if has_sklearn:
@@ -205,7 +213,8 @@ if has_sklearn:
                                            l1_ratio=.5,
                                            fit_intercept=False)
 MODELS["l1l2__fista"] = \
-    estimators.ElasticNetLogisticRegression(alpha=alpha / 10, l=.5)
+    estimators.ElasticNetLogisticRegression(alpha=alpha / 10, l=.5,
+                                            algorithm_params=algorithm_params)
 
 
 MODELS["l1l2_inter__sklearn"] = \
@@ -216,13 +225,8 @@ MODELS["l1l2_inter__sklearn"] = \
 
 MODELS["l1l2_inter__fista"] = \
     estimators.ElasticNetLogisticRegression(alpha=alpha / 10, l=.5,
-                                            penalty_start=1)
-
-from parsimony.algorithms.utils import Info
-info = [Info.converged,
-        Info.num_iter,
-        Info.time,
-        Info.fvalue]
+                                            penalty_start=1,
+                                            algorithm_params=algorithm_params)
 
 ## LogisticRegressionL1L2TV, Parsimony only
 # Minimize:
@@ -233,53 +237,46 @@ info = [Info.converged,
 A, n_compacts = nesterov_tv.linear_operator_from_shape(beta3d.shape)
 l1, l2, tv = alpha * np.array((.05, .65, .3))  # l2, l1, tv penalties
 
-nite_fsta = 20000
 MODELS["l1l2tv__fista"] = \
     estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
-            algorithm=algorithms.proximal.FISTA(
-                eps=1e-2, max_iter=nite_fsta, info=info))
+            algorithm=algorithms.proximal.FISTA(),
+            algorithm_params=algorithm_params)
 
 MODELS["l1l2tv_inter__fista"] = \
     estimators.LogisticRegressionL1L2TV(l1, l2, tv, A, penalty_start=1,
-            algorithm=algorithms.proximal.FISTA(
-                eps=1e-2, max_iter=nite_fsta, info=info))
+            algorithm=algorithms.proximal.FISTA(),
+            algorithm_params=algorithm_params)
 
 
-nite_stc_cnsta = 10000
 MODELS["l1l2tv__static_conesta"] = \
     estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
-            algorithm=algorithms.proximal.StaticCONESTA(
-            eps=1e-2, max_iter=nite_stc_cnsta, info=info))
+            algorithm=algorithms.proximal.StaticCONESTA(),
+            algorithm_params=algorithm_params)
 
 MODELS["l1l2tv_inter__static_conesta"] = \
     estimators.LogisticRegressionL1L2TV(l1, l2, tv, A, penalty_start=1,
-            algorithm=algorithms.proximal.StaticCONESTA(
-            eps=1e-2, max_iter=nite_stc_cnsta, info=info))
+            algorithm=algorithms.proximal.StaticCONESTA(),
+            algorithm_params=algorithm_params)
 
-nite_cnsta = 10000
 MODELS["l1l2tv__conesta"] = \
     estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
-            algorithm=algorithms.proximal.CONESTA(
-            eps=1e-3, max_iter=nite_cnsta,  info=info))
-
+            algorithm=algorithms.proximal.CONESTA(),
+            algorithm_params=algorithm_params)
 
 MODELS["l1l2tv_inter__conesta"] = \
     estimators.LogisticRegressionL1L2TV(l1, l2, tv, A, penalty_start=1,
-            algorithm=algorithms.proximal.CONESTA(
-            eps=1e-3, max_iter=nite_cnsta, info=info))
+            algorithm=algorithms.proximal.CONESTA(),
+            algorithm_params=algorithm_params)
 
-nite_inexact = 1000
 Al1tv = l1tv.linear_operator_from_shape(shape, np.prod(shape))
 MODELS["l1l2tv_inexactfista"] = \
     estimators.LogisticRegressionL1L2TVInexactFISTA(l1, l2, tv, Al1tv,
-        algorithm_params=dict(eps=1e-3, max_iter=nite_inexact, info=info))
+            algorithm_params=algorithm_params)
 
-
-#Al1tv_i = l1tv.linear_operator_from_shape(shape, np.prod(shape), penalty_start=0)
 MODELS["l1l2tv__inter_inexactfista"] = \
     estimators.LogisticRegressionL1L2TVInexactFISTA(l1, l2, tv, Al1tv,
         penalty_start=1,
-        algorithm_params=dict(eps=1e-3, max_iter=nite_inexact, info=info))
+        algorithm_params=algorithm_params)
 
 
 ###############################################################################
@@ -314,7 +311,7 @@ def test_weights_vs_sklearn():
         utils.testing.assert_close_vectors(
             MODELS["l2_inter__sklearn"].coef_,
             MODELS["l2_inter__grad_descnt"].beta[1:],
-            "l2_inter, sklearn vs prsmy", slope_tol=5e-2, corr_tol=5e-2, n2_tol=.2)
+            "l2_inter, sklearn vs prsmy", slope_tol=5e-2, corr_tol=5e-2, n2_tol=.4)
 
 
 if __name__ == "__main__":
