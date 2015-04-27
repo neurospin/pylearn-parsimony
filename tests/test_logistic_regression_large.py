@@ -18,7 +18,7 @@ import parsimony.estimators as estimators
 import parsimony.algorithms as algorithms
 import parsimony.utils as utils
 from parsimony.utils.penalties import l1_max_logistic_loss
-import sklearn.linear_model
+from parsimony.utils import mesh
 import parsimony.config as config
 import parsimony.functions.nesterov.l1tv as l1tv
 import parsimony.utils.start_vectors as start_vectors
@@ -41,12 +41,10 @@ n_train = 300
 
 np.random.seed(42)
 
-###############################################################################
 
 ###############################################################################
 ## Utils
 ###############################################################################
-
 def fit_model(model_key):
     global MODELS
     mod = MODELS[model_key]
@@ -68,17 +66,20 @@ def fit_model(model_key):
         time_ellapsed = time.time() - start_time
         print model_key, "(%.3f seconds)" % time_ellapsed
         score = utils.stats.accuracy(mod.predict(Xte_), yte)
-        mod.__title__ = "%s\nS:%.2f, T:%.1f" % (model_key, score, time_ellapsed)
+        mod.__title__ = "%s\nS:%.2f, T:%.1f" % (model_key,
+                                                score, time_ellapsed)
         mod.__info__ = dict(score=score, time_ellapsed=time_ellapsed)
         try:
             mod.__title__ +=\
-                "(%i,%i)" % (int(mod.get_info()['converged']), mod.get_info()['num_iter'])
+                "(%i,%i)" % (int(mod.get_info()['converged']),
+                             mod.get_info()['num_iter'])
         except:
             pass
     except Exception, e:
         print e
         ret = False
     assert ret
+
 
 def fit_all(MODELS):
     for model_key in MODELS:
@@ -87,19 +88,20 @@ def fit_all(MODELS):
 
 def weights_filename(shape, n_samples):
     import parsimony
-    filename = os.path.abspath(os.path.join(os.path.dirname(
-            parsimony.__file__), "..", "tests" , "data",
+    filename = os.path.abspath(
+        os.path.join(
+            os.path.dirname(parsimony.__file__), "..", "tests", "data",
             "dice5_classif_weights_%ix%ix%i_%i.npz" %
-                tuple(list(shape) + [n_samples])))
+            tuple(list(shape) + [n_samples])))
     return filename
 
 ###############################################################################
-## Datasets
+## Dataset
 ###############################################################################
 import parsimony.datasets as datasets
 X3d, y, beta3d, proba = datasets.classification.dice5.load(
-            n_samples=n_samples, shape=shape,
-            sigma_spatial_smoothing=1, snr=10, random_seed=1)
+    n_samples=n_samples, shape=shape,
+    sigma_spatial_smoothing=1, snr=10, random_seed=1)
 
 if hashlib.sha1(X3d).hexdigest() != '5286c0cee52be789948a9e83e22b1e46704305ce':
     raise Exception("Generated dataset differs from the original one")
@@ -152,53 +154,55 @@ MODELS = collections.OrderedDict()
 
 algorithm_params = dict(eps=1e-4, max_iter=20000, info=info)
 
-## l2 + grad_descnt
+## Get data structure from array shape
+
+# l2 + grad_descnt
 if has_sklearn:
-    MODELS["l2__sklearn"] = \
+    MODELS["2d_l2_sklearn"] = \
         sklearn.linear_model.LogisticRegression(C=1. / alpha,
                                                 fit_intercept=False,
                                                 class_weight=None,
                                                 dual=False)
 
 # Parsimony: minimize f(beta, X, y) = - loglik + alpha/2 * ||beta||_1
-MODELS["l2__grad_descnt"] = \
+MODELS["2d_l2_grad_descnt"] = \
     estimators.RidgeLogisticRegression(alpha, class_weight=None,
                                        mean=False,
                                        algorithm_params=algorithm_params)
 
 if has_sklearn:
-    MODELS["l2_inter__sklearn"] = \
+    MODELS["2d_l2_inter_sklearn"] = \
         sklearn.linear_model.LogisticRegression(C=1. / alpha,
                                                 fit_intercept=True,
                                                 class_weight=None,
                                                 dual=False)
 
-MODELS["l2_inter__grad_descnt"] = \
+MODELS["2d_l2_inter_grad_descnt"] = \
     estimators.RidgeLogisticRegression(alpha, class_weight=None,
                                        mean=False,
                                        penalty_start=1,
                                        algorithm_params=algorithm_params)
 
 if has_sklearn:
-    MODELS["l1__sklearn"] = \
+    MODELS["2d_l1_sklearn"] = \
         sklearn.linear_model.LogisticRegression(C=1. / alpha, penalty="l1",
                                                 fit_intercept=False,
                                                 class_weight=None,
                                                 dual=False)
-MODELS["l1__fista"] = \
+MODELS["2d_l1_fista"] = \
     estimators.ElasticNetLogisticRegression(alpha=alpha, l=1.,
                                             class_weight=None,
                                             mean=False,
                                             algorithm_params=algorithm_params)
 
 if has_sklearn:
-    MODELS["l1_inter__sklearn"] = \
+    MODELS["2d_l1_inter_sklearn"] = \
         sklearn.linear_model.LogisticRegression(C=1. / alpha, penalty="l1",
                                                 fit_intercept=True,
                                                 class_weight=None,
                                                 dual=False)
 
-MODELS["l1_inter__fista"] = \
+MODELS["2d_l1_inter_fista"] = \
     estimators.ElasticNetLogisticRegression(alpha=alpha, l=1.,
                                             class_weight=None,
                                             mean=False,
@@ -207,23 +211,23 @@ MODELS["l1_inter__fista"] = \
 
 ## Enet + fista
 if has_sklearn:
-    MODELS["l1l2__sklearn"] = \
+    MODELS["2d_l1l2_sklearn"] = \
         sklearn.linear_model.SGDClassifier(loss='log', penalty='elasticnet',
                                            alpha=alpha / 1000 * n_train,
                                            l1_ratio=.5,
                                            fit_intercept=False)
-MODELS["l1l2__fista"] = \
+MODELS["2d_l1l2_fista"] = \
     estimators.ElasticNetLogisticRegression(alpha=alpha / 10, l=.5,
                                             algorithm_params=algorithm_params)
 
 
-MODELS["l1l2_inter__sklearn"] = \
+MODELS["2d_l1l2_inter_sklearn"] = \
     sklearn.linear_model.SGDClassifier(loss='log', penalty='elasticnet',
                                        alpha=alpha / 1000 * n_train,
                                        l1_ratio=.5,
                                        fit_intercept=True)
 
-MODELS["l1l2_inter__fista"] = \
+MODELS["2d_l1l2_inter_fista"] = \
     estimators.ElasticNetLogisticRegression(alpha=alpha / 10, l=.5,
                                             penalty_start=1,
                                             algorithm_params=algorithm_params)
@@ -237,44 +241,83 @@ MODELS["l1l2_inter__fista"] = \
 A, n_compacts = nesterov_tv.linear_operator_from_shape(beta3d.shape)
 l1, l2, tv = alpha * np.array((.05, .65, .3))  # l2, l1, tv penalties
 
-MODELS["l1l2tv__fista"] = \
-    estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
-            algorithm=algorithms.proximal.FISTA(),
-            algorithm_params=algorithm_params)
+MODELS["2d_l1l2tv_fista"] = \
+    estimators.LogisticRegressionL1L2TV(
+        l1, l2, tv, A,
+        algorithm=algorithms.proximal.FISTA(),
+        algorithm_params=algorithm_params)
 
-MODELS["l1l2tv_inter__fista"] = \
-    estimators.LogisticRegressionL1L2TV(l1, l2, tv, A, penalty_start=1,
-            algorithm=algorithms.proximal.FISTA(),
-            algorithm_params=algorithm_params)
+MODELS["2d_l1l2tv_inter_fista"] = \
+    estimators.LogisticRegressionL1L2TV(
+        l1, l2, tv, A, penalty_start=1,
+        algorithm=algorithms.proximal.FISTA(),
+        algorithm_params=algorithm_params)
 
 
-MODELS["l1l2tv__static_conesta"] = \
-    estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
-            algorithm=algorithms.proximal.StaticCONESTA(),
-            algorithm_params=algorithm_params)
+MODELS["2d_l1l2tv_static_conesta"] = \
+    estimators.LogisticRegressionL1L2TV(
+        l1, l2, tv, A,
+        algorithm=algorithms.proximal.StaticCONESTA(),
+        algorithm_params=algorithm_params)
 
-MODELS["l1l2tv_inter__static_conesta"] = \
-    estimators.LogisticRegressionL1L2TV(l1, l2, tv, A, penalty_start=1,
-            algorithm=algorithms.proximal.StaticCONESTA(),
-            algorithm_params=algorithm_params)
+MODELS["2d_l1l2tv_inter_static_conesta"] = \
+    estimators.LogisticRegressionL1L2TV(
+        l1, l2, tv, A, penalty_start=1,
+        algorithm=algorithms.proximal.StaticCONESTA(),
+        algorithm_params=algorithm_params)
 
-MODELS["l1l2tv__conesta"] = \
-    estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
-            algorithm=algorithms.proximal.CONESTA(),
-            algorithm_params=algorithm_params)
+MODELS["2d_l1l2tv_conesta"] = \
+    estimators.LogisticRegressionL1L2TV(
+        l1, l2, tv, A,
+        algorithm=algorithms.proximal.CONESTA(),
+        algorithm_params=algorithm_params)
 
-MODELS["l1l2tv_inter__conesta"] = \
-    estimators.LogisticRegressionL1L2TV(l1, l2, tv, A, penalty_start=1,
-            algorithm=algorithms.proximal.CONESTA(),
-            algorithm_params=algorithm_params)
+MODELS["2d_l1l2tv_inter_conesta"] = \
+    estimators.LogisticRegressionL1L2TV(
+        l1, l2, tv, A, penalty_start=1,
+        algorithm=algorithms.proximal.CONESTA(),
+        algorithm_params=algorithm_params)
 
 Al1tv = l1tv.linear_operator_from_shape(shape, np.prod(shape))
-MODELS["l1l2tv_inexactfista"] = \
-    estimators.LogisticRegressionL1L2TVInexactFISTA(l1, l2, tv, Al1tv,
-            algorithm_params=algorithm_params)
+MODELS["2d_l1l2tv_inexactfista"] = \
+    estimators.LogisticRegressionL1L2TVInexactFISTA(
+        l1, l2, tv, Al1tv,
+        algorithm_params=algorithm_params)
 
-MODELS["l1l2tv__inter_inexactfista"] = \
-    estimators.LogisticRegressionL1L2TVInexactFISTA(l1, l2, tv, Al1tv,
+MODELS["2d_l1l2tv_inter_inexactfista"] = \
+    estimators.LogisticRegressionL1L2TVInexactFISTA(
+        l1, l2, tv, Al1tv,
+        penalty_start=1,
+        algorithm_params=algorithm_params)
+
+## Get data structure from mesh
+
+# build a cylinder mesh with the same topology than the 2D grid
+xyz, tri = mesh.cylinder(shape[1], shape[0])
+Atvmesh, n_compacts = nesterov_tv.linear_operator_from_mesh(xyz, tri)
+
+MODELS["mesh_l1l2tv_conesta"] = \
+    estimators.LogisticRegressionL1L2TV(
+        l1, l2, tv, Atvmesh,
+        algorithm=algorithms.proximal.CONESTA(),
+        algorithm_params=algorithm_params)
+
+MODELS["mesh_l1l2tv_inter_conesta"] = \
+    estimators.LogisticRegressionL1L2TV(
+        l1, l2, tv, Atvmesh,
+        penalty_start=1,
+        algorithm=algorithms.proximal.CONESTA(),
+        algorithm_params=algorithm_params)
+
+Atvl1mesh = l1tv.linear_operator_from_mesh(xyz, tri)
+MODELS["mesh_l1l2tv_inexactfista"] = \
+    estimators.LogisticRegressionL1L2TVInexactFISTA(
+        l1, l2, tv, Atvl1mesh,
+        algorithm_params=algorithm_params)
+
+MODELS["mesh_l1l2tv_inter_inexactfista"] = \
+    estimators.LogisticRegressionL1L2TVInexactFISTA(
+        l1, l2, tv, Atvl1mesh,
         penalty_start=1,
         algorithm_params=algorithm_params)
 
@@ -287,31 +330,36 @@ def test_fit_all():
     for model_key in MODELS:
         yield fit_model, model_key
 
+
 def test_weights_calculated_vs_precomputed():
     global MODELS
     for model_key in MODELS:
         if hasattr(MODELS[model_key], "beta"):
             yield assert_weights_calculated_vs_precomputed, model_key
 
+
 def assert_weights_calculated_vs_precomputed(model_key):
     utils.testing.assert_close_vectors(
-        MODELS[model_key].beta ,
+        MODELS[model_key].beta,
         WEIGHTS_TRUTH[model_key],
         "%s: calculated weights differ from precomputed" % model_key,
         slope_tol=2e-2, corr_tol=1e-2)
 
-def test_weights_vs_sklearn():
-    if "l2__sklearn" in MODELS:
-        utils.testing.assert_close_vectors(
-            MODELS["l2__sklearn"].coef_,
-            MODELS["l2__grad_descnt"].beta,
-            "l2, sklearn vs prsmy", slope_tol=5e-2, corr_tol=5e-2, n2_tol=.2)
 
-    if "l2_inter__sklearn" in MODELS:
+def test_weights_vs_sklearn():
+    if "2d_l2_sklearn" in MODELS:
         utils.testing.assert_close_vectors(
-            MODELS["l2_inter__sklearn"].coef_,
-            MODELS["l2_inter__grad_descnt"].beta[1:],
-            "l2_inter, sklearn vs prsmy", slope_tol=5e-2, corr_tol=5e-2, n2_tol=.4)
+            MODELS["2d_l2_sklearn"].coef_,
+            MODELS["2d_l2_grad_descnt"].beta,
+            "2d_l2, sklearn vs prsmy", slope_tol=5e-2,
+            corr_tol=5e-2, n2_tol=.35)
+
+    if "2d_l2_inter_sklearn" in MODELS:
+        utils.testing.assert_close_vectors(
+            MODELS["2d_l2_inter_sklearn"].coef_,
+            MODELS["2d_l2_inter_grad_descnt"].beta[1:],
+            "2d_l2_inter, sklearn vs prsmy",
+            slope_tol=5e-2, corr_tol=5e-2, n2_tol=.4)
 
 
 if __name__ == "__main__":
@@ -320,10 +368,12 @@ if __name__ == "__main__":
                         help="Run tests")
     parser.add_argument('-p', '--plot', action='store_true', default=False,
                         help="Fit models and plot weight maps")
-    parser.add_argument('-s', '--save_weights', action='store_true', default=False,
-                        help="Fit models, plot weight maps and save it into npz file")
-    parser.add_argument('-m', '--models', help="test only models listed as args."
-                        "Possible models:" + ",".join(MODELS.keys()))
+    parser.add_argument('-s', '--save_weights', action='store_true',
+                        default=False,
+                        help="Fit models, plot weight maps and save it "
+                        "into npz file")
+    parser.add_argument('-m', '--models', help="test only models listed as "
+                        "args. Possible models:" + ",".join(MODELS.keys()))
     options = parser.parse_args()
 
     if options.models:
@@ -342,14 +392,15 @@ if __name__ == "__main__":
 
     if options.save_weights:
         fit_all(MODELS)
-        utils.plot.plot_map2d_of_models(MODELS, nrow=3, ncol=7, shape=shape,
+        utils.plot.plot_map2d_of_models(MODELS, nrow=4, ncol=6, shape=shape,
                                         title_attr="__title__")
         if raw_input("Save weights ? [n]/y") == "y":
-            utils.testing.save_weights(MODELS, weights_filename(shape, n_samples))
+            utils.testing.save_weights(MODELS,
+                                       weights_filename(shape, n_samples))
             import string
             print "Weights saved in", weights_filename(shape, n_samples)
-            dataset_filename = string.replace(weights_filename(shape, n_samples),
-                                              "weights", "dataset")
+            dataset_filename = string.replace(
+                weights_filename(shape, n_samples), "weights", "dataset")
             np.savez_compressed(file=dataset_filename,
                                 X3d=X3d, y=y, beta3d=beta3d, proba=proba)
             print "Dataset saved in", dataset_filename
@@ -360,4 +411,5 @@ if __name__ == "__main__":
 
     if options.plot:
         fit_all(MODELS)
-        utils.plot.plot_map2d_of_models(MODELS, nrow=3, ncol=7, shape=shape, title_attr="__title__")
+        utils.plot.plot_map2d_of_models(MODELS, nrow=3, ncol=7, shape=shape,
+                                        title_attr="__title__")

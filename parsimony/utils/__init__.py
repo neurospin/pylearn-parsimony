@@ -21,6 +21,7 @@ from . import start_vectors
 from . import stats
 from . import testing
 from . import penalties
+from . import mesh
 
 
 __all__ = ["time_cpu", "time_wall", "time", "deprecated",
@@ -29,4 +30,4 @@ __all__ = ["time_cpu", "time_wall", "time", "deprecated",
            "plot_map2d",
            "class_weight_to_sample_weight", "check_labels",
            "consts", "maths", "linalgs", "resampling", "start_vectors",
-           "stats", "testing", "penalties"]
+           "stats", "testing", "penalties", "mesh"]
