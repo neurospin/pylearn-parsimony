@@ -12,6 +12,36 @@ import numpy as np
 from parsimony.utils import check_arrays
 from parsimony.utils import class_weight_to_sample_weight, check_labels
 
+
+def l1_max_linear_loss(X, y, mean=True):
+    """Estimate class weights for unbalanced datasets.
+
+    Parameters
+    ----------
+    X : array-like, shape (n_samples, n_features)
+        Array of input data;
+
+    y : array-like, shape (n_samples, 1)
+        Target values
+
+    mean : Boolean. Whether to compute the squared loss or the mean squared
+            loss. Default is True, the mean squared loss.
+
+    Returns
+    -------
+    l1_max : scalar
+        Maximum l1 pentlty to avoid null solution
+
+    Example
+    -------
+    """
+    X, y = check_arrays(X, check_labels(y))
+    n = float(X.shape[0])
+    scale = 1.0 / n if mean else 1.
+    l1_max = scale * np.abs(np.dot(X.T, y)).max()
+    return 0.95 * l1_max
+
+
 def l1_max_logistic_loss(X, y, mean=True, class_weight=None):
     """Estimate class weights for unbalanced datasets.
 
@@ -46,5 +76,5 @@ def l1_max_logistic_loss(X, y, mean=True, class_weight=None):
 
     n = float(X.shape[0])
     scale = 1.0 / n if mean else 1.
-    l1_max =  scale * np.abs(np.dot(X.T, sample_weight * (y - 0.5))).max()
+    l1_max = scale * np.abs(np.dot(X.T, sample_weight * (y - 0.5))).max()
     return 0.95 * l1_max
