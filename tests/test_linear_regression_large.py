@@ -17,7 +17,6 @@ import parsimony.functions.nesterov.tv as nesterov_tv
 import parsimony.estimators as estimators
 import parsimony.algorithms as algorithms
 import parsimony.utils as utils
-import sklearn.linear_model
 import parsimony.config as config
 from parsimony.utils.stats import r2_score
 

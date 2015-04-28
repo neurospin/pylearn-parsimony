@@ -170,11 +170,11 @@ class TotalVariation(properties.NesterovFunction,
 
         elif self._lambda_max is None:
 
-            from parsimony.algorithms.nipals import FastSparseSVD
+            from parsimony.algorithms.nipals import RankOneSparseSVD
 
             A = sparse.vstack(self.A())
             # TODO: Add max_iter here!
-            v = FastSparseSVD().run(A)  # , max_iter=max_iter)
+            v = RankOneSparseSVD().run(A)  # , max_iter=max_iter)
             us = A.dot(v)
             self._lambda_max = np.sum(us ** 2.0)
 

@@ -807,11 +807,11 @@ class NesterovFunction(Gradient,
         # should allow dense matrices as well.
         if self._lambda_max is None:
 
-            from parsimony.algorithms.nipals import FastSparseSVD
+            from parsimony.algorithms.nipals import RankOneSparseSVD
 
             A = sparse.vstack(self.A())
             # TODO: Add max_iter here!
-            v = FastSparseSVD().run(A)  # , max_iter=max_iter)
+            v = RankOneSparseSVD().run(A)  # , max_iter=max_iter)
             us = A.dot(v)
             self._lambda_max = np.sum(us ** 2.0)
 
@@ -878,12 +878,12 @@ class NesterovFunction(Gradient,
 
             def step(self, x, index=0):
                 if self._step is None:
-                    from parsimony.algorithms.nipals import FastSparseSVD
+                    from parsimony.algorithms.nipals import RankOneSparseSVD
 
                     # TODO: Avoid stacking here.
                     A = sparse.vstack(self.A)
                     # TODO: Add max_iter here!
-                    v = FastSparseSVD().run(A)  # , max_iter=max_iter)
+                    v = RankOneSparseSVD().run(A)  # , max_iter=max_iter)
                     us = A.dot(v)
                     l = np.sum(us ** 2.0)
 
