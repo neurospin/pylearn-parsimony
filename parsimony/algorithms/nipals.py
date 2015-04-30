@@ -117,12 +117,14 @@ class RankOneSVD(bases.ImplicitAlgorithm,
     """
     INFO_PROVIDED = [utils.Info.ok,
                      utils.Info.time,
-                     utils.Info.func_val]
+                     utils.Info.func_val,
+                     utils.Info.converged]
 
     def __init__(self, eps=consts.TOLERANCE,
                  max_iter=consts.MAX_ITER, min_iter=1, info=[]):
 
         super(RankOneSVD, self).__init__(info=info)
+
         self.max_iter = max_iter
         self.min_iter = min_iter
         self.eps = eps
@@ -143,23 +145,33 @@ class RankOneSVD(bases.ImplicitAlgorithm,
         if self.info_requested(utils.Info.time):
             _t = utils.time()
 
-        if has_svds:
-            if start_vector is not None:
-                v0 = start_vector.get_vector(np.min(X.shape))
-            else:
-                v0 = None
+        if start_vector is None:
+            start_vector = start_vectors.RandomStartVector(normalise=True)
 
-            [_, _, v] = sparse_linalg.svds(X, k=1, v0=v0,
-                                           tol=self.eps, maxiter=self.max_iter,
-                                           return_singular_vectors=True)
+        v0 = start_vector.get_vector(np.min(X.shape))
+
+        arpack_failed = False
+        try:
+
+            try:
+                [_, _, v] = sparse_linalg.svds(X, k=1, v0=v0,
+                                               tol=self.eps,
+                                               maxiter=self.max_iter,
+                                               return_singular_vectors=True)
+            except TypeError:  # For scipy 0.9.0.
+                [_, _, v] = sparse_linalg.svds(X, k=1, tol=self.eps)
+
             v = v.T
 
-        else:
-            if start_vector is None:
-                start_vector = start_vectors.RandomStartVector(normalise=True)
+            if self.info_requested(utils.Info.converged):
+                self.info_set(utils.Info.converged, True)
+
+        except ArpackNoConvergence:
+            arpack_failed = True
+
+        if arpack_failed:  # Use the power method if this happens.
 
             M, N = X.shape
-
             if M < 80 and N < 80:  # Very arbitrary threshold from one computer
 
                 _, _, V = scipy.linalg.svd(X, full_matrices=True)
@@ -168,7 +180,7 @@ class RankOneSVD(bases.ImplicitAlgorithm,
             elif M < N:
 
                 K = np.dot(X, X.T)
-                t = start_vector.get_vector(X.shape[0])
+                t = v0
                 for it in xrange(self.max_iter):
                     t_ = t
                     t = np.dot(K, t_)
@@ -183,7 +195,7 @@ class RankOneSVD(bases.ImplicitAlgorithm,
             else:
 
                 K = np.dot(X.T, X)
-                v = start_vector.get_vector(X.shape[1])
+                v = v0
                 for it in xrange(self.max_iter):
                     v_ = v
                     v = np.dot(K, v_)
