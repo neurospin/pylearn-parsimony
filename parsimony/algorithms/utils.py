@@ -55,6 +55,7 @@ class Info(object):
     betak = "betak"  # The final found vector.
     beta_start = "beta_start"  # The start vector used.
     continuations = "continuations"  # In continuation: Number of continuations
+    verbose = "verbose"  # Tell algo to be verbose
 
 
 def direct_vector(v):

@@ -254,7 +254,8 @@ class FISTA(bases.ExplicitAlgorithm,
                      Info.fvalue,  # <-- To be deprecated!
                      Info.func_val,
                      Info.converged,
-                     Info.gap]
+                     Info.gap,
+                     Info.verbose]
 
     def __init__(self, use_gap=False,
                  info=[], eps=consts.TOLERANCE, max_iter=10000, min_iter=1,
@@ -296,6 +297,9 @@ class FISTA(bases.ExplicitAlgorithm,
             gap_ = []
 
         for i in xrange(1, max(self.min_iter, self.max_iter) + 1):
+
+            if self.info_requested(Info.verbose):
+                print "FISTA ite#", i
 
             if self.info_requested(Info.time):
                 tm = utils.time_cpu()
@@ -410,7 +414,8 @@ class CONESTA(bases.ExplicitAlgorithm,
                      Info.fvalue,
                      Info.func_val,
                      Info.gap,
-                     Info.mu]
+                     Info.mu,
+                     Info.verbose]
 
     def __init__(self, mu_min=consts.TOLERANCE, tau=0.5,
                  info=[], eps=consts.TOLERANCE, max_iter=10000, min_iter=1,
@@ -478,6 +483,8 @@ class CONESTA(bases.ExplicitAlgorithm,
 
         i = 0  # Iteration counter.
         while True:
+            if self.info_requested(Info.verbose):
+                print "CONESTA ite#", i
             converged = False
 
             # Current precision.
