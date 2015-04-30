@@ -744,21 +744,21 @@ class LinearRegressionL1L2TV(RegressionEstimator):
     ...                     mean=False)
     >>> res = lr.fit(X, y)
     >>> round(lr.score(X, y), 13)
-    0.0683615474525
+    0.0683583406798
     >>>
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                                algorithm=proximal.FISTA(max_iter=1000),
     ...                                mean=False)
     >>> lr = lr.fit(X, y)
     >>> round(lr.score(X, y), 13)
-    1.3549228767247
+    1.5817577127184
     >>>
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                                 algorithm=proximal.ISTA(max_iter=1000),
     ...                                 mean=False)
     >>> lr = lr.fit(X, y)
     >>> round(lr.score(X, y), 14)
-    1.92290672778289
+    2.07583068899674
     >>>
     >>> import parsimony.functions.nesterov.l1tv as l1tv
     >>> np.random.seed(1337)

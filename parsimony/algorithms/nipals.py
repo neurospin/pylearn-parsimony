@@ -312,31 +312,31 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
         if self.info_requested(utils.Info.converged):
             self.info_set(utils.Info.converged, False)
 
-        arpack_failed = False
-        if has_svds:
-            if start_vector is not None:
-                v0 = start_vector.get_vector(np.min(X.shape))
-            else:
-                v0 = None
+#        arpack_failed = False
+#        if has_svds:
+#            if start_vector is not None:
+#                v0 = start_vector.get_vector(np.min(X.shape))
+#            else:
+#                v0 = None
+#
+#            from scipy.sparse.linalg import ArpackNoConvergence
+#
+#            try:
+#
+#                [_, _, v] = sparse_linalg.svds(X, k=1, v0=v0,
+#                                               tol=self.eps,
+#                                               maxiter=self.max_iter,
+#                                               return_singular_vectors=True)
+#                v = v.T
+#
+#                if self.info_requested(utils.Info.converged):
+#                    self.info_set(utils.Info.converged, True)
+#
+#            except ArpackNoConvergence:
+#
+#                arpack_failed = True
 
-            from scipy.sparse.linalg import ArpackNoConvergence
-
-            try:
-
-                [_, _, v] = sparse_linalg.svds(X, k=1, v0=v0,
-                                               tol=self.eps,
-                                               maxiter=self.max_iter,
-                                               return_singular_vectors=True)
-                v = v.T
-
-                if self.info_requested(utils.Info.converged):
-                    self.info_set(utils.Info.converged, True)
-
-            except ArpackNoConvergence:
-
-                arpack_failed = True
-
-        if not has_svds or arpack_failed:
+        if True:  # not has_svds or arpack_failed:
 
             if start_vector is None:
                 start_vector = start_vectors.RandomStartVector(normalise=True)
@@ -350,7 +350,7 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
                 for it in xrange(self.max_iter):
                     t_ = t
                     t = K.dot(t_)
-                    t *= 1.0 / maths.norm(t ** 2.0)
+                    t *= 1.0 / maths.norm(t)
 
                     crit = float(maths.norm(t_ - t)) / float(maths.norm(t))
                     if crit < consts.TOLERANCE:
@@ -361,7 +361,7 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
                         break
 
                 v = X.T.dot(t)
-                v *= 1.0 / maths.norm(v ** 2.0)
+                v *= 1.0 / maths.norm(v)
 
             else:
 
@@ -370,7 +370,7 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
                 for it in xrange(self.max_iter):
                     v_ = v
                     v = K.dot(v_)
-                    v *= 1.0 / maths.norm(v ** 2.0)
+                    v *= 1.0 / maths.norm(v)
 
                     crit = float(maths.norm(v_ - v)) / float(maths.norm(v))
                     if crit < consts.TOLERANCE:
