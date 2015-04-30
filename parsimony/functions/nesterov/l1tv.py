@@ -370,7 +370,8 @@ def linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0,
                                            mesh_triangles=mesh_triangles,
                                            mask=mask, offset=offset,
                                            weights=weights)
-    Al1 = l1.linear_operator_from_variables(mesh_coord.shape[0],
+    num_variables = mask.sum() if not mask is None else mesh_coord.shape[0]
+    Al1 = l1.linear_operator_from_variables(num_variables,
                                             penalty_start=offset)
 
     return [Al1[0]] + Atv
