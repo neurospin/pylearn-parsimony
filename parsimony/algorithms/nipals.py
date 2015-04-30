@@ -34,6 +34,8 @@ import parsimony.functions.penalties as penalties
 
 try:
     import scipy.sparse.linalg as sparse_linalg
+    from scipy.sparse.linalg import ArpackNoConvergence
+
     if sparse_linalg.svds:
         has_svds = True
     else:
@@ -312,41 +314,32 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
         if self.info_requested(utils.Info.converged):
             self.info_set(utils.Info.converged, False)
 
-#        arpack_failed = False
-#        if has_svds:
-#            if start_vector is not None:
-#                v0 = start_vector.get_vector(np.min(X.shape))
-#            else:
-#                v0 = None
-#
-#            from scipy.sparse.linalg import ArpackNoConvergence
-#
-#            try:
-#
-#                [_, _, v] = sparse_linalg.svds(X, k=1, v0=v0,
-#                                               tol=self.eps,
-#                                               maxiter=self.max_iter,
-#                                               return_singular_vectors=True)
-#                v = v.T
-#
-#                if self.info_requested(utils.Info.converged):
-#                    self.info_set(utils.Info.converged, True)
-#
-#            except ArpackNoConvergence:
-#
-#                arpack_failed = True
+        if start_vector is None:
+            start_vector = start_vectors.RandomStartVector(normalise=True)
 
-        if True:  # not has_svds or arpack_failed:
+        v0 = start_vector.get_vector(np.min(X.shape))
 
-            if start_vector is None:
-                start_vector = start_vectors.RandomStartVector(normalise=True)
+        arpack_failed = False
+        try:
+            [_, _, v] = sparse_linalg.svds(X, k=1, v0=v0,
+                                           tol=self.eps,
+                                           maxiter=self.max_iter,
+                                           return_singular_vectors=True)
+            v = v.T
+
+            if self.info_requested(utils.Info.converged):
+                self.info_set(utils.Info.converged, True)
+
+        except ArpackNoConvergence:
+            arpack_failed = True
+
+        if arpack_failed:  # Use the power method.
 
             M, N = X.shape
-
             if M < N:
 
                 K = X.dot(X.T)
-                t = start_vector.get_vector(X.shape[0])
+                t = v0
                 for it in xrange(self.max_iter):
                     t_ = t
                     t = K.dot(t_)
@@ -366,7 +359,7 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
             else:
 
                 K = X.T.dot(X)
-                v = start_vector.get_vector(X.shape[1])
+                v = v0
                 for it in xrange(self.max_iter):
                     v_ = v
                     v = K.dot(v_)
