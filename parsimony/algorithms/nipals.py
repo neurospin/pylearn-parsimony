@@ -44,7 +44,8 @@ try:
 except:
     has_svds = False
 
-__all__ = ["RankOneSVD", "RankOneSparseSVD", "FastSVDProduct", "PLSR"]
+__all__ = ["RankOneSVD", "RankOneSparseSVD", "RankOneSVDProduct",
+           "PLSR", "SparsePLSR"]
 
 # TODO: Add information about the runs.
 
@@ -304,6 +305,7 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
                  max_iter=consts.MAX_ITER, min_iter=1, info=[]):
 
         super(RankOneSparseSVD, self).__init__(info=info)
+
         self.max_iter = max_iter
         self.min_iter = min_iter
         self.eps = eps
@@ -406,16 +408,68 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
 FastSparseSVD = RankOneSparseSVD
 
 
-class FastSVDProduct(bases.ImplicitAlgorithm):
+class RankOneSVDProduct(bases.ImplicitAlgorithm,
+                        bases.InformationAlgorithm):
+    """A kernel SVD implementation of a product of two matrices, X and Y.
+    I.e. the SVD of np.dot(X, Y), but the SVD is computed without actually
+    computing the matrix product.
 
-    def run(self, X, Y, start_vector=None,
-            eps=consts.TOLERANCE, max_iter=100, min_iter=1):
-        """A kernel SVD implementation of a product of two matrices, X and Y.
-        I.e. the SVD of np.dot(X, Y), but the SVD is computed without actually
-        computing the matrix product.
+    The rank-one SVD corresponds to the following optimization problem:
 
-        Performs SVD of a given matrix. This is always faster than
-        np.linalg.svd when extracting only one, or a few, vectors.
+        max. ||XYv||_2 = sigma_max(XY)
+        s.t. ||v||_2 = 1,
+
+    where ||.||_2 is the 2-norm.
+
+    Performs SVD of a given matrix. This is always faster than np.linalg.svd
+    when extracting only one, or a few, vectors.
+
+    Parameters
+    ----------
+    eps : Positive float. The tolerance used by the stopping criterion.
+
+    max_iter : Non-negative integer. Maximum allowed number of iterations.
+            Default is consts.MAX_ITER.
+
+    min_iter : Non-negative integer. Minimum allowed number of iterations.
+            Default is 1.
+
+    Returns
+    -------
+    v : Numpy array. The right singular vector of np.dot(X, Y) that
+            corresponds to the largest singular value of np.dot(X, Y).
+
+    Example
+    -------
+    >>> import numpy as np
+    >>> from parsimony.algorithms.nipals import RankOneSVDProduct
+    >>> np.random.seed(0)
+    >>> X = np.random.random((15,10))
+    >>> Y = np.random.random((10,5))
+    >>> fast_svd = RankOneSVDProduct()
+    >>> fast_svd.run(X, Y)
+    array([[ 0.47169804],
+           [ 0.38956366],
+           [ 0.41397845],
+           [ 0.52493576],
+           [ 0.42285389]])
+    """
+    INFO_PROVIDED = [utils.Info.ok,
+                     utils.Info.time,
+                     utils.Info.func_val,
+                     utils.Info.converged]
+
+    def __init__(self, eps=consts.TOLERANCE,
+                 max_iter=consts.MAX_ITER, min_iter=1, info=[]):
+
+        super(RankOneSVDProduct, self).__init__(info=info)
+
+        self.eps = eps
+        self.max_iter = max_iter
+        self.min_iter = min_iter
+
+    def run(self, X, Y, start_vector=None):
+        """Find the right-singular vector of the product of two matrices.
 
         Parameters
         ----------
@@ -423,51 +477,50 @@ class FastSVDProduct(bases.ImplicitAlgorithm):
 
         Y : Numpy array with shape (p, m). The second matrix of the product.
 
-        start_vector : Numpy array. The start vector.
-
-        eps : Float. Tolerance.
-
-        max_iter : Integer. Maximum number of iterations.
-
-        min_iter : Integer. Minimum number of iterations.
-
-        Returns
-        -------
-        v : Numpy array. The right singular vector of np.dot(X, Y) that
-                corresponds to the largest singular value of np.dot(X, Y).
-
-        Example
-        -------
-        >>> import numpy as np
-        >>> from parsimony.algorithms.nipals import FastSVDProduct
-        >>> np.random.seed(0)
-        >>> X = np.random.random((15,10))
-        >>> Y = np.random.random((10,5))
-        >>> fast_svd = FastSVDProduct()
-        >>> fast_svd.run(X, Y)
-        array([[ 0.47169804],
-               [ 0.38956366],
-               [ 0.41397845],
-               [ 0.52493576],
-               [ 0.42285389]])
+        start_vector : BaseStartVector. A start vector generator. Default is to
+                use a random start vector.
         """
+        if self.info_requested(utils.Info.ok):
+            self.info_set(utils.Info.ok, False)
+
+        if self.info_requested(utils.Info.time):
+            _t = utils.time()
+
+        if self.info_requested(utils.Info.converged):
+            self.info_set(utils.Info.converged, False)
+
         M, N = X.shape
 
         if start_vector is None:
             start_vector = start_vectors.RandomStartVector(normalise=True)
+
         v = start_vector.get_vector(Y.shape[1])
 
-        for it in xrange(1, max_iter + 1):
+        for it in xrange(1, self.max_iter + 1):
             v_ = v
             v = np.dot(X, np.dot(Y, v_))
             v = np.dot(Y.T, np.dot(X.T, v))
-            v *= 1.0 / np.sqrt(np.sum(v ** 2.0))
+            v *= 1.0 / maths.norm(v)
 
-            if np.sqrt(np.sum((v_ - v) ** 2.0)) < eps \
-                    and it >= min_iter:
+            if maths.norm(v_ - v) / maths.norm(v) < self.eps \
+                    and it >= self.min_iter:
+
+                if self.info_requested(utils.Info.converged):
+                    self.info_set(utils.Info.converged, True)
+
                 break
 
-        return v
+        if self.info_requested(utils.Info.time):
+            self.info_set(utils.Info.time, utils.time() - _t)
+        if self.info_requested(utils.Info.func_val):
+            _f = maths.norm(np.dot(X, np.dot(Y, v)))  # Largest singular value.
+            self.info_set(utils.Info.func_val, _f)
+        if self.info_requested(utils.Info.ok):
+            self.info_set(utils.Info.ok, True)
+
+        return utils.direct_vector(v)
+
+FastSVDProduct = RankOneSVDProduct
 
 
 class PLSR(bases.ImplicitAlgorithm,
