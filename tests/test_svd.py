@@ -11,6 +11,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 import unittest
 
 import numpy as np
+import scipy as sp
 
 from parsimony.algorithms.nipals import RankOneSVD
 from parsimony.algorithms.nipals import RankOneSparseSVD
@@ -59,6 +60,19 @@ class TestSVD(TestCase):
 
         return err
 
+    def get_err_by_sp_sparse_linalg_svds(self, computed_v, X):
+        # svd from numpy array
+        X = sp.sparse.csr_matrix(X)
+
+        U, s_np, V = sp.sparse.linalg.svds(X, k=1)
+        np_v = V[[0], :].T
+
+        sign = np.dot(computed_v.T, np_v)[0][0]
+        np_v_new = np_v * sign
+        err = np.linalg.norm(computed_v - np_v_new)
+
+        return err
+
     def get_err_fast_svd(self, nrow, ncol):
         np.random.seed(0)
         X = np.random.random((nrow, ncol))
@@ -89,7 +103,8 @@ class TestSVD(TestCase):
         # svd from parsimony
         fast_sparse_svd = RankOneSparseSVD(max_iter=1000)
         parsimony_v = fast_sparse_svd.run(X)
-        return self.get_err_by_np_linalg_svd(parsimony_v, X)
+#        return self.get_err_by_np_linalg_svd(parsimony_v, X)
+        return self.get_err_by_sp_sparse_linalg_svds(parsimony_v, X)
 
     def test_fast_sparse_svd(self):
         err = self.get_err_fast_sparse_svd(50, 50, density=0.1)

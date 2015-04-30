@@ -639,8 +639,8 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
     >>> static_conesta = StaticCONESTA(max_iter=10000)
     >>> beta1 = static_conesta.run(function, np.zeros((50, 1)))
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
-    >>> round(np.linalg.norm(beta1 - beta2), 12)
-    0.966290706098
+    >>> round(np.linalg.norm(beta1 - beta2), 11)
+    0.9662907061
     """
     INTERFACES = [properties.NesterovFunction,
                   properties.StepSize,

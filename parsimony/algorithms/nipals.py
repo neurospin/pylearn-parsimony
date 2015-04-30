@@ -17,6 +17,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @license: BSD 3-clause.
 """
 import numpy as np
+import scipy as sp
 import scipy.linalg
 
 try:
@@ -321,10 +322,17 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
 
         arpack_failed = False
         try:
-            [_, _, v] = sparse_linalg.svds(X, k=1, v0=v0,
-                                           tol=self.eps,
-                                           maxiter=self.max_iter,
-                                           return_singular_vectors=True)
+            if not sp.sparse.issparse(X):
+                X = sp.sparse.csr_matrix(X)
+
+            try:
+                [_, _, v] = sparse_linalg.svds(X, k=1, v0=v0,
+                                               tol=self.eps,
+                                               maxiter=self.max_iter,
+                                               return_singular_vectors=True)
+            except TypeError:  # For scipy 0.9.0.
+                [_, _, v] = sparse_linalg.svds(X, k=1, tol=self.eps)
+
             v = v.T
 
             if self.info_requested(utils.Info.converged):
@@ -333,7 +341,7 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
         except ArpackNoConvergence:
             arpack_failed = True
 
-        if arpack_failed:  # Use the power method.
+        if arpack_failed:  # Use the power method if this happens.
 
             M, N = X.shape
             if M < N:
