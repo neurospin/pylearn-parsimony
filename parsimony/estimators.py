@@ -731,7 +731,7 @@ class LinearRegressionL1L2TV(RegressionEstimator):
     >>> l1 = 0.1  # L1 coefficient
     >>> l2 = 0.9  # Ridge coefficient
     >>> tv = 1.0  # TV coefficient
-    >>> A, n_compacts = total_variation.linear_operator_from_shape(shape)
+    >>> A = total_variation.linear_operator_from_shape(shape)
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                      algorithm=proximal.StaticCONESTA(max_iter=1000),
     ...                      mean=False)
@@ -1103,7 +1103,7 @@ class LinearRegressionL1L2GL(RegressionEstimator):
 ##    >>> k = 0.9  # ridge regression coefficient
 ##    >>> l = 0.1  # l1 coefficient
 ##    >>> g = 1.0  # tv coefficient
-##    >>> A, n_compacts = tv.linear_operator_from_shape(shape)
+##    >>> A = tv.linear_operator_from_shape(shape)
 ##    >>> ridge_l1_tv = estimators.RidgeRegression_L1_TV(k, l, g, A,
 ##    ...                     algorithm=proximal.StaticCONESTA(max_iter=1000))
 ##    >>> res = ridge_l1_tv.fit(X, y)
@@ -1593,7 +1593,7 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
     >>> l1 = 0.1  # L1 coefficient
     >>> l2 = 0.9  # Ridge coefficient
     >>> tv = 1.0  # TV coefficient
-    >>> A, n_compacts = total_variation.linear_operator_from_shape(shape)
+    >>> A = total_variation.linear_operator_from_shape(shape)
     >>> lr = estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
     ...                      algorithm=proximal.StaticCONESTA(max_iter=1000),
     ...                      mean=False)

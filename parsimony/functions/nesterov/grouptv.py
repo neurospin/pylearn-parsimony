@@ -269,7 +269,7 @@ def linear_operator_from_masks(masks, weights=None):
             weight = weights[g]
 
         # Compute group A matrix
-        Ag, _ = tv.A_from_subset_mask(mask)
+        Ag = tv.linear_operator_from_subset_mask(mask)
 
         # Include the weights
         if weight != 1.0 and weight != 1:
@@ -339,7 +339,7 @@ def linear_operator_from_rects(rects, shape, weights=None):
             weight = weights[g]
 
         # Compute group A matrix
-        Ag, _ = tv.A_from_subset_mask(mask)
+        Ag = tv.linear_operator_from_subset_mask(mask)
 
         # Include the weights
         if weight != 1.0 and weight != 1:

@@ -24,10 +24,9 @@ import parsimony.utils as utils
 
 __all__ = ["TotalVariation",
            "linear_operator_from_mask", "A_from_mask",
-           "linear_operator_from_subset_mask", "A_from_subset_mask",
+           "linear_operator_from_subset_mask",
            "linear_operator_from_shape", "A_from_shape",
-           "linear_operator_from_mesh", "A_from_mesh",
-           "nesterov_linear_operator_from_mesh"]
+           "linear_operator_from_mesh"]
 
 
 class TotalVariation(properties.NesterovFunction,
@@ -377,14 +376,8 @@ def linear_operator_from_mask(mask, offset=0, weights=None):
     Ax = sparse.csr_matrix((Ax_v, (Ax_i, Ax_j)), shape=(p, p))
     Ay = sparse.csr_matrix((Ay_v, (Ay_i, Ay_j)), shape=(p, p))
     Az = sparse.csr_matrix((Az_v, (Az_i, Az_j)), shape=(p, p))
-
-    return [Ax, Ay, Az], n_compacts
-
-
-@utils.deprecated("linear_operator_from_subset_mask")
-def A_from_subset_mask(*args, **kwargs):
-
-    return linear_operator_from_subset_mask(*args, **kwargs)
+    # n_compacts
+    return [Ax, Ay, Az]
 
 
 def linear_operator_from_subset_mask(mask, weights=None):
@@ -469,8 +462,8 @@ def linear_operator_from_subset_mask(mask, weights=None):
     Az = sparse.csr_matrix((Az_v, (Az_i, Az_j)), shape=(p, p))
     Ay = sparse.csr_matrix((Ay_v, (Ay_i, Ay_j)), shape=(p, p))
     Ax = sparse.csr_matrix((Ax_v, (Ax_i, Ax_j)), shape=(p, p))
-
-    return [Ax, Ay, Az], num_compacts
+    #num_compacts
+    return [Ax, Ay, Az]
 
 
 @utils.deprecated("linear_operator_from_shape")
@@ -559,20 +552,8 @@ def linear_operator_from_shape(shape, weights=None):
         Az.eliminate_zeros()
     else:
         Az = sparse.csr_matrix((p, p), dtype=float)
-
-    return [Ax, Ay, Az], (nz * ny * nx - 1)
-
-
-@utils.deprecated("linear_operator_from_mesh")
-def A_from_mesh(*args, **kwargs):
-
-    return linear_operator_from_mesh(*args, **kwargs)
-
-
-@utils.deprecated("linear_operator_from_mesh")
-def nesterov_linear_operator_from_mesh(*args, **kwargs):
-
-    return linear_operator_from_mesh(*args, **kwargs)
+    # n_compacts = , (nz * ny * nx - 1)
+    return [Ax, Ay, Az]
 
 
 def linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0,
@@ -619,8 +600,7 @@ def linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0,
     >>> import parsimony.functions.nesterov.tv as tv_helper
     >>> mesh_coord = np.array([[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2]])
     >>> mesh_triangles = np.array([[0 ,1, 3], [0, 2 ,3], [2, 3, 5], [2, 4, 5]])
-    >>> A, _ = tv_helper.nesterov_linear_operator_from_mesh(mesh_coord,
-    ...                                                     mesh_triangles)
+    >>> A = tv_helper.linear_operator_from_mesh(mesh_coord, mesh_triangles)
     """
     if mask is None:
         mask = np.ones(mesh_coord.shape[0], dtype=bool)
@@ -678,5 +658,5 @@ def linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0,
     p = mask.sum()
     A = [sparse.csr_matrix((A[i][2], (A[i][0], A[i][1])),
                            shape=(p, p)) for i in xrange(len(A))]
-
-    return A, n_compacts
+    # n_compacts
+    return A

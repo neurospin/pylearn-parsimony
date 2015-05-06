@@ -61,7 +61,7 @@ class TestSimulations(TestCase):
         k = 1.0 - l
         g = 1.618
 
-        A, _ = tv.linear_operator_from_shape(shape)
+        A = tv.linear_operator_from_shape(shape)
         snr = 100.0
         eps = 1e-8
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
@@ -255,7 +255,7 @@ class TestSimulations(TestCase):
 #        k = 1.0 - l
 #        g = 1.618
 #
-#        A, _ = tv.linear_operator_from_shape(shape)
+#        A = tv.linear_operator_from_shape(shape)
 #        snr = 100.0
 #        eps = 1e-8
 #        mus = [5e-2, 5e-4, 5e-6, 5e-8]
@@ -535,7 +535,7 @@ class TestSimulations(TestCase):
         k = 1.0 - l
         g = 1.618
 
-        A, _ = tv.linear_operator_from_shape(shape)
+        A = tv.linear_operator_from_shape(shape)
         snr = 100.0
         eps = 1e-8
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
@@ -1406,7 +1406,7 @@ class TestSimulations(TestCase):
 #        k = 1.0 - l
 #        g = 1.618
 #
-#        A, _ = tv.linear_operator_from_shape(shape)
+#        A = tv.linear_operator_from_shape(shape)
 #        snr = 100.0
 #        eps = 1e-8
 #        mus = [5e-2, 5e-4, 5e-6, 5e-8]

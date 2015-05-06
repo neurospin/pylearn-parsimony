@@ -953,7 +953,7 @@ class TestLinearRegression(TestCase):
         k = 0.0
         g = 1.618
 
-        A, _ = tv.linear_operator_from_shape(shape)
+        A = tv.linear_operator_from_shape(shape)
         snr = 20.0
         eps = 1e-8
         max_iter = 5000
@@ -1044,7 +1044,7 @@ class TestLinearRegression(TestCase):
         k = 0.001  # Cannot be zero.
         g = 1.618
 
-        A, _ = tv.linear_operator_from_shape(shape)
+        A = tv.linear_operator_from_shape(shape)
         snr = 20.0
         eps = 1e-8
         max_iter = 8800
@@ -1495,7 +1495,7 @@ class TestLinearRegression(TestCase):
         k = 0.0
         g = 1.618
 
-        A, _ = tv.linear_operator_from_shape(shape)
+        A = tv.linear_operator_from_shape(shape)
         snr = 20.0
         eps = 1e-8
         max_iter = 1800
@@ -1709,7 +1709,7 @@ class TestLinearRegression(TestCase):
         k = 0.618
         g = 1.618
 
-        A, _ = tv.linear_operator_from_shape(shape)
+        A = tv.linear_operator_from_shape(shape)
         snr = 20.0
         eps = 1e-8
         max_iter = 1900
@@ -2086,7 +2086,7 @@ class TestLinearRegression(TestCase):
         k = 1.0 - l
         g = 1.618
 
-        A, _ = tv.linear_operator_from_shape(shape)
+        A = tv.linear_operator_from_shape(shape)
         snr = 100.0
         eps = 1e-8
         max_iter = 1200
@@ -2370,7 +2370,7 @@ class TestLinearRegression(TestCase):
         np.random.seed(42)
 
         shape = (4, 4, 4)
-        A, n_compacts = tv.linear_operator_from_shape(shape)
+        A = tv.linear_operator_from_shape(shape)
 
         n, p = 64, np.prod(shape)
 
@@ -2814,7 +2814,7 @@ class TestLinearRegression(TestCase):
         shape = (pz, py, px)
         n, p = 100, np.prod(shape)
 
-        A, _ = tv.linear_operator_from_shape(shape)
+        A = tv.linear_operator_from_shape(shape)
 
         alpha = 0.9
         Sigma = alpha * np.eye(p, p) \

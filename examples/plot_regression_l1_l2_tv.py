@@ -49,7 +49,7 @@ yte_pred_enet = enet.fit(Xtr, ytr).predict(Xte)
 #    + tv * TV(beta)
 #
 l1, l2, tv = alpha * np.array((.33, .33, .33))  # l1, l2, tv penalties
-A, n_compacts = nesterov_tv.linear_operator_from_shape(shape)
+A = nesterov_tv.linear_operator_from_shape(shape)
 algo = algorithms.proximal.CONESTA(max_iter=500)
 enettv = estimators.LinearRegressionL1L2TV(l1, l2, tv, A, algorithm=algo)
 yte_pred_enettv = enettv.fit(Xtr, ytr).predict(Xte)

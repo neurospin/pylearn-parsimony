@@ -55,7 +55,7 @@ _, recall_ridge_sklrn, _, _ = precision_recall_fscore_support(yte, yte_pred_ridg
 ## Use parsimony l2 penalized LogisticRegression: LogisticRegressionL1L2TV with l1=tv=0
 # Minimize:
 #    f(beta, X, y) = - loglik/n_train + k/2 * ||beta||^2_2
-A, n_compacts = nesterov_tv.linear_operator_from_shape(beta3d.shape)
+A = nesterov_tv.linear_operator_from_shape(beta3d.shape)
 ridge_prsmy = estimators.RidgeLogisticRegression(alpha)
 #ridge_prsmy = estimators.RidgeRegression(alpha)
 
@@ -77,7 +77,7 @@ l1, l2, tv = alpha * np.array((.1, .1, 10.)) #/ 10 # l2, l1, tv penalties
 ## Limit the number of iteration to 500
 conesta = algorithms.proximal.CONESTA(max_iter=500)
 
-A, n_compacts = nesterov_tv.linear_operator_from_shape(beta3d.shape)
+A = nesterov_tv.linear_operator_from_shape(beta3d.shape)
 enettv = estimators.LogisticRegressionL1L2TV(l1, l2, tv, A, algorithm=conesta)
 yte_pred_enettv = enettv.fit(Xtr, ytr).predict(Xte)
 _, recall_enettv, _, _ = precision_recall_fscore_support(yte, yte_pred_enettv, average=None)

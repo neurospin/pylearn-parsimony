@@ -56,7 +56,6 @@ Agl = gl.linear_operator_from_groups(p, [range(0,
                                                int(2.0 * p / 3.0)),
                                          range(int(2.0 * p / 3.0),
                                                p)])
-#Atv, n_compacts = tv.linear_operator_from_shape(shape)
 
 snr = 20.0
 

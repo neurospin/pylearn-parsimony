@@ -180,7 +180,7 @@ MODELS["l1l2_inter__fista"] = \
 #                        + l1 * ||beta||_1
 #                        + (l2 / 2) * ||beta||²_2
 #                        + tv * TV(beta)
-A, n_compacts = nesterov_tv.linear_operator_from_shape(beta3d.shape)
+A = nesterov_tv.linear_operator_from_shape(beta3d.shape)
 l1, l2, tv = alpha * np.array((.05, .65, .3))  # l2, l1, tv penalties
 
 nite_fsta = 70000

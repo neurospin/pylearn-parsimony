@@ -283,7 +283,7 @@ def linear_operator_from_mask(mask, num_variables, penalty_start=0):
             from penalisation. Equivalently, the first index to be penalised.
             Default is 0, all variables are included.
     """
-    Atv, _ = tv.linear_operator_from_mask(mask)
+    Atv = tv.linear_operator_from_mask(mask)
     Al1 = l1.A_from_variables(num_variables, penalty_start=penalty_start)
 
     return [Al1[0]] + Atv
@@ -315,7 +315,7 @@ def linear_operator_from_shape(shape, num_variables, penalty_start=0):
             from penalisation. Equivalently, the first index to be penalised.
             Default is 0, all variables are included.
     """
-    Atv, _ = tv.linear_operator_from_shape(shape)
+    Atv = tv.linear_operator_from_shape(shape)
     Al1 = l1.linear_operator_from_variables(num_variables, penalty_start=penalty_start)
 
     return [Al1[0]] + Atv
@@ -366,10 +366,10 @@ def linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0,
     >>> mesh_triangles = np.array([[0 ,1, 3], [0, 2 ,3], [2, 3, 5], [2, 4, 5]])
     >>> A = tv_helper.linear_operator_from_mesh(mesh_coord,mesh_triangles)
     """
-    Atv, _ = tv.linear_operator_from_mesh(mesh_coord=mesh_coord,
-                                           mesh_triangles=mesh_triangles,
-                                           mask=mask, offset=offset,
-                                           weights=weights)
+    Atv = tv.linear_operator_from_mesh(mesh_coord=mesh_coord,
+                                       mesh_triangles=mesh_triangles,
+                                       mask=mask, offset=offset,
+                                       weights=weights)
     num_variables = mask.sum() if not mask is None else mesh_coord.shape[0]
     Al1 = l1.linear_operator_from_variables(num_variables,
                                             penalty_start=offset)

@@ -167,7 +167,7 @@ You can combine :math:`\ell_1`, :math:`\ell_2` and TV penalties with coefficient
     l1 = 0.1  # l1 penalty
     l2 = 0.1  # l2 penalty
     tv = 0.1  # tv penalty
-    A, n_compacts = tv_helper.linear_operator_from_shape(shape)  # Memory allocation for TV
+    A = tv_helper.linear_operator_from_shape(shape)  # Memory allocation for TV
     tvenet_estimator = estimators.LinearRegressionL1L2TV(l1=l1, l2=l2, tv=tv, A=A)
     tvenet_estimator.fit(X, y)
     print "Estimated beta error =", np.linalg.norm(tvenet_estimator.beta - beta)
@@ -254,7 +254,7 @@ LogisticRegressionL1L2TV estimator with null :math:`l_1, tv` coefficient
     import parsimony.estimators as estimators
     import parsimony.functions.nesterov.tv as tv_helper
     l2 = 0.1  # l2 ridge regression coefficient
-    A, n_compacts = tv_helper.linear_operator_from_shape(shape)
+    A = tv_helper.linear_operator_from_shape(shape)
     ridge_lr_estimator = estimators.LogisticRegressionL1L2TV(l1=0, l2=l2, tv=0, A=A)
     ridge_lr_estimator.fit(X, y)
     print "Estimated prediction rate =", ridge_lr_estimator.score(X, y)
@@ -276,7 +276,7 @@ minimise:
     import parsimony.functions.nesterov.tv as tv_helper
     l1 = 0.1  # l1 lasso coefficient
     l2 = 0.1  # l2 ridge regression coefficient
-    A, n_compacts = tv_helper.linear_operator_from_shape(shape)
+    A = tv_helper.linear_operator_from_shape(shape)
     enet_lr_estimator = estimators.LogisticRegressionL1L2TV(l1=l1, l2=l2, tv=0, A=A)
     enet_lr_estimator.fit(X, y)
     print "Estimated prediction rate =", enet_lr_estimator.score(X, y)
@@ -297,7 +297,7 @@ Finally, you can add a :math:`\mathrm{TV}` penalty minimise:
     l1 = 0.1  # l1 lasso coefficient
     l2 = 0.1  # l2 ridge regression coefficient
     tv = 0.1  # l2 ridge regression coefficient
-    A, n_compacts = tv_helper.linear_operator_from_shape(shape)
+    A = tv_helper.linear_operator_from_shape(shape)
     enettv_lr_estimator = estimators.LogisticRegressionL1L2TV(l1=l1, l2=l2, tv=tv, A=A)
     enettv_lr_estimator.fit(X, y)
     print "Estimated prediction rate =", enettv_lr_estimator.score(X, y)
@@ -349,7 +349,7 @@ switch to CONESTA to minimise the function.
     k = 0.0  # l2 ridge regression coefficient
     l = 0.1  # l1 lasso coefficient
     g = 0.1  # tv coefficient
-    Atv, n_compacts = tv.linear_operator_from_shape(shape)
+    Atv = tv.linear_operator_from_shape(shape)
     tvl1l2_conesta = estimators.LinearRegressionL1L2TV(
                                           k, l, g, A=Atv,
                                           algorithm=algorithms.proximal.CONESTA())
@@ -368,8 +368,6 @@ positive.
     import scipy.sparse as sparse
     import parsimony.functions.nesterov.l1tv as l1tv
     import parsimony.algorithms.primaldual as primaldual
-    #Atv, n_compacts = tv.linear_operator_from_shape(shape)
-    #Al1 = sparse.eye(num_ft, num_ft)
     A = l1tv.linear_operator_from_shape(shape, num_ft, penalty_start=0)
     Al1 = A[0]
     Atv = A[1:]

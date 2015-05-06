@@ -238,7 +238,7 @@ MODELS["2d_l1l2_inter_fista"] = \
 #                    + k/2 * ||beta||^2_2
 #                    + l * ||beta||_1
 #                    + g * TV(beta)
-A, n_compacts = nesterov_tv.linear_operator_from_shape(beta3d.shape)
+A = nesterov_tv.linear_operator_from_shape(beta3d.shape)
 l1, l2, tv = alpha * np.array((.05, .65, .3))  # l2, l1, tv penalties
 
 MODELS["2d_l1l2tv_fista"] = \
@@ -294,7 +294,7 @@ MODELS["2d_l1l2tv_inter_inexactfista"] = \
 
 # build a cylinder mesh with the same topology than the 2D grid
 xyz, tri = mesh.cylinder(shape[1], shape[0])
-Atvmesh, n_compacts = nesterov_tv.linear_operator_from_mesh(xyz, tri)
+Atvmesh = nesterov_tv.linear_operator_from_mesh(xyz, tri)
 
 MODELS["mesh_l1l2tv_conesta"] = \
     estimators.LogisticRegressionL1L2TV(

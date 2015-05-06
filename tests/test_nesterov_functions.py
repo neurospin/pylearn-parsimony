@@ -201,7 +201,7 @@ class TestL1TV(TestCase):
 
         mu = 5e-3
 
-        A, _ = tv.linear_operator_from_shape(shape)
+        A = tv.linear_operator_from_shape(shape)
 #        X, y, beta_star = l1_l2_tvmu.load(l=l, k=k, g=g, beta=beta, M=M, e=e,
 #                                        A=A, mu=mu, snr=snr)
 
@@ -224,7 +224,7 @@ class TestL1TV(TestCase):
         function.add_penalty(penalties.L2Squared(l=k))
         A = l1tv.linear_operator_from_shape(shape, p)
         function.add_prox(l1tv.L1TV(l, g, A=A, mu=mu, penalty_start=0))
-#        A, _ = tv.linear_operator_from_shape(shape)
+#        A = tv.linear_operator_from_shape(shape)
 #        function.add_penalty(tv.TotalVariation(l=g, A=A, mu=mu,
 #                                               penalty_start=0))
 #        function.add_prox(penalties.L1(l=l))
