@@ -468,6 +468,7 @@ class CONESTA(bases.ExplicitAlgorithm,
         # TODO: Warn if gap < -consts.TOLERANCE: DONE see Special case 1
         gM = function.eps_max(1.0)
         loop = True
+
         # Special case 1: gap is very small: stopping criterion satisfied 
         if gap < self.eps: # - mu * gM has been removed since mu = 0
             warnings.warn(
@@ -476,13 +477,16 @@ class CONESTA(bases.ExplicitAlgorithm,
                 " If beta_start is null the problem might be over-penalized. "
                 " Then try smaller penalization.")
             loop = False
+
         # Special case 2: gap infinite or NaN => eps is not finite or NaN
         # => mu is NaN etc. Force eps to a large value, to force some FISTA
         # iteration to getbetter starting point
         if not np.isfinite(eps):
             eps = self.eps_max
-        mu = function.mu_opt(eps)
-        function.set_mu(mu)
+
+        if loop:  # mu is useless if loop is False
+            mu = function.mu_opt(eps)
+            function.set_mu(mu)
         #gM = function.eps_max(1.0)
 
         # Initialise info variables. Info variables have the suffix "_".
@@ -534,12 +538,15 @@ class CONESTA(bases.ExplicitAlgorithm,
             if self.info_requested(Info.gap):
                 gap_ += algorithm.info_get(Info.gap)
 
-            #print gap, derived_eps, eps, mu, self.tau, self.num_iter
-
             # Obtain the gap from the last FISTA run. May be small and negative
             # close to machine epsilon.
             gap = abs(algorithm.info_get(Info.gap)[-1])
             # TODO: Warn if gap < -consts.TOLERANCE.
+
+            if self.info_requested(Info.verbose):
+                print "CONESTA: gap:%f, mu:%f, eps:%f, derived_eps:%f" % \
+                    (gap, mu, eps, derived_eps)
+
             if not self.simulation:
                 if gap < self.eps - mu * gM:
 
