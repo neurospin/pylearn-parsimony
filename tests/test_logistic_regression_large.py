@@ -321,7 +321,6 @@ MODELS["mesh_l1l2tv_inter_inexactfista"] = \
         penalty_start=1,
         algorithm_params=algorithm_params)
 
-
 ###############################################################################
 ## tests
 ###############################################################################
@@ -360,6 +359,17 @@ def test_weights_vs_sklearn():
             MODELS["2d_l2_inter_grad_descnt"].beta[1:],
             "2d_l2_inter, sklearn vs prsmy",
             slope_tol=5e-2, corr_tol=5e-2, n2_tol=.4)
+
+
+def test_conesta_do_not_enter_loop_if_criterium_satisfied():
+    # beta_start = 0; with over penalized problem: should not enter loop
+    mod = estimators.LogisticRegressionL1L2TV(
+        l1*100, l2*100, tv*100, A,
+        algorithm=algorithms.proximal.CONESTA(),
+        algorithm_params=algorithm_params)
+    mod.fit(Xtr, ytr, beta=np.zeros((Xtr.shape[1], 1), dtype=float))
+    assert np.all(mod.beta == 0)
+    assert mod.get_info()['num_iter'] == 0
 
 
 if __name__ == "__main__":
@@ -413,3 +423,5 @@ if __name__ == "__main__":
         fit_all(MODELS)
         utils.plot.plot_map2d_of_models(MODELS, nrow=3, ncol=7, shape=shape,
                                         title_attr="__title__")
+
+

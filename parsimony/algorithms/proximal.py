@@ -18,6 +18,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @license: BSD 3-clause.
 """
 import numpy as np
+import warnings
 try:
     from scipy.interpolate import PchipInterpolator as interp1
 except ImportError:
@@ -419,12 +420,14 @@ class CONESTA(bases.ExplicitAlgorithm,
 
     def __init__(self, mu_min=consts.TOLERANCE, tau=0.5,
                  info=[], eps=consts.TOLERANCE, max_iter=10000, min_iter=1,
+                 eps_max = 10.,
                  simulation=False):
 
         super(CONESTA, self).__init__(info=info,
                                       max_iter=max_iter, min_iter=min_iter)
 
         self.mu_min = max(consts.FLOAT_EPSILON, float(mu_min))
+        self.eps_max = eps_max
         self.tau = max(consts.TOLERANCE,
                        min(float(tau), 1.0 - consts.TOLERANCE))
         self.eps = max(consts.TOLERANCE, float(eps))
@@ -462,10 +465,25 @@ class CONESTA(bases.ExplicitAlgorithm,
         # Obtain the gap from the last FISTA run. May be small and negative
         # close to machine epsilon.
         eps = self.tau * abs(gap)
-        # TODO: Warn if gap < -consts.TOLERANCE.
+        # TODO: Warn if gap < -consts.TOLERANCE: DONE see Special case 1
+        gM = function.eps_max(1.0)
+        loop = True
+        # Special case 1: gap is very small: stopping criterion satisfied 
+        if gap < self.eps: # - mu * gM has been removed since mu = 0
+            warnings.warn(
+                "Stopping criterion satisfied before the first iteration."
+                " Either beta_start a the solution (given eps)."
+                " If beta_start is null the problem might be over-penalized. "
+                " Then try smaller penalization.")
+            loop = False
+        # Special case 2: gap infinite or NaN => eps is not finite or NaN
+        # => mu is NaN etc. Force eps to a large value, to force some FISTA
+        # iteration to getbetter starting point
+        if not np.isfinite(eps):
+            eps = self.eps_max
         mu = function.mu_opt(eps)
         function.set_mu(mu)
-        gM = function.eps_max(1.0)
+        #gM = function.eps_max(1.0)
 
         # Initialise info variables. Info variables have the suffix "_".
         if self.info_requested(Info.time):
@@ -482,7 +500,7 @@ class CONESTA(bases.ExplicitAlgorithm,
             mu_ = []
 
         i = 0  # Iteration counter.
-        while True:
+        while loop:
             if self.info_requested(Info.verbose):
                 print "CONESTA ite#", i
             converged = False
