@@ -21,6 +21,8 @@ from .. import properties
 import parsimony.utils.consts as consts
 import parsimony.utils.maths as maths
 import parsimony.utils as utils
+from parsimony.utils.linalgs import LinearOperator
+
 
 __all__ = ["TotalVariation",
            "linear_operator_from_mask", "A_from_mask",
@@ -376,8 +378,9 @@ def linear_operator_from_mask(mask, offset=0, weights=None):
     Ax = sparse.csr_matrix((Ax_v, (Ax_i, Ax_j)), shape=(p, p))
     Ay = sparse.csr_matrix((Ay_v, (Ay_i, Ay_j)), shape=(p, p))
     Az = sparse.csr_matrix((Az_v, (Az_i, Az_j)), shape=(p, p))
-    # n_compacts
-    return [Ax, Ay, Az]
+    A = LinearOperator(Ax, Ay, Az)
+    A.n_compacts = n_compacts
+    return A
 
 
 def linear_operator_from_subset_mask(mask, weights=None):
@@ -462,8 +465,9 @@ def linear_operator_from_subset_mask(mask, weights=None):
     Az = sparse.csr_matrix((Az_v, (Az_i, Az_j)), shape=(p, p))
     Ay = sparse.csr_matrix((Ay_v, (Ay_i, Ay_j)), shape=(p, p))
     Ax = sparse.csr_matrix((Ax_v, (Ax_i, Ax_j)), shape=(p, p))
-    #num_compacts
-    return [Ax, Ay, Az]
+    A = LinearOperator(Ax, Ay, Az)
+    A.n_compacts = num_compacts
+    return A
 
 
 @utils.deprecated("linear_operator_from_shape")
@@ -552,9 +556,9 @@ def linear_operator_from_shape(shape, weights=None):
         Az.eliminate_zeros()
     else:
         Az = sparse.csr_matrix((p, p), dtype=float)
-    # n_compacts = , (nz * ny * nx - 1)
-    return [Ax, Ay, Az]
-
+    A = LinearOperator(Ax, Ay, Az)
+    A.n_compacts = (nz * ny * nx - 1)
+    return A
 
 def linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0,
                               weights=None):
@@ -658,5 +662,6 @@ def linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0,
     p = mask.sum()
     A = [sparse.csr_matrix((A[i][2], (A[i][0], A[i][1])),
                            shape=(p, p)) for i in xrange(len(A))]
-    # n_compacts
+    A = LinearOperator(*A)
+    A.n_compacts = n_compacts
     return A

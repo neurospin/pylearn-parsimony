@@ -16,7 +16,7 @@ import scipy.sparse as sparse
 
 import consts
 
-__all__ = ["MultipartArray"]
+__all__ = ["MultipartArray", "LinearOperator"]
 
 
 class MultipartArray(object):
@@ -558,6 +558,74 @@ class TridiagonalSolver(Solver):
             x[i] = d_[i] - c_[i + 1] * x[i + 1]
 
         return x.reshape((n, 1))
+
+
+class LinearOperator(list):
+    """Linear operator for the Nesterov function. It inherits from a list, with
+   some serialization capabilities and the possibility to store some values:
+   the maximum eigen value "lambda_max" and the number of compact "n_compacts".
+
+    Parameters
+    ----------
+    filename : string. The filename of a serialized linear operator to
+               build the current object.
+
+    argv: The linear operator as a list of sparse csr matrix. The constructed
+          LinearOperator will have the same properties than the original one
+          plus some serialization capabilities and the possibility to store
+          some values.
+
+    Examples
+    --------
+    >>> from parsimony.utils.linalgs import LinearOperator
+    >>> import os.path
+    >>> import tempfile
+    >>> import parsimony.functions.nesterov.tv as nesterov_tv
+    >>> A = nesterov_tv.linear_operator_from_shape((3, 3, 3))
+    >>> A.lambda_max = nesterov_tv.TotalVariation(l=0., A=A).lambda_max()
+    >>> filename = os.path.join(tempfile.gettempdir(), "A.npz")
+    >>> A.save(filename)
+    >>> A_ = LinearOperator(filename=filename)
+    >>> print np.all([np.all(A_[i].todense() == A[i].todense()) for
+    ...              i in xrange(len(A))])
+    True
+    >>> print (A.n_compacts == A_.n_compacts) & (A.lambda_max == A_.lambda_max)
+    True
+    """
+    def __init__(self, *argv, **kwargs):
+        self.lambda_max = None
+        self.n_compacts = None
+        filename = kwargs["filename"] if "filename" in kwargs else None
+        if filename is not None:
+            d = np.load(filename)
+            arr_k = [k for k in d.keys() if k.count("csr")]
+            argv = [sparse.csr_matrix((d[k][0], d[k][1], d[k][2]),
+                                      shape=d[k][3])
+                    for k in arr_k]
+            for k in set(d.keys()) - set(arr_k):
+                try:
+                    setattr(self, k, float(d[k]))
+                except:
+                    pass
+        for l in argv:
+            self.append(l)
+
+    def save(self, filename):
+        # copy items arrays
+        arr_dict = {"csr_%i" % i:
+                    [self[i].data, self[i].indices,
+                     self[i].indptr, self[i].shape]
+                    for i in xrange(len(self))}
+        # copy attributes
+        for k in self.__dict__.keys():
+            arr_dict[k] = getattr(self, k)
+        np.savez_compressed(filename, **arr_dict)
+
+    def lambda_max(self):
+        return self.lambda_max
+
+    def n_compacts(self):
+        return self.n_compacts
 
 if __name__ == "__main__":
     import doctest
