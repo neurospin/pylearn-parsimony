@@ -36,7 +36,11 @@ except ImportError:
     has_sklearn = False
 
 n_samples = 500
-shape = (50, 50, 1)
+#shape = (50, 50, 1)
+#hash_50x50x1 = '5286c0cee52be789948a9e83e22b1e46704305ce'
+shape = (30, 30, 1)
+hash_30x30x1 = '4de7a1040d45cc006a01c4dd385544af22ab8cf1'
+
 n_train = 300
 
 np.random.seed(42)
@@ -103,7 +107,8 @@ X3d, y, beta3d, proba = datasets.classification.dice5.load(
     n_samples=n_samples, shape=shape,
     sigma_spatial_smoothing=1, snr=10, random_seed=1)
 
-if hashlib.sha1(X3d).hexdigest() != '5286c0cee52be789948a9e83e22b1e46704305ce':
+
+if hashlib.sha1(X3d).hexdigest() != hash_30x30x1:
     raise Exception("Generated dataset differs from the original one")
 
 ## TODO: REMOVE THIS DOWNLOAD when Git Large File Storage is released
@@ -116,6 +121,7 @@ if not os.path.exists(weights_filename(shape, n_samples)):
 
 # Load true weights
 WEIGHTS_TRUTH = np.load(weights_filename(shape, n_samples))
+
 
 # Ensure that train dataset is balanced
 tr = np.hstack([np.where(y.ravel() == 1)[0][:int(n_train / 2)],
@@ -130,8 +136,8 @@ yte = y[te]
 beta_start = start_vectors.RandomStartVector().get_vector(Xtr.shape[1])
 
 # check that ytr is balanced
-assert ytr.sum() / ytr.shape[0] == 0.5
-assert yte.sum() / yte.shape[0] == 0.53500000000000003
+#assert ytr.sum() / ytr.shape[0] == 0.5
+#assert yte.sum() / yte.shape[0] == 0.53500000000000003
 
 # Dataset with intercept
 Xtr_i = np.c_[np.ones((Xtr.shape[0], 1)), Xtr]
@@ -421,7 +427,7 @@ if __name__ == "__main__":
 
     if options.plot:
         fit_all(MODELS)
-        utils.plot.plot_map2d_of_models(MODELS, nrow=3, ncol=7, shape=shape,
+        utils.plot.plot_map2d_of_models(MODELS, nrow=4, ncol=6, shape=shape,
                                         title_attr="__title__")
 
 
