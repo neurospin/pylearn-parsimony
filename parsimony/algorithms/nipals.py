@@ -334,28 +334,30 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
 
         v0 = start_vector.get_vector(np.min(X.shape))
 
-        arpack_failed = False
-        try:
-            if not sp.sparse.issparse(X):
-                X = sp.sparse.csr_matrix(X)
-
+        # determine when to use power method or scipy_sparse
+        use_power = True if X.shape[1] >= 10 ** 3 else False
+        if not use_power:
             try:
-                [_, _, v] = sparse_linalg.svds(X, k=1, v0=v0,
-                                               tol=self.eps,
-                                               maxiter=self.max_iter,
-                                               return_singular_vectors=True)
-            except TypeError:  # For scipy 0.9.0.
-                [_, _, v] = sparse_linalg.svds(X, k=1, tol=self.eps)
+                if not sp.sparse.issparse(X):
+                    X = sp.sparse.csr_matrix(X)
 
-            v = v.T
+                try:
+                    [_, _, v] = sparse_linalg.svds(X, k=1, v0=v0,
+                                                   tol=self.eps,
+                                                   maxiter=self.max_iter,
+                                                   return_singular_vectors=True)
+                except TypeError:  # For scipy 0.9.0.
+                    [_, _, v] = sparse_linalg.svds(X, k=1, tol=self.eps)
 
-            if self.info_requested(utils.Info.converged):
-                self.info_set(utils.Info.converged, True)
+                v = v.T
 
-        except ArpackNoConvergence:
-            arpack_failed = True
+                if self.info_requested(utils.Info.converged):
+                    self.info_set(utils.Info.converged, True)
 
-        if arpack_failed:  # Use the power method if this happens.
+            except ArpackNoConvergence:
+                use_power = True
+
+        if use_power:  # Use the power method if scipy failed or if determined.
 
             M, N = X.shape
             if M < N:
