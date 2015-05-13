@@ -299,9 +299,6 @@ class FISTA(bases.ExplicitAlgorithm,
 
         for i in xrange(1, max(self.min_iter, self.max_iter) + 1):
 
-            if self.info_requested(Info.verbose):
-                print "FISTA ite#", i
-
             if self.info_requested(Info.time):
                 tm = utils.time_cpu()
 
@@ -333,6 +330,8 @@ class FISTA(bases.ExplicitAlgorithm,
                     gap_.append(gap)
 
                 if not self.simulation:
+                    if self.info_requested(Info.verbose):
+                        print "FISTA ite:%i, gap:%g" % (i, gap)
                     if gap < self.eps:
                         if self.info_requested(Info.converged):
                             self.info_set(Info.converged, True)
@@ -340,8 +339,11 @@ class FISTA(bases.ExplicitAlgorithm,
                         break
             else:
                 if not self.simulation:
+                    eps_cur = maths.norm(betanew - z)
+                    if self.info_requested(Info.verbose):
+                        print "FISTA ite:%i, eps_cur:%g" %  (i, eps_cur)
                     if step > 0.0:
-                        if (1.0 / step) * maths.norm(betanew - z) < self.eps \
+                        if (1.0 / step) * eps_cur < self.eps \
                                 and i >= self.min_iter:
 
                             if self.info_requested(Info.converged):
@@ -505,8 +507,6 @@ class CONESTA(bases.ExplicitAlgorithm,
 
         i = 0  # Iteration counter.
         while loop:
-            if self.info_requested(Info.verbose):
-                print "CONESTA ite#", i
             converged = False
 
             # Current precision.
@@ -544,8 +544,8 @@ class CONESTA(bases.ExplicitAlgorithm,
             # TODO: Warn if gap < -consts.TOLERANCE.
 
             if self.info_requested(Info.verbose):
-                print "CONESTA: gap:%f, mu:%f, eps:%f, derived_eps:%f" % \
-                    (gap, mu, eps, derived_eps)
+                print "CONESTA ite:%i, gap:%g, mu:%g, eps:%g, derived_eps:%g"\
+                    % (i, gap, mu, eps, derived_eps)
 
             if not self.simulation:
                 if gap < self.eps - mu * gM:
