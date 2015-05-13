@@ -35,7 +35,7 @@ def l1_max_linear_loss(X, y, mean=True):
     Example
     -------
     """
-    X, y = check_arrays(X, check_labels(y))
+    X, y = check_arrays(X, y)
     n = float(X.shape[0])
     scale = 1.0 / n if mean else 1.
     l1_max = scale * np.abs(np.dot(X.T, y)).max()
