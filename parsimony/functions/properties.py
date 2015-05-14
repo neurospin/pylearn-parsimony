@@ -857,11 +857,12 @@ class NesterovFunction(Gradient,
 
         # Define the function to minimise
         class F(Function, Gradient, ProximalOperator, StepSize):
-            def __init__(self, v, A, t, proj):
+            def __init__(self, v, A, t, proj, lambda_max):
                 self.v = v
                 self.A = A
                 self.t = t
                 self.proj = proj
+                self.lambda_max = lambda_max
 
                 self._step = None
 
@@ -878,16 +879,16 @@ class NesterovFunction(Gradient,
 
             def step(self, x, index=0):
                 if self._step is None:
-                    from parsimony.algorithms.nipals import RankOneSparseSVD
-
-                    # TODO: Avoid stacking here.
-                    A = sparse.vstack(self.A)
-                    # TODO: Add max_iter here!
-                    v = RankOneSparseSVD().run(A)  # , max_iter=max_iter)
-                    us = A.dot(v)
-                    l = np.sum(us ** 2.0)
-
-                    self._step = 1.0 / (self.t * self.t * l)
+                    #from parsimony.algorithms.nipals import RankOneSparseSVD
+                    ## TODO: Avoid stacking here.
+                    #A = sparse.vstack(self.A)
+                    ## TODO: Add max_iter here!
+                    #v = RankOneSparseSVD().run(A)  # , max_iter=max_iter)
+                    #us = A.dot(v)
+                    #l = np.sum(us ** 2.0)
+                    #self._step = 1.0 / (self.t * self.t * l)
+                    lambda_max = self.lambda_max()
+                    self._step = 1.0 / (self.t * self.t * lambda_max)
 
                 return self._step
 
@@ -928,7 +929,7 @@ class NesterovFunction(Gradient,
 
         A = self.lA()
         t = factor
-        f = F(beta_, A, t, self.project)
+        f = F(beta_, A, t, self.project, self.lambda_max)
 
         if self._alpha is None:
             alpha = [0] * len(A)

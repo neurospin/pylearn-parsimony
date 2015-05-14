@@ -59,6 +59,11 @@ class L1(properties.NesterovFunction,
         super(L1, self).__init__(l, A=A, mu=mu, penalty_start=penalty_start)
 
         self.c = float(c)
+        self.reset()
+
+    def reset(self):
+
+        self._lambda_max = None
 
     def f(self, beta):
         """ Function value.
