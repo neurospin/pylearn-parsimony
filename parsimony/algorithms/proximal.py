@@ -209,6 +209,9 @@ class FISTA(bases.ExplicitAlgorithm,
     min_iter : Non-negative integer less than or equal to max_iter. Minimum
             number of iterations that must be performed. Default is 1.
 
+    callback: a callable object that will be call at the end of each iteration
+        with locals() as arguments.
+
     Example
     -------
     >>> from parsimony.algorithms.proximal import FISTA
@@ -260,6 +263,7 @@ class FISTA(bases.ExplicitAlgorithm,
 
     def __init__(self, use_gap=False,
                  info=[], eps=consts.TOLERANCE, max_iter=10000, min_iter=1,
+                 callback=None,
                  simulation=False):
 
         super(FISTA, self).__init__(info=info,
@@ -269,6 +273,7 @@ class FISTA(bases.ExplicitAlgorithm,
         self.use_gap = bool(use_gap)
         self.eps = max(consts.FLOAT_EPSILON, float(eps))
 
+        self.callback = callback
         self.simulation = bool(simulation)
 
     @bases.force_reset
@@ -317,6 +322,8 @@ class FISTA(bases.ExplicitAlgorithm,
             if self.info_requested(Info.fvalue) \
                     or self.info_requested(Info.func_val):
                 f_.append(function.f(betanew))
+            if self.callback is not None:
+                self.callback(locals())
 
             if self.use_gap:
 
@@ -406,6 +413,9 @@ class CONESTA(bases.ExplicitAlgorithm,
     eps_max: float, a maximum value for eps computed from the gap. If
         np.isfinite(tau * gap(beta)) then use eps_max to avoid NaN. Default
         is a large value: 10.
+
+    callback: a callable object that will be call at the end of each iteration
+        with locals() as arguments.
     """
     INTERFACES = [properties.NesterovFunction,
                   properties.StepSize,
@@ -426,7 +436,8 @@ class CONESTA(bases.ExplicitAlgorithm,
 
     def __init__(self, mu_min=consts.TOLERANCE, tau=0.5,
                  info=[], eps=consts.TOLERANCE, max_iter=10000, min_iter=1,
-                 eps_max = 10.,
+                 eps_max=10.,
+                 callback=None,
                  simulation=False):
 
         super(CONESTA, self).__init__(info=info,
@@ -437,6 +448,7 @@ class CONESTA(bases.ExplicitAlgorithm,
         self.tau = max(consts.TOLERANCE,
                        min(float(tau), 1.0 - consts.TOLERANCE))
         self.eps = max(consts.TOLERANCE, float(eps))
+        self.callback = callback
         self.simulation = bool(simulation)
 
     @bases.force_reset
@@ -541,6 +553,8 @@ class CONESTA(bases.ExplicitAlgorithm,
                 mu_ += [mu] * algorithm.num_iter
             if self.info_requested(Info.gap):
                 gap_ += algorithm.info_get(Info.gap)
+            if self.callback is not None:
+                self.callback(locals())
 
             # Obtain the gap from the last FISTA run. May be small and negative
             # close to machine epsilon.

@@ -25,7 +25,8 @@ import parsimony.utils.consts as consts
 import parsimony.functions.penalties as penalties
 import parsimony.functions.properties as properties
 
-__all__ = ["Info", "direct_vector",
+__all__ = ["Info", "AlgorithmSnapshot",
+           "direct_vector",
 
            "Bisection", "NewtonRaphson",
            "BacktrackingLineSearch"]
@@ -56,6 +57,88 @@ class Info(object):
     beta_start = "beta_start"  # The start vector used.
     continuations = "continuations"  # In continuation: Number of continuations
     verbose = "verbose"  # Tell algo to be verbose
+
+class AlgorithmSnapshot:
+    """
+    Snapshot the algorithm state to disk. Its save_* methods should be provided
+    as callback argument to FISTA or CONESTA. This callback will be called at
+    each iteration.
+
+    Parameters
+    ----------
+    output_prefix: string a prefix path to store algorithm state.
+
+    saving_period: int the period (# of iterations) of trig the saving.
+
+    >>> import os
+    >>> import tempfile
+    >>> import numpy as np
+    >>> import parsimony.estimators as estimators
+    >>> import parsimony.algorithms.proximal as proximal
+    >>> from parsimony.algorithms.utils import AlgorithmSnapshot
+    >>> prefix = os.path.join(tempfile.mkdtemp(), "snapshots")
+    >>> snapshot = AlgorithmSnapshot(prefix, saving_period=10).save_fista
+    >>> np.random.seed(42)
+    >>> X = np.random.rand(10, 16)
+    >>> y = np.random.rand(10, 1)
+    >>> en = estimators.ElasticNet(0.1,
+    ...          algorithm=proximal.FISTA(max_iter=50, callback=snapshot))
+    >>> en = en.fit(X, y)
+    >>> import glob
+    >>> print "Nb snapshots =", len(glob.glob(prefix + "*"))
+    Nb snapshots = 5
+    """
+    def __init__(self, output_prefix, saving_period=100):
+        self.output_prefix = output_prefix
+        self.saving_period = saving_period
+        self.cpt = 0
+
+    def save_conesta(self, algo_locals):
+        self.cpt += 1
+        #ite = algo_locals["i"]
+        if (self.cpt % self.saving_period) != 0 :
+            return
+        algo = algo_locals["self"]
+        snapshot = dict()
+        if algo.info_requested(Info.num_iter):
+            snapshot["Info.num_iter"] = algo.num_iter
+        if algo.info_requested(Info.continuations):
+            snapshot["Info.continuations"] = algo_locals["i"] + 1
+        if algo.info_requested(Info.time):
+            snapshot["Info.time"] = algo_locals["t_"]
+        if algo.info_requested(Info.func_val):
+            snapshot["Info.func_val"] = algo_locals["f_"]
+        if algo.info_requested(Info.fvalue):
+            snapshot["Info.fvalue"] = algo_locals["f_"]
+        if algo.info_requested(Info.gap):
+            snapshot["Info.gap"] = algo_locals["gap_"]
+        if algo.info_requested(Info.mu):
+            snapshot["Info.mu"] = algo_locals["mu_"]
+        cpt_str = str(self.cpt).zfill(int(np.log10(algo.max_iter)+1))
+        output_filename = self.output_prefix + 'conesta_ite:%s.npz' % (cpt_str)
+        #print "save in ", output_filename
+        np.savez_compressed(output_filename, **snapshot)
+
+    def save_fista(self, algo_locals):
+        self.cpt += 1
+        if (self.cpt % self.saving_period) != 0 :
+            return
+        algo = algo_locals["self"]
+        snapshot = dict()
+        if algo.info_requested(Info.num_iter):
+            snapshot["Info.num_iter"] = algo.num_iter
+        if algo.info_requested(Info.time):
+            snapshot["Info.time"] = algo_locals["t_"]
+        if algo.info_requested(Info.func_val):
+            snapshot["Info.func_val"] = algo_locals["f_"]
+        if algo.info_requested(Info.fvalue):
+            snapshot["Info.fvalue"] = algo_locals["f_"]
+        if algo.info_requested(Info.gap):
+            snapshot["Info.gap"] = algo_locals["gap_"]
+        cpt_str = str(self.cpt).zfill(int(np.log10(algo.max_iter)+1))
+        output_filename = self.output_prefix + 'fista_ite:%s.npz' % (cpt_str)
+        #print "save in ", output_filename
+        np.savez_compressed(output_filename, **snapshot)
 
 
 def direct_vector(v):
