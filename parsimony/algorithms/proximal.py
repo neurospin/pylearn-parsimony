@@ -402,6 +402,10 @@ class CONESTA(bases.ExplicitAlgorithm,
 
     min_iter : Non-negative integer less than or equal to max_iter. Minimum
             number of iterations that must be performed. Default is 1.
+
+    eps_max: float, a maximum value for eps computed from the gap. If
+        np.isfinite(tau * gap(beta)) then use eps_max to avoid NaN. Default
+        is a large value: 10.
     """
     INTERFACES = [properties.NesterovFunction,
                   properties.StepSize,
@@ -471,7 +475,7 @@ class CONESTA(bases.ExplicitAlgorithm,
         gM = function.eps_max(1.0)
         loop = True
 
-        # Special case 1: gap is very small: stopping criterion satisfied 
+        # Special case 1: gap is very small: stopping criterion satisfied
         if gap < self.eps: # - mu * gM has been removed since mu = 0
             warnings.warn(
                 "Stopping criterion satisfied before the first iteration."
