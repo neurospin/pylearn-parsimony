@@ -1667,12 +1667,13 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
         y, sample_weight = check_arrays(y, sample_weight)
             #sample_weight = sample_weight.ravel()
 
-        function = functions.LogisticRegressionL1L2TV(X, y,
-                                              self.l1, self.l2, self.tv,
-                                              A=self.A,
-                                              weights=sample_weight,
-                                              penalty_start=self.penalty_start,
-                                              mean=self.mean)
+        function = functions.LogisticRegressionL1L2TV(
+            X, y,
+            self.l1, self.l2, self.tv,
+            A=self.A,
+            weights=sample_weight,
+            penalty_start=self.penalty_start,
+            mean=self.mean)
 
         self.algorithm.check_compatibility(function,
                                            self.algorithm.INTERFACES)

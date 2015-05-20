@@ -553,17 +553,11 @@ class CONESTA(bases.ExplicitAlgorithm,
                 mu_ += [mu] * algorithm.num_iter
             if self.info_requested(Info.gap):
                 gap_ += algorithm.info_get(Info.gap)
-            if self.callback is not None:
-                self.callback(locals())
 
             # Obtain the gap from the last FISTA run. May be small and negative
             # close to machine epsilon.
             gap = abs(algorithm.info_get(Info.gap)[-1])
             # TODO: Warn if gap < -consts.TOLERANCE.
-
-            if self.info_requested(Info.verbose):
-                print "CONESTA ite:%i, gap:%g, mu:%g, eps:%g, derived_eps:%g"\
-                    % (i, gap, mu, eps, derived_eps)
 
             if not self.simulation:
                 if gap < self.eps - mu * gM:
@@ -572,6 +566,12 @@ class CONESTA(bases.ExplicitAlgorithm,
                         self.info_set(Info.converged, True)
 
                     converged = True
+
+            if self.callback is not None:
+                self.callback(locals())
+            if self.info_requested(Info.verbose):
+                print "CONESTA ite:%i, gap:%g, eps:%g, mu:%g, derived_eps:%g"\
+                    % (i, gap, eps, mu, derived_eps)
 
             # Stopping criteria.
             if (converged or self.num_iter >= self.max_iter) \
@@ -637,6 +637,9 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
     min_iter : Non-negative integer less than or equal to max_iter. Minimum
             number of iterations that must be performed. Default is 1.
 
+    callback: a callable object that will be call at the end of each iteration
+        with locals() as arguments.
+
     Example
     -------
     >>> from parsimony.algorithms.proximal import StaticCONESTA
@@ -698,10 +701,12 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
                      Info.time,
                      Info.fvalue,
                      Info.func_val,
-                     Info.mu]
+                     Info.mu,
+                     Info.verbose]
 
     def __init__(self, mu_min=consts.TOLERANCE, tau=0.5, exponent=1.52753,
                  info=[], eps=consts.TOLERANCE, max_iter=10000, min_iter=1,
+                 callback=None,
                  simulation=False):
 
         super(StaticCONESTA, self).__init__(info=info,
@@ -713,6 +718,8 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
                        min(float(tau), 1.0 - consts.TOLERANCE))
         self.exponent = max(1.001, min(float(exponent), 2.0))
         self.eps = max(consts.TOLERANCE, float(eps))
+        self.callback = callback
+
         self.simulation = bool(simulation)
 
         self._harmonic = None
@@ -832,6 +839,12 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
                     converged = True
 
             beta = beta_new
+
+            if self.callback is not None:
+                self.callback(locals())
+            if self.info_requested(Info.verbose):
+                print "StaticCONESTA ite:%i, eps:%g, mu:%g"\
+                    % (i, eps, mu)
 
             # All combined stopping criteria.
             if (converged or self.num_iter >= self.max_iter) \

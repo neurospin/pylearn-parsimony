@@ -58,6 +58,7 @@ class Info(object):
     continuations = "continuations"  # In continuation: Number of continuations
     verbose = "verbose"  # Tell algo to be verbose
 
+
 class AlgorithmSnapshot:
     """
     Snapshot the algorithm state to disk. Its save_* methods should be provided
@@ -70,6 +71,8 @@ class AlgorithmSnapshot:
 
     saving_period: int the period (# of iterations) of trig the saving.
 
+    Example
+    -------
     >>> import os
     >>> import tempfile
     >>> import numpy as np
@@ -96,48 +99,48 @@ class AlgorithmSnapshot:
     def save_conesta(self, algo_locals):
         self.cpt += 1
         #ite = algo_locals["i"]
-        if (self.cpt % self.saving_period) != 0 :
+        if (self.cpt % self.saving_period) != 0:
             return
         algo = algo_locals["self"]
-        snapshot = dict()
+        snapshot = dict(beta=algo_locals["beta"])
         if algo.info_requested(Info.num_iter):
-            snapshot["Info.num_iter"] = algo.num_iter
+            snapshot[Info.num_iter] = algo.num_iter
         if algo.info_requested(Info.continuations):
-            snapshot["Info.continuations"] = algo_locals["i"] + 1
+            snapshot[Info.continuations] = algo_locals["i"] + 1
         if algo.info_requested(Info.time):
-            snapshot["Info.time"] = algo_locals["t_"]
+            snapshot[Info.time] = algo_locals["t_"]
         if algo.info_requested(Info.func_val):
-            snapshot["Info.func_val"] = algo_locals["f_"]
+            snapshot[Info.func_val] = algo_locals["f_"]
         if algo.info_requested(Info.fvalue):
-            snapshot["Info.fvalue"] = algo_locals["f_"]
+            snapshot[Info.fvalue] = algo_locals["f_"]
         if algo.info_requested(Info.gap):
-            snapshot["Info.gap"] = algo_locals["gap_"]
+            snapshot[Info.gap] = algo_locals["gap_"]
         if algo.info_requested(Info.mu):
-            snapshot["Info.mu"] = algo_locals["mu_"]
+            snapshot[Info.mu] = algo_locals["mu_"]
         cpt_str = str(self.cpt).zfill(int(np.log10(algo.max_iter)+1))
         output_filename = self.output_prefix + 'conesta_ite:%s.npz' % (cpt_str)
-        #print "save in ", output_filename
+        #print "AlgorithmSnapshot.save_conesta: save in ", output_filename
         np.savez_compressed(output_filename, **snapshot)
 
     def save_fista(self, algo_locals):
         self.cpt += 1
-        if (self.cpt % self.saving_period) != 0 :
+        if (self.cpt % self.saving_period) != 0:
             return
         algo = algo_locals["self"]
-        snapshot = dict()
+        snapshot = dict(beta=algo_locals["beta"])
         if algo.info_requested(Info.num_iter):
-            snapshot["Info.num_iter"] = algo.num_iter
+            snapshot[Info.num_iter] = algo.num_iter
         if algo.info_requested(Info.time):
-            snapshot["Info.time"] = algo_locals["t_"]
+            snapshot[Info.time] = algo_locals["t_"]
         if algo.info_requested(Info.func_val):
-            snapshot["Info.func_val"] = algo_locals["f_"]
+            snapshot[Info.func_val] = algo_locals["f_"]
         if algo.info_requested(Info.fvalue):
-            snapshot["Info.fvalue"] = algo_locals["f_"]
+            snapshot[Info.fvalue] = algo_locals["f_"]
         if algo.info_requested(Info.gap):
-            snapshot["Info.gap"] = algo_locals["gap_"]
+            snapshot[Info.gap] = algo_locals["gap_"]
         cpt_str = str(self.cpt).zfill(int(np.log10(algo.max_iter)+1))
         output_filename = self.output_prefix + 'fista_ite:%s.npz' % (cpt_str)
-        #print "save in ", output_filename
+        #print "AlgorithmSnapshot.save_fista: save in ", output_filename
         np.savez_compressed(output_filename, **snapshot)
 
 
