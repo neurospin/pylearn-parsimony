@@ -95,6 +95,7 @@ class AlgorithmSnapshot:
         self.output_prefix = output_prefix
         self.saving_period = saving_period
         self.cpt = 0
+        self.continuation_ite_nb = list()  # ite nb where continuation occured
 
     def save_conesta(self, algo_locals):
         self.cpt += 1
@@ -102,7 +103,10 @@ class AlgorithmSnapshot:
         if (self.cpt % self.saving_period) != 0:
             return
         algo = algo_locals["self"]
-        snapshot = dict(beta=algo_locals["beta"])
+        self.continuation_ite_nb.append(algo.num_iter)
+        snapshot = dict(beta=algo_locals["beta"],
+                        continuation_ite_nb=self.continuation_ite_nb,
+                        gM=algo_locals["gM"])
         if algo.info_requested(Info.num_iter):
             snapshot[Info.num_iter] = algo.num_iter
         if algo.info_requested(Info.continuations):
