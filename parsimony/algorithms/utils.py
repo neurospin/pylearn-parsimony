@@ -131,7 +131,7 @@ class AlgorithmSnapshot:
         if (self.cpt % self.saving_period) != 0:
             return
         algo = algo_locals["self"]
-        snapshot = dict(beta=algo_locals["beta"])
+        snapshot = dict(beta=algo_locals["betanew"])
         if algo.info_requested(Info.num_iter):
             snapshot[Info.num_iter] = algo.num_iter
         if algo.info_requested(Info.time):
