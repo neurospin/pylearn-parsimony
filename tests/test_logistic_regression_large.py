@@ -327,6 +327,18 @@ MODELS["mesh_l1l2tv_inter_inexactfista"] = \
         penalty_start=1,
         algorithm_params=algorithm_params)
 
+## Special cases with l2==0
+MODELS["2d_l1tv_conesta"] = \
+    estimators.LogisticRegressionL1L2TV(
+        l1, 0, tv, A,
+        algorithm=algorithms.proximal.CONESTA(),
+        algorithm_params=algorithm_params)
+
+MODELS["2d_l1tv_inexactfista"] = \
+    estimators.LogisticRegressionL1L2TVInexactFISTA(
+        l1, 0, tv, Al1tv,
+        algorithm_params=algorithm_params)
+
 ###############################################################################
 ## tests
 ###############################################################################
@@ -408,7 +420,7 @@ if __name__ == "__main__":
 
     if options.save_weights:
         fit_all(MODELS)
-        utils.plot.plot_map2d_of_models(MODELS, nrow=4, ncol=6, shape=shape,
+        utils.plot.plot_map2d_of_models(MODELS, nrow=5, ncol=6, shape=shape,
                                         title_attr="__title__")
         if raw_input("Save weights ? [n]/y") == "y":
             utils.testing.save_weights(MODELS,
@@ -427,7 +439,7 @@ if __name__ == "__main__":
 
     if options.plot:
         fit_all(MODELS)
-        utils.plot.plot_map2d_of_models(MODELS, nrow=4, ncol=6, shape=shape,
+        utils.plot.plot_map2d_of_models(MODELS, nrow=5, ncol=6, shape=shape,
                                         title_attr="__title__")
 
 
