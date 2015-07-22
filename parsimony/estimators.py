@@ -1624,7 +1624,8 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
                  mean=True):
 
         self.l1 = max(consts.TOLERANCE, float(l1))
-        self.l2 = max(consts.TOLERANCE, float(l2))
+        #self.l2 = max(consts.TOLERANCE, float(l2))
+        self.l2 = max(0.0, float(l2))
         self.tv = max(consts.FLOAT_EPSILON, float(tv))
 
         if algorithm is None:

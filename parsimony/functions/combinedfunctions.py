@@ -613,6 +613,8 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
 #        print "Fenchel duality gap:", gap
 
         return gap
+        
+        
 
     def A(self):
         """Linear operator of the Nesterov function.
@@ -1159,13 +1161,19 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
         """Compute the duality gap for the logistic function.
 
         From the interface "DualFunction".
-        If penalty_start > 0 or l2 == 0, the gap may be
-        infinite. Use f_tilde instead of f an artificial l2 penatly which is
-        suffictently small to converge toward eps while maintaining a finite
-        gap. This avoid to scale the dual variable sigma as done by Mairal &
-        Bach spam http://spams-devel.gforge.inria.fr/doc/html/doc_spams009.html.
 
-        The artificial penalty lambda_0 = 2 * eps / len(beta). 
+        Details
+        -------
+
+        If penalty_start > 0 or l2 == 0, the gap may be infinite.
+        We use f_tilde instead of f with an artificial l2 penatly which is
+        sufficiently small to converge toward the same eps while maintaining
+        a finite gap.
+        This avoid to scale the dual variable sigma as done by Mairal &
+        Bach in spam see:
+        http://spams-devel.gforge.inria.fr/doc/html/doc_spams009.html
+
+        The artificial penalty is lambda_0 = 2 * eps / len(beta_with_null_l2). 
 
         If l2 == 0.
         - f_tilde = f + lambda_0 ||beta||^2_2
@@ -1173,16 +1181,15 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
         - psi_star:  psi_star + Eq 33 paper OLS avec kappa = gamma = 0
 
         If penalty_start > 0 some variable are unpenalized.
-        Solution: Define beta = [beta_0, beta_1] with beta_0 
+        Define beta = [beta_0, beta_1] with beta_0 
         coeficients of unpenalized variables.
         - f_tilde = f + lambda_0 ||beta_0||^2_2
         - l_star remain the same
         - psi_star:  psi_star + Eq 33 paper OLS avec kappa = gamma = 0
-
         """
         n = float(self.X.shape[0])
         alpha = self.tv.alpha(beta)
-        # gap = f + l_star + psi_star Eq 29 OLS paper
+        # gap = f + l_star + psi_star Eq 29 of OLS paper
  
         # f
         f = self.fmu(beta)
@@ -1199,7 +1206,7 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
 
         # l_star
         # sigma in the next line is the gradient of l at xbeta following the ols
-        # paper notations Eq. 29
+        # paper notations Eq. 29 of OLS paper
         sigma = (pi - self.y) * (self.weights * scale)
         b = ((1. / (self.weights * scale)) * sigma) + self.y
         l_star = np.sum((b * np.log(b) + (1 - b)
@@ -1215,16 +1222,19 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
             alpha_sqsum += np.sum(a_ ** 2.0)
 
         # psi_star
-        v = -np.dot(self.X.T, sigma)  # Eq. 29
-        psi_star = (1.0 / (2 * self.rr.k)) \
+        v = -np.dot(self.X.T, sigma)  
+        # Eq. 29 of OLS paper
+        if self.rr.k == 0:
+            l2_penalty = (2 * eps / len(beta))
+        else:
+            l2_penalty = self.rr.k
+        psi_star = (1.0 / (2 * l2_penalty)) \
            * np.sum(maths.positive(np.abs(v - lAta) - self.l1.l) ** 2.0) \
            + (0.5 * self.tv.l * self.tv.get_mu() * alpha_sqsum)
-        if self.rr.k == 0:
-            psi_star += (0.5 / (2 * eps / len(beta))) * \
-                np.sum(v ** 2)
-        elif self.penalty_start > 0:
+        if self.penalty_start > 0 and self.rr.k > 0:
             psi_star += (0.5 / (2 * eps / self.penalty_start)) * \
-                np.sum(v[:self.penalty_start, :] ** 2)            
+                np.sum(v[:self.penalty_start, :] ** 2)
+
         gap = f + l_star + psi_star
 
         return gap

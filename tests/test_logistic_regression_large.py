@@ -245,7 +245,7 @@ MODELS["2d_l1l2_inter_fista"] = \
 #                    + l * ||beta||_1
 #                    + g * TV(beta)
 A = nesterov_tv.linear_operator_from_shape(beta3d.shape)
-l1, l2, tv = alpha * np.array((.05, .65, .3))  # l2, l1, tv penalties
+l1, l2, tv = alpha * np.array((.05, .75, .2))  # l2, l1, tv penalties
 
 MODELS["2d_l1l2tv_fista"] = \
     estimators.LogisticRegressionL1L2TV(
@@ -344,6 +344,7 @@ MODELS["2d_l1tv_inexactfista"] = \
 ###############################################################################
 def test_fit_all():
     global MODELS
+    print MODELS
     for model_key in MODELS:
         yield fit_model, model_key
 
