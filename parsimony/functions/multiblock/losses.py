@@ -829,7 +829,7 @@ class LatentVariableCovariance(mb_properties.MultiblockFunction,
                            #properties.Eigenvalues):
     """Represents
 
-        Cov(X.w, Y.c) = (1 / (n - 1)) * w'.X'.Y.c,
+        Cov(X.w, Y.c) = (K / (n - 1)) * w'.X'.Y.c,
 
     where X.w and Y.c are latent variables.
 
@@ -840,14 +840,19 @@ class LatentVariableCovariance(mb_properties.MultiblockFunction,
     unbiased : Boolean. Whether or not to use biased or unbiased sample
             covariance. Default is True, the unbiased sample covariance is
             used.
+
+    scalar_multiple : Non-negative float. Default is 1.0. A scalar multiple of
+            the function. Useful when the covariance is used as a "penalty".
     """
-    def __init__(self, X, unbiased=True):
+    def __init__(self, X, unbiased=True, scalar_multiple=1.0):
 
         self.X = X
         if unbiased:
             self.n = float(X[0].shape[0] - 1.0)
         else:
             self.n = float(X[0].shape[0])
+
+        self.K = max(0.0, float(scalar_multiple))
 
         self.reset()
 
@@ -864,7 +869,7 @@ class LatentVariableCovariance(mb_properties.MultiblockFunction,
         Yc = np.dot(self.X[1], w[1])
         wXYc = np.dot(wX, Yc)
 
-        return -wXYc[0, 0] / self.n
+        return -wXYc[0, 0] * (self.K / self.n)
 
     def grad(self, w, index):
         """Gradient of the function.
@@ -896,10 +901,9 @@ class LatentVariableCovariance(mb_properties.MultiblockFunction,
         """
         index = int(index)
         grad = -np.dot(self.X[index].T,
-                       np.dot(self.X[1 - index], w[1 - index])) \
-             * (1.0 / self.n)
+                       np.dot(self.X[1 - index], w[1 - index]))
 
-        return grad
+        return grad * (self.K / self.n)
 
     def L(self, w, index):
         """Lipschitz constant of the gradient with given index.
