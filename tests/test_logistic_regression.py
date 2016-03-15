@@ -124,7 +124,7 @@ class TestLogisticRegression(TestCase):
 
         re = maths.norm(logreg_est.beta - beta_spams) / maths.norm(beta_spams)
 #        print "re:", re
-        assert_almost_equal(re, 0.050577,
+        assert_almost_equal(re, 0.050547,
                             msg="The found regression vector is not correct.",
                             places=5)
 
@@ -146,7 +146,7 @@ class TestLogisticRegression(TestCase):
         else:
             err = abs(f_logreg - f_spams)
 #        print "err:", err
-        assert_almost_equal(err, 0.263714,
+        assert_almost_equal(err, 0.263355,
                             msg="The found regression vector does not give " \
                                 "the correct function value.",
                             places=5)
@@ -255,7 +255,7 @@ class TestLogisticRegression(TestCase):
 
         re = maths.norm(logreg_est.beta - beta_spams) / maths.norm(beta_spams)
 #        print "re:", re
-        assert_almost_equal(re, 0.040440,
+        assert_almost_equal(re, 0.040414,
                             msg="The found regression vector is not correct.",
                             places=5)
 
