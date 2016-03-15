@@ -433,8 +433,13 @@ class LipschitzContinuousGradient(object):
 
     # TODO: Should L by default take a weight vector as argument?
     @abc.abstractmethod
-    def L(self):
+    def L(self, beta=None):
         """Lipschitz constant of the gradient.
+
+        Parameters
+        ----------
+        beta : Numpy array. The point at which to evaluate the Lipschitz
+                constant. Optional.
         """
         raise NotImplementedError('Abstract method "L" must be '
                                   'specialised!')

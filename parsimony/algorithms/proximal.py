@@ -740,6 +740,7 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
         return self._harmonic
 
     def _approximate_eps(self, function, beta0):
+
         old_mu = function.set_mu(self.mu_min)
 
         step = function.step(beta0)
@@ -776,7 +777,7 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
 
         # Estimate the initial precision, eps, and the smoothing parameter mu.
         gM = function.eps_max(1.0)  # gamma * M
-        if maths.norm(beta) > 0.0:
+        if maths.norm(beta) > consts.TOLERANCE:
             mu = function.estimate_mu(beta)
             eps = mu * gM
         else:

@@ -209,7 +209,10 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
             for j in xrange(len(fi)):
                 fij = self._f[i][j]
                 for k in xrange(len(fij)):
-                    val += fij[k].f([w[i], w[j]])
+                    if isinstance(fij[k], mb_properties.MultiblockFunction):
+                        val += fij[k].f([w[i], w[j]])
+                    else:
+                        val += fij[k].f(w[i])
 
         for i in xrange(len(self._p)):
             pi = self._p[i]
@@ -242,7 +245,10 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
             for j in xrange(len(fi)):
                 fij = self._f[i][j]
                 for k in xrange(len(fij)):
-                    val += fij[k].f([w[i], w[j]])
+                    if isinstance(fij[k], mb_properties.MultiblockFunction):
+                        val += fij[k].f([w[i], w[j]])
+                    else:
+                        val += fij[k].f(w[i])
 
         for i in xrange(len(self._p)):
             pi = self._p[i]

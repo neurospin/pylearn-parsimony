@@ -285,7 +285,7 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
     INFO_PROVIDED = [Info.ok,
                      Info.num_iter,
                      Info.time,
-                     Info.fvalue,
+                     Info.func_val,
                      Info.converged]
 
     def __init__(self, mu_start=None, mu_min=consts.TOLERANCE,
@@ -302,7 +302,7 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
 
         # Copy the allowed info keys for FISTA.
         from parsimony.algorithms.proximal import FISTA
-        from parsimony.algorithms.primaldual import NaiveCONESTA
+        from parsimony.algorithms.proximal import StaticCONESTA
         alg_info = []
         for nfo in self.info_copy():
             if nfo in FISTA.INFO_PROVIDED:
@@ -316,14 +316,12 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
                            eps=self.eps,
                            max_iter=self.max_iter,
                            min_iter=self.min_iter)
-        self.conesta = NaiveCONESTA(mu_start=mu_start,
-                                    mu_min=mu_min,
-                                    tau=tau,
-
-                                    eps=self.eps,
-                                    info=alg_info,
-                                    max_iter=self.max_iter,
-                                    min_iter=self.min_iter)
+        self.conesta = StaticCONESTA(mu_min=mu_min,
+                                     tau=tau,
+                                     info=alg_info,
+                                     eps=self.eps,
+                                     max_iter=self.max_iter,
+                                     min_iter=self.min_iter)
 
     @bases.force_reset
     @bases.check_compatibility

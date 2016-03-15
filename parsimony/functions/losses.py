@@ -114,7 +114,7 @@ class LinearRegression(properties.CompositeFunction,
 
         return grad
 
-    def L(self):
+    def L(self, beta=None):
         """Lipschitz constant of the gradient.
 
         From the interface "LipschitzContinuousGradient".
@@ -284,7 +284,7 @@ class RidgeRegression(properties.CompositeFunction,
 
         return grad
 
-    def L(self):
+    def L(self, beta=None):
         """Lipschitz constant of the gradient.
 
         From the interface "LipschitzContinuousGradient".
@@ -444,7 +444,7 @@ class LogisticRegression(properties.AtomicFunction,
 
         return grad
 
-    def L(self):
+    def L(self, beta=None):
         """Lipschitz constant of the gradient.
 
         Returns the maximum eigenvalue of (1 / 4) * X'WX.
@@ -634,7 +634,7 @@ class RidgeLogisticRegression(properties.CompositeFunction,
 #                       np.dot(self.W, (self.y - pi))) \
 #                       + self.k * beta
 
-    def L(self):
+    def L(self, beta=None):
         """Lipschitz constant of the gradient.
 
         Returns the maximum eigenvalue of (1 / 4) * X'WX.
@@ -739,7 +739,7 @@ class LatentVariableVariance(properties.Function,
 
         return grad
 
-    def L(self):
+    def L(self, beta=None):
         """Lipschitz constant of the gradient with given index.
 
         From the interface "LipschitzContinuousGradient".
@@ -845,7 +845,7 @@ class LinearFunction(properties.CompositeFunction,
 
         return grad
 
-    def L(self):
+    def L(self, beta=None):
         """Lipschitz constant of the gradient.
 
         From the interface "LipschitzContinuousGradient".

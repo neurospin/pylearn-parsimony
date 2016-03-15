@@ -20,13 +20,14 @@ from functools import wraps
 from time import time, clock
 
 import numpy as np
+import consts
 
 #TODO: This depends on the OS. We should try to be clever here ...
 time_cpu = clock  # UNIX-based system measures CPU time used.
 time_wall = time  # UNIX-based system measures time in seconds since the epoch.
 time = time_cpu  # TODO: Make it so that this can be changed by settings.
 
-__all__ = ["time_cpu", "time_wall", "time", "deprecated",
+__all__ = ["time_cpu", "time_wall", "time", "deprecated", "corr",
            "optimal_shrinkage", "AnonymousClass"]
 
 #_DEBUG = True
@@ -102,30 +103,30 @@ def deprecated(*replaced_by):
 #        a = [default] * n
 #    return a
 
-#def corr(a, b):
-#    ma = np.mean(a)
-#    mb = np.mean(b)
-#
-#    a_ = a - ma
-#    b_ = b - mb
-#
-#    norma = np.sqrt(np.sum(a_ ** 2.0, axis=0))
-#    normb = np.sqrt(np.sum(b_ ** 2.0, axis=0))
-#
-#    norma[norma < TOLERANCE] = 1.0
-#    normb[normb < TOLERANCE] = 1.0
-#
-#    a_ /= norma
-#    b_ /= normb
-#
-#    ip = np.dot(a_.T, b_)
-#
-#    if ip.shape == (1, 1):
-#        return ip[0, 0]
-#    else:
-#        return ip
-#
-#
+def corr(a, b):
+    ma = np.mean(a)
+    mb = np.mean(b)
+
+    a_ = a - ma
+    b_ = b - mb
+
+    norma = np.sqrt(np.sum(a_ ** 2.0, axis=0))
+    normb = np.sqrt(np.sum(b_ ** 2.0, axis=0))
+
+    norma[norma < consts.TOLERANCE] = 1.0
+    normb[normb < consts.TOLERANCE] = 1.0
+
+    a_ /= norma
+    b_ /= normb
+
+    ip = np.dot(a_.T, b_)
+
+    if ip.shape == (1, 1):
+        return ip[0, 0]
+    else:
+        return ip
+
+
 #def cov(a, b):
 #    ma = np.mean(a)
 #    mb = np.mean(b)

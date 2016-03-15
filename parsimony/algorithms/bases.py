@@ -290,7 +290,8 @@ class InformationAlgorithm(object):
         """
         for i in info:
             if not self.info_provided(i):
-                raise ValueError("Requested information not provided.")
+                raise ValueError("Requested information (%s) not provided." \
+                        % (str(i),))
 
 if __name__ == "__main__":
     import doctest
