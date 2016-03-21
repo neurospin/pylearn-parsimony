@@ -45,8 +45,8 @@ class Info(object):
     converged = "converged"  # Did the algorithm converge?
     num_iter = "num_iter"  # Number of iterations.
     time = "time"  # Time of e.g. every iteration.
-    fvalue = "fvalue"  # Function value at e.g. every iteration. Deprecated!!
     func_val = "func_val"  # Function value at e.g. every iteration.
+    fvalue = "fvalue"  # Function value at e.g. every iteration. Deprecated!!
     smooth_func_val = "smooth_func_val"  # Smoothed function value.
     gap = "gap"  # The gap at e.g. every iteration.
     mu = "mu"  # Smoothing constant, or other parameter, at every iteration.

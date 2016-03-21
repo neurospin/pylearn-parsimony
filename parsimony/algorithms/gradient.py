@@ -72,6 +72,7 @@ class GradientDescent(bases.ExplicitAlgorithm,
                      Info.num_iter,
                      Info.time,
                      Info.fvalue,
+                     Info.func_val,
                      Info.converged]
 
     def __init__(self, eps=consts.TOLERANCE,
@@ -102,7 +103,8 @@ class GradientDescent(bases.ExplicitAlgorithm,
 
         if self.info_requested(Info.time):
             t = []
-        if self.info_requested(Info.fvalue):
+        if self.info_requested(Info.fvalue) \
+                or self.info_requested(Info.func_val):
             f = []
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
@@ -119,7 +121,8 @@ class GradientDescent(bases.ExplicitAlgorithm,
 
             if self.info_requested(Info.time):
                 t.append(utils.time_cpu() - tm)
-            if self.info_requested(Info.fvalue):
+            if self.info_requested(Info.fvalue) \
+                    or self.info_requested(Info.func_val):
                 f.append(function.f(betanew))
 
             if maths.norm(betanew - betaold) < self.eps \
@@ -134,8 +137,10 @@ class GradientDescent(bases.ExplicitAlgorithm,
             self.info_set(Info.num_iter, i)
         if self.info_requested(Info.time):
             self.info_set(Info.time, t)
-        if self.info_requested(Info.fvalue):
+        if self.info_requested(Info.fvalue) \
+                or self.info_requested(Info.func_val):
             self.info_set(Info.fvalue, f)
+            self.info_set(Info.func_val, f)
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, True)
 
