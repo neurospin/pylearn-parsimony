@@ -113,7 +113,7 @@ class BaseEstimator(object):
         """If an InformationAlgorithm, returns the information dictionary.
         """
         if not isinstance(self.algorithm, bases.InformationAlgorithm):
-            raise AttributeError("Algorithm is not an " \
+            raise AttributeError("Algorithm is not an "
                                  "InformationAlgorithm.")
 
         return self.algorithm.info_get()
@@ -406,12 +406,13 @@ class RidgeRegression(RegressionEstimator):
         function = functions.CombinedFunction()
         function.add_function(losses.LinearRegression(X, y, mean=self.mean))
         function.add_penalty(penalties.L2Squared(l=self.l,
-                                             penalty_start=self.penalty_start))
+                                                 penalty_start=self.penalty_start))
 
         self.algorithm.check_compatibility(function,
                                            self.algorithm.INTERFACES)
 
-        # TODO: Should we use a seed somewhere so that we get deterministic results?
+        # TODO: Should we use a seed somewhere so that we get deterministic
+        # results?
         if beta is None:
             beta = self.start_vector.get_vector(X.shape[1])
 
@@ -617,7 +618,7 @@ class ElasticNet(RegressionEstimator):
             algorithm.set_params(**algorithm_params)
 
         super(ElasticNet, self).__init__(algorithm=algorithm,
-                                    start_vector=start_vector)
+                                         start_vector=start_vector)
 
         self.l = float(l)
         self.alpha = float(alpha)
@@ -639,7 +640,7 @@ class ElasticNet(RegressionEstimator):
         function = functions.CombinedFunction()
         function.add_function(losses.LinearRegression(X, y, mean=self.mean))
         function.add_penalty(penalties.L2Squared(l=self.alpha * (1.0 - self.l),
-                                             penalty_start=self.penalty_start))
+                                                 penalty_start=self.penalty_start))
         function.add_prox(penalties.L1(l=self.alpha * self.l,
                                        penalty_start=self.penalty_start))
 
@@ -867,7 +868,7 @@ class LinearRegressionL1L2TV(RegressionEstimator):
                                            self.algorithm.INTERFACES)
 
         if self.mu is None:
-#            self.mu = function.estimate_mu(beta)
+            # self.mu = function.estimate_mu(beta)
             self.mu = self.tv_function.estimate_mu(beta)
 
         function.set_params(mu=self.mu)
@@ -1275,7 +1276,7 @@ class LogisticRegression(LogisticRegressionEstimator):
         if sample_weight is None:
             sample_weight = class_weight_to_sample_weight(self.class_weight, y)
         y, sample_weight = check_arrays(y, sample_weight)
-            #sample_weight = sample_weight.ravel()
+        # sample_weight = sample_weight.ravel()
 
         function = losses.LogisticRegression(X, y,
                                              weights=sample_weight,
@@ -1371,7 +1372,7 @@ class RidgeLogisticRegression(LogisticRegressionEstimator):
             algorithm.set_params(**algorithm_params)
 
         super(RidgeLogisticRegression, self).__init__(algorithm=algorithm,
-                                                     class_weight=class_weight)
+                                                      class_weight=class_weight)
 
         self.penalty_start = max(0, int(penalty_start))
         self.mean = bool(mean)
@@ -1390,7 +1391,7 @@ class RidgeLogisticRegression(LogisticRegressionEstimator):
         if sample_weight is None:
             sample_weight = class_weight_to_sample_weight(self.class_weight, y)
         y, sample_weight = check_arrays(y, sample_weight)
-            #sample_weight = sample_weight.ravel()
+        # sample_weight = sample_weight.ravel()
 
         function = losses.RidgeLogisticRegression(X, y, self.l,
                                               weights=sample_weight,
@@ -1438,9 +1439,10 @@ class ElasticNetLogisticRegression(LogisticRegressionEstimator):
 
     algorithm : ExplicitAlgorithm. The algorithm that should be applied.
             Should be one of:
-                1. GradientDescent(...)
+                1. FISTA(...)
+                2. ISTA(...)
 
-            Default is GradientDescent(...).
+            Default is FISTA(...).
 
     algorithm_params : A dict. The dictionary algorithm_params contains
             parameters that should be set in the algorithm. Passing
@@ -1463,6 +1465,22 @@ class ElasticNetLogisticRegression(LogisticRegressionEstimator):
 
     Examples
     --------
+    >>> import numpy as np
+    >>> import parsimony.estimators as estimators
+    >>> import parsimony.algorithms.proximal as proximal
+    >>> n = 10
+    >>> p = 20
+    >>>
+    >>> np.random.seed(42)
+    >>> X = np.random.rand(n, p)
+    >>> y = np.random.randint(0, 2, (n, 1))
+    >>> l = 0.1  # L1 coefficient, L2 is 1 - l.
+    >>> alpha = 1.5
+    >>> lr = estimators.ElasticNetLogisticRegression(l, alpha)
+    >>> res = lr.fit(X, y)
+    >>> error = lr.score(X, y)
+    >>> print "error =", error
+    error = 0.8
     """
     def __init__(self, l, alpha=1.0,
                  algorithm=None, algorithm_params=dict(),
@@ -1470,7 +1488,7 @@ class ElasticNetLogisticRegression(LogisticRegressionEstimator):
                  penalty_start=0,
                  mean=True):
 
-        self.l = max(0.0, float(l))
+        self.l = max(0.0, min(float(l), 1.0))
         self.alpha = float(alpha)
 
         if algorithm is None:
@@ -1479,7 +1497,7 @@ class ElasticNetLogisticRegression(LogisticRegressionEstimator):
             algorithm.set_params(**algorithm_params)
 
         super(ElasticNetLogisticRegression, self).__init__(algorithm=algorithm,
-                                                     class_weight=class_weight)
+                                                           class_weight=class_weight)
 
         self.penalty_start = max(0, int(penalty_start))
         self.mean = bool(mean)
@@ -1495,14 +1513,17 @@ class ElasticNetLogisticRegression(LogisticRegressionEstimator):
         """Fit the estimator to the data.
         """
         X, y = check_arrays(X, check_labels(y))
+
         if sample_weight is None:
             sample_weight = class_weight_to_sample_weight(self.class_weight, y)
+
         y, sample_weight = check_arrays(y, sample_weight)
 
         function = functions.CombinedFunction()
         function.add_loss(losses.LogisticRegression(X, y, mean=self.mean))
+
         function.add_penalty(penalties.L2Squared(l=self.alpha * (1.0 - self.l),
-                                             penalty_start=self.penalty_start))
+                                                 penalty_start=self.penalty_start))
         function.add_prox(penalties.L1(l=self.alpha * self.l,
                                        penalty_start=self.penalty_start))
 
@@ -1516,6 +1537,11 @@ class ElasticNetLogisticRegression(LogisticRegressionEstimator):
         self.beta = self.algorithm.run(function, beta)
 
         return self
+
+    def parameters(self):
+        """Returns the fitted parameters, i.e., the regression coefficients.
+        """
+        return self.beta
 
 
 class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
@@ -1624,7 +1650,7 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
                  mean=True):
 
         self.l1 = max(consts.TOLERANCE, float(l1))
-        #self.l2 = max(consts.TOLERANCE, float(l2))
+        # self.l2 = max(consts.TOLERANCE, float(l2))
         self.l2 = max(0.0, float(l2))
         self.tv = max(consts.FLOAT_EPSILON, float(tv))
 
@@ -1638,7 +1664,7 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
             algorithm = proximal.FISTA(**algorithm_params)
 
         super(LogisticRegressionL1L2TV, self).__init__(algorithm=algorithm,
-                                                     class_weight=class_weight)
+                                                       class_weight=class_weight)
 
         if A is None:
             raise TypeError("A may not be None.")
@@ -1666,7 +1692,7 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
         if sample_weight is None:
             sample_weight = class_weight_to_sample_weight(self.class_weight, y)
         y, sample_weight = check_arrays(y, sample_weight)
-            #sample_weight = sample_weight.ravel()
+        # sample_weight = sample_weight.ravel()
 
         function = functions.LogisticRegressionL1L2TV(
             X, y,
@@ -1719,7 +1745,8 @@ class LogisticRegressionL1L2TVInexactFISTA(LogisticRegressionL1L2TV):
     >>> l2 = 0.9  # Ridge coefficient
     >>> tv = 1.0  # TV coefficient
     >>> Al1tv = l1tv.linear_operator_from_shape(shape, num_variables=p)
-    >>> lr = estimators.LogisticRegressionL1L2TVInexactFISTA(l1, l2, tv, Al1tv, mean=False)
+    >>> lr = estimators.LogisticRegressionL1L2TVInexactFISTA(l1, l2, tv, Al1tv,
+    ...                                                      mean=False)
     >>> print lr.fit(X, y).score(X, y)
     0.7
     """
@@ -1737,7 +1764,7 @@ class LogisticRegressionL1L2TVInexactFISTA(LogisticRegressionL1L2TV):
 
         super(LogisticRegressionL1L2TVInexactFISTA, self).__init__(
                 l1, l2, tv, algorithm=algorithm,
-                A=Al1tv, 
+                A=Al1tv,
                 class_weight=class_weight,
                 penalty_start=penalty_start,
                 mean=mean)
@@ -1752,10 +1779,10 @@ class LogisticRegressionL1L2TVInexactFISTA(LogisticRegressionL1L2TV):
         function = functions.CombinedFunction()
         function.add_loss(functions.losses.LogisticRegression(X, y,
                                                               mean=self.mean))
-        function.add_penalty(functions.penalties.L2Squared(l=self.l2, 
-            penalty_start=self.penalty_start))
+        function.add_penalty(functions.penalties.L2Squared(l=self.l2,
+                                                           penalty_start=self.penalty_start))
         function.add_prox(l1tv.L1TV(l1=self.l1, tv=self.tv, A=self.A,
-            penalty_start=self.penalty_start))
+                                    penalty_start=self.penalty_start))
 
         self.algorithm.check_compatibility(function,
                                            self.algorithm.INTERFACES)
@@ -1765,6 +1792,7 @@ class LogisticRegressionL1L2TVInexactFISTA(LogisticRegressionL1L2TV):
         self.beta = self.algorithm.run(function, beta)
 
         return self
+
 
 class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
     """Logistic regression (re-weighted log-likelihood aka. cross-entropy)
@@ -1889,7 +1917,7 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
             algorithm = proximal.FISTA(**algorithm_params)
 
         super(LogisticRegressionL1L2GL, self).__init__(algorithm=algorithm,
-                                                     class_weight=class_weight)
+                                                       class_weight=class_weight)
 
         if isinstance(algorithm, proximal.CONESTA) \
                 and self.gl < consts.TOLERANCE:
@@ -2178,9 +2206,9 @@ class PLSRegression(RegressionEstimator):
 
             if isinstance(self.algorithm, bases.ExplicitAlgorithm):
                 cov1 = mb_losses.LatentVariableCovariance([X, Y],
-                                                        unbiased=self.unbiased)
+                                                          unbiased=self.unbiased)
                 cov2 = mb_losses.LatentVariableCovariance([Y, X],
-                                                        unbiased=self.unbiased)
+                                                          unbiased=self.unbiased)
 
                 l21 = penalties.L2(c=1.0)
                 l22 = penalties.L2(c=1.0)
@@ -2387,9 +2415,9 @@ class SparsePLSRegression(RegressionEstimator):
 
             if isinstance(self.algorithm, bases.ExplicitAlgorithm):
                 cov1 = mb_losses.LatentVariableCovariance([X, Y],
-                                                        unbiased=self.unbiased)
+                                                          unbiased=self.unbiased)
                 cov2 = mb_losses.LatentVariableCovariance([Y, X],
-                                                        unbiased=self.unbiased)
+                                                          unbiased=self.unbiased)
 
                 l1l2_1 = penalties.L1L2Squared(self.l[0], 1.0)
                 l1l2_2 = penalties.L1L2Squared(self.l[1], 1.0)
