@@ -954,8 +954,8 @@ class LinearRegressionL1L2GL(RegressionEstimator):
     ...                                   algorithm_params=dict(max_iter=1000),
     ...                                   mean=False)
     >>> res = lr.fit(X, y)
-    >>> round(lr.score(X, y), 13)
-    0.6101838224235
+    >>> round(lr.score(X, y), 12)
+    0.610183822424
     >>>
     >>> lr = estimators.LinearRegressionL1L2GL(l1, l2, gl, A,
     ...                                  algorithm=proximal.CONESTA(),
