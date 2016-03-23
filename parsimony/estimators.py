@@ -17,6 +17,7 @@ import numpy as np
 
 import parsimony.utils.consts as consts
 import parsimony.utils.maths as maths
+import parsimony.utils.resampling as resampling
 import parsimony.functions as functions
 import parsimony.functions.losses as losses
 import parsimony.functions.multiblock.losses as mb_losses
@@ -48,7 +49,11 @@ __all__ = ["BaseEstimator",
            "LogisticRegressionL1L2TVInexactFISTA",
            "LogisticRegressionL1L2GL",
 
-           "LinearRegressionL2SmoothedL1TV"]
+           "LinearRegressionL2SmoothedL1TV",
+
+           "Clustering",
+
+           "GridSearchKFoldRegression"]
 
 
 class BaseEstimator(object):
@@ -93,8 +98,8 @@ class BaseEstimator(object):
     # TODO: Make all estimators implement this method!
     # @abc.abstractmethod
     def parameters(self):
-        """Returns the estimator's fitted parameters, e.g. the regression
-        coefficients.
+        """Returns a dictionary with the estimator's fitted parameters, e.g.
+        the regression coefficients.
 
         What is returned depends on the estimator. See the estimator's
         documentation.
@@ -107,6 +112,14 @@ class BaseEstimator(object):
     def score(self, X, y):
         raise NotImplementedError('Abstract method "score" must be '
                                   'specialised!')
+
+#    # TODO: Make this an abstract method!
+#    @abc.abstractmethod
+#    def reset(self):
+#        """Resets the function such that it is as if just created.
+#        """
+#        raise NotImplementedError('Abstract method "reset" must be '
+#                                  'specialised!')
 
     # TODO: Why is this here? Move to InformationAlgorithm?
     def get_info(self):
@@ -214,6 +227,11 @@ class LogisticRegressionEstimator(BaseEstimator):
         prob = np.reciprocal(1.0 + np.exp(-logit))
 
         return prob
+
+    def parameters(self):
+        """Returns the fitted parameters, the regression coefficients (beta).
+        """
+        return {"beta": self.beta}
 
     def score(self, X, y):
         """Rate of correct classification.
@@ -1293,6 +1311,12 @@ class LogisticRegression(LogisticRegressionEstimator):
 
         return self
 
+    def reset(self):
+        """Resets the function such that it is as if just created.
+        """
+        if hasattr(self, "beta"):
+            del self.beta
+
 
 class RidgeLogisticRegression(LogisticRegressionEstimator):
     """Logistic regression (re-weighted log-likelihood aka. cross-entropy) with
@@ -1380,7 +1404,9 @@ class RidgeLogisticRegression(LogisticRegressionEstimator):
     def get_params(self):
         """Return a dictionary containing all the estimator's parameters.
         """
-        return {"class_weight": self.class_weight,
+        return {"l": self.l,
+                "algorithm": self.algorithm,
+                "class_weight": self.class_weight,
                 "penalty_start": self.penalty_start,
                 "mean": self.mean}
 
@@ -1413,6 +1439,12 @@ class RidgeLogisticRegression(LogisticRegressionEstimator):
         self.beta = self.algorithm.run(function, beta)
 
         return self
+
+    def reset(self):
+        """Resets the function such that it is as if just created.
+        """
+        if hasattr(self, "beta"):
+            del self.beta
 
 
 class ElasticNetLogisticRegression(LogisticRegressionEstimator):
@@ -1470,7 +1502,6 @@ class ElasticNetLogisticRegression(LogisticRegressionEstimator):
     >>> import parsimony.algorithms.proximal as proximal
     >>> n = 10
     >>> p = 20
-    >>>
     >>> np.random.seed(42)
     >>> X = np.random.rand(n, p)
     >>> y = np.random.randint(0, 2, (n, 1))
@@ -1478,9 +1509,9 @@ class ElasticNetLogisticRegression(LogisticRegressionEstimator):
     >>> alpha = 1.5
     >>> lr = estimators.ElasticNetLogisticRegression(l, alpha)
     >>> res = lr.fit(X, y)
-    >>> error = lr.score(X, y)
-    >>> print "error =", error
-    error = 0.8
+    >>> score = lr.score(X, y)
+    >>> print "Prediction rate: %.2f" % (score,)
+    Prediction rate: 0.80
     """
     def __init__(self, l, alpha=1.0,
                  algorithm=None, algorithm_params=dict(),
@@ -2619,6 +2650,190 @@ class Clustering(BaseEstimator):
 
         return wcss
 
+
+class GridSearchKFoldRegression(BaseEstimator):
+    """Estimator for performing a grid search with k-fold cross-validation over
+    a range of parameters.
+
+    For every parameter setting, a selected resampling approach is used and a
+    statistic is computed.
+
+    Parameters
+    ----------
+    estimator : BaseEstimator. The estimator to perform grid search for.
+
+    grid : Dictionary or lists. Every key in the dictionary is a parameter of
+            the constructor of the estimator, and all combinations of the
+            parameters in the lists will be used exactly once.
+
+    K : Positive integer greater than 1. The number of cross-validation folds.
+
+    score_function : Python function, optional. Default is None, which means
+            that the score() method of the estimator will be used.
+            score_function takes as argument the estimator and a list of data
+            sets.
+
+    maximise : Boolean. Whether the score function should be maximised (True)
+            or minimised (False).
+
+    Examples
+    --------
+    >>> import parsimony.estimators as estimators
+    >>> import numpy as np
+    >>> np.random.seed(1337)
+    >>>
+    """
+    def __init__(self, estimator, grid, K=7, score_function=None,
+                 maximise=True):
+
+        super(GridSearchKFoldRegression, self).__init__(algorithm=None)
+
+        self.estimator = estimator
+        self.grid = grid
+        self.K = max(2, int(K))
+        self.score_function = score_function
+        self.maximise = bool(maximise)
+
+    def get_params(self):
+        """Returns a dictionary containing the estimator's own input
+        parameters.
+        """
+        return {"estimator": self.estimator,
+                "grid": self.grid,
+                "K": self.K,
+                "score_function": self.score_function,
+                "maximise": self.maximise}
+
+    def fit(self, X, y, means=None):
+        """Fit the estimator to the data.
+        """
+        X = check_arrays(X)
+
+        self._best_result = None
+        self._best_params = None
+        self._result = []
+
+        keys = self.grid.keys()
+        idx = [0] * len(keys)
+        maxs = [0] * len(keys)
+        for i in range(len(keys)):
+            maxs[i] = len(self.grid[keys[i]])
+        while idx[0] < maxs[0]:
+
+            params = dict()
+            for i in range(len(keys)):
+                params[keys[i]] = self.grid[keys[i]][idx[i]]
+
+            output_y, score_values = self._perform_cv(self.estimator,
+                                                      params, X, y)
+            value = np.mean(score_values)
+
+            self._result.append((output_y, score_values, value))
+
+            if self._best_result is None:
+                self._best_result = value
+                self._best_params = params
+            else:
+                if self.maximise and value > self._best_result:
+                    self._best_result = value
+                    self._best_params = params
+                elif not self.maximise and value < self._best_result:
+                    self._best_result = value
+                    self._best_params = params
+
+            idx[-1] = idx[-1] + 1
+            for i in reversed(range(1, len(keys))):
+                if idx[i] >= maxs[i]:
+                    idx[i] = 0
+                    idx[i - 1] = idx[i - 1] + 1
+
+        # Compute best model
+        self.estimator.reset()
+        self.estimator.set_params(**self._best_params)
+        self.estimator.fit(X, y)
+        self._best_beta = self.estimator.beta
+
+        return self
+
+    def _perform_cv(self, estimator, params, X, y):
+
+        estimator.set_params(**params)
+
+        output_y = np.zeros(y.shape)
+        score_values = []
+
+        n = y.shape[0]
+        for train, test in resampling.k_fold(n, self.K):
+            estimator.reset()
+
+            Xtr = X[train, :]
+            ytr = y[train, :]
+            Xte = X[test, :]
+            yte = y[test, :]
+
+            estimator.fit(Xtr, ytr)
+            yhat = estimator.predict(Xte)
+
+            output_y[test, :] = yhat
+
+            if self.score_function is None:
+                value = self.estimator.score(Xte, yte)
+            else:
+                value = self.score_function(self.estimator, params, Xte, yte)
+
+            score_values.append(value)
+
+        return output_y, score_values
+
+    def predict(self, X):
+        """Perform prediction using the best combination of parameters.
+
+        Parameters
+        ----------
+        X : A numpy array, n-by-p. A dataset to use for prediction of output y.
+
+        Returns
+        -------
+        y : A numpy array, p-by-1. The predicted class (0 or 1).
+        """
+        X = check_arrays(X)
+
+        self.estimator.reset()
+        self.estimator.set_params(**self._best_params)
+        self.estimator.beta = self._best_beta
+        yhat = self.estimator.predict(X)
+
+        return yhat
+
+    def parameters(self):
+        """Returns the fitted parameters, the regression coefficients (beta).
+        """
+        return {"beta": self._best_beta}
+
+    def score(self, X, y):
+        """Returns the estimator's score value or the value of the score
+        function, if it is specified, on the best combination of parameters.
+        """
+        X = check_arrays(X)
+
+        self.estimator.reset()
+        self.estimator.set_params(**self._best_params)
+        self.estimator.beta = self._best_beta
+        score_value = self.estimator.score(X, y)
+
+        return score_value
+
+    def reset(self):
+        """Resets the function such that it is as if just created.
+        """
+        if hasattr(self, "_best_result"):
+            del self._best_result
+        if hasattr(self, "_best_params"):
+            del self._best_params
+        if hasattr(self, "_best_beta"):
+            del self._best_beta
+        if hasattr(self, "_result"):
+            del self._result
 
 if __name__ == "__main__":
     import doctest
