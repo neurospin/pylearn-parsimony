@@ -177,7 +177,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
 
         self._f[i][j].append(function)
 
-        self._param_map(accepts_params[0]) = (function, accepts_params[1])
+        self._param_map[accepts_params[0]] = (function, accepts_params[1])
 
     def add_penalty(self, penalty, i, accepts_params=None):
         """Add a penalty, i.e. a constraint on the Lagrange form, for block i.
@@ -208,7 +208,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
                 else:
                     raise ValueError("Non-smooth and no proximal operator.")
 
-        self._param_map(accepts_params[0]) = (penalty, accepts_params[1])
+        self._param_map[accepts_params[0]] = (penalty, accepts_params[1])
 
 #    @utils.deprecated("add_penalty")
     def add_prox(self, penalty, i, accepts_params=None):
@@ -233,7 +233,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
 
         self._prox[i].append(penalty)
 
-        self._param_map(accepts_params[0]) = (penalty, accepts_params[1])
+        self._param_map[accepts_params[0]] = (penalty, accepts_params[1])
 
     def add_constraint(self, constraint, i, accepts_params=None):
         """Add a constraint for block i.
@@ -258,7 +258,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
 
         self._c[i].append(constraint)
 
-        self._param_map(accepts_params[0]) = (constraint, accepts_params[1])
+        self._param_map[accepts_params[0]] = (constraint, accepts_params[1])
 
     def has_nesterov_function(self, index):
 
