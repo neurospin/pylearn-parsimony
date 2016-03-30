@@ -115,6 +115,8 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
         else:
             self._c = constraints
 
+        self._param_map = dict()
+
     def reset(self):
 
         for fi in self._f:
@@ -138,7 +140,19 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
             for cik in ci:
                 cik.reset()
 
-    def add_function(self, function, i, j):
+    def set_params(self, **kwargs):
+        """Set the given input parameters in the estimator.
+        """
+        for k in kwargs:
+            if k in self._param_map:
+                param_map = self._param_map[k]
+                param = dict()
+                param[param_map[1]] = kwargs[k]
+                param_map[0].set_params(param)
+            else:
+                self.__setattr__(k, kwargs[k])
+
+    def add_function(self, function, i, j, accepts_params=None):
         """Add a function that connects blocks i and j.
 
         Parameters
@@ -151,6 +165,11 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
 
         j : Non-negative integer. Index of the second block. Zero based, so 0
                 is the first block.
+
+        accepts_params : Dictionary of 2-tuples. The outer function will
+                accept parameters with the name of the first element of the
+                tuple, and map them to this function with the name of the
+                second element of the tuple.
         """
         if not isinstance(function, properties.Gradient):
             if not isinstance(function, mb_properties.MultiblockGradient):
@@ -158,8 +177,23 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
 
         self._f[i][j].append(function)
 
-    def add_penalty(self, penalty, i):
+        self._param_map(accepts_params[0]) = (function, accepts_params[1])
 
+    def add_penalty(self, penalty, i, accepts_params=None):
+        """Add a penalty, i.e. a constraint on the Lagrange form, for block i.
+
+        Parameters
+        ----------
+        penalty : Penalty. A function that penalises the objective function.
+
+        i : Non-negative integer. Index of the block to penalise. Zero based,
+                so 0 is the first block.
+
+        accepts_params : Dictionary of 2-tuples. The outer function will
+                accept parameters with the name of the first element of the
+                tuple, and map them to this function with the name of the
+                second element of the tuple.
+        """
         if not isinstance(penalty, properties.Penalty):
             raise ValueError("Not a penalty.")
 
@@ -174,22 +208,57 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
                 else:
                     raise ValueError("Non-smooth and no proximal operator.")
 
-#    @utils.deprecated("add_penalty")
-    def add_prox(self, penalty, i):
+        self._param_map(accepts_params[0]) = (penalty, accepts_params[1])
 
+#    @utils.deprecated("add_penalty")
+    def add_prox(self, penalty, i, accepts_params=None):
+        """Add a penalty for block i that has a known or computable proximal
+        operator.
+
+        Parameters
+        ----------
+        penalty : ProximalOperator. A function that penalises the
+                objective function.
+
+        i : Non-negative integer. Index of the block to penalise. Zero based,
+                so 0 is the first block.
+
+        accepts_params : Dictionary of 2-tuples. The outer function will
+                accept parameters with the name of the first element of the
+                tuple, and map them to this function with the name of the
+                second element of the tuple.
+        """
         if not isinstance(penalty, properties.ProximalOperator):
             raise ValueError("Not a proximal operator.")
 
         self._prox[i].append(penalty)
 
-    def add_constraint(self, constraint, i):
+        self._param_map(accepts_params[0]) = (penalty, accepts_params[1])
 
+    def add_constraint(self, constraint, i, accepts_params=None):
+        """Add a constraint for block i.
+
+        Parameters
+        ----------
+        constraint : Constraint. A function that constrains the possible
+                solutions of the objective function.
+
+        i : Non-negative integer. Index of the block to penalise. Zero based,
+                so 0 is the first block.
+
+        accepts_params : Dictionary of 2-tuples. The outer function will
+                accept parameters with the name of the first element of the
+                tuple, and map them to this function with the name of the
+                second element of the tuple.
+        """
         if not isinstance(constraint, properties.Constraint):
             raise ValueError("Not a constraint.")
         if not isinstance(constraint, properties.ProjectionOperator):
             raise ValueError("Constraints must have projection operators.")
 
         self._c[i].append(constraint)
+
+        self._param_map(accepts_params[0]) = (constraint, accepts_params[1])
 
     def has_nesterov_function(self, index):
 

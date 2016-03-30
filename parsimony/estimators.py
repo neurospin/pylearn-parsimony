@@ -53,7 +53,8 @@ __all__ = ["BaseEstimator",
 
            "Clustering",
 
-           "GridSearchKFoldRegression"]
+           "GridSearchKFoldRegression",
+           "GridSearchKFold"]
 
 
 class BaseEstimator(object):
@@ -2655,18 +2656,16 @@ class GridSearchKFoldRegression(BaseEstimator):
     """Estimator for performing a grid search with k-fold cross-validation over
     a range of parameters.
 
-    For every parameter setting, a selected resampling approach is used and a
+    For every parameter setting, a K-fold cross-validation is applied and a
     statistic is computed.
 
     Parameters
     ----------
     estimator : BaseEstimator. The estimator to perform grid search for.
 
-    grid : Dictionary or lists. Every key in the dictionary is a parameter of
+    grid : Dictionary of lists. Every key in the dictionary is a parameter of
             the constructor of the estimator, and all combinations of the
             parameters in the lists will be used exactly once.
-
-    K : Positive integer greater than 1. The number of cross-validation folds.
 
     score_function : Python function, optional. Default is None, which means
             that the score() method of the estimator will be used.
@@ -2676,6 +2675,8 @@ class GridSearchKFoldRegression(BaseEstimator):
     maximise : Boolean. Whether the score function should be maximised (True)
             or minimised (False).
 
+    K : Positive integer greater than 1. The number of cross-validation folds.
+
     Examples
     --------
     >>> import parsimony.estimators as estimators
@@ -2683,16 +2684,16 @@ class GridSearchKFoldRegression(BaseEstimator):
     >>> np.random.seed(1337)
     >>>
     """
-    def __init__(self, estimator, grid, K=7, score_function=None,
-                 maximise=True):
+    def __init__(self, estimator, grid, score_function=None, maximise=True,
+                 K=7):
 
         super(GridSearchKFoldRegression, self).__init__(algorithm=None)
 
         self.estimator = estimator
         self.grid = grid
-        self.K = max(2, int(K))
         self.score_function = score_function
         self.maximise = bool(maximise)
+        self.K = max(2, int(K))
 
     def get_params(self):
         """Returns a dictionary containing the estimator's own input
@@ -2834,6 +2835,234 @@ class GridSearchKFoldRegression(BaseEstimator):
             del self._best_beta
         if hasattr(self, "_result"):
             del self._result
+
+
+class GridSearchKFold(BaseEstimator):
+    """Estimator for performing a grid search with k-fold cross-validation over
+    a range of parameters.
+
+    For every parameter setting, a K-fold cross-validation is applied and a
+    statistic is computed.
+
+    Parameters
+    ----------
+    generate_function : Python function. A function that returns a
+            MultiblockFunction that.works with the given algorithm. Also
+            returns a list of start vectors for the algorithm. The signature
+            is:
+
+                function, beta = generate_function(X, params,
+                                                   start_vectors=True),
+
+            where X is a list if numpy arrats (e.g., the training data sets),
+            and params is a dictionary with the current parameters. Beta may be
+            None, if the algorithm doesn't need any start vectors, and is not
+            returned at all if start_vectors is False.
+
+    algorithm : ExplicitAlgorithm. An algorithm to apply to minimise the
+            function for every parameter setting.
+
+    grid : Dictionary of lists. Every key in the dictionary is a parameter of
+            the constructor of the function, and all combinations of the
+            parameters in the lists will be used exactly once.
+
+    score_function : Python function. The score_function takes as argument a
+            list of data sets, the grid parameters and the fitted parameters
+            and returns a statistic on the fit.
+
+    maximise : Boolean. Whether the score function should be maximised (True)
+            or minimised (False).
+
+    predict_function : Python function. The predict function takes as argument
+            a list of numpy arrays to predict from, the grid parameters and the
+            fitted parameters.
+
+    K : Positive integer greater than 1. The number of cross-validation folds.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> np.random.seed(1337)
+    >>>
+    """
+    def __init__(self, generate_function, algorithm, algorithm_params, grid,
+                 score_function, predict_function, maximise=True, K=7):
+
+        super(GridSearchKFold, self).__init__(algorithm=None)
+
+        self.generate_function = generate_function
+        self.algorithm = algorithm
+        self.grid = grid
+        self.score_function = score_function
+        self.predict_function = predict_function
+        self.maximise = bool(maximise)
+        self.K = max(2, int(K))
+
+        self._warm_restart = None
+
+    def get_params(self):
+        """Returns a dictionary containing the estimator's own input
+        parameters.
+        """
+        return {"generate_function": self.generate_function,
+                "algorithm": self.algorithm,
+                "grid": self.grid,
+                "score_function": self.score_function,
+                "predict_function": self.predict_function,
+                "maximise": self.maximise,
+                "K": self.K}
+
+    def fit(self, X, means=None):
+        """Fit the estimator to the data.
+        """
+        X = check_arrays(X)
+
+        # Store results
+        self._best_result = None
+        self._best_params = None
+        self._result = []
+
+        # Generate upper limit of the grid parameters
+        keys = self.grid.keys()
+        maxs = [0] * len(keys)
+        for i in range(len(keys)):
+            maxs[i] = len(self.grid[keys[i]])
+        idx = [0] * len(keys)
+
+        # Go through all grid settings
+        while idx[0] < maxs[0]:
+
+            # Generate current parameter setting
+            params = dict()
+            for i in range(len(keys)):
+                params[keys[i]] = self.grid[keys[i]][idx[i]]
+
+            # Compute model for these parameter settings
+            score_values = self._perform_cv(params, X)
+
+            # The cross-validated statistic
+            value = np.mean(score_values)
+
+            # Save all results
+            self._result.append((score_values, value))
+
+            # Store best result
+            if self._best_result is None:  # First time
+                self._best_result = value
+                self._best_params = params
+            else:
+                if self.maximise and value > self._best_result:
+                    self._best_result = value
+                    self._best_params = params
+                elif not self.maximise and value < self._best_result:
+                    self._best_result = value
+                    self._best_params = params
+
+            # Go to the next parameter setting
+            idx[-1] = idx[-1] + 1
+            for i in reversed(range(1, len(keys))):
+                if idx[i] >= maxs[i]:
+                    idx[i] = 0
+                    idx[i - 1] = idx[i - 1] + 1
+
+        # Compute the best model
+        if self._warm_restart is None:
+            function, beta = self.generate_function(X, self._best_params,
+                                                    start_vectors=True)
+            self._warm_restart = beta
+        else:
+            beta = self._warm_restart
+            function = self.generate_function(X, self._best_params,
+                                              start_vectors=False)
+        self.algorithm.reset()
+        self._best_beta = self.algorithm.run(function, beta)
+
+        return self
+
+    def _perform_cv(self, params, X):
+
+        self.function.set_params(**params)
+
+        score_values = []
+
+        n = X[0].shape[0]
+        for train, test in resampling.k_fold(n, self.K):
+            self.function.reset()
+
+            Xtr = [0] * len(X)
+            Xte = [0] * len(X)
+            for i in range(len(X)):
+                Xtr[i] = X[i][train, :]
+                Xte[i] = X[i][test, :]
+
+            if self._warm_restart is None:
+                function, beta = self.generate_function(Xtr, params,
+                                                        start_vectors=True)
+                self._warm_restart = beta
+            else:
+                beta = self._warm_restart
+                function = self.generate_function(Xtr, params,
+                                                  start_vectors=False)
+
+            self.algorithm.reset()
+            beta = self.algorithm.run(function, beta)
+            self._warm_restart = beta
+
+            value = self.score_function(Xte, params, beta)
+
+            score_values.append(value)
+
+        return score_values
+
+    def predict(self, X):
+        """Perform prediction using the best combination of parameters.
+
+        Parameters
+        ----------
+        X : A list of numpy arrays, n-by-p_i. The datasets to use in the
+                prediction.
+
+        Returns
+        -------
+        Y : A numpy array, n-by-q. The predicted output.
+        """
+        X = check_arrays(X)
+
+        Yhat = self.predict_function(X, self._best_params, self._best_beta)
+
+        return Yhat
+
+    def parameters(self):
+        """Returns the fitted parameters, the regression coefficients (beta).
+        """
+        return {"beta": self._best_beta,
+                "params": self._best_params}
+
+    def score(self, X, y):
+        """Returns the estimator's score value or the value of the score
+        function, if it is specified, on the best combination of parameters.
+        """
+        X = check_arrays(X)
+
+        score_value = self.score_function(X, self._best_params,
+                                          self._best_beta)
+
+        return score_value
+
+    def reset(self):
+        """Resets the function such that it is as if just created.
+        """
+        if hasattr(self, "_best_result"):
+            del self._best_result
+        if hasattr(self, "_best_params"):
+            del self._best_params
+        if hasattr(self, "_best_beta"):
+            del self._best_beta
+        if hasattr(self, "_result"):
+            del self._result
+        if hasattr(self, "_warm_restart"):
+            self._warm_restart = None
+
 
 if __name__ == "__main__":
     import doctest
