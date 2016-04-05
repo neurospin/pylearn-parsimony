@@ -3139,8 +3139,8 @@ class GridSearchKFold(BaseEstimator):
 
         # Compute the best model
 #        if self._warm_restart is None:
-#            function, beta = self.generate_function(X, self._best_params,
-#                                                    start_vectors=True)
+        function, beta = self.generate_function(X, self._best_params,
+                                                start_vectors=True)
 #            self._warm_restart = beta
 #        else:
 #            beta = self._warm_restart
