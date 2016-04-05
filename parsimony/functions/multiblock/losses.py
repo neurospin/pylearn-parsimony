@@ -11,7 +11,6 @@ Created on Tue Feb  4 08:51:43 2014
 @email:   lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
-import abc
 import numbers
 
 import numpy as np
@@ -31,7 +30,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
                                  mb_properties.MultiblockGradient,
                                  mb_properties.MultiblockProximalOperator,
                                  mb_properties.MultiblockProjectionOperator,
-#                                 mb_properties.MultiblockContinuation,
+                                 # mb_properties.MultiblockContinuation,
                                  mb_properties.MultiblockStepSize):
     """Combines one or more loss functions, any number of penalties and zero
     or one proximal operator.
@@ -212,7 +211,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
         if accepts_params is not None:
             self._param_map[accepts_params[0]] = (penalty, accepts_params[1])
 
-#    @utils.deprecated("add_penalty")
+    @utils.deprecated("add_penalty")
     def add_prox(self, penalty, i, accepts_params=None):
         """Add a penalty for block i that has a known or computable proximal
         operator.
@@ -419,9 +418,8 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
 
         else:
             from parsimony.algorithms.proximal \
-                    import ParallelDykstrasProximalAlgorithm
-            combo = ParallelDykstrasProximalAlgorithm(output=False,
-                                                      eps=eps,
+                import ParallelDykstrasProximalAlgorithm
+            combo = ParallelDykstrasProximalAlgorithm(eps=eps,
                                                       max_iter=max_iter,
                                                       min_iter=1)
             prox_w = combo.run(w[index], prox=prox, proj=proj, factor=factor)
@@ -447,7 +445,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
 
         elif len(proj) == 2 and len(prox) == 0:
             from parsimony.algorithms.proximal \
-                    import DykstrasProjectionAlgorithm
+                import DykstrasProjectionAlgorithm
             combo = DykstrasProjectionAlgorithm(eps=eps,
                                                 max_iter=max_iter, min_iter=1)
 
@@ -487,7 +485,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
                         L += fijk.L(w[index])
                 elif isinstance(fijk, mb_properties.MultiblockGradient):
                     if not isinstance(fijk,
-                          mb_properties.MultiblockLipschitzContinuousGradient):
+                                      mb_properties.MultiblockLipschitzContinuousGradient):
                         all_lipschitz = False
                         break
                     else:
@@ -508,7 +506,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
                         pass
                     elif isinstance(fijk, mb_properties.MultiblockGradient):
                         if not isinstance(fijk,
-                          mb_properties.MultiblockLipschitzContinuousGradient):
+                                          mb_properties.MultiblockLipschitzContinuousGradient):
                             all_lipschitz = False
                             break
                         else:
@@ -598,8 +596,8 @@ class MultiblockFunctionWrapper(properties.CompositeFunction,
         ----------
         w : Numpy array (p-by-1). The point at which to evaluate the function.
         """
-        return self.function.f(self.w[:self.index] + \
-                               [w] + \
+        return self.function.f(self.w[:self.index] +
+                               [w] +
                                self.w[self.index + 1:])
 
     def grad(self, w):
@@ -609,8 +607,8 @@ class MultiblockFunctionWrapper(properties.CompositeFunction,
         ----------
         w : Numpy array (p-by-1). The point at which to evaluate the gradient.
         """
-        return self.function.grad(self.w[:self.index] + \
-                                  [w] + \
+        return self.function.grad(self.w[:self.index] +
+                                  [w] +
                                   self.w[self.index + 1:],
                                   self.index)
 
@@ -625,8 +623,8 @@ class MultiblockFunctionWrapper(properties.CompositeFunction,
         factor : Positive float. A factor by which the Lagrange multiplier is
                 scaled. This is usually the step size.
         """
-        return self.function.prox(self.w[:self.index] + \
-                                  [w] + \
+        return self.function.prox(self.w[:self.index] +
+                                  [w] +
                                   self.w[self.index + 1:],
                                   self.index, factor=factor,
                                   eps=eps, max_iter=max_iter)
@@ -638,8 +636,8 @@ class MultiblockFunctionWrapper(properties.CompositeFunction,
         ----------
         w : Numpy array. The point at which to determine the step size.
         """
-        return self.function.step(self.w[:self.index] + \
-                                  [w] + \
+        return self.function.step(self.w[:self.index] +
+                                  [w] +
                                   self.w[self.index + 1:],
                                   self.index)
 
@@ -898,9 +896,9 @@ class MultiblockNesterovFunctionWrapper(MultiblockFunctionWrapper,
 
 
 class LatentVariableCovariance(mb_properties.MultiblockFunction,
-                          mb_properties.MultiblockGradient,
-                          mb_properties.MultiblockLipschitzContinuousGradient):
-                           #properties.Eigenvalues):
+                               mb_properties.MultiblockGradient,
+                               mb_properties.MultiblockLipschitzContinuousGradient):
+                               # properties.Eigenvalues):
     """Represents
 
         Cov(X.w, Y.c) = (K / (n - 1)) * w'.X'.Y.c,
@@ -960,7 +958,8 @@ class LatentVariableCovariance(mb_properties.MultiblockFunction,
         Examples
         --------
         >>> import numpy as np
-        >>> from parsimony.functions.multiblock.losses import LatentVariableCovariance
+        >>> from parsimony.functions.multiblock.losses \
+        ...     import LatentVariableCovariance
         >>>
         >>> np.random.seed(42)
         >>> X = np.random.rand(100, 150)
@@ -1004,8 +1003,8 @@ class LatentVariableCovariance(mb_properties.MultiblockFunction,
 
 
 class LatentVariableCovarianceSquared(mb_properties.MultiblockFunction,
-                          mb_properties.MultiblockGradient,
-                          mb_properties.MultiblockLipschitzContinuousGradient):
+                                      mb_properties.MultiblockGradient,
+                                      mb_properties.MultiblockLipschitzContinuousGradient):
     """Represents
 
         Cov(X.w, Y.c)² = ((1 / (n - 1)) * w'.X'.Y.c)²,
@@ -1063,7 +1062,8 @@ class LatentVariableCovarianceSquared(mb_properties.MultiblockFunction,
         Examples
         --------
         >>> import numpy as np
-        >>> from parsimony.functions.multiblock.losses import LatentVariableCovarianceSquared
+        >>> from parsimony.functions.multiblock.losses \
+        ...     import LatentVariableCovarianceSquared
         >>>
         >>> np.random.seed(42)
         >>> X = np.random.rand(100, 150)
@@ -1083,7 +1083,7 @@ class LatentVariableCovarianceSquared(mb_properties.MultiblockFunction,
         index = int(index)
         grad = np.dot(self.X[index].T,
                       np.dot(self.X[1 - index], w[1 - index])) \
-             * ((2.0 * wXYc) / (self.n * self.n))
+            * ((2.0 * wXYc) / (self.n * self.n))
 
         return -grad
 
@@ -1095,18 +1095,18 @@ class LatentVariableCovarianceSquared(mb_properties.MultiblockFunction,
         index = int(index)
         grad = np.dot(self.X[index].T,
                       np.dot(self.X[1 - index], w[1 - index])) \
-             * (1.0 / self.n)
+            * (1.0 / self.n)
 
         return 2.0 * maths.norm(grad) ** 2.0
 
 
 class GeneralisedMultiblock(mb_properties.MultiblockFunction,
                             mb_properties.MultiblockGradient,
-#                            mb_properties.MultiblockProximalOperator,
+                            # mb_properties.MultiblockProximalOperator,
                             mb_properties.MultiblockProjectionOperator,
                             properties.StepSize,
-#                            LipschitzContinuousGradient,
-#                            NesterovFunction, Continuation, DualFunction
+                            # LipschitzContinuousGradient,
+                            # NesterovFunction, Continuation, DualFunction
                             ):
 
     def __init__(self, X, functions):
@@ -1195,8 +1195,8 @@ class GeneralisedMultiblock(mb_properties.MultiblockFunction,
 ##                w[index] = fii[k].prox(w[index], factor)
 ##                break
 ##        # If no proximal operator was found, we will just return the same
-##        # vectors again. The proximal operator of the zero function returns the
-##        # vector itself.
+##        # vectors again. The proximal operator of the zero function returns
+##        # the vector itself.
 #
 #        return w
 
@@ -1233,7 +1233,7 @@ class GeneralisedMultiblock(mb_properties.MultiblockFunction,
                 if isinstance(fij, properties.LipschitzContinuousGradient):
                     L += fij.L()
                 elif isinstance(fij,
-                        mb_properties.MultiblockLipschitzContinuousGradient):
+                                mb_properties.MultiblockLipschitzContinuousGradient):
                     L += fij.L(w, index)
                 else:
                     all_lipschitz = False
@@ -1247,7 +1247,7 @@ class GeneralisedMultiblock(mb_properties.MultiblockFunction,
                 if isinstance(fii[k], properties.LipschitzContinuousGradient):
                     L += fii[k].L()
                 elif isinstance(fii[k],
-                        mb_properties.MultiblockLipschitzContinuousGradient):
+                                mb_properties.MultiblockLipschitzContinuousGradient):
                     L += fii[k].L(w, index)
                 else:
                     all_lipschitz = False

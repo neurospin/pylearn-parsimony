@@ -1354,9 +1354,10 @@ class RidgeLogisticRegression(LogisticRegressionEstimator):
 
     algorithm : ExplicitAlgorithm. The algorithm that should be applied.
             Should be one of:
-                1. GradientDescent(...)
+                1. AcceleratedGradientDescent(...)
+                2. GradientDescent(...)
 
-            Default is GradientDescent(...).
+            Default is AcceleratedGradientDescent(...).
 
     algorithm_params : A dict. The dictionary algorithm_params contains
             parameters that should be set in the algorithm. Passing
@@ -1405,7 +1406,7 @@ class RidgeLogisticRegression(LogisticRegressionEstimator):
         self.l = max(0.0, float(l))
 
         if algorithm is None:
-            algorithm = gradient.GradientDescent(**algorithm_params)
+            algorithm = gradient.AcceleratedGradientDescent(**algorithm_params)
         else:
             algorithm.set_params(**algorithm_params)
 
@@ -1442,6 +1443,126 @@ class RidgeLogisticRegression(LogisticRegressionEstimator):
 #        function.add_function(losses.LogisticRegression(X, y, mean=self.mean))
 #        function.add_penalty(penalties.L2Squared(self.l,
 #                                             penalty_start=self.penalty_start))
+
+        self.algorithm.check_compatibility(function,
+                                           self.algorithm.INTERFACES)
+
+        # TODO: Should we use a seed here so that we get deterministic results?
+        if beta is None:
+            beta = self.start_vector.get_vector(X.shape[1])
+
+        self.beta = self.algorithm.run(function, beta)
+
+        return self
+
+
+class LassoLogisticRegression(LogisticRegressionEstimator):
+    """Logistic regression (re-weighted log-likelihood aka. cross-entropy) with
+    an L1 penalty:
+
+        f(beta) = -loglik / n_samples + l * ||beta||_1,
+
+    where
+
+        loglik = Sum wi * (yi * log(pi) + (1 − yi) * log(1 − pi)),
+
+        pi = p(y=1|xi, beta) = 1 / (1 + exp(-xi'*beta)),
+
+        wi = weight of sample i,
+
+        and ||.||_1 is the squared L2-norm.
+
+    Parameters
+    ----------
+    l : Non-negative float. The L1 regularisation parameter.
+
+    algorithm : ExplicitAlgorithm. The algorithm that should be applied.
+            Should be one of:
+                1. FISTA(...)
+                2. ISTA(...)
+
+            Default is FISTA(...).
+
+    algorithm_params : A dict. The dictionary algorithm_params contains
+            parameters that should be set in the algorithm. Passing
+            algorithm=MyAlgorithm(**params) is equivalent to passing
+            algorithm=MyAlgorithm() and algorithm_params=params. Default is
+            an empty dictionary.
+
+    class_weight : Dict, 'auto' or None. If 'auto', class weights will be
+            given inverse proportional to the frequency of the class in
+            the data. If a dictionary is given, keys are classes and values
+            are corresponding class weights. If None is given, the class
+            weights will be uniform.
+
+    penalty_start : Non-negative integer. The number of columns, variables
+            etc., to be exempt from penalisation. Equivalently, the first
+            index to be penalised. Default is 0, all columns are included.
+
+    mean : Boolean. Whether to compute the mean loss or not. Default is True,
+            the mean loss.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import parsimony.estimators as estimators
+    >>> import parsimony.algorithms.gradient as gradient
+    >>> n, p = 10, 16
+    >>>
+    >>> np.random.seed(1337)
+    >>> X = np.random.rand(n, p)
+    >>> y = np.random.randint(0, 2, (n, 1))
+    >>> l = 1.0
+    >>> lr = estimators.LassoLogisticRegression(l,
+    ...                      algorithm=gradient.GradientDescent(max_iter=1000),
+    ...                      mean=False)
+    >>> res = lr.fit(X, y)
+    >>> pred = lr.score(X, y)
+    >>> print "prediction rate = %.1f" % pred
+    prediction rate = 1.0
+    """
+    def __init__(self, l,
+                 algorithm=None, algorithm_params=dict(),
+                 class_weight=None,
+                 penalty_start=0,
+                 mean=True):
+
+        self.l = max(0.0, float(l))
+
+        if algorithm is None:
+            algorithm = proximal.FISTA(**algorithm_params)
+        else:
+            algorithm.set_params(**algorithm_params)
+
+        super(LassoLogisticRegression, self).__init__(algorithm=algorithm,
+                                                      class_weight=class_weight)
+
+        self.penalty_start = max(0, int(penalty_start))
+        self.mean = bool(mean)
+
+    def get_params(self):
+        """Return a dictionary containing all the estimator's parameters.
+        """
+        return {"l": self.l,
+                "algorithm": self.algorithm,
+                "class_weight": self.class_weight,
+                "penalty_start": self.penalty_start,
+                "mean": self.mean}
+
+    def fit(self, X, y, beta=None, sample_weight=None):
+        """Fit the estimator to the data.
+        """
+        X, y = check_arrays(X, check_labels(y))
+        if sample_weight is None:
+            sample_weight = class_weight_to_sample_weight(self.class_weight, y)
+        y, sample_weight = check_arrays(y, sample_weight)
+
+        function = functions.CombinedFunction()
+        function.add_function(losses.LogisticRegression(X, y,
+                                                        weights=sample_weight,
+                                                        mean=self.mean))
+        function.add_prox(penalties.L1(l=self.l,
+                                       penalty_start=self.penalty_start))
 
         self.algorithm.check_compatibility(function,
                                            self.algorithm.INTERFACES)
@@ -2747,7 +2868,7 @@ class GridSearchKFoldRegression(BaseEstimator):
                                                       params, X, y, beta)
             value = np.mean(score_values)
 
-            self._result.append((output_y, score_values, value))
+            self._result.append((params, output_y, score_values, value))
 
             if self._best_result is None:
                 self._best_result = value
@@ -2790,8 +2911,8 @@ class GridSearchKFoldRegression(BaseEstimator):
             Xte = X[test, :]
             yte = y[test, :]
 
-            if self._warm_restart is not None:
-                beta = self._warm_restart
+#            if self._warm_restart is not None:
+#                beta = self._warm_restart
 
             estimator.fit(Xtr, ytr, beta)
 
@@ -2833,7 +2954,8 @@ class GridSearchKFoldRegression(BaseEstimator):
         """Returns the fitted parameters, the regression coefficients (beta).
         """
         return {"beta": self._best_beta,
-                "best_params": self._best_params}
+                "best_params": self._best_params,
+                "cv_score": self._best_result}
 
     def score(self, X, y):
         """Returns the estimator's score value or the value of the score
@@ -2859,35 +2981,55 @@ class GridSearchKFold(BaseEstimator):
     Parameters
     ----------
     generate_function : Python function. A function that returns a
-            MultiblockFunction that works with the given algorithm. Also
-            returns a list of start vectors for the algorithm. The signature
-            is:
+            Function that works with the given algorithm. Also returns a list
+            of start vectors for the algorithm. The signature is:
 
                 function, beta = generate_function(X, params,
                                                    start_vectors=True),
+            or
+
+                function = generate_function(X, params, start_vectors=False),
 
             where X is a list if numpy arrays (e.g., the training data sets),
-            and params is a dictionary with the current parameters. Beta may be
-            None, if the algorithm doesn't need any start vectors, and is not
-            returned at all if start_vectors is False.
+            and params is a dictionary with the current parameters. The beta
+            may be None, if the algorithm doesn't need any start vectors, and
+            is not returned at all if start_vectors is False.
 
-    algorithm : ExplicitAlgorithm. An algorithm to apply to minimise the
-            function for every parameter setting.
+    score_function : Python function. The score_function takes as argument a
+            list of data sets, the grid parameters and the fitted parameters
+            and returns a statistic on the fit. The signature is:
+
+                score = score_function(X, params, beta),
+
+            where X is a list of numpy arrays, params is a dictionary with the
+            current parameters, beta is the fitted parameters and score is the
+            computed statistic.
+
+    predict_function : Python function. The predict function takes as argument
+            a list of numpy arrays to predict from, the grid parameters and the
+            fitted parameters. The signature is:
+
+                Yhat = predict_function(X, params, beta),
+
+            where X is a list of numpy arrays, params is a dictionary with the
+            current parameters, beta is the fitted parameters and Yhat is the
+            predicted output.
 
     grid : Dictionary of lists. Every key in the dictionary is a parameter of
             the constructor of the function, and all combinations of the
             parameters in the lists will be used exactly once.
 
-    score_function : Python function. The score_function takes as argument a
-            list of data sets, the grid parameters and the fitted parameters
-            and returns a statistic on the fit.
+    algorithm : ExplicitAlgorithm. An algorithm to apply to minimise the
+            function for every parameter setting.
+
+    algorithm_params : A dict. The dictionary algorithm_params contains
+            parameters that should be set in the algorithm. Passing
+            algorithm=GradientDescent(**params) and algorithm_params=dict() is
+            equivalent to passing algorithm=GradientDescent() and
+            algorithm_params=params. Default is an empty dictionary.
 
     maximise : Boolean. Whether the score function should be maximised (True)
             or minimised (False).
-
-    predict_function : Python function. The predict function takes as argument
-            a list of numpy arrays to predict from, the grid parameters and the
-            fitted parameters.
 
     K : Positive integer greater than 1. The number of cross-validation folds.
 
@@ -2897,16 +3039,18 @@ class GridSearchKFold(BaseEstimator):
     >>> np.random.seed(1337)
     >>>
     """
-    def __init__(self, generate_function, algorithm, algorithm_params, grid,
-                 score_function, predict_function, maximise=True, K=7):
+    def __init__(self, generate_function, score_function, predict_function,
+                 grid, algorithm, algorithm_params=dict(), maximise=True, K=7):
 
-        super(GridSearchKFold, self).__init__(algorithm=None)
+        algorithm.set_params(**dict(algorithm_params))
+
+        super(GridSearchKFold, self).__init__(algorithm=algorithm)
 
         self.generate_function = generate_function
-        self.algorithm = algorithm
-        self.grid = grid
         self.score_function = score_function
         self.predict_function = predict_function
+        self.grid = dict(grid)
+        self.algorithm_params = algorithm_params
         self.maximise = bool(maximise)
         self.K = max(2, int(K))
 
@@ -2917,10 +3061,10 @@ class GridSearchKFold(BaseEstimator):
         parameters.
         """
         return {"generate_function": self.generate_function,
-                "algorithm": self.algorithm,
-                "grid": self.grid,
                 "score_function": self.score_function,
-                "predict_function": self.predict_function,
+                "grid": self.grid,
+                "algorithm": self.algorithm,
+                "algorithm_params": self.algorithm_params,
                 "maximise": self.maximise,
                 "K": self.K}
 
@@ -2931,17 +3075,17 @@ class GridSearchKFold(BaseEstimator):
             del self._best_result
         if hasattr(self, "_best_params"):
             del self._best_params
-        if hasattr(self, "_best_beta"):
-            del self._best_beta
         if hasattr(self, "_result"):
             del self._result
+        if hasattr(self, "_best_beta"):
+            del self._best_beta
         if hasattr(self, "_warm_restart"):
             self._warm_restart = None
 
     def fit(self, X):
         """Fit the estimator to the data.
         """
-        X = check_arrays(X)
+        X = check_arrays(*X)
 
         # Store results
         self._best_result = None
@@ -2970,7 +3114,7 @@ class GridSearchKFold(BaseEstimator):
             value = np.mean(score_values)
 
             # Save all results
-            self._result.append((score_values, value))
+            self._result.append((params, score_values, value))
 
             # Store best result
             if self._best_result is None:  # First time
@@ -2984,6 +3128,8 @@ class GridSearchKFold(BaseEstimator):
                     self._best_result = value
                     self._best_params = params
 
+#            print params, value
+
             # Go to the next parameter setting
             idx[-1] = idx[-1] + 1
             for i in reversed(range(1, len(keys))):
@@ -2992,14 +3138,14 @@ class GridSearchKFold(BaseEstimator):
                     idx[i - 1] = idx[i - 1] + 1
 
         # Compute the best model
-        if self._warm_restart is None:
-            function, beta = self.generate_function(X, self._best_params,
-                                                    start_vectors=True)
-            self._warm_restart = beta
-        else:
-            beta = self._warm_restart
-            function = self.generate_function(X, self._best_params,
-                                              start_vectors=False)
+#        if self._warm_restart is None:
+        function, beta = self.generate_function(X, self._best_params,
+                                                start_vectors=True)
+#            self._warm_restart = beta
+#        else:
+#            beta = self._warm_restart
+#            function = self.generate_function(X, self._best_params,
+#                                              start_vectors=False)
         self.algorithm.reset()
         self._best_beta = self.algorithm.run(function, beta)
 
@@ -3007,13 +3153,10 @@ class GridSearchKFold(BaseEstimator):
 
     def _perform_cv(self, params, X):
 
-        self.function.set_params(**params)
-
         score_values = []
 
         n = X[0].shape[0]
         for train, test in resampling.k_fold(n, self.K):
-            self.function.reset()
 
             Xtr = [0] * len(X)
             Xte = [0] * len(X)
@@ -3021,20 +3164,23 @@ class GridSearchKFold(BaseEstimator):
                 Xtr[i] = X[i][train, :]
                 Xte[i] = X[i][test, :]
 
-            if self._warm_restart is None:
-                function, beta = self.generate_function(Xtr, params,
-                                                        start_vectors=True)
-                self._warm_restart = beta
-            else:
-                beta = self._warm_restart
-                function = self.generate_function(Xtr, params,
-                                                  start_vectors=False)
+#            if self._warm_restart is None:
+            function, beta = self.generate_function(Xtr, params,
+                                                    start_vectors=True)
+#                self._warm_restart = beta
+#            else:
+#                beta = self._warm_restart
+#                function = self.generate_function(Xtr, params,
+#                                                  start_vectors=False)
 
             self.algorithm.reset()
             beta = self.algorithm.run(function, beta)
-            self._warm_restart = beta
+#            self._warm_restart = beta
 
-            value = self.score_function(Xte, params, beta)
+            if not isinstance(beta, (list,)):
+                value = self.score_function(Xte, params, [beta])
+            else:
+                value = self.score_function(Xte, params, beta)
 
             score_values.append(value)
 
@@ -3052,7 +3198,7 @@ class GridSearchKFold(BaseEstimator):
         -------
         Y : A numpy array, n-by-q. The predicted output.
         """
-        X = check_arrays(X)
+        X = check_arrays(*X)
 
         Yhat = self.predict_function(X, self._best_params, self._best_beta)
 
@@ -3101,8 +3247,8 @@ class KFoldCrossValidation(BaseEstimator):
 
                 score = score_function(X, beta),
 
-            where X is a list of numpy arrays and score is the computed
-            statistic.
+            where X is a list of numpy arrays, beta is the fitted parameters
+            and score is the computed statistic.
 
     algorithm : ExplicitAlgorithm. An algorithm to apply to minimise the
             function for every fold.
@@ -3166,7 +3312,7 @@ class KFoldCrossValidation(BaseEstimator):
         """
         X = check_arrays(*X)
 
-        # Store results
+        # Store results here
         self._score_values = []
         self._betas = []
 
@@ -3179,16 +3325,15 @@ class KFoldCrossValidation(BaseEstimator):
                 Xtr[i] = X[i][train, :]
                 Xte[i] = X[i][test, :]
 
-            if self._warm_restart is None:
-                function, beta = self.generate_function(Xtr,
-                                                        start_vectors=True)
-                self._warm_restart = beta
-            else:
-                function = self.generate_function(Xtr, start_vectors=False)
+#            if self._warm_restart is None:
+            function, beta = self.generate_function(Xtr,
+                                                    start_vectors=True)
+#                self._warm_restart = beta
+#            else:
+#                function = self.generate_function(Xtr, start_vectors=False)
+#
+#                beta = self._warm_restart
 
-                beta = self._warm_restart
-
-#            self.algorithm.reset()
             beta = self.algorithm.run(function, beta)
             self._warm_restart = beta
 
