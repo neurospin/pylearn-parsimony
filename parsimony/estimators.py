@@ -3049,35 +3049,55 @@ class GridSearchKFold(BaseEstimator):
     Parameters
     ----------
     generate_function : Python function. A function that returns a
-            MultiblockFunction that works with the given algorithm. Also
-            returns a list of start vectors for the algorithm. The signature
-            is:
+            Function that works with the given algorithm. Also returns a list
+            of start vectors for the algorithm. The signature is:
 
                 function, beta = generate_function(X, params,
                                                    start_vectors=True),
+            or
+
+                function = generate_function(X, params, start_vectors=False),
 
             where X is a list if numpy arrays (e.g., the training data sets),
-            and params is a dictionary with the current parameters. Beta may be
-            None, if the algorithm doesn't need any start vectors, and is not
-            returned at all if start_vectors is False.
+            and params is a dictionary with the current parameters. The beta
+            may be None, if the algorithm doesn't need any start vectors, and
+            is not returned at all if start_vectors is False.
 
-    algorithm : ExplicitAlgorithm. An algorithm to apply to minimise the
-            function for every parameter setting.
+    score_function : Python function. The score_function takes as argument a
+            list of data sets, the grid parameters and the fitted parameters
+            and returns a statistic on the fit. The signature is:
+
+                score = score_function(X, params, beta),
+
+            where X is a list of numpy arrays, params is a dictionary with the
+            current parameters, beta is the fitted parameters and score is the
+            computed statistic.
+
+    predict_function : Python function. The predict function takes as argument
+            a list of numpy arrays to predict from, the grid parameters and the
+            fitted parameters. The signature is:
+
+                Yhat = predict_function(X, params, beta),
+
+            where X is a list of numpy arrays, params is a dictionary with the
+            current parameters, beta is the fitted parameters and Yhat is the
+            predicted output.
 
     grid : Dictionary of lists. Every key in the dictionary is a parameter of
             the constructor of the function, and all combinations of the
             parameters in the lists will be used exactly once.
 
-    score_function : Python function. The score_function takes as argument a
-            list of data sets, the grid parameters and the fitted parameters
-            and returns a statistic on the fit.
+    algorithm : ExplicitAlgorithm. An algorithm to apply to minimise the
+            function for every parameter setting.
+
+    algorithm_params : A dict. The dictionary algorithm_params contains
+            parameters that should be set in the algorithm. Passing
+            algorithm=GradientDescent(**params) and algorithm_params=dict() is
+            equivalent to passing algorithm=GradientDescent() and
+            algorithm_params=params. Default is an empty dictionary.
 
     maximise : Boolean. Whether the score function should be maximised (True)
             or minimised (False).
-
-    predict_function : Python function. The predict function takes as argument
-            a list of numpy arrays to predict from, the grid parameters and the
-            fitted parameters.
 
     K : Positive integer greater than 1. The number of cross-validation folds.
 
@@ -3087,16 +3107,18 @@ class GridSearchKFold(BaseEstimator):
     >>> np.random.seed(1337)
     >>>
     """
-    def __init__(self, generate_function, algorithm, algorithm_params, grid,
-                 score_function, predict_function, maximise=True, K=7):
+    def __init__(self, generate_function, score_function, predict_function,
+                 grid, algorithm, algorithm_params=dict(), maximise=True, K=7):
 
-        super(GridSearchKFold, self).__init__(algorithm=None)
+        algorithm.set_params(**dict(algorithm_params))
+
+        super(GridSearchKFold, self).__init__(algorithm=algorithm)
 
         self.generate_function = generate_function
-        self.algorithm = algorithm
-        self.grid = grid
         self.score_function = score_function
         self.predict_function = predict_function
+        self.grid = dict(grid)
+        self.algorithm_params = algorithm_params
         self.maximise = bool(maximise)
         self.K = max(2, int(K))
 
@@ -3107,10 +3129,10 @@ class GridSearchKFold(BaseEstimator):
         parameters.
         """
         return {"generate_function": self.generate_function,
-                "algorithm": self.algorithm,
-                "grid": self.grid,
                 "score_function": self.score_function,
-                "predict_function": self.predict_function,
+                "grid": self.grid,
+                "algorithm": self.algorithm,
+                "algorithm_params": self.algorithm_params,
                 "maximise": self.maximise,
                 "K": self.K}
 
@@ -3121,17 +3143,17 @@ class GridSearchKFold(BaseEstimator):
             del self._best_result
         if hasattr(self, "_best_params"):
             del self._best_params
-        if hasattr(self, "_best_beta"):
-            del self._best_beta
         if hasattr(self, "_result"):
             del self._result
+        if hasattr(self, "_best_beta"):
+            del self._best_beta
         if hasattr(self, "_warm_restart"):
             self._warm_restart = None
 
     def fit(self, X):
         """Fit the estimator to the data.
         """
-        X = check_arrays(X)
+        X = check_arrays(*X)
 
         # Store results
         self._best_result = None
@@ -3160,7 +3182,7 @@ class GridSearchKFold(BaseEstimator):
             value = np.mean(score_values)
 
             # Save all results
-            self._result.append((score_values, value))
+            self._result.append((params, score_values, value))
 
             # Store best result
             if self._best_result is None:  # First time
@@ -3174,6 +3196,8 @@ class GridSearchKFold(BaseEstimator):
                     self._best_result = value
                     self._best_params = params
 
+#            print params, value
+
             # Go to the next parameter setting
             idx[-1] = idx[-1] + 1
             for i in reversed(range(1, len(keys))):
@@ -3182,14 +3206,14 @@ class GridSearchKFold(BaseEstimator):
                     idx[i - 1] = idx[i - 1] + 1
 
         # Compute the best model
-        if self._warm_restart is None:
-            function, beta = self.generate_function(X, self._best_params,
-                                                    start_vectors=True)
-            self._warm_restart = beta
-        else:
-            beta = self._warm_restart
-            function = self.generate_function(X, self._best_params,
-                                              start_vectors=False)
+#        if self._warm_restart is None:
+        function, beta = self.generate_function(X, self._best_params,
+                                                start_vectors=True)
+#            self._warm_restart = beta
+#        else:
+#            beta = self._warm_restart
+#            function = self.generate_function(X, self._best_params,
+#                                              start_vectors=False)
         self.algorithm.reset()
         self._best_beta = self.algorithm.run(function, beta)
 
@@ -3197,13 +3221,10 @@ class GridSearchKFold(BaseEstimator):
 
     def _perform_cv(self, params, X):
 
-        self.function.set_params(**params)
-
         score_values = []
 
         n = X[0].shape[0]
         for train, test in resampling.k_fold(n, self.K):
-            self.function.reset()
 
             Xtr = [0] * len(X)
             Xte = [0] * len(X)
@@ -3211,20 +3232,23 @@ class GridSearchKFold(BaseEstimator):
                 Xtr[i] = X[i][train, :]
                 Xte[i] = X[i][test, :]
 
-            if self._warm_restart is None:
-                function, beta = self.generate_function(Xtr, params,
-                                                        start_vectors=True)
-                self._warm_restart = beta
-            else:
-                beta = self._warm_restart
-                function = self.generate_function(Xtr, params,
-                                                  start_vectors=False)
+#            if self._warm_restart is None:
+            function, beta = self.generate_function(Xtr, params,
+                                                    start_vectors=True)
+#                self._warm_restart = beta
+#            else:
+#                beta = self._warm_restart
+#                function = self.generate_function(Xtr, params,
+#                                                  start_vectors=False)
 
             self.algorithm.reset()
             beta = self.algorithm.run(function, beta)
-            self._warm_restart = beta
+#            self._warm_restart = beta
 
-            value = self.score_function(Xte, params, beta)
+            if not isinstance(beta, (list,)):
+                value = self.score_function(Xte, params, [beta])
+            else:
+                value = self.score_function(Xte, params, beta)
 
             score_values.append(value)
 
@@ -3242,7 +3266,7 @@ class GridSearchKFold(BaseEstimator):
         -------
         Y : A numpy array, n-by-q. The predicted output.
         """
-        X = check_arrays(X)
+        X = check_arrays(*X)
 
         Yhat = self.predict_function(X, self._best_params, self._best_beta)
 
@@ -3291,8 +3315,8 @@ class KFoldCrossValidation(BaseEstimator):
 
                 score = score_function(X, beta),
 
-            where X is a list of numpy arrays and score is the computed
-            statistic.
+            where X is a list of numpy arrays, beta is the fitted parameters
+            and score is the computed statistic.
 
     algorithm : ExplicitAlgorithm. An algorithm to apply to minimise the
             function for every fold.

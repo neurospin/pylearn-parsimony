@@ -16,12 +16,10 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
-import numpy as np
-
 try:
     from . import bases  # Only works when imported as a package.
 except ValueError:
-    import parsimony.algorithms.bases as bases  # When run as a program.import parsimony.utils.maths as maths
+    import parsimony.algorithms.bases as bases  # When run as a program.
 import parsimony.utils.consts as consts
 from parsimony.algorithms.utils import Info
 import parsimony.utils as utils
@@ -29,7 +27,6 @@ import parsimony.utils.maths as maths
 import parsimony.functions.properties as properties
 import parsimony.functions.multiblock.properties as multiblock_properties
 import parsimony.functions.multiblock.losses as mb_losses
-#from parsimony.algorithms.proximal import FISTA, ISTA
 
 __all__ = ["MultiblockFISTA"]
 
@@ -102,8 +99,8 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                   multiblock_properties.MultiblockGradient,
                   multiblock_properties.MultiblockStepSize,
                   properties.OR(
-                          multiblock_properties.MultiblockProjectionOperator,
-                          multiblock_properties.MultiblockProximalOperator)]
+                      multiblock_properties.MultiblockProjectionOperator,
+                      multiblock_properties.MultiblockProximalOperator)]
 
     INFO_PROVIDED = [Info.ok,
                      Info.num_iter,
@@ -121,6 +118,11 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                                               min_iter=min_iter)
 
         self.eps = max(consts.FLOAT_EPSILON, float(eps))
+
+    def reset(self):
+
+        self.info_reset()
+        self.iter_reset()
 
     @bases.force_reset
     @bases.check_compatibility
@@ -151,7 +153,7 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
         while True:
 
             for i in xrange(len(w)):
-                print "it: %d, i: %d" % (it, i)
+#                print "it: %d, i: %d" % (it, i)
 
 #                if True:
 #                    pass
@@ -338,8 +340,8 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
 
-        print "len(w):", len(w)
-        print "max_iter:", self.max_iter
+#        print "len(w):", len(w)
+#        print "max_iter:", self.max_iter
 
         num_iter = [0] * len(w)
 
@@ -348,10 +350,10 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
             all_converged = True
 
             for i in xrange(len(w)):
-                print "it: %d, i: %d" % (it, i)
+#                print "it: %d, i: %d" % (it, i)
 
                 if function.has_nesterov_function(i):
-                    print "Block %d has a Nesterov function!" % (i,)
+#                    print "Block %d has a Nesterov function!" % (i,)
                     func = mb_losses.MultiblockNesterovFunctionWrapper(
                                                                function, w, i)
                     algorithm = self.conesta
@@ -378,11 +380,11 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
                 if self.info_requested(Info.fvalue):
                     f = f + fval
 
-                print "l0 :", maths.norm0(w[i]), \
-                    ", l1 :", maths.norm1(w[i]), \
-                    ", l2²:", maths.norm(w[i]) ** 2.0
+#                print "l0 :", maths.norm0(w[i]), \
+#                    ", l1 :", maths.norm1(w[i]), \
+#                    ", l2²:", maths.norm(w[i]) ** 2.0
 
-            print "f:", fval[-1]
+#            print "f:", fval[-1]
 
             for i in xrange(len(w)):
 
@@ -398,13 +400,13 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
 #
 #                print "diff:", maths.norm(w_tilde - w_tilde2)
 
-                print "err:", maths.norm(w[i] - w_tilde) * (1.0 / step)
+#                print "err:", maths.norm(w[i] - w_tilde) * (1.0 / step)
                 if (1.0 / step) * maths.norm(w[i] - w_tilde) > self.eps:
                     all_converged = False
                     break
 
             if all_converged:
-                print "All converged!"
+#                print "All converged!"
 
                 if self.info_requested(Info.converged):
                     self.info_set(Info.converged, True)
