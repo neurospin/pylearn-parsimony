@@ -3128,7 +3128,7 @@ class GridSearchKFold(BaseEstimator):
                     self._best_result = value
                     self._best_params = params
 
-#            print params, value
+            print params, value
 
             # Go to the next parameter setting
             idx[-1] = idx[-1] + 1
@@ -3208,7 +3208,8 @@ class GridSearchKFold(BaseEstimator):
         """Returns the fitted parameters, the regression coefficients (beta).
         """
         return {"beta": self._best_beta,
-                "params": self._best_params}
+                "best_params": self._best_params,
+                "cv_score": self._best_result}
 
     def score(self, X, y):
         """Returns the estimator's score value or the value of the score
