@@ -44,6 +44,7 @@ __all__ = ["BaseEstimator",
            "LinearRegressionL1L2GL",
 
            "LogisticRegression",
+           "RandomLogisticRegression",
            "ElasticNetLogisticRegression",
            "LogisticRegressionL1L2TV",
            "LogisticRegressionL1L2TVInexactFISTA",
@@ -1328,6 +1329,73 @@ class LogisticRegression(LogisticRegressionEstimator):
             beta = self.start_vector.get_vector(X.shape[1])
 
         self.beta = self.algorithm.run(function, beta)
+
+        return self
+
+
+class RandomLogisticRegression(LogisticRegression):
+    """A "logistic regression" estimator that returns random outputs.
+
+    Useful for testing.
+
+    Parameters
+    ----------
+    rng : A RandomNumberGenerator class. The random number generator that will
+            be used to generate the regression coefficients. The generator must
+            accept the signature:
+
+                v = rng(shape).
+
+    class_weight : Dict, 'auto' or None. If 'auto', class weights will be
+            given inverse proportional to the frequency of the class in
+            the data. If a dictionary is given, keys are classes and values
+            are corresponding class weights. If None is given, the class
+            weights will be uniform.
+
+    penalty_start : Non-negative integer. The number of columns, variables
+            etc., to be exempt from penalisation. Equivalently, the first
+            index to be penalised. Default is 0, all columns are included.
+
+    mean : Boolean. Whether to compute the squared loss or the mean squared
+            loss. Default is True, the mean squared loss.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import parsimony.estimators as estimators
+    >>>
+    >>> np.random.seed(42)
+    >>>
+    >>> n = 100
+    >>> p = 160
+    >>> X = np.random.rand(n, p)
+    >>> y = np.random.randint(0, 2, (n, 1))
+    >>> rr = estimators.RandomLogisticRegression(lambda x: np.random.randn(*x))
+    >>> round(rr.fit(X, y).score(X, y), 2)
+    0.52
+    """
+    def __init__(self, rng, class_weight=None, penalty_start=0,
+                 start_vector=start_vectors.RandomStartVector(),
+                 mean=True):
+
+        super(RandomLogisticRegression, self).__init__(algorithm=None)#,
+                                                       #start_vector=start_vector)
+
+        self.rng = rng
+        self.mean = bool(mean)
+
+    def get_params(self):
+        """Return a dictionary containing the estimator's parameters
+        """
+        return {"rng": self.rng,
+                "mean": self.mean}
+
+    def fit(self, X, y, beta=None):
+        """Fit the estimator to the data.
+        """
+        X, y = check_arrays(X, y)
+
+        self.beta = self.rng((X.shape[1], 1))
 
         return self
 
