@@ -2946,15 +2946,22 @@ class GridSearchKFoldRegression(BaseEstimator):
                 self._best_result = value
                 self._best_results = score_values
                 self._best_params = params
+
+                print params, value
             else:
                 if self.maximise and value > self._best_result:
                     self._best_result = value
                     self._best_results = score_values
                     self._best_params = params
+
+                    print params, value
                 elif not self.maximise and value < self._best_result:
                     self._best_result = value
                     self._best_results = score_values
                     self._best_params = params
+
+                    print params, value
+
 
             idx[-1] = idx[-1] + 1
             for i in reversed(range(1, len(keys))):
@@ -3149,6 +3156,8 @@ class GridSearchKFold(BaseEstimator):
         """
         if hasattr(self, "_best_result"):
             del self._best_result
+        if hasattr(self, "_best_results"):
+            del self._best_results
         if hasattr(self, "_best_params"):
             del self._best_params
         if hasattr(self, "_result"):
@@ -3165,6 +3174,7 @@ class GridSearchKFold(BaseEstimator):
 
         # Store results
         self._best_result = None
+        self._best_results = None
         self._best_params = None
         self._result = []
 
@@ -3195,16 +3205,23 @@ class GridSearchKFold(BaseEstimator):
             # Store best result
             if self._best_result is None:  # First time
                 self._best_result = value
+                self._best_results = score_values
                 self._best_params = params
+
+                print params, value
             else:
                 if self.maximise and value > self._best_result:
                     self._best_result = value
-                    self._best_params = params
-                elif not self.maximise and value < self._best_result:
-                    self._best_result = value
+                    self._best_results = score_values
                     self._best_params = params
 
-#            print params, value
+                    print params, value
+                elif not self.maximise and value < self._best_result:
+                    self._best_result = value
+                    self._best_results = score_values
+                    self._best_params = params
+
+                    print params, value
 
             # Go to the next parameter setting
             idx[-1] = idx[-1] + 1
@@ -3284,7 +3301,9 @@ class GridSearchKFold(BaseEstimator):
         """Returns the fitted parameters, the regression coefficients (beta).
         """
         return {"beta": self._best_beta,
-                "best_params": self._best_params}
+                "best_params": self._best_params,
+                "cv_score": self._best_result,
+                "score_values": self._best_results}
 
     def score(self, X, y):
         """Returns the estimator's score value or the value of the score
