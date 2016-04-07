@@ -1306,7 +1306,8 @@ class LogisticRegression(LogisticRegressionEstimator):
         """
         return {"class_weight": self.class_weight,
                 "penalty_start": self.penalty_start,
-                "mean": self.mean}
+                "mean": self.mean,
+                "beta": self.beta}
 
     def fit(self, X, y, beta=None, sample_weight=None):
         """Fit the estimator to the data.
@@ -2905,6 +2906,8 @@ class GridSearchKFoldRegression(BaseEstimator):
         """
         if hasattr(self, "_best_result"):
             del self._best_result
+        if hasattr(self, "_best_results"):
+            del self._best_results
         if hasattr(self, "_best_params"):
             del self._best_params
         if hasattr(self, "_best_beta"):
@@ -2918,6 +2921,7 @@ class GridSearchKFoldRegression(BaseEstimator):
         X, y = check_arrays(X, y)
 
         self._best_result = None
+        self._best_results = None
         self._best_params = None
         self._result = []
 
@@ -2940,13 +2944,16 @@ class GridSearchKFoldRegression(BaseEstimator):
 
             if self._best_result is None:
                 self._best_result = value
+                self._best_results = score_values
                 self._best_params = params
             else:
                 if self.maximise and value > self._best_result:
                     self._best_result = value
+                    self._best_results = score_values
                     self._best_params = params
                 elif not self.maximise and value < self._best_result:
                     self._best_result = value
+                    self._best_results = score_values
                     self._best_params = params
 
             idx[-1] = idx[-1] + 1
@@ -3023,7 +3030,8 @@ class GridSearchKFoldRegression(BaseEstimator):
         """
         return {"beta": self._best_beta,
                 "best_params": self._best_params,
-                "cv_score": self._best_result}
+                "cv_score": self._best_result,
+                "score_values": self._best_results}
 
     def score(self, X, y):
         """Returns the estimator's score value or the value of the score
@@ -3276,7 +3284,7 @@ class GridSearchKFold(BaseEstimator):
         """Returns the fitted parameters, the regression coefficients (beta).
         """
         return {"beta": self._best_beta,
-                "params": self._best_params}
+                "best_params": self._best_params}
 
     def score(self, X, y):
         """Returns the estimator's score value or the value of the score
