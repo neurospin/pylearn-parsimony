@@ -55,7 +55,9 @@ __all__ = ["BaseEstimator",
            "Clustering",
 
            "GridSearchKFoldRegression",
-           "GridSearchKFold"]
+           "GridSearchKFold",
+           "KFoldCrossValidationRegression",
+           "KFoldCrossValidation"]
 
 
 class BaseEstimator(object):
@@ -172,6 +174,11 @@ class RegressionEstimator(BaseEstimator):
         """Perform prediction using the fitted parameters.
         """
         return np.dot(check_arrays(X), self.beta)
+
+    def parameters(self):
+        """Returns the fitted parameters, the regression coefficients (beta).
+        """
+        return {"beta": self.beta}
 
     @abc.abstractmethod
     def score(self, X, y):
@@ -1298,16 +1305,18 @@ class LogisticRegression(LogisticRegressionEstimator):
         super(LogisticRegression, self).__init__(algorithm=algorithm,
                                                  class_weight=class_weight)
 
+        self.algorithm_params = algorithm_params
         self.penalty_start = int(penalty_start)
         self.mean = bool(mean)
 
     def get_params(self):
         """Return a dictionary containing all the estimator's parameters.
         """
-        return {"class_weight": self.class_weight,
+        return {"algorithm": self.algorithm,
+                "algorithm_params": self.algorithm_params,
+                "class_weight": self.class_weight,
                 "penalty_start": self.penalty_start,
-                "mean": self.mean,
-                "beta": self.beta}
+                "mean": self.mean}
 
     def fit(self, X, y, beta=None, sample_weight=None):
         """Fit the estimator to the data.
@@ -3317,10 +3326,110 @@ class GridSearchKFold(BaseEstimator):
         return score_value
 
 
+class KFoldCrossValidationRegression(BaseEstimator):
+    """Estimator for performing k-fold cross-validation with a regression
+    estimator.
+
+    A statistic is computed for every fold.
+
+    Parameters
+    ----------
+    estimator : BaseEstimator. The estimator to apply on the CV training and
+            test data.
+
+    maximise : Boolean. Whether the score function should be maximised (True)
+            or minimised (False).
+
+    K : Positive integer greater than 1. The number of cross-validation folds.
+            Default is K=7.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> np.random.seed(1337)
+    >>>
+    """
+    def __init__(self, estimator, maximise=True, K=7):
+
+        super(KFoldCrossValidationRegression, self).__init__(algorithm=None)
+
+        self.estimator = estimator
+        self.maximise = bool(maximise)
+        self.K = max(2, int(K))
+
+    def get_params(self):
+        """Returns a dictionary containing the estimator's own input
+        parameters.
+        """
+        return {"estimator": self.estimator,
+                "maximise": self.maximise,
+                "K": self.K}
+
+    def reset(self):
+        """Resets the function such that it is as if just created.
+        """
+        if hasattr(self, "_score_values"):
+            del self._score_values
+        if hasattr(self, "_betas"):
+            del self._betas
+
+    def fit(self, X, y, beta=None):
+        """Fit the estimator to the data.
+        """
+        X, y = check_arrays(X, y)
+
+        # Store results here
+        self._score_values = []
+        self._betas = []
+
+        n = X.shape[0]
+        for train, test in resampling.k_fold(n, self.K):
+
+            Xtr = X[train, :]
+            Xte = X[test, :]
+            ytr = y[train, :]
+            yte = y[test, :]
+
+            params = self.estimator.fit(Xtr, ytr).parameters()
+            beta = params["beta"]
+
+            value = self.estimator.score(Xte, yte)
+
+            self._score_values.append(value)
+            self._betas.append(beta)
+
+        return self
+
+    def predict(self, X):
+        """Returns the cross-validated statistic.
+
+        Returns
+        -------
+        Y : A float. The mean of the statistic computed in each of the K folds.
+        """
+        return self.estimator.predict(X)
+
+    def parameters(self):
+        """Returns the fitted parameters, the regression coefficients (beta),
+        and the computed score values.
+        """
+        return {"score_values": self._score_values,
+                "betas": self._betas}
+
+    def score(self, X=None):
+        """Returns the cross-validated statistic.
+
+        Returns
+        -------
+        Y : A float. The mean of the statistics computed in the K folds.
+        """
+        return np.mean(self._score_values)
+
+
 class KFoldCrossValidation(BaseEstimator):
     """Estimator for performing k-fold cross-validation.
 
-    For every fold a statistic is computed.
+    A statistic is computed for every fold.
 
     Parameters
     ----------
