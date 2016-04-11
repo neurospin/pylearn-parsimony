@@ -26,8 +26,9 @@ import hashlib
 
 if not config.get_boolean("tests", "allow_downloads", False):
     raise Exception("Download of weight map is not authorized and it is "
-        "required to complete this test.\n"
-        "Please set allow_downloads = True in the file: config.ini")
+                    "required to complete this test.\n"
+                    "Please set allow_downloads = True in the file: "
+                    "config.ini")
 
 try:
     import sklearn.linear_model
@@ -339,6 +340,7 @@ MODELS["2d_l1tv_inexactfista"] = \
         l1, 0, tv, Al1tv,
         algorithm_params=algorithm_params)
 
+
 ###############################################################################
 ## tests
 ###############################################################################
@@ -421,8 +423,8 @@ if __name__ == "__main__":
 
     if options.save_weights:
         fit_all(MODELS)
-        utils.plot.plot_map2d_of_models(MODELS, nrow=5, ncol=6, shape=shape,
-                                        title_attr="__title__")
+        utils.plots.map2d_of_models(MODELS, nrow=5, ncol=6, shape=shape,
+                                    title_attr="__title__")
         if raw_input("Save weights ? [n]/y") == "y":
             utils.testing.save_weights(MODELS,
                                        weights_filename(shape, n_samples))
@@ -440,7 +442,5 @@ if __name__ == "__main__":
 
     if options.plot:
         fit_all(MODELS)
-        utils.plot.plot_map2d_of_models(MODELS, nrow=5, ncol=6, shape=shape,
-                                        title_attr="__title__")
-
-
+        utils.plots.map2d_of_models(MODELS, nrow=5, ncol=6, shape=shape,
+                                    title_attr="__title__")

@@ -13,7 +13,7 @@ import scipy.stats as ss
 import matplotlib.pyplot as plot
 
 
-__all__ = ["plot_map2d", "plot_map2d_of_models", "plot_classes",
+__all__ = ["map2d", "map2d_of_models", "classes", "errorbars",
            "voronoi_tesselation"]
 
 
@@ -24,8 +24,8 @@ MARKERS = ["+", ".", "o", "*", "p", "s", "x", "D", "h", "^"]
 LINE_STYLE = ["-", "--", "--.", ":"]
 
 
-def plot_map2d(map2d, plot=None, title=None, limits=None,
-               center_cmap=True):
+def map2d(map2d, plot=None, title=None, limits=None, center_cmap=True):
+
     import matplotlib.pyplot as plt
 
     if plot is None:
@@ -63,10 +63,10 @@ def plot_map2d(map2d, plot=None, title=None, limits=None,
         plt.title(title)
 
 
-def plot_map2d_of_models(models_dict, nrow, ncol, shape, title_attr=None):
+def map2d_of_models(models_dict, nrow, ncol, shape, title_attr=None):
     """Plot 2 weight maps of models"""
-    #from .plot import plot_map2d
-    import matplotlib.pyplot as plt
+    #from .plots import plot_map2d
+
     ax_i = 1
     for k in models_dict.keys():
         mod = models_dict[k]
@@ -80,16 +80,13 @@ def plot_map2d_of_models(models_dict, nrow, ncol, shape, title_attr=None):
             title = getattr(mod, title_attr)
         else:
             title = None
-        ax = plt.subplot(nrow, ncol, ax_i)
-        plot_map2d(w.reshape(shape), ax,
-                   title=title)
+        ax = plot.subplot(nrow, ncol, ax_i)
+        map2d(w.reshape(shape), ax, title=title)
         ax_i += 1
-    plt.show()
+    plot.show()
 
 
-def plot_classes(X, classes, title=None, xlabel=None, ylabel=None, show=True):
-
-    import matplotlib.pyplot as plot
+def classes(X, classes, title=None, xlabel=None, ylabel=None, show=True):
 
     if isinstance(classes, np.ndarray):
         classes = classes.ravel().tolist()
@@ -123,12 +120,9 @@ def plot_classes(X, classes, title=None, xlabel=None, ylabel=None, show=True):
             plot.show()
 
 
-def plot_errorbars(X, classes=None, means=None, alpha=0.05,
-                   title=None, xlabel=None, ylabel=None,
-                   colors=None,
-                   show=True, latex=True):
-
-    import matplotlib.pyplot as plot
+def errorbars(X, classes=None, means=None, alpha=0.05,
+              title=None, xlabel=None, ylabel=None, colors=None,
+              new_figure=True, show=True, latex=True, ylim=None):
 
     B, n = X.shape
     if classes is None:
@@ -147,7 +141,8 @@ def plot_errorbars(X, classes=None, means=None, alpha=0.05,
     labels, cls_inverse = np.unique(classes, return_inverse=True)
     labels = labels.ravel().tolist()
 
-#    plot.figure()
+    if new_figure:
+        plot.figure()
     if latex:
         plot.rc('text', usetex=True)
         plot.rc('font', family='serif')
@@ -173,10 +168,13 @@ def plot_errorbars(X, classes=None, means=None, alpha=0.05,
                       capsize=5)
 
     plot.xlim((0, n + 1))
-    mn = np.min(data_mu - ci)
-    mx = np.max(data_mu + ci)
-    d = mx - mn
-    plot.ylim((mn - d * 0.05, mx + d * 0.05))
+    if ylim is not None:
+        plot.ylim(ylim)
+    else:
+        mn = np.min(data_mu - ci)
+        mx = np.max(data_mu + ci)
+        d = mx - mn
+        plot.ylim((mn - d * 0.05, mx + d * 0.05))
 
     if xlabel is not None:
         plot.xlabel(xlabel)
@@ -283,7 +281,7 @@ def _voronoi_finite_polygons_2d(vor, radius=None):
                 continue
 
             # Compute the missing endpoint of an infinite ridge.
-            t = vor.points[p2] - vor.points[p1] # tangent
+            t = vor.points[p2] - vor.points[p1]  # tangent
             t /= np.linalg.norm(t)
             n = np.array([-t[1], t[0]])  # normal
 
@@ -297,7 +295,7 @@ def _voronoi_finite_polygons_2d(vor, radius=None):
         # Sort region counterclockwise.
         vs = np.asarray([new_vertices[v] for v in new_region])
         c = vs.mean(axis=0)
-        angles = np.arctan2(vs[:,1] - c[1], vs[:,0] - c[0])
+        angles = np.arctan2(vs[:, 1] - c[1], vs[:, 0] - c[0])
         new_region = np.array(new_region)[np.argsort(angles)]
 
         # Finish.

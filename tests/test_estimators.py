@@ -29,7 +29,10 @@ class TestEstimators(TestCase):
         X = np.random.rand(n, p)
         y = np.random.rand(n, 1)
 
-        info = [Info.converged, Info.num_iter, Info.time, Info.fvalue]
+        info = [Info.converged, Info.num_iter, Info.time, Info.fvalue,
+                Info.func_val]
+        # Note: Info.fvalue and Info.func_val are both returned for now. But
+        # recall that Info.fvalue is deprecated!
         lr = estimators.LinearRegression(algorithm=gradient.GradientDescent(),
                                      algorithm_params=dict(max_iter=7000,
                                                            info=info),

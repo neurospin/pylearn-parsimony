@@ -958,8 +958,7 @@ class LatentVariableCovariance(mb_properties.MultiblockFunction,
         Examples
         --------
         >>> import numpy as np
-        >>> from parsimony.functions.multiblock.losses \
-        ...     import LatentVariableCovariance
+        >>> from parsimony.functions.multiblock.losses import LatentVariableCovariance
         >>>
         >>> np.random.seed(42)
         >>> X = np.random.rand(100, 150)
@@ -1062,8 +1061,7 @@ class LatentVariableCovarianceSquared(mb_properties.MultiblockFunction,
         Examples
         --------
         >>> import numpy as np
-        >>> from parsimony.functions.multiblock.losses \
-        ...     import LatentVariableCovarianceSquared
+        >>> from parsimony.functions.multiblock.losses import LatentVariableCovarianceSquared
         >>>
         >>> np.random.seed(42)
         >>> X = np.random.rand(100, 150)
