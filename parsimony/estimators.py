@@ -3087,13 +3087,14 @@ class GridSearchKFold(BaseEstimator):
             may be None, if the algorithm doesn't need any start vectors, and
             is not returned at all if start_vectors is False.
 
-    score_function : Python function. The score_function takes as argument a
-            list of data sets, the grid parameters and the fitted parameters
+    score_function : Python function. The score_function takes as argument two
+            lists of data sets, the grid parameters and the fitted parameters
             and returns a statistic on the fit. The signature is:
 
-                score = score_function(X, params, beta),
+                score = score_function(Xtr, Xte, params, beta),
 
-            where X is a list of numpy arrays, params is a dictionary with the
+            where Xtr is a list of numpy arrays, the training set, Xte is a
+            list of numpy arrays, the test set, params is a dictionary with the
             current parameters, beta is the fitted parameters and score is the
             computed statistic.
 
@@ -3189,6 +3190,7 @@ class GridSearchKFold(BaseEstimator):
 
         # Generate upper limit of the grid parameters
         keys = self.grid.keys()
+        print "keys: ", keys
         maxs = [0] * len(keys)
         for i in range(len(keys)):
             maxs[i] = len(self.grid[keys[i]])
@@ -3280,9 +3282,9 @@ class GridSearchKFold(BaseEstimator):
 #            self._warm_restart = beta
 
             if not isinstance(beta, (list,)):
-                value = self.score_function(Xte, params, [beta])
+                value = self.score_function(Xtr, Xte, params, [beta])
             else:
-                value = self.score_function(Xte, params, beta)
+                value = self.score_function(Xtr, Xte, params, beta)
 
             score_values.append(value)
 
@@ -3445,14 +3447,15 @@ class KFoldCrossValidation(BaseEstimator):
             start vectors, and is not returned at all if start_vectors is
             False.
 
-    score_function : Python function. The score_function takes as argument a
-            list of data sets, the grid parameters and the fitted parameters
+    score_function : Python function. The score_function takes as argument two
+            lists of data sets, the grid parameters and the fitted parameters
             and returns a statistic on the fit. The signature is:
 
-                score = score_function(X, beta),
+                score = score_function(Xtr, Xte, beta),
 
-            where X is a list of numpy arrays, beta is the fitted parameters
-            and score is the computed statistic.
+            where Xtr is a list of numpy arrays, the training set, Xte is also
+            a list of numpy arrays, the test set, beta is the fitted
+            parameters and the returned score is the computed statistic.
 
     algorithm : ExplicitAlgorithm. An algorithm to apply to minimise the
             function for every fold.
@@ -3542,9 +3545,9 @@ class KFoldCrossValidation(BaseEstimator):
             self._warm_restart = beta
 
             if not isinstance(beta, (list,)):
-                value = self.score_function(Xte, [beta])
+                value = self.score_function(Xtr, Xte, [beta])
             else:
-                value = self.score_function(Xte, beta)
+                value = self.score_function(Xtr, Xte, beta)
 
             self._score_values.append(value)
             self._betas.append(beta)
