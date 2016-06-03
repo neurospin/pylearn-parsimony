@@ -12,7 +12,7 @@ import random
 
 import numpy as np
 
-import correlation_matrices
+from . import correlation_matrices
 
 __all__ = ['load']
 
@@ -94,7 +94,7 @@ def load(size=[[100, 100]], rho=[0.05], delta=0.1, eps=None, density=0.5,
 
     p = [0] * K
     n = None
-    for k in xrange(K):
+    for k in range(K):
         if n != None and size[k][0] != n:
             raise ValueError("The groups must have the same number of samples")
         n = size[k][0]
@@ -117,7 +117,7 @@ def load(size=[[100, 100]], rho=[0.05], delta=0.1, eps=None, density=0.5,
 
     # Apply sparsity
     beta = (np.random.rand(p, 1) - 0.5) * 2.0
-    ind = range(p)
+    ind = list(range(p))
     random.shuffle(ind)
     ind = ind[:int(round(len(ind) * (1.0 - density)))]
     beta[ind] = 0

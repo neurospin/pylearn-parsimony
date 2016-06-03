@@ -10,7 +10,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 import os.path
 import numpy as np
-import utils
+from . import utils
 import tempfile
 
 
@@ -44,7 +44,7 @@ def orth_matrix(n=10):
     Y = utils.rand(n, 1)
     X = utils.zeros(n, n)
     if n > 2:
-        for j in xrange(n - 1):
+        for j in range(n - 1):
             x = utils.rand(n, 1)
             while abs(abs(utils.corr(x, Y)) - j / (n - 1.0)) > 0.005:
                 x = utils.rand(n, 1)

@@ -22,8 +22,8 @@ from .. import properties
 import parsimony.utils.consts as consts
 import parsimony.utils.maths as maths
 import parsimony.utils as utils
-import tv
-import l1
+from . import tv
+from . import l1
 from parsimony.utils.linalgs import LinearOperator
 
 __all__ = ["L1TV",
@@ -67,7 +67,7 @@ class L1TV(properties.NesterovFunction,
         # WARNING: Number of non-zero rows may differ from p.
         self._p = A[0].shape[1]
         # Put lambda and gamma in A matrices.
-        A = [l1 * A[0]] + [tv * A[i] for i in xrange(1, len(A))]
+        A = [l1 * A[0]] + [tv * A[i] for i in range(1, len(A))]
 
         super(L1TV, self).__init__(l1, A=A, mu=mu, penalty_start=penalty_start)
 
@@ -91,7 +91,7 @@ class L1TV(properties.NesterovFunction,
         # lambda and gamma are in A.
         A = self.A()
         abeta_tv = A[1].dot(beta_) ** 2.0
-        for k in xrange(2, len(A)):
+        for k in range(2, len(A)):
             abeta_tv += A[k].dot(beta_) ** 2
 
         return maths.norm1(A[0].dot(beta_)) + np.sum(np.sqrt(abeta_tv))
@@ -211,7 +211,7 @@ class L1TV(properties.NesterovFunction,
         else:
             beta_ = beta
         # Remember: lambda and gamma are already in the A matrices.
-        a = [(1.0 / self.mu) * A[i].dot(beta_) for i in xrange(len(A))]
+        a = [(1.0 / self.mu) * A[i].dot(beta_) for i in range(len(A))]
 
         return self.project(a)
 
@@ -228,12 +228,12 @@ class L1TV(properties.NesterovFunction,
 
         # TV
         anorm_tv = a[1] ** 2.0
-        for k in xrange(2, len(a)):
+        for k in range(2, len(a)):
             anorm_tv += a[k] ** 2
         i_tv = anorm_tv > 1.0
 
         anorm_tv_i = anorm_tv[i_tv] ** 0.5  # Square root is taken here. Faster.
-        for k in xrange(1, len(a)):
+        for k in range(1, len(a)):
             a[k][i_tv] = np.divide(a[k][i_tv], anorm_tv_i)
 
         return a

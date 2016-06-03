@@ -10,7 +10,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 from nose.tools import assert_less
 
-from tests import TestCase
+from .tests import TestCase
 
 
 class TestAlgorithms(TestCase):
@@ -100,7 +100,7 @@ class TestAlgorithms(TestCase):
 #        # Note that p should be divisible by 3!
 #        n, p = 75, 90
 #        penalty_start = 0
-#        groups = [range(penalty_start, 2 * p / 3), range(p / 3, p)]
+#        groups = [range(penalty_start, 2 * int(p / 3)), range(int(p / 3), p)]
 #        weights = [1.5, 0.5]
 #
 #        l = 0.618

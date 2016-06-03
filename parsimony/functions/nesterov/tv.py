@@ -88,7 +88,7 @@ class TotalVariation(properties.NesterovFunction,
 
         A = self.A()
         abeta2 = A[0].dot(beta_) ** 2.0
-        for k in xrange(1, len(A)):
+        for k in range(1, len(A)):
             abeta2 += A[k].dot(beta_) ** 2
 
         return self.l * (np.sum(np.sqrt(abeta2)) - self.c)
@@ -133,7 +133,7 @@ class TotalVariation(properties.NesterovFunction,
 
         A = self.A()
         abeta2 = A[0].dot(beta_) ** 2.0
-        for k in xrange(1, len(A)):
+        for k in range(1, len(A)):
             abeta2 += A[k].dot(beta_) ** 2
         val = np.sum(np.sqrt(abeta2))
 #        val = np.sum(np.sqrt(A[0].dot(beta_) ** 2.0 +
@@ -246,12 +246,12 @@ class TotalVariation(properties.NesterovFunction,
         From the interface "NesterovFunction".
         """
         anorm = a[0] ** 2.0
-        for k in xrange(1, len(a)):
+        for k in range(1, len(a)):
             anorm += a[k] ** 2
         i = anorm > 1.0
 
         anorm_i = anorm[i] ** 0.5  # Square root is taken here. Faster.
-        for k in xrange(len(a)):
+        for k in range(len(a)):
             a[k][i] = np.divide(a[k][i], anorm_i)
 
         return a
@@ -344,7 +344,7 @@ def linear_operator_from_mask(mask, offset=0, weights=None):
     im2flat[:] = -1
     im2flat[mask_bool] = np.arange(np.sum(mask_bool)) + offset
 
-    for pt in xrange(len(xyz_mask[0])):
+    for pt in range(len(xyz_mask[0])):
 
         found = False
         x, y, z = xyz_mask[0][pt], xyz_mask[1][pt], xyz_mask[2][pt]
@@ -431,7 +431,7 @@ def linear_operator_from_subset_mask(mask, weights=None):
 #    im2flat[mask] = np.arange(p)
 #    im2flat[np.arange(p)] = np.arange(p)
 
-    for pt in xrange(len(zyx_mask[0])):
+    for pt in range(len(zyx_mask[0])):
 
         found = False
         z, y, x = zyx_mask[0][pt], zyx_mask[1][pt], zyx_mask[2][pt]
@@ -616,7 +616,7 @@ def linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0,
     map_full2masked[:] = -1
     map_full2masked[mask_bool] = np.arange(np.sum(mask_bool)) + offset
     ## 1) Associate edges to nodes
-    nodes_with_edges = [[] for i in xrange(mesh_coord.shape[0])]
+    nodes_with_edges = [[] for i in range(mesh_coord.shape[0])]
 
     def connect_edge_to_node(node_idx1, node_idx2, nodes_with_edges):
             # Attach edge to first node.
@@ -628,7 +628,7 @@ def linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0,
                 edge = [node_idx2, node_idx1]
                 if not edge in nodes_with_edges[node_idx2]:
                     nodes_with_edges[node_idx2].append(edge)
-    for i in xrange(mesh_triangles.shape[0]):
+    for i in range(mesh_triangles.shape[0]):
         t = mesh_triangles[i, :]
         connect_edge_to_node(t[0], t[1], nodes_with_edges)
         connect_edge_to_node(t[0], t[2], nodes_with_edges)
@@ -636,7 +636,7 @@ def linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0,
     max_connectivity = np.max(np.array([len(n) for n in nodes_with_edges]))
     # 3. build sparse matrices
     # 1..max_connectivity of i, j and value
-    A = [[[], [], []] for i in xrange(max_connectivity)]
+    A = [[[], [], []] for i in range(max_connectivity)]
     n_compacts = 0
     for node_idx in mask_idx:
         #node_idx = 0
@@ -661,7 +661,7 @@ def linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0,
             n_compacts += 1
     p = mask.sum()
     A = [sparse.csr_matrix((A[i][2], (A[i][0], A[i][1])),
-                           shape=(p, p)) for i in xrange(len(A))]
+                           shape=(p, p)) for i in range(len(A))]
     A = LinearOperator(*A)
     A.n_compacts = n_compacts
     return A

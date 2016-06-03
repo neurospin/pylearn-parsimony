@@ -10,7 +10,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 import unittest
 
-from tests import TestCase
+from .tests import TestCase
 
 
 class TestFunctions(TestCase):

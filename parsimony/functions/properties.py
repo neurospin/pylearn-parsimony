@@ -14,6 +14,8 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com, edouard.duchesnay@cea.fr
 @license: BSD 3-clause.
 """
+from six import with_metaclass
+from six import with_metaclass
 import abc
 
 import numpy as np
@@ -32,9 +34,7 @@ __all__ = ["Function", "AtomicFunction", "CompositeFunction",
            "OR"]
 
 
-class Function(object):
-
-    __metaclass__ = abc.ABCMeta
+class Function(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
     def f(self, *args, **kwargs):
@@ -62,19 +62,17 @@ class Function(object):
             setattr(self, k, kwargs[k])
 
 
-class AtomicFunction(Function):
+class AtomicFunction(with_metaclass(abc.ABCMeta, Function)):
     """This is a function that is not in general supposed to be minimised by
     itself. Instead it should be combined with other atomic functions and
     composite functions into composite functions.
     """
-    __metaclass__ = abc.ABCMeta
 
 
-class CompositeFunction(Function):
+class CompositeFunction(with_metaclass(abc.ABCMeta, Function)):
     """This is a function that is the combination (e.g. sum) of other
     composite or atomic functions. It may also be a constrained function.
     """
-    __metaclass__ = abc.ABCMeta
 
 #    constraints = list()
 #
@@ -90,12 +88,11 @@ class CompositeFunction(Function):
 #        return self.constraints
 
 
-class IndicatorFunction(Function):
+class IndicatorFunction(with_metaclass(abc.ABCMeta, Function)):
     """Represents an indicator function.
 
     I.e. f(x) = 0 if x is in the associated set and infinity otherwise.
     """
-    __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def f(self, *args, **kwargs):
@@ -105,7 +102,7 @@ class IndicatorFunction(Function):
                                   'specialised!')
 
 
-class SplittableFunction(Function):
+class SplittableFunction(with_metaclass(abc.ABCMeta, Function)):
     """Represents a function that is the sum of two other functions such that
 
         f(x) = g(x) + h(x),
@@ -117,7 +114,6 @@ class SplittableFunction(Function):
     The first function, g(x), is accessed as self.g(...) and the second
     function, h(x), is accessed as self.h(...).
     """
-    __metaclass__ = abc.ABCMeta
 
     def f(self, x):
         """Function value.
@@ -126,7 +122,7 @@ class SplittableFunction(Function):
              + self.h.f(x)
 
 
-class Penalty(object):
+class Penalty(with_metaclass(abc.ABCMeta, object)):
     """Represents the penalisation of a function.
 
     Penalties must take a parameter penalty_start, with default value 0.
@@ -139,11 +135,10 @@ class Penalty(object):
             etc., to except from penalisation. Equivalently, the first index
             to be penalised. Default is 0, all columns are included.
     """
-    __metaclass__ = abc.ABCMeta
 
 
 # TODO: Should all constraints have the projection operator?
-class Constraint(object):
+class Constraint(with_metaclass(abc.ABCMeta, object)):
     """Represents a constraint of a function.
 
     Constraints must take a parameter penalty_start, with default value 0.
@@ -156,7 +151,6 @@ class Constraint(object):
             penalisation. Equivalently, the first index to be penalised.
             Default is 0, all columns are included.
     """
-    __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def feasible(self, x):
@@ -166,9 +160,7 @@ class Constraint(object):
                                   'specialised!')
 
 
-class ProximalOperator(object):
-
-    __metaclass__ = abc.ABCMeta
+class ProximalOperator(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
     def prox(self, x, factor=1.0, eps=consts.TOLERANCE, max_iter=100,
@@ -199,7 +191,7 @@ class ProximalOperator(object):
                                   'specialised!')
 
 
-class AugmentedProximalOperator(ProximalOperator):
+class AugmentedProximalOperator(with_metaclass(abc.ABCMeta, ProximalOperator)):
     """Given the problem
 
         min. f(x)
@@ -223,7 +215,6 @@ class AugmentedProximalOperator(ProximalOperator):
     rho : Non-negative float. The regularisation constant for the augmented
             Lagrangian.
     """
-    __metaclass__ = abc.ABCMeta
 
     def __init__(self, rho=1.0):
 
@@ -236,9 +227,7 @@ class AugmentedProximalOperator(ProximalOperator):
         self.rho = rho
 
 
-class ProjectionOperator(object):
-
-    __metaclass__ = abc.ABCMeta
+class ProjectionOperator(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
     def proj(self, beta, eps=consts.TOLERANCE, max_iter=100):
@@ -280,9 +269,7 @@ class CombinedProjectionOperator(Function, ProjectionOperator):
         return proj
 
 
-class Continuation(object):
-
-    __metaclass__ = abc.ABCMeta
+class Continuation(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
     def mu_opt(self, eps):
@@ -346,9 +333,7 @@ class Continuation(object):
                                   'specialised!')
 
 
-class Gradient(object):
-
-    __metaclass__ = abc.ABCMeta
+class Gradient(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
     def grad(self, beta):
@@ -380,7 +365,7 @@ class Gradient(object):
             start = self.penalty_start
         else:
             start = 0
-        for i in xrange(start, p):
+        for i in range(start, p):
             x[i, 0] -= eps
             loss1 = self.f(x)
             x[i, 0] += 2.0 * eps
@@ -391,9 +376,7 @@ class Gradient(object):
         return grad
 
 
-class Hessian(object):
-
-    __metaclass__ = abc.ABCMeta
+class Hessian(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
     def hessian(self, beta, vector=None):
@@ -427,11 +410,8 @@ class Hessian(object):
                                   'specialised!')
 
 
-class LipschitzContinuousGradient(object):
+class LipschitzContinuousGradient(with_metaclass(abc.ABCMeta, object)):
 
-    __metaclass__ = abc.ABCMeta
-
-    # TODO: Should L by default take a weight vector as argument?
     @abc.abstractmethod
     def L(self, beta=None):
         """Lipschitz constant of the gradient.
@@ -456,7 +436,7 @@ class LipschitzContinuousGradient(object):
                 points which we draw randomly.
         """
         L = -float("inf")
-        for i in xrange(max_iter):
+        for i in range(max_iter):
             a = np.random.rand(*shape) * 2.0 - 1.0
             b = np.random.rand(*shape) * 2.0 - 1.0
             grad_a = self.grad(a)
@@ -467,9 +447,7 @@ class LipschitzContinuousGradient(object):
         return L
 
 
-class StepSize(object):
-
-    __metaclass__ = abc.ABCMeta
+class StepSize(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
     def step(self, beta, index=0):
@@ -486,9 +464,7 @@ class StepSize(object):
                                   'specialised!')
 
 
-class GradientMap(object):
-
-    __metaclass__ = abc.ABCMeta
+class GradientMap(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
     def V(self, alpha, beta, L):
@@ -498,9 +474,7 @@ class GradientMap(object):
                                   'specialised!')
 
 
-class DualFunction(object):
-
-    __metaclass__ = abc.ABCMeta
+class DualFunction(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
     def gap(self, beta, beta_hat=None,
@@ -519,9 +493,7 @@ class DualFunction(object):
                                   'specialised!')
 
 
-class Eigenvalues(object):
-
-    __metaclass__ = abc.ABCMeta
+class Eigenvalues(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
     def lambda_max(self):
@@ -537,7 +509,7 @@ class Eigenvalues(object):
                                   'implemented!')
 
 
-class StronglyConvex(object):
+class StronglyConvex(with_metaclass(abc.ABCMeta, object)):
     """Represents strongly convex functions.
 
     A function is strongly convex with parameter m if
@@ -551,7 +523,6 @@ class StronglyConvex(object):
     where H is the Hessian, I is the identity matrix. The second ">=" means
     that H(f(x)) - mI is positive semi-definite.
     """
-    __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def parameter(self):
@@ -573,14 +544,14 @@ class OR(object):
 
     def __str__(self):
         string = str(self.classes[0])
-        for i in xrange(1, len(self.classes)):
+        for i in range(1, len(self.classes)):
             string = string + " OR " + str(self.classes[i])
 
 
-class NesterovFunction(Gradient,
+class NesterovFunction(with_metaclass(abc.ABCMeta, Gradient,
                        LipschitzContinuousGradient,
                        Eigenvalues,
-                       ProximalOperator):
+                       ProximalOperator)):
     """Abstract superclass of Nesterov functions.
 
     Attributes:
@@ -595,7 +566,6 @@ class NesterovFunction(Gradient,
             etc., to except from penalisation. Equivalently, the first index
             to be penalised. Default is 0, all columns are included.
     """
-    __metaclass__ = abc.ABCMeta
 
     def __init__(self, l, A=None, mu=consts.TOLERANCE, penalty_start=0):
         """
@@ -719,7 +689,7 @@ class NesterovFunction(Gradient,
         A = self.A()
         mu = self.get_mu()
         alpha = [0] * len(A)
-        for i in xrange(len(A)):
+        for i in range(len(A)):
             alpha[i] = A[i].dot(beta_) * (1.0 / mu)
 
         # Apply projection.
@@ -741,7 +711,7 @@ class NesterovFunction(Gradient,
         """
         A = self.A()
         lA = [0] * len(A)
-        for i in xrange(len(A)):
+        for i in range(len(A)):
             lA[i] = self.l * A[i]
 
         return lA
@@ -755,7 +725,7 @@ class NesterovFunction(Gradient,
         """
         A = self.A()
         Aa = A[0].T.dot(alpha[0])
-        for i in xrange(1, len(A)):
+        for i in range(1, len(A)):
             Aa += A[i].T.dot(alpha[i])
 
         return Aa
@@ -797,7 +767,7 @@ class NesterovFunction(Gradient,
 
         SS = 0.0
         A = self.A()
-        for i in xrange(len(A)):
+        for i in range(len(A)):
             SS = max(SS, maths.norm(A[i].dot(beta_)))
 
         return SS
@@ -900,7 +870,7 @@ class NesterovFunction(Gradient,
             def Av(self, v):
                 A = self.A
                 a = [0] * len(A)
-                for i in xrange(len(A)):
+                for i in range(len(A)):
                     a[i] = A[i].dot(v)
 
                 return a
@@ -908,7 +878,7 @@ class NesterovFunction(Gradient,
             def Ata(self, a):
                 A = self.A
                 x = A[0].T.dot(a[0])
-                for i in xrange(1, len(A)):
+                for i in range(1, len(A)):
                     x = x + A[i].T.dot(a[i])
 
                 return x
@@ -938,7 +908,7 @@ class NesterovFunction(Gradient,
 
         if self._alpha is None:
             alpha = [0] * len(A)
-            for i in xrange(len(A)):
+            for i in range(len(A)):
                 alpha[i] = np.random.rand(A[i].shape[0], 1)
             alpha = f.prox(alpha)  # Project onto the compact set K
         else:
@@ -949,7 +919,7 @@ class NesterovFunction(Gradient,
         # This loop call self.f(y) that will apply penalty_start that has
         # already been applied. Create y_padded with penalty_start zeros.
         y_padded = np.zeros(beta.shape)
-        for it in xrange(1, max_iter + 1):
+        for it in range(1, max_iter + 1):
 
             # ISTA
 #            z = alpha
@@ -959,7 +929,7 @@ class NesterovFunction(Gradient,
                 z = alpha
             else:
                 z = [0] * len(alpha)
-                for i in xrange(len(alpha)):
+                for i in range(len(alpha)):
                     z[i] = alpha[i] \
                          + ((it - 2.0) / (it + 1.0)) * (alpha[i] - alpha_[i])
 
@@ -972,7 +942,7 @@ class NesterovFunction(Gradient,
             grad = f.grad(z)
 
             # Gradient step for each "block"
-            for i in xrange(len(z)):
+            for i in range(len(z)):
                 z[i] -= step * grad[i]
 
             # Project onto the compact set K
@@ -980,7 +950,7 @@ class NesterovFunction(Gradient,
 
             # Compute the proximal operator
             Aa = A[0].T.dot(alpha[0])
-            for i in xrange(1, len(A)):
+            for i in range(1, len(A)):
                 Aa = Aa + A[i].T.dot(alpha[i])
             y = beta_ - t * Aa
             y_padded[self.penalty_start:, :] = y

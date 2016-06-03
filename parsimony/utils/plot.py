@@ -68,7 +68,7 @@ def plot_map2d_of_models(models_dict, nrow, ncol, shape, title_attr=None):
     #from .plot import plot_map2d
     import matplotlib.pyplot as plt
     ax_i = 1
-    for k in models_dict.keys():
+    for k in list(models_dict.keys()):
         mod = models_dict[k]
         if  hasattr(mod, "beta"):
             w = mod.beta
@@ -99,7 +99,7 @@ def plot_classes(X, classes, title=None, xlabel=None, ylabel=None, show=True):
     # TODO: Add the other cases.
     if X.shape[1] == 2:
 
-        for i in xrange(len(cls)):
+        for i in range(len(cls)):
             c = cls[i]
             cl = np.array(classes) == c
 #            print cl.shape
@@ -158,7 +158,7 @@ def plot_errorbars(X, classes=None, means=None, alpha=0.05,
 
     ci = ss.t.ppf(1.0 - alpha / 2.0, data_df) * data_sd / np.sqrt(B)
 
-    for i in xrange(len(labels)):
+    for i in range(len(labels)):
         ind = np.where(classes == labels[i])[0]
 
         plot.errorbar(x[ind],
@@ -206,10 +206,10 @@ def voronoi_tesselation(mu, rect=None, nx=100, ny=100,
                          np.random.rand(),
                          np.random.rand()]
 
-    for i in xrange(len(regions)):
+    for i in range(len(regions)):
         region = regions[i]
         polygon = vertices[region]
-        plot.fill(*zip(*polygon), alpha=alpha, color=colors[i])
+        plot.fill(*list(zip(*polygon)), alpha=alpha, color=colors[i])
         plot.plot(mu[i, 0], mu[i, 1], marker='o', color=colors[i],
                   markersize=markersize)
 

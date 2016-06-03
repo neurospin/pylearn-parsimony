@@ -7,8 +7,8 @@ Created on Wed Feb 19 14:55:58 2014
 
 Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
-@author:  Tommy Löfstedt
-@email:   lofstedt.tommy@gmail.com
+@author:  Tommy Löfstedt, Edouard Duchesnay
+@email:   lofstedt.tommy@gmail.com, edouard.duchesnay@cea.fr
 @license: BSD 3-clause.
 """
 try:
@@ -27,6 +27,7 @@ try:
 except ImportError:
     has_timer = False
 import unittest
+from six import with_metaclass
 import abc
 import os
 #import re
@@ -34,7 +35,7 @@ import os
 __all__ = ["TestCase", "test_all"]
 
 
-class TestCase(unittest.TestCase):
+class TestCase(with_metaclass(abc.ABCMeta, unittest.TestCase)):
     """Unit test base class.
 
     Inherit from this class and add tests by naming the test methods such that
@@ -47,7 +48,6 @@ class TestCase(unittest.TestCase):
         def test_1(self):
             assert True
     """
-    __metaclass__ = abc.ABCMeta
 
     def setup(self):
         """This method is run before each unit test.
@@ -143,15 +143,15 @@ def test_all():
                   % (extras, parsimonydir)
 
     # First run doctests in parsimony.
-    print "Running: " + exec_string
+    print("Running: " + exec_string)
     os.system(exec_string)
 
     exec_string = "nosetests --with-doctest --doctest-tests " + \
                   "%s --verbosity=3 -w %s" \
                   % (extras, testdir)
     # Then run unit tests in test directory.
-    print
-    print "Running: " + exec_string
+    print()
+    print("Running: " + exec_string)
     os.system(exec_string)
 
 

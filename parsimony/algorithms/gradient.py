@@ -111,7 +111,7 @@ class GradientDescent(bases.ExplicitAlgorithm,
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
 
-        for i in xrange(1, self.max_iter + 1):
+        for i in range(1, self.max_iter + 1):
 
             if self.info_requested(Info.time):
                 tm = utils.time_cpu()
@@ -226,7 +226,7 @@ class AcceleratedGradientDescent(bases.ExplicitAlgorithm,
         aold = anew = 1.0
         thetaold = thetanew = beta
         betanew = betaold = beta
-        for i in xrange(1, self.max_iter + 1):
+        for i in range(1, self.max_iter + 1):
 
             if self.info_requested(Info.time):
                 tm = utils.time_cpu()

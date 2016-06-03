@@ -12,7 +12,7 @@ from nose.tools import assert_less, assert_equal
 
 import numpy as np
 
-from tests import TestCase
+from .tests import TestCase
 
 
 class TestSimulations(TestCase):
@@ -783,7 +783,7 @@ class TestSimulations(TestCase):
         f_star = function.f(beta_star)
         f_penalty = function.f(estimator.beta)
         eff = abs(f_penalty - f_star) / f_star
-        print eff
+        print(eff)
         assert_less(eff, 0.23, msg="Error is too large!")
 
 #    def test_linear_regression_l1_l2_gl_intercept(self):
@@ -828,7 +828,7 @@ class TestSimulations(TestCase):
 #        k = 1.0 - l
 #        g = 1.618
 #
-#        groups = [range(0, 2 * p / 3), range(p / 3, p - 1)]
+#        groups = [range(0, 2 * int(p / 3)), range(int(p / 3), p - 1)]
 #        A = gl.linear_operator_from_groups(p - 1, groups=groups)
 #
 #        snr = 100.0
@@ -1111,7 +1111,7 @@ class TestSimulations(TestCase):
         k = 1.0 - l
         g = 1.618
 
-        groups = [range(0, 2 * p / 3), range(p / 3, p - 1)]
+        groups = [list(range(0, 2 * int(p / 3))), list(range(int(p / 3), p - 1))]
         A = gl.linear_operator_from_groups(p - 1, groups=groups)
 
         snr = 100.0
@@ -1680,7 +1680,7 @@ class TestSimulations(TestCase):
 #        k = 1.0 - l
 #        g = 1.618
 #
-#        groups = [range(0, 2 * p / 3), range(p / 3, p - 1)]
+#        groups = [range(0, 2 * int(p / 3)), range(int(p / 3), p - 1)]
 #        A = gl.linear_operator_from_groups(p - 1, groups=groups)
 #
 #        snr = 100.0

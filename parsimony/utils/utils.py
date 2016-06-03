@@ -20,7 +20,8 @@ from functools import wraps
 from time import time, clock
 
 import numpy as np
-import consts
+from . import consts
+import collections
 
 #TODO: This depends on the OS. We should try to be clever here ...
 time_cpu = clock  # UNIX-based system measures CPU time used.
@@ -43,7 +44,7 @@ def deprecated(*replaced_by):
     replaced_by : String. The name of the function that should be used instead.
     """
     arg = True
-    if len(replaced_by) == 1 and callable(replaced_by[0]):
+    if len(replaced_by) == 1 and isinstance(replaced_by[0], collections.Callable):
         func = replaced_by[0]
         replaced_by = None
         arg = False
@@ -229,7 +230,7 @@ def optimal_shrinkage(X, T=None):
             T = [T[0]] * len(X)
 
 #    import sys
-    for i in xrange(len(X)):
+    for i in range(len(X)):
         Xi = X[i]
         Ti = T[i]
 #        print "Here1"
@@ -256,8 +257,8 @@ def optimal_shrinkage(X, T=None):
 #        sys.stdout.flush()
 
         Var_sij = 0
-        for i in xrange(N):
-            for j in xrange(N):
+        for i in range(N):
+            for j in range(N):
                 wij = np.multiply(Xi[:, [i]], Xi[:, [j]]) - Wm[i, j]
                 Var_sij += np.dot(wij.T, wij)
         Var_sij = Var_sij[0, 0] * (M / ((M - 1.0) ** 3.0))

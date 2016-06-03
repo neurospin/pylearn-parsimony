@@ -83,7 +83,7 @@ def ConstantCorrelation(p=[100], rho=[0.05], delta=0.10, eps=0.5):
     eps = eps * (1.0 - rho_max)
     delta = delta * rho_min
 
-    for k in xrange(K):
+    for k in range(K):
         N += p[k]
 
     u = np.random.randn(M, N)
@@ -96,7 +96,7 @@ def ConstantCorrelation(p=[100], rho=[0.05], delta=0.10, eps=0.5):
     S = delta + eps * uu
 
     Nk = 0
-    for k in xrange(K):
+    for k in range(K):
         pk = p[k]
         Nk += pk
 
@@ -174,18 +174,18 @@ def ToeplitzCorrelation(p=[100], rho=[0.05], eps=0.5):
 
     S = np.zeros((N, N))
     Nk = 0
-    for k in xrange(K):
+    for k in range(K):
         pk = p[k]
         Nk += pk
         rhok = rho[k]
         v = [0] * (pk - 1)
-        for i in xrange(0, pk - 1):
+        for i in range(0, pk - 1):
             v[i] = rhok ** (i + 1)
 
         Sk = np.eye(pk, pk)
         Sk[0, 1:] = v
         Sk[1:, 0] = v
-        for i in xrange(1, pk - 1):
+        for i in range(1, pk - 1):
             Sk[i, i + 1:] = v[:-i]
             Sk[i + 1:, i] = v[:-i]
 
