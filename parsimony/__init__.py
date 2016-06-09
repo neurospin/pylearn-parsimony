@@ -18,7 +18,7 @@ from parsimony import functions
 from parsimony import algorithms
 from parsimony import estimators
 
-__version__ = "0.2.2"
+__version__ = "0.3"
 
 __all__ = ["algorithms", "config", "datasets", "estimators", "functions",
            "utils"]

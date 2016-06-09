@@ -48,13 +48,35 @@ In order to show plots, you may need to install Matplotlib:
 $ sudo apt-get install python-matplotlib
 ```
 
-To install: Download the release of pylearn-parsimony from
+**Downloading a stable release**
+
+
+Download the release of pylearn-parsimony from
 [https://github.com/neurospin/pylearn-parsimony/releases](https://github.com/neurospin/pylearn-parsimony/releases).
-Unpack the file, go to the pylearn-parsimony directory and type:
+Unpack the file.
+
+**Downloading the latest development version**
+
+Clone the github repository
+
+```
+git clone https://github.com/neurospin/pylearn-parsimony.git
+```
+
+**Installing**
+
+To install on your system, go to the pylearn-parsimony directory and type:
 ```
 $ sudo python setup.py install
 ```
+
+Or, you can simply set your ``$PYTHONPATH`` variable to point parsimony:
+```
+$ export $PYTHONPATH=$PYTHONPATH:/directory/pylearn-parsimony
+```
+
 You are now ready to use your fresh installation of pylearn-parsimony!
+
 
 Quick start
 -----------
