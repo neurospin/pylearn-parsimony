@@ -15,6 +15,8 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
+import abc
+
 import numpy as np
 
 try:
@@ -29,7 +31,8 @@ __all__ = ["Info", "AlgorithmSnapshot",
            "direct_vector",
 
            "Bisection", "NewtonRaphson",
-           "BacktrackingLineSearch"]
+           "BacktrackingLineSearch",
+           "Kernel", "LinearKernel"]
 
 
 # TODO: This class should be replaced with Enum.
@@ -583,6 +586,22 @@ class BacktrackingLineSearch(bases.ExplicitAlgorithm):
                 return 0.0  # If we did not find a feasible point, don't move!
 
             a = a * rho
+
+
+class Kernel(object):
+
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def __call__(self, x1, x2):
+        raise NotImplementedError('Abstract method "__call__" must be '
+                                  'specialised!')
+
+
+class LinearKernel(Kernel):
+
+    def __call__(self, x1, x2):
+        return np.dot(x1.T, x2)
 
 
 if __name__ == "__main__":

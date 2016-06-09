@@ -17,6 +17,7 @@ from parsimony.algorithms import nipals
 from parsimony.algorithms import primaldual
 from parsimony.algorithms import proximal
 from parsimony.algorithms import multiblock
+from parsimony.algorithms import algorithms
 
-__all__ = ["bases", "cluster", "deflation", "gradient", "multiblock", "nipals",
-           "primaldual", "proximal", "utils"]
+__all__ = ["algorithms", "bases", "cluster", "deflation", "gradient",
+           "multiblock", "nipals", "primaldual", "proximal", "utils"]
