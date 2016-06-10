@@ -118,9 +118,11 @@ class SubGradientDescent(bases.ExplicitAlgorithm,
 
         Parameters
         ----------
-        function : Function. The function to minimise.
+        function : Function
+            The function to minimise.
 
-        beta : Numpy array. The start vector.
+        beta : numpy array
+            The start vector.
         """
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, False)

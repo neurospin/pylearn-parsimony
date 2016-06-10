@@ -57,6 +57,24 @@ class TestAlgorithms(TestCase):
 
         assert(np.linalg.norm(beta1 - beta2) < 1e-4)
 
+    def test_SMO(self):
+
+        import numpy as np
+
+        np.random.seed(42)
+
+        X = np.vstack([0.2 * np.random.randn(50, 2) + 0.25,
+                       0.2 * np.random.randn(50, 2) + 0.75])
+        y = np.random.randint(0, 2, (100, 1)) * 2 - 1
+
+        import parsimony.algorithms.algorithms as alg
+        smo = alg.SequentialMinimalOptimization(1.0)
+        alpha = smo.run(X, y)
+
+#        import matplotlib.pyplot as plt
+#        plt.plot(X[:, 0], X[:, 1], '.')
+#        plt.show()
+
 #    def test_DynamicCONESTA_tv(self):
 #        import numpy as np
 #        np.random.seed(42)

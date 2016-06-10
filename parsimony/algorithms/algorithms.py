@@ -56,8 +56,23 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
 
     K : kernel object, optional
         The kernel for non-linear SVM, of type
-        parsimony.algorithms.utils.Kernel. Default is None, which implies a
-        linear kernel.
+        parsimony.algorithms.utils.Kernel. Default is a linear kernel.
+
+    eps : float
+        Must be positive. Tolerance for the stopping criterion.
+
+    max_iter : int
+        Must be non-negative. Maximum allowed number of iterations. Default is
+        20000.
+
+    min_iter : int
+        Must be non-negative and less than or equal to max_iter. Minimum number
+        of iterations that must be performed. Default is 1.
+
+    info : list or tuple of utils.consts.Info
+        What, if any, extra run information should be stored. Default is an
+        empty list, which means that no run information is computed nor
+        returned.
 
     Returns
     -------
@@ -76,16 +91,13 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
                      utils.Info.func_val,
                      utils.Info.converged]
 
-    def __init__(self, C, K, eps=1e-4,
+    def __init__(self, C, K=utils.LinearKernel(), eps=1e-4,
                  max_iter=consts.MAX_ITER, min_iter=1, info=[]):
 
         super(SequentialMinimalOptimization, self).__init__(info=info)
 
         self.C = max(0, float(C))
-        if K is None:
-            self.K = utils.LinearKernel()
-        else:
-            self.K = K
+        self.K = K
         self.eps = max(consts.FLOAT_EPSILON, float(eps))
         self.min_iter = max(1, int(min_iter))
         self.max_iter = max(self.min_iter, int(max_iter))
@@ -103,8 +115,7 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
             or 1.
 
         start_vector : BaseStartVector
-            A start vector generator. Default is to use a random start
-            vector.
+            A start vector generator. Default is to use a zero vector.
         """
         X, y = check_arrays(X, check_array_in(y, [-1, 1]))
 
