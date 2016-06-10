@@ -18,8 +18,6 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com, edouard.duchesnay@cea.fr
 @license: BSD 3-clause.
 """
-import time
-
 import numpy as np
 import scipy.sparse as sparse
 
@@ -114,8 +112,9 @@ class L1(properties.AtomicFunction,
          properties.Penalty,
          properties.Constraint,
          properties.ProximalOperator,
-         properties.ProjectionOperator):
-    """The proximal operator of the L1 function with a penalty formulation
+         properties.ProjectionOperator,
+         properties.SubGradient):
+    """The L1 function in a penalty formulation has the form
 
         f(\beta) = l * (||\beta||_1 - c),
 
@@ -141,7 +140,7 @@ class L1(properties.AtomicFunction,
 
         self.l = float(l)
         self.c = float(c)
-        self.penalty_start = int(penalty_start)
+        self.penalty_start = max(0, int(penalty_start))
 
     def f(self, beta):
         """Function value.
@@ -152,6 +151,26 @@ class L1(properties.AtomicFunction,
             beta_ = beta
 
         return self.l * (maths.norm1(beta_) - self.c)
+
+    def subgrad(self, beta, clever=True, random_state=None, **kwargs):
+
+        if random_state is None:
+            random_state = np.random.RandomState()
+
+        izero = np.abs(beta) < 10.0 * consts.FLOAT_EPSILON
+        inonzero = np.negative(izero)
+
+        grad = np.zeros(beta.shape)
+        grad[inonzero] = np.sign(beta[inonzero])
+        if clever:
+            # The "clever" part here is that since we are already at the
+            # minimum of the penalty, we have no reason to move away from here.
+            # Hence, the subgradient is zero at this point.
+            grad[izero] = np.zeros(np.sum(izero))
+        else:
+            grad[izero] = random_state.uniform(-1, 1, np.sum(izero))
+
+        return self.l * grad
 
     def prox(self, beta, factor=1.0, **kwargs):
         """The corresponding proximal operator.

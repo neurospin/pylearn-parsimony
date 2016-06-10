@@ -10,10 +10,52 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 from nose.tools import assert_less
 
+import numpy as np
+
 from tests import TestCase
 
 
 class TestAlgorithms(TestCase):
+
+    def test_SubGradientDescent(self):
+
+        from parsimony.algorithms.subgradient import SubGradientDescent
+        from parsimony.functions.combinedfunctions import LinearRegressionL1
+        from parsimony.algorithms.utils import NonSumDimStepSize
+        from parsimony.estimators import Lasso
+
+        np.random.seed(42)
+
+        X = np.random.randn(100, 50)
+        y = np.random.randn(100, 1)
+
+        sgd = SubGradientDescent(max_iter=1000,
+                                 step_size=NonSumDimStepSize(a=0.01),
+                                 use_gradient=False)
+        function = LinearRegressionL1(X, y, l1=0.01, mean=False)
+        beta1 = sgd.run(function, np.random.rand(50, 1))
+        beta2 = np.dot(np.linalg.pinv(X), y)
+
+        assert(np.linalg.norm(beta1 - beta2) < 0.005)
+
+        np.random.seed(42)
+
+        X = np.random.randn(100, 50)
+        y = np.random.randn(100, 1)
+
+        l1 = 0.1
+
+        sgd = SubGradientDescent(max_iter=2000,
+                                 step_size=NonSumDimStepSize(a=0.05),
+                                 use_gradient=False)
+        function = LinearRegressionL1(X, y, l1=l1, mean=False)
+        beta1 = sgd.run(function, np.random.rand(50, 1))
+
+        lasso_est = Lasso(l=l1, algorithm_params=dict(max_iter=1000),
+                          mean=False)
+        beta2 = lasso_est.fit(X, y).beta
+
+        assert(np.linalg.norm(beta1 - beta2) < 1e-4)
 
 #    def test_DynamicCONESTA_tv(self):
 #        import numpy as np

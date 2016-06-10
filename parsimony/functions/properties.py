@@ -27,7 +27,8 @@ __all__ = ["Function", "AtomicFunction", "CompositeFunction",
            "ProximalOperator", "ProjectionOperator",
            "CombinedProjectionOperator",
            "Continuation",
-           "Gradient", "Hessian", "LipschitzContinuousGradient", "StepSize",
+           "SubGradient", "Gradient", "Hessian", "LipschitzContinuousGradient",
+           "StepSize",
            "GradientMap", "DualFunction", "Eigenvalues", "StronglyConvex",
            "OR"]
 
@@ -389,6 +390,33 @@ class Gradient(object):
             grad[i, 0] = (loss2 - loss1) / (2.0 * eps)
 
         return grad
+
+
+class SubGradient(object):
+
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def subgrad(self, beta, clever=True, random_state=None, **kwargs):
+        """Subgradient of the function.
+
+        Parameters
+        ----------
+        beta : numpy array (p-by-1)
+            The point at which to evaluate the subgradient.
+
+        clever : bool
+            Whether or not to try to be "clever" when computing the
+            subgradient. If True, be "clever"; if False, use random uniform
+            values. Default is True.
+
+        random_state : numpy.random.RandomState, optional
+            An instance of numpy.random.RandomState that can be used to draw
+            random samples. Default is None, do not use a particular random
+            state.
+        """
+        raise NotImplementedError('Abstract method "subgrad" must be '
+                                  'specialised!')
 
 
 class Hessian(object):

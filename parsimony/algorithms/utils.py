@@ -15,6 +15,8 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
+import abc
+
 import numpy as np
 
 try:
@@ -29,7 +31,9 @@ __all__ = ["Info", "AlgorithmSnapshot",
            "direct_vector",
 
            "Bisection", "NewtonRaphson",
-           "BacktrackingLineSearch"]
+           "BacktrackingLineSearch",
+
+           "StepSize", "SqSumNotSumStepSize", "NonSumDimStepSize"]
 
 
 # TODO: This class should be replaced with Enum.
@@ -583,6 +587,65 @@ class BacktrackingLineSearch(bases.ExplicitAlgorithm):
                 return 0.0  # If we did not find a feasible point, don't move!
 
             a = a * rho
+
+
+class StepSize(object):
+
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def __call__(self, k=None, beta=None, grad=None):
+        raise NotImplementedError('Abstract method "__call__" must be '
+                                  'specialised!')
+
+
+class SqSumNotSumStepSize(StepSize):
+    """Represents the square summable but not summable step size
+
+        t_k = a / (b + k),
+
+    where a > 0 and b >= 0.
+
+    Parameters
+    ----------
+    a : float
+        Positive value. Factor in the numerator. Large values give longer
+        steps. Default is 0.1.
+
+    b : float
+        Non-negative value. Addend in the denominator. Large values give
+        smaller steps. Default is 0.
+    """
+    def __init__(self, a=0.1, b=0.0):
+
+        self.a = max(consts.TOLERANCE, float(a))
+        self.b = max(0.0, float(b))
+
+    def __call__(self, k=None, beta=None, grad=None):
+
+        return self.a / (self.b + float(k))
+
+
+class NonSumDimStepSize(StepSize):
+    """Represents the non-summable diminishing step size
+
+        t_k = a / sqrt(k),
+
+    where a > 0.
+
+    Parameters
+    ----------
+    a : float
+        Positive value. Factor in the numerator. Large values give longer
+        steps. Default is 0.1.
+    """
+    def __init__(self, a=0.1):
+
+        self.a = max(consts.TOLERANCE, float(a))
+
+    def __call__(self, k=None, beta=None, grad=None):
+
+        return self.a / np.sqrt(float(k))
 
 
 if __name__ == "__main__":

@@ -15,14 +15,13 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @license: BSD 3-clause.
 """
 import warnings
-#import collections
 from functools import wraps
 from time import time, clock
 
 import numpy as np
 import consts
 
-#TODO: This depends on the OS. We should try to be clever here ...
+# TODO: This depends on the OS. We should try to be clever here ...
 time_cpu = clock  # UNIX-based system measures CPU time used.
 time_wall = time  # UNIX-based system measures time in seconds since the epoch.
 time = time_cpu  # TODO: Make it so that this can be changed by settings.
@@ -30,7 +29,7 @@ time = time_cpu  # TODO: Make it so that this can be changed by settings.
 __all__ = ["time_cpu", "time_wall", "time", "deprecated", "corr",
            "optimal_shrinkage", "AnonymousClass"]
 
-#_DEBUG = True
+# _DEBUG = True
 
 
 def deprecated(*replaced_by):

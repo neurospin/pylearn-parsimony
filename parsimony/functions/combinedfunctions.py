@@ -24,6 +24,7 @@ from .nesterov.tv import TotalVariation
 from .nesterov.gl import GroupLassoOverlap
 from .penalties import ZeroFunction, L1, LinearVariableConstraint
 from .penalties import RidgeSquaredError
+from .losses import LinearRegression
 from .losses import RidgeRegression
 from .losses import RidgeLogisticRegression
 from .losses import LatentVariableVariance
@@ -40,6 +41,108 @@ __all__ = ["CombinedFunction",
            "PrincipalComponentAnalysisL1TV"]
 
 # TODO: Add penalty_start and mean to all of these!
+
+
+class LinearRegressionL1(properties.CompositeFunction,
+                         properties.Gradient,
+                         properties.SubGradient,
+                         properties.LipschitzContinuousGradient,
+                         properties.ProximalOperator,
+                         properties.ProjectionOperator,
+                         properties.StepSize):
+    """Combination (sum) of LinearRegression and an L1 penalty.
+
+    Parameters:
+    ----------
+    X : numpy array
+        The X matrix for the linear regression.
+
+    y : numpy array
+        The y vector for the linear regression.
+
+    l1 : float
+        Must be non-negative. The Lagrange multiplier, or regularisation
+        constant, for the L1 penalty.
+
+    penalty_start : Non-negative integer. The number of columns, variables
+            etc., to except from penalisation. Equivalently, the first
+            index to be penalised. Default is 0, all columns are included.
+
+    mean : Boolean. Whether to compute the squared loss or the mean
+            squared loss. Default is True, the mean squared loss.
+    """
+    def __init__(self, X, y, l1, penalty_start=0, mean=True):
+
+        self.X = X
+        self.y = y
+
+        self.penalty_start = max(0, int(penalty_start))
+        self.mean = bool(mean)
+
+        self.lr = LinearRegression(self.X, self.y, mean=self.mean)
+        self.l1 = L1(max(0.0, float(l1)), penalty_start=self.penalty_start)
+
+        self.reset()
+
+    def reset(self):
+
+        self.lr.reset()
+        self.l1.reset()
+
+        self._Xty = None
+
+    def f(self, beta):
+        """Function value.
+        """
+        return self.lr.f(beta) + self.l1.f(beta)
+
+    def grad(self, beta):
+        """Gradient of the differentiable part of the function.
+
+        From the interface "Gradient".
+        """
+        return self.lr.grad(beta)
+
+    def subgrad(self, beta):
+        """Subgradient of the function.
+
+        From the interface "SubGradient".
+        """
+        return self.lr.grad(beta) + self.l1.subgrad(beta)
+
+    def L(self, beta=None):
+        """Lipschitz constant of the gradient.
+
+        From the interface "LipschitzContinuousGradient".
+        """
+        return self.lr.L()
+
+    def prox(self, beta, factor=1.0, **kwargs):
+        """The proximal operator of the non-differentiable part of the
+        function.
+
+        From the interface "ProximalOperator".
+        """
+        return self.l1.prox(beta, factor, **kwargs)
+
+    def proj(self, beta, **kwargs):
+        """The projection operator onto the constraint set (of the
+        non-differentiable part of the function).
+
+        From the interface "ProjectionOperator".
+        """
+        return self.l1.proj(beta, **kwargs)
+
+    def step(self, beta):
+        """The step size to use in descent methods.
+
+        From the interface "StepSize".
+
+        Parameters
+        ----------
+        x : Numpy array. The point at which to evaluate the step size.
+        """
+        return 1.0 / self.L()
 
 
 class CombinedFunction(properties.CompositeFunction,
@@ -1238,6 +1341,7 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
         gap = f + l_star + psi_star
 
         return gap
+
 
 class LogisticRegressionL1L2GL(LinearRegressionL1L2GL):
     """Combination (sum) of RidgeLogisticRegression, L1 and TotalVariation.

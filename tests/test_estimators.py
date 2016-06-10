@@ -34,9 +34,9 @@ class TestEstimators(TestCase):
         # Note: Info.fvalue and Info.func_val are both returned for now. But
         # recall that Info.fvalue is deprecated!
         lr = estimators.LinearRegression(algorithm=gradient.GradientDescent(),
-                                     algorithm_params=dict(max_iter=7000,
-                                                           info=info),
-                                     mean=False)
+                                         algorithm_params=dict(max_iter=7000,
+                                                               info=info),
+                                         mean=False)
 
         error = lr.fit(X, y).score(X, y)
 #        print "error:", error
@@ -53,7 +53,8 @@ class TestEstimators(TestCase):
         assert len(ret_info[Info.fvalue]) == ret_info[Info.num_iter]
 
 #        print "converged:", ret_info[Info.converged]
-        assert ret_info[Info.converged] == False
+        assert not ret_info[Info.converged]
+
 
 if __name__ == "__main__":
     import unittest

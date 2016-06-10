@@ -265,6 +265,7 @@ class AcceleratedGradientDescent(bases.ExplicitAlgorithm,
 
         return betanew
 
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
