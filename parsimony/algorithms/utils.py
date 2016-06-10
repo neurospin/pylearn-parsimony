@@ -33,7 +33,9 @@ __all__ = ["Info", "AlgorithmSnapshot",
            "Bisection", "NewtonRaphson",
            "BacktrackingLineSearch",
 
-           "StepSize", "SqSumNotSumStepSize", "NonSumDimStepSize"]
+           "StepSize", "SqSumNotSumStepSize", "NonSumDimStepSize",
+
+           "Kernel", "LinearKernel"]
 
 
 # TODO: This class should be replaced with Enum.
@@ -103,7 +105,7 @@ class AlgorithmSnapshot:
 
     def save_conesta(self, algo_locals):
         self.cpt += 1
-        #ite = algo_locals["i"]
+        # ite = algo_locals["i"]
         if (self.cpt % self.saving_period) != 0:
             return
         algo = algo_locals["self"]
@@ -127,7 +129,7 @@ class AlgorithmSnapshot:
             snapshot[Info.mu] = algo_locals["mu_"]
         cpt_str = str(self.cpt).zfill(int(np.log10(algo.max_iter)+1))
         output_filename = self.output_prefix + 'conesta_ite:%s.npz' % (cpt_str)
-        #print "AlgorithmSnapshot.save_conesta: save in ", output_filename
+        # print "AlgorithmSnapshot.save_conesta: save in ", output_filename
         np.savez_compressed(output_filename, **snapshot)
 
     def save_fista(self, algo_locals):
@@ -148,7 +150,7 @@ class AlgorithmSnapshot:
             snapshot[Info.gap] = algo_locals["gap_"]
         cpt_str = str(self.cpt).zfill(int(np.log10(algo.max_iter)+1))
         output_filename = self.output_prefix + 'fista_ite:%s.npz' % (cpt_str)
-        #print "AlgorithmSnapshot.save_fista: save in ", output_filename
+        # print "AlgorithmSnapshot.save_fista: save in ", output_filename
         np.savez_compressed(output_filename, **snapshot)
 
 
@@ -578,8 +580,8 @@ class BacktrackingLineSearch(bases.ExplicitAlgorithm):
         it = 0
         while True:
             if line_search.feasible((x, a)):
-#                print "Broke after %d iterations of %d iterations." \
-#                    % (it, self.max_iter)
+                # print "Broke after %d iterations of %d iterations." \
+                #     % (it, self.max_iter)
                 return a
 
             it += 1
@@ -646,6 +648,22 @@ class NonSumDimStepSize(StepSize):
     def __call__(self, k=None, beta=None, grad=None):
 
         return self.a / np.sqrt(float(k))
+
+
+class Kernel(object):
+
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def __call__(self, x1, x2):
+        raise NotImplementedError('Abstract method "__call__" must be '
+                                  'specialised!')
+
+
+class LinearKernel(Kernel):
+
+    def __call__(self, x1, x2):
+        return np.dot(x1.T, x2)
 
 
 if __name__ == "__main__":
