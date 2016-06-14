@@ -3,10 +3,10 @@
 The :mod:`parsimony.algorithms.algorithms` module includes several algorithms
 that doesn't fit in any of the other categories.
 
-Algorithms may not store states. I.e., if they are classes, do not keep
-references to objects with state in the algorithm objects. It should be
-possible to copy and share algorithms between e.g. estimators, and thus they
-should not depend on any state.
+Algorithms may not depend on states. I.e., if they are classes, do not keep
+references to objects with state in the algorithm objects that may be reused.
+It should be possible to copy and share algorithms between e.g. estimators, and
+thus they should not depend on any state.
 
 Created on Sat Apr 23 22:16:48 2016
 
@@ -17,27 +17,24 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @license: BSD 3-clause.
 """
 import numpy as np
-#import scipy as sp
-#import scipy.linalg
 
 try:
     from . import bases  # When imported as a package.
 except ValueError:
     import parsimony.algorithms.bases as bases  # When run as a program.
-#import parsimony.utils.maths as maths
 import parsimony.utils.consts as consts
 try:
     from . import utils  # When imported as a package.
 except ValueError:
     import parsimony.algorithms.utils as utils  # When run as a program.
-#import parsimony.utils.start_vectors as start_vectors
-#import parsimony.functions.penalties as penalties
 from parsimony.utils import check_arrays, check_array_in
 
 __all__ = ["SequentialMinimalOptimization"]
 
 
 class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
+                                    bases.KernelAlgorithm,
+                                    bases.IterativeAlgorithm,
                                     bases.InformationAlgorithm):
     """An implementation of Platt's SMO algorithm for Support Vector Machines.
 
@@ -46,7 +43,9 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
         max. 0.5 * \sum_{i=1}^N \sum_{j=1}^N y_i.y_j.K(x_i, x_j).a_i.a_j
              - \sum_{i=1}^N a_i.
         s.t. 0 <= a_i <= C,    for all i=1,...,N,
-             \sum_{i=1}^N y_i.a_i = 0.
+             \sum_{i=1}^N y_i.a_i = 0,
+
+    where K is a kernel.
 
     Parameters
     ----------
@@ -54,12 +53,12 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
         Must be non-negative. The trade-off parameter between large margin
         and few margin failures.
 
-    K : kernel object, optional
+    kernel : kernel object, optional
         The kernel for non-linear SVM, of type
         parsimony.algorithms.utils.Kernel. Default is a linear kernel.
 
     eps : float
-        Must be positive. Tolerance for the stopping criterion.
+        Must be positive. Tolerance used in the algorithm.
 
     max_iter : int
         Must be non-negative. Maximum allowed number of iterations. Default is
@@ -76,33 +75,54 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
 
     Returns
     -------
-    alpha : numpy array
-        The lagrange multipliers, the variable of the optimisation problem.
+    w : numpy array
+        The primal variable, the normal to the separating hyperplane.
 
     Examples
     --------
     >>> import numpy as np
-    >>> from parsimony.algorithms import SequentialMinimalOptimization
+    >>> import parsimony.algorithms.algorithms as alg
+    >>> import parsimony.algorithms.utils as utils
     >>>
-    >>> np.random.seed(0)
+    >>> np.random.seed(42)
+    >>> n = 30
+    >>> X = np.vstack([0.3 * np.random.randn(n / 2, 2) + 0.25,
+    ...                0.3 * np.random.randn(n / 2, 2) + 0.75])
+    >>> y = np.vstack([1 * np.ones((n / 2, 1)),
+    ...                3 * np.ones((n / 2, 1))]) - 2
+    >>>
+    >>> K = utils.LinearKernel(X=X, use_cache=True)
+    >>> smo = alg.SequentialMinimalOptimization(1.0, kernel=K, max_iter=100)
+    >>> w = smo.run(X, y)
+    >>> yhat = np.zeros(y.shape)
+    >>> for j in xrange(y.shape[0]):
+    ...     val = 0.0
+    ...     for i in xrange(y.shape[0]):
+    ...         val += smo.alpha[i, 0] * y[i, 0] * smo.kernel(X[i, :], X[j, :])
+    ...     val -= smo.bias
+    ...     yhat[j, 0] = val
+    >>> yhat = np.sign(yhat)
+    >>> round(np.mean(yhat == y), 13)
+    0.8666666666667
     """
     INFO_PROVIDED = [utils.Info.ok,
                      utils.Info.time,
                      utils.Info.func_val,
                      utils.Info.converged]
 
-    def __init__(self, C, K=utils.LinearKernel(), eps=1e-4,
+    def __init__(self, C, kernel=utils.LinearKernel(), eps=1e-4,
                  max_iter=consts.MAX_ITER, min_iter=1, info=[]):
 
-        super(SequentialMinimalOptimization, self).__init__(info=info)
+        super(SequentialMinimalOptimization, self).__init__(kernel=kernel,
+                                                            info=info)
 
         self.C = max(0, float(C))
-        self.K = K
         self.eps = max(consts.FLOAT_EPSILON, float(eps))
         self.min_iter = max(1, int(min_iter))
         self.max_iter = max(self.min_iter, int(max_iter))
 
-    def run(self, X, y, start_vector=None):
+    @bases.force_reset
+    def run(self, X, y, alpha=None):
         """Find the best separating margin for the samples in X.
 
         Parameters
@@ -114,8 +134,9 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
             The class belongings for the samples in X. Values must be -1
             or 1.
 
-        start_vector : BaseStartVector
-            A start vector generator. Default is to use a zero vector.
+        alpha : numpy array
+            A start vector for the lagrange multipliers. Default is to use a
+            zero vector.
         """
         X, y = check_arrays(X, check_array_in(y, [-1, 1]))
 
@@ -125,30 +146,34 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
         if self.info_requested(utils.Info.time):
             _t = utils.time()
 
-#        if start_vector is None:
-#            start_vector = start_vectors.RandomStartVector(normalise=False)
-#        v0 = start_vector.get_vector(np.min(X.shape))
+        if self.info_requested(utils.Info.func_val):
+            self._f = []
 
         n, p = X.shape
 
         # Set up error cache
         self._E = np.zeros(n)
+        self._Evalid = np.zeros(n, dtype=np.bool)
 
-        # Threshold
-        self.b = 0.0
+        # Bias (intercept/threshold)
+        self.bias = 0.0
+        # Lagrange multipliers
+        if alpha is None:
+            self.alpha = np.zeros((n, 1))
+        else:
+            self.alpha = alpha
 
-        alpha = np.zeros((p, 1))
         numChanged = 0
         examineAll = True
         while numChanged > 0 or examineAll:
             numChanged = 0
             if examineAll:
                 for i in xrange(n):
-                    numChanged += self._examineSample(i, X, y, alpha)
+                    numChanged += self._examineSample(i, X, y)
             else:
                 for i in xrange(n):
-                    if alpha[i, 0] > 0.0 and alpha[i, 0] < self.C:
-                        numChanged += self._examineSample(i, X, y, alpha)
+                    if self.alpha[i, 0] > 0.0 and self.alpha[i, 0] < self.C:
+                        numChanged += self._examineSample(i, X, y)
 
             if examineAll:
                 examineAll = False
@@ -157,71 +182,66 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
 
         if self.info_requested(utils.Info.time):
             self.info_set(utils.Info.time, _t)
-#        if self.info_requested(utils.Info.func_val):
-#            self.info_set(utils.Info.func_val, _f)
+        if self.info_requested(utils.Info.func_val):
+            self.info_set(utils.Info.func_val, self._f)
+            del self._f  # Remove for future runs
         if self.info_requested(utils.Info.ok):
             self.info_set(utils.Info.ok, True)
 
-        return alpha
+        return self._compute_w(X, y)
 
-    def _examineSample(self, i2, X, y, alpha):
+    def _examineSample(self, i2, X, y):
 
         y2 = y[i2, 0]
-        alpha2 = alpha[i2, 0]
-        x2 = X[i2, :]
-        E2 = self._f(x2, X, y, alpha) - y2
-        self._E[i2] = E2  # Update error cache
+        alpha2 = self.alpha[i2, 0]
+        E2 = self._output(i2, X, y) - y2
         r2 = E2 * y2
         if (r2 < -self.eps and alpha2 < self.C) \
                 or (r2 > self.eps and alpha2 > 0.0):
 
-            ind = np.logical_and(alpha > self.eps,
-                                 alpha < self.C - self.eps)
+            ind = np.logical_and(self.alpha > self.eps,
+                                 self.alpha < self.C - self.eps)
 
-            # if number of non-zero & non-C alpha > 1
+            # If number of non-zero & non-C alpha > 1:
             if np.sum(ind) > 1:
                 # TODO: What if multiple maxs?
                 i1 = np.argmax(np.abs(self._E - E2))  # 2nd choice heuristics.
-                if self._takeStep(i1, i2, X, y, alpha) == 1:
+                if self._takeStep(i1, i2, X, y) == 1:
                     return 1
 
-            # loop over all non-zero and non-C alpha in random order
+            # Loop over all non-zero and non-C alpha in random order:
             for i1 in np.random.permutation(np.nonzero(ind)[0]):
-                if self._takeStep(i1, i2, X, y, alpha) == 1:
+                if self._takeStep(i1, i2, X, y) == 1:
                     return 1
 
             # TODO: Necessary to loop over those from the loop above?
-            # loop over all possible i1 in random order
-            for i1 in np.random.permutation(range(np.size(alpha))):
-                if self._takeStep(i1, i2, X, y, alpha) == 1:
+            # Loop over all possible i1 in random order:
+            for i1 in np.random.permutation(range(np.size(self.alpha))):
+                if self._takeStep(i1, i2, X, y) == 1:
                     return 1
 
         return 0
 
-    def _takeStep(self, i1, i2, X, y, alpha):
+    def _takeStep(self, i1, i2, X, y):
 
         if i1 == i2:
             return 0
 
-        alpha1 = alpha[i1, 0]
-        alpha2 = alpha[i2, 0]
+        alpha1 = self.alpha[i1, 0]
+        alpha2 = self.alpha[i2, 0]
         y1 = y[i1, 0]
         y2 = y[i2, 0]
-        x1 = X[i1, :]
-        x2 = X[i2, :]
-        # TODO: Use cache!
-        E1 = self._f(x1, X, y, alpha) - y1
-        E2 = self._f(x2, X, y, alpha) - y2
-        self._E[i1] = E1  # Update error cache
+        E1 = self._output(i1, X, y) - y1
+        E2 = self._output(i2, X, y) - y2
         s = y1 * y2
 
         L, H = self._compute_LH(y1, y2, alpha1, alpha2)
         if L == H:
             return 0
 
-        k11 = self.K(x1, x1)
-        k12 = self.K(x1, x2)
-        k22 = self.K(x2, x2)
+        k11 = self.kernel(i1, i1)
+        k12 = self.kernel(i1, i2)
+        k22 = self.kernel(i2, i2)
         eta = k11 + k22 - 2.0 * k12
         if eta > 0.0:
             a2 = alpha2 + y2 * (E1 - E2) / eta
@@ -230,11 +250,11 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
             elif a2 > H:
                 a2 = H
         else:  # Degenerate case
-            alpha[i2, 0] = L
-            Lobj = self._f(x1, X, y, alpha)
-            alpha[i2, 0] = H
-            Hobj = self._f(x1, X, y, alpha)
-            alpha[i2, 0] = alpha2
+            self.alpha[i2, 0] = L  # Temporarily change self.alpha[i2, 0]
+            Lobj = self._func_val(X, y)
+            self.alpha[i2, 0] = H  # Temporarily change self.alpha[i2, 0]
+            Hobj = self._func_val(X, y)
+            self.alpha[i2, 0] = alpha2  # Set again to the original value
 
             if Lobj < Hobj - self.eps:
                 a2 = L
@@ -249,36 +269,50 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
         a1 = alpha1 + s * (alpha2 - a2)
 
         # Update threshold to reflect change in Lagrange multipliers
-        b1 = E1 + y1 * (a1 - alpha1) * k11 + y2 * (a2 - alpha2) * k12 + self.b
-        b2 = E2 + y1 * (a1 - alpha1) * k12 + y2 * (a2 - alpha2) * k22 + self.b
-
+        b1 = E1 + y1 * (a1 - alpha1) * k11 + y2 * (a2 - alpha2) * k12 + self.bias
+        b2 = E2 + y1 * (a1 - alpha1) * k12 + y2 * (a2 - alpha2) * k22 + self.bias
         # Use self.eps here?
-        if 0.0 < alpha[i1, 0] and alpha[i1, 0] < self.C:
-            self.b = b1
-        elif 0.0 < alpha[i2, 0] and alpha[i2, 0] < self.C:
-            self.b = b2
+        if 0.0 < alpha1 and alpha1 < self.C:
+            self.bias = b1
+        elif 0.0 < alpha2 and alpha2 < self.C:
+            self.bias = b2
         else:
-            self.b = (b1 + b2) / 2.0
+            self.bias = (b1 + b2) / 2.0
 
-        # Update weight vector to reflect change in a1 & a2, if SVM is linear
-        pass
+        # We update the weight vector to reflect change in a1 & a2, if SVM is
+        # linear, as the last step (instead of here).
 
         # Update error cache using new Lagrange multipliers
-        pass
+        # We invalidate the cache, so that new values will be computed
+        self._Evalid.fill(False)
 
         # Update lagrange multipliers in alpha
-        alpha[i1, 0] = a1
-        alpha[i2, 0] = a2
+        self.alpha[i1, 0] = a1
+        self.alpha[i2, 0] = a2
+
+        # We have performed a full step.
+        # Update global iteration counter:
+        self.num_iter += 1
+        # Save function value if requested:
+        if self.info_requested(utils.Info.func_val):
+            self._f.append(self._func_val(X, y))
 
         return 1
 
-    def _f(self, x, X, y, alpha):
+    def _output(self, idx, X, y):
 
-        val = 0.0
-        for i in xrange(y.shape[0]):
-            val += alpha[i, 0] * y[i, 0] * self.K(X[i, :], x)
+        if self._Evalid[idx]:
+            return self._E[idx]
+        else:
+            val = -self.bias
+            for i in xrange(y.shape[0]):
+                if self.alpha[i, 0] > 0.0:
+                    val += self.alpha[i, 0] * y[i, 0] * self.kernel(i, idx)
 
-        return val
+            self._E[idx] = val  # Update error cache
+            self._Evalid[idx] = True
+
+            return self._E[idx]
 
     def _compute_LH(self, y1, y2, alpha1, alpha2):
 
@@ -290,6 +324,26 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
             H = min(self.C, alpha2 + alpha1)
 
         return L, H
+
+    def _compute_w(self, X, y):
+
+        w = X.T.dot(np.multiply(y, self.alpha))
+
+        return w
+
+    def _func_val(self, X, y):
+
+        f = 0.0
+        for i in xrange(y.shape[0]):
+            if self.alpha[i, 0] > 0.0:
+                for j in xrange(y.shape[0]):
+                    if self.alpha[j, 0] > 0.0:
+                        f += y[i, 0] * y[j, 0] * self.kernel(i, j) \
+                            * self.alpha[i, 0] * self.alpha[j, 0]
+        f *= 0.5
+        f -= np.sum(self.alpha)
+
+        return f
 
 
 if __name__ == "__main__":

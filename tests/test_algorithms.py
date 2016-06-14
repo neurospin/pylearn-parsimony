@@ -13,6 +13,7 @@ from nose.tools import assert_less
 import numpy as np
 
 from tests import TestCase
+import parsimony.algorithms.utils as utils
 
 
 class TestAlgorithms(TestCase):
@@ -63,17 +64,73 @@ class TestAlgorithms(TestCase):
 
         np.random.seed(42)
 
-        X = np.vstack([0.2 * np.random.randn(50, 2) + 0.25,
-                       0.2 * np.random.randn(50, 2) + 0.75])
-        y = np.random.randint(0, 2, (100, 1)) * 2 - 1
+        n = 100
+        X = np.vstack([0.2 * np.random.randn(n / 2, 2) + 0.25,
+                       0.2 * np.random.randn(n / 2, 2) + 0.75])
+        y = np.vstack([1 * np.ones((n / 2, 1)),
+                       3 * np.ones((n / 2, 1))]) - 2
 
         import parsimony.algorithms.algorithms as alg
-        smo = alg.SequentialMinimalOptimization(1.0)
-        alpha = smo.run(X, y)
+
+        info = [utils.Info.func_val]
+        K = utils.LinearKernel(X=X, use_cache=True)
+        smo = alg.SequentialMinimalOptimization(1.0, K=K, info=info,
+                                                max_iter=100)
+        beta = smo.run(X, y)
+
+        # Check that it is never increasing:
+        f = smo.info_get("func_val")
+        fdiff = np.array(f[2:]) - np.array(f[:-2])
+
+        assert(np.sum(fdiff > 0) == 0)
 
 #        import matplotlib.pyplot as plt
-#        plt.plot(X[:, 0], X[:, 1], '.')
+#        plt.plot(X[:50, 0], X[:50, 1], 'g.')
+#        plt.plot(X[50:, 0], X[50:, 1], 'b.')
+#        for i in range(10000):
+#            p = np.random.rand(2, 1)
+#
+#            val = 0.0
+#            for i in xrange(y.shape[0]):
+#                val += smo.alpha[i, 0] * y[i, 0] * smo.K(X[i, :], p)
+#            val -= smo.bias
+#
+#            if np.abs(val) < 0.01:
+#                plt.plot(p[0], p[1], 'r.')
+#
 #        plt.show()
+
+        from parsimony.estimators import RidgeLogisticRegression
+        from parsimony.estimators import SupportVectorMachine
+        from parsimony.algorithms.gradient import AcceleratedGradientDescent
+
+        lr = RidgeLogisticRegression(1.0,
+                                     algorithm=AcceleratedGradientDescent(max_iter=100),
+                                     mean=False,
+                                     penalty_start=1)
+        X_1 = np.hstack((np.ones((X.shape[0], 1)), X))
+        params = lr.fit(X_1, y).parameters()
+        beta_lr = params["beta"]
+
+        n_beta = beta / np.linalg.norm(beta)
+        n_beta_lr = beta_lr[1:, :] / np.linalg.norm(beta_lr[1:, :])
+#        print n_beta
+#        print n_beta_lr
+#        print np.linalg.norm(n_beta - n_beta_lr)
+        assert(np.linalg.norm(n_beta - n_beta_lr) < 0.065)
+
+        smo = SupportVectorMachine(1.0, kernel=K,
+                                   algorithm=smo)
+        params = smo.fit(X, y).parameters()
+#        beta_smo = params["beta"]
+
+#        print lr.score(X_1, (y + 1) / 2)
+#        print smo.score(X, y)
+#        print np.abs(lr.score(X_1, (y + 1) / 2) - smo.score(X, y))
+        assert(np.abs(lr.score(X_1, (y + 1) / 2) - smo.score(X, y)) < 0.02)
+
+#        asdf = 1
+
 
 #    def test_DynamicCONESTA_tv(self):
 #        import numpy as np

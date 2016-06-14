@@ -534,7 +534,7 @@ class CONESTA(bases.ExplicitAlgorithm,
             # Run FISTA.
             beta = algorithm.run(function, beta)
 
-            # Update global iteration count.
+            # Update global iteration counter.
             self.num_iter += algorithm.num_iter
 
             # Get info from algorithm.

@@ -4,10 +4,10 @@ The :mod:`parsimony.algorithms.gradient` module includes several algorithms
 that minimises an explicit loss function while utilising the gradient of the
 function.
 
-Algorithms may not store states. I.e., if they are classes, do not keep
-references to objects with state in the algorithm objects. It should be
-possible to copy and share algorithms between e.g. estimators, and thus they
-should not depend on any state.
+Algorithms may not depend on states. I.e., if they are classes, do not keep
+references to objects with state in the algorithm objects that may be reused.
+It should be possible to copy and share algorithms between e.g. estimators, and
+thus they should not depend on any state.
 
 Created on Wed Jun  4 15:22:50 2014
 

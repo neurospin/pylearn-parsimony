@@ -47,7 +47,7 @@ class TestLogisticRegression(TestCase):
 
         alpha = 0.9
         Sigma = alpha * np.eye(p, p) \
-              + (1.0 - alpha) * np.random.randn(p, p)
+            + (1.0 - alpha) * np.random.randn(p, p)
         mean = np.zeros(p)
         X = np.random.multivariate_normal(mean, Sigma, n)
         y = np.array(np.random.randint(0, 2, (n, 1)), dtype=X.dtype)

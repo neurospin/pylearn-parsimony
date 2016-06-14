@@ -26,17 +26,20 @@ import parsimony.functions.nesterov.l1tv as l1tv
 import parsimony.utils.start_vectors as start_vectors
 import parsimony.utils.linalgs as linalgs
 import parsimony.algorithms.bases as bases
+import parsimony.algorithms.algorithms as algorithms
 import parsimony.algorithms.cluster as cluster
 import parsimony.algorithms.gradient as gradient
 import parsimony.algorithms.proximal as proximal
 import parsimony.algorithms.primaldual as primaldual
 import parsimony.algorithms.nipals as nipals
 import parsimony.algorithms.deflation as deflation
-from parsimony.utils import check_arrays
+import parsimony.algorithms.utils as alg_utils
+from parsimony.utils import check_arrays, check_array_in
 from parsimony.utils import class_weight_to_sample_weight, check_labels
 
 __all__ = ["BaseEstimator",
            "RegressionEstimator", "LogisticRegressionEstimator",
+           "SVMEstimator",
 
            "LinearRegression", "RidgeRegression", "Lasso", "ElasticNet",
 
@@ -191,81 +194,6 @@ class RegressionEstimator(BaseEstimator):
 #        return self.function.f(self.beta)
         raise NotImplementedError('Abstract method "score" must be '
                                   'specialised!')
-
-
-class LogisticRegressionEstimator(BaseEstimator):
-    """Base estimator for logistic regression estimation
-
-    Parameters
-    ----------
-    algorithm : ExplicitAlgorithm. The algorithm that will be applied.
-
-    start_vector : Numpy array. Generates the start vector that will be used.
-
-    class_weight : {dict, "auto"}, optional. Set the parameter weight of
-            sample belonging to class i to class_weight[i]. If not given, all
-            classes are supposed to have weight one. The "auto" mode uses the
-            values of y to automatically adjust weights inversely proportional
-            to class frequencies.
-    """
-    __metaclass__ = abc.ABCMeta
-
-    def __init__(self, algorithm,
-                 start_vector=start_vectors.RandomStartVector(),
-                 class_weight=None):
-
-        super(LogisticRegressionEstimator, self).__init__(algorithm=algorithm)
-
-        self.start_vector = start_vector
-        self.class_weight = class_weight
-
-    def reset(self):
-        """Resets the estimator such that it is as if just created.
-        """
-        if hasattr(self, "beta"):
-            del self.beta
-
-        if hasattr(self.algorithm, "reset"):
-            self.algorithm.reset()
-
-    @abc.abstractmethod
-    def fit(self, X, y):
-        """Fit the model to the data.
-        """
-        raise NotImplementedError('Abstract method "fit" must be '
-                                  'specialised!')
-
-    def predict(self, X):
-        """Return a predicted y corresponding to the X given and the beta
-        previously determined.
-        """
-        X = check_arrays(X)
-        prob = self.predict_probability(X)
-        y = np.ones((X.shape[0], 1))
-        y[prob < 0.5] = 0.0
-
-        return y
-
-    def predict_probability(self, X):
-        X = check_arrays(X)
-        logit = np.dot(X, self.beta)
-#        prob = 1.0 / (1.0 + np.exp(-logit))
-        prob = np.reciprocal(1.0 + np.exp(-logit))
-
-        return prob
-
-    def parameters(self):
-        """Returns the fitted parameters, the regression coefficients (beta).
-        """
-        return {"beta": self.beta}
-
-    def score(self, X, y):
-        """Rate of correct classification.
-        """
-        yhat = self.predict(X)
-        rate = np.mean(y == yhat)
-
-        return rate
 
 
 class LinearRegression(RegressionEstimator):
@@ -1230,6 +1158,84 @@ class LinearRegressionL1L2GL(RegressionEstimator):
 #        return np.sum((y_hat - y) ** 2.0) / float(n)
 
 
+class LogisticRegressionEstimator(BaseEstimator):
+    """Base estimator for logistic regression estimation.
+
+    Parameters
+    ----------
+    algorithm : ExplicitAlgorithm
+        The algorithm that will be applied to minimise the logistic regression
+        problem.
+
+    start_vector : BaseStartVector
+        Generates the start vector that will be used.
+
+    class_weight : {dict, "auto"}, optional
+        Set the parameter weight of sample belonging to class i to
+        class_weight[i]. If not given, all classes are supposed to have weight
+        one. The "auto" mode uses the values of y to automatically adjust
+        weights inversely proportional to class frequencies.
+    """
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, algorithm,
+                 start_vector=start_vectors.RandomStartVector(),
+                 class_weight=None):
+
+        super(LogisticRegressionEstimator, self).__init__(algorithm=algorithm)
+
+        self.start_vector = start_vector
+        self.class_weight = class_weight
+
+    def reset(self):
+        """Resets the estimator such that it is as if just created.
+        """
+        if hasattr(self, "beta"):
+            del self.beta
+
+        if hasattr(self.algorithm, "reset"):
+            self.algorithm.reset()
+
+    @abc.abstractmethod
+    def fit(self, X, y):
+        """Fit the model to the data.
+        """
+        raise NotImplementedError('Abstract method "fit" must be '
+                                  'specialised!')
+
+    def predict(self, X):
+        """Return a predicted y corresponding to the X given and the beta
+        previously determined.
+        """
+        X = check_arrays(X)
+        prob = self.predict_probability(X)
+        y = np.ones((X.shape[0], 1))
+        y[prob < 0.5] = 0.0
+
+        return y
+
+    def predict_probability(self, X):
+        X = check_arrays(X)
+        logit = np.dot(X, self.beta)
+#        prob = 1.0 / (1.0 + np.exp(-logit))
+        prob = np.reciprocal(1.0 + np.exp(-logit))
+
+        return prob
+
+    def parameters(self):
+        """Returns the fitted parameters, the regression coefficients (beta).
+        """
+        return {"beta": self.beta}
+
+    def score(self, X, y):
+        """Rate of correct classification.
+        """
+        yhat = self.predict(X)
+        rate = np.mean(y == yhat)
+
+        return rate
+
+
 class LogisticRegression(LogisticRegressionEstimator):
     """Logistic regression (re-weighted log-likelihood aka. cross-entropy):
 
@@ -1344,7 +1350,7 @@ class LogisticRegression(LogisticRegressionEstimator):
 
 
 class RandomLogisticRegression(LogisticRegression):
-    """A "logistic regression" estimator that returns random outputs.
+    """A "logistic regression" estimator that just returns random outputs.
 
     Useful for testing.
 
@@ -1513,9 +1519,9 @@ class RidgeLogisticRegression(LogisticRegressionEstimator):
         # sample_weight = sample_weight.ravel()
 
         function = losses.RidgeLogisticRegression(X, y, self.l,
-                                              weights=sample_weight,
-                                              penalty_start=self.penalty_start,
-                                              mean=self.mean)
+                                                  weights=sample_weight,
+                                                  penalty_start=self.penalty_start,
+                                                  mean=self.mean)
 
 #        function = functions.CombinedFunction()
 #        function.add_function(losses.LogisticRegression(X, y, mean=self.mean))
@@ -2339,6 +2345,233 @@ class LinearRegressionL2SmoothedL1TV(RegressionEstimator):
         y_hat = np.dot(X, self.beta)
 
         return np.sum((y_hat - y) ** 2.0) / float(n)
+
+
+class SVMEstimator(BaseEstimator):
+    """Base estimator for support vector machines.
+
+    Parameters
+    ----------
+    algorithm : ImplicitAlgorithm or ExplicitAlgorithm
+        The algorithm that will be used to solve the SVM problem.
+    """
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, kernel, algorithm):
+
+        super(SVMEstimator, self).__init__(algorithm=algorithm)
+
+        self.kernel = kernel
+
+    def reset(self):
+        """Resets the estimator such that it is as if just created.
+        """
+        if hasattr(self, "w"):
+            del self.w
+        if hasattr(self, "alpha"):
+            del self.alpha
+        if hasattr(self, "bias"):
+            del self.bias
+        if hasattr(self, "X"):
+            del self.bias
+        if hasattr(self, "y"):
+            del self.bias
+        if hasattr(self, "kernel"):
+            del self.kernel
+
+        if hasattr(self.algorithm, "reset"):
+            self.algorithm.reset()
+
+    @abc.abstractmethod
+    def fit(self, X, y):
+        """Fit the model to the data.
+        """
+        raise NotImplementedError('Abstract method "fit" must be '
+                                  'specialised!')
+
+    def predict(self, X):
+        """Return a predicted y corresponding to the X given and the model
+        previously determined.
+        """
+        X = check_arrays(X)
+
+        alphay = np.multiply(self.alpha, self.y)
+
+        y = np.zeros((X.shape[0], 1))
+        for j in xrange(X.shape[0]):
+            x = X[j, :]
+            val = 0.0
+            for i in xrange(self.X.shape[0]):
+                val += alphay[i, 0] * self.kernel(self.X[i, :], x)
+            val -= self.bias
+
+            y[j, 0] = np.sign(val)
+
+        return y
+
+    def parameters(self):
+        """Returns a dictionary with the estimator's fitted parameters, e.g.
+        the regression coefficients.
+        """
+        return {"w": self.w,
+                "alpha": self.alpha,
+                "bias": self.bias}
+
+    def score(self, X, y):
+        """Rate of correct classification.
+        """
+        yhat = self.predict(X)
+        rate = np.mean(y == yhat)
+
+        return rate
+
+
+class SupportVectorMachine(SVMEstimator):
+    """An estimator for support vector machines.
+
+    Solves the following primal optimisation problem
+
+        min. (l / 2).||w||²_2 + (1 / n).\sum_{i=1}^N h(w | x, y),
+
+    where h is the hinge loss; or the equivalent dual problem
+
+        max. 0.5 * \sum_{i=1}^N \sum_{j=1}^N y_i.y_j.K(x_i, x_j).a_i.a_j
+             - \sum_{i=1}^N a_i.
+        s.t. 0 <= a_i <= C,    for all i=1,...,N,
+             \sum_{i=1}^N y_i.a_i = 0.
+
+    Which problem is solved depends on the selected algorithm.
+
+    Parameters
+    ----------
+    C : float
+        Must be positive. The regularisation parameter controlling the
+        trade-off between a wide margin and a small number of margin failures.
+        Note that l = 1 / C is used in the primal formulation.
+
+    kernel : kernel object, optional
+        The kernel for non-linear SVM, of type
+        parsimony.algorithms.utils.Kernel. Will override the algorithms kernel,
+        if there is one, and if they differ in type. Default is a linear
+        kernel.
+
+    algorithm : ImplicitAlgorithm or ExplicitAlgorithm, optional
+        The algorithm that will be used to solve the SVM problem. Should be one
+        of:
+                1. SequentialMinimalOptimization(...)
+                2. SubGradientDescent(...)
+
+            Default is SequentialMinimalOptimization(...).
+
+    start_vector : BaseStartVector, optional
+        Generates the start vector that will be used.
+
+    algorithm_params : dict, optional
+        The dictionary algorithm_params contains parameters that should be set
+        in the algorithm. Passing algorithm=Algorithm(**params) is equivalent
+        to passing algorithm=MyAlgorithm() and algorithm_params=params. Default
+        is an empty dictionary.
+
+    mean : bool, optional
+        Whether to compute the loss or the mean loss. Default is False, the
+        loss. Warning: May not be applicable to all algorithms!
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import parsimony.estimators as estimators
+    >>> import parsimony.algorithms.algorithms as alg
+    >>> import parsimony.algorithms.utils as utils
+    >>>
+    >>> np.random.seed(42)
+    >>>
+    >>> n = 30
+    >>> X = np.vstack([0.2 * np.random.randn(n / 2, 2) + 0.25,
+    ...                0.2 * np.random.randn(n / 2, 2) + 0.75])
+    >>> y = np.vstack([1 * np.ones((n / 2, 1)),
+    ...                3 * np.ones((n / 2, 1))]) - 2
+    >>>
+    >>> K = utils.LinearKernel(X=X, use_cache=True)
+    >>> svm = estimators.SupportVectorMachine(1.0,
+    ...     algorithm=alg.SequentialMinimalOptimization(1.0, kernel=K,
+    ...                                                 max_iter=100))
+    >>> res = svm.fit(X, y)
+    >>> error = svm.score(X, y)
+    >>> print "error = ", error
+    error =  0.933333333333
+    """
+    def __init__(self, C, kernel=None,
+                 algorithm=None, algorithm_params=dict(),
+                 start_vector=start_vectors.RandomStartVector(),
+                 mean=True):
+
+        self.C = max(consts.FLOAT_EPSILON, float(C))
+
+        # Make sure we have a kernel:
+        if kernel is None:
+            if algorithm is not None:
+                kernel = algorithm.kernel_get()
+            if kernel is None:
+                kernel = alg_utils.LinearKernel()
+
+        # Pass the kernel to the algorithm:
+        if "kernel" in algorithm_params:
+            if not isinstance(algorithm_params["kernel"], kernel.__class__):
+                algorithm_params["kernel"] = kernel
+        else:
+            algorithm_params["kernel"] = kernel
+
+        # Create the algorithm:
+        if algorithm is None:
+            algorithm = \
+                algorithms.SequentialMinimalOptimization(self.C,
+                                                         **algorithm_params)
+        else:
+            algorithm.set_params(**algorithm_params)
+
+        # Init base classes:
+        super(SupportVectorMachine, self).__init__(kernel=kernel,
+                                                   algorithm=algorithm)
+
+        self.algorithm_params = dict(algorithm_params)
+        self.start_vector = start_vector
+        self.mean = bool(mean)
+
+    def get_params(self):
+        """Return a dictionary containing all the estimator's parameters.
+        """
+        return {"kernel": self.kernel,
+                "algorithm": self.algorithm,
+                "algorithm_params": self.algorithm_params,
+                "start_vector": self.start_vector,
+                "mean": self.mean}
+
+    def fit(self, X, y, beta=None):
+        """Fit the estimator to the data.
+        """
+        X, y = check_arrays(X, check_array_in(y, [-1, 1]))
+
+        if isinstance(self.algorithm,
+                      algorithms.SequentialMinimalOptimization):
+            self.beta = self.algorithm.run(X, y)
+            self.alpha = self.algorithm.alpha
+            self.bias = self.algorithm.bias
+            self.X = X
+            self.y = y
+        else:
+            pass
+#            function = losses.LogisticRegression(X, y,
+#                                                 mean=self.mean)
+#
+#            self.algorithm.check_compatibility(function,
+#                                               self.algorithm.INTERFACES)
+#
+#            if beta is None:
+#                beta = self.start_vector.get_vector(X.shape[1])
+#
+#            self.beta = self.algorithm.run(function, beta)
+
+        return self
 
 
 class PLSRegression(RegressionEstimator):

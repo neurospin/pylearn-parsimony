@@ -654,15 +654,58 @@ class Kernel(object):
 
     __metaclass__ = abc.ABCMeta
 
+    def __init__(self, X=None, use_cache=True):
+
+        self.X = X
+        self.use_cache = bool(use_cache)
+        if self.use_cache:
+            self.reset()
+
+    def reset(self):
+        if self.use_cache:
+            self._cache = dict()
+
     @abc.abstractmethod
     def __call__(self, x1, x2):
+
         raise NotImplementedError('Abstract method "__call__" must be '
                                   'specialised!')
 
 
 class LinearKernel(Kernel):
 
+    def __init__(self, **kwargs):
+
+        super(LinearKernel, self).__init__(**kwargs)
+
     def __call__(self, x1, x2):
+
+        if isinstance(x1, (int, np.int64)) and isinstance(x2, (int, np.int64)):
+            return self._index(x1, x2)
+        else:
+            return self._vectors(x1, x2)
+
+    def _index(self, i1, i2):
+
+        i1 = int(i1)
+        i2 = int(i2)
+
+        if self.X is None:
+            raise RuntimeError('No matrix supplied!')
+
+        if self.use_cache:
+            if (i1, i2) in self._cache:
+                return self._cache[(i1, i2)]
+            else:
+                val = np.dot(self.X[i1, :].T, self.X[i2, :])
+                self._cache[(i1, i2)] = val
+        else:
+            val = np.dot(self.X[i1, :].T, self.X[i2, :])
+
+        return val
+
+    def _vectors(self, x1, x2):
+
         return np.dot(x1.T, x2)
 
 

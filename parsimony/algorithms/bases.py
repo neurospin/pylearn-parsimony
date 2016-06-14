@@ -24,7 +24,7 @@ import parsimony.functions.properties as properties
 
 __all__ = ["BaseAlgorithm", "check_compatibility",
            "ImplicitAlgorithm", "ExplicitAlgorithm",
-           "IterativeAlgorithm", "InformationAlgorithm"]
+           "IterativeAlgorithm", "InformationAlgorithm", "KernelAlgorithm"]
 
 
 class BaseAlgorithm(object):
@@ -46,7 +46,7 @@ class BaseAlgorithm(object):
                                          "properties %s" % (str(f), str(prop)))
                 elif not isinstance(f, prop):
                     raise ValueError("%s does not implement interface %s" %
-                                    (str(f), str(prop)))
+                                     (str(f), str(prop)))
 
     def set_params(self, **kwargs):
 
@@ -290,8 +290,46 @@ class InformationAlgorithm(object):
         """
         for i in info:
             if not self.info_provided(i):
-                raise ValueError("Requested information (%s) not provided." \
-                        % (str(i),))
+                raise ValueError("Requested information (%s) not provided."
+                                 % (str(i),))
+
+
+class KernelAlgorithm(object):
+    """Algorithms that use kernels.
+
+    Implementing classes should have a field kernel and supply a get_kernel
+    method.
+
+    Fields
+    ------
+    kernel_get : kernel object, optional
+        Returns the kernel. Default is a linear kernel.
+
+    Examples
+    --------
+    >>> import parsimony.algorithms as algorithms
+    >>> import parsimony.algorithms.utils as utils
+    >>>
+    >>> K = utils.LinearKernel()
+    >>> smo = alg.SequentialMinimalOptimization(1.0, kernel=K)
+    >>> smo.kernel_get()
+    """
+    def __init__(self, kernel=None, **kwargs):
+        """
+        Parameters
+        ----------
+        kernel : kernel object, optional
+            The kernel to use. Default is a linear kernel.
+        """
+        super(KernelAlgorithm, self).__init__(**kwargs)
+
+        self.kernel = kernel
+
+    def kernel_get(self):
+        """Returns the kernel.
+        """
+        return self.kernel
+
 
 if __name__ == "__main__":
     import doctest
