@@ -14,7 +14,7 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 params = dict(name="pylearn-parsimony",
-              version="0.2.2",
+              version="0.3",
               author="See contributors on https://github.com/neurospin/pylearn-parsimony",
               author_email="lofstedt.tommy@gmail.com",
               maintainer="Tommy Löfstedt",
