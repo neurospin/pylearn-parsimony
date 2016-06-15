@@ -10,11 +10,30 @@ Copyright (c) 2013-2015, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 import os
 
+
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
+
+def read_version():
+
+    # Default value if we cannot find the __version__ field in the init file:
+    version = "0.3.x"
+
+    init_file = os.path.dirname(__file__) + "/parsimony/__init__.py"
+    if os.path.exists(init_file):
+        with open(init_file, 'r') as f:
+            for line in f:
+                if line.startswith("__version__"):
+                    _, version = line.split("=")
+                    version = version.replace('\"', '').replace('\'', '')
+                    version = version.strip()
+                    break
+
+    return version
+
 params = dict(name="pylearn-parsimony",
-              version="0.3",
+              version=read_version(),
               author="See contributors on https://github.com/neurospin/pylearn-parsimony",
               author_email="lofstedt.tommy@gmail.com",
               maintainer="Tommy Löfstedt",
@@ -35,11 +54,11 @@ params = dict(name="pylearn-parsimony",
                         "parsimony.functions.multiblock",
                         "parsimony.functions.nesterov",
                         "parsimony.utils",
-                       ],
-#              package_data = {"": ["README.md", "LICENSE"],
-#                              "examples": ["*.py"],
-#                              "tests": ["*.py"],
-#                             },
+                        ],
+              # package_data = {"": ["README.md", "LICENSE"],
+              #                 "examples": ["*.py"],
+              #                 "tests": ["*.py"],
+              #                },
               classifiers=["Development Status :: 3 - Alpha",
                            "Intended Audience :: Developers",
                            "Intended Audience :: Science/Research",
@@ -47,18 +66,18 @@ params = dict(name="pylearn-parsimony",
                            "Topic :: Scientific/Engineering",
                            "Topic :: Machine learning"
                            "Programming Language :: Python :: 2.7",
-                          ],
-)
+                           ],
+              )
 
 try:
     from setuptools import setup
 
     params["install_requires"] = ["numpy>=1.6.1",
                                   "scipy>=0.9.0",
-                                 ]
+                                  ]
     params["extras_require"] = {"examples": ["matplotlib>=1.1.1rc"],
                                 "tests": ["doctest", "nose>=1.1.2"],
-                               }
+                                }
 except:
     from distutils.core import setup
 

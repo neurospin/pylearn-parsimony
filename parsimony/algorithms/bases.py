@@ -295,7 +295,7 @@ class InformationAlgorithm(object):
 
 
 class KernelAlgorithm(object):
-    """Algorithms that use kernels.
+    """Algorithms that use Mercer kernels.
 
     Implementing classes should have a field kernel and supply a get_kernel
     method.
