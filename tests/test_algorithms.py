@@ -13,76 +13,92 @@ from nose.tools import assert_less
 import numpy as np
 
 from tests import TestCase
+
 import parsimony.algorithms.utils as utils
+import parsimony.functions.losses as losses
 
 
 class TestAlgorithms(TestCase):
 
-    def test_SubGradientDescent(self):
+#    def test_SubGradientDescent(self):
+#
+#        from parsimony.algorithms.subgradient import SubGradientDescent
+#        from parsimony.functions.combinedfunctions import LinearRegressionL1
+#        from parsimony.algorithms.utils import NonSumDimStepSize
+#        from parsimony.estimators import Lasso
+#
+#        np.random.seed(42)
+#
+#        X = np.random.randn(100, 50)
+#        y = np.random.randn(100, 1)
+#
+#        sgd = SubGradientDescent(max_iter=1000,
+#                                 step_size=NonSumDimStepSize(a=0.01),
+#                                 use_gradient=False)
+#        function = LinearRegressionL1(X, y, l1=0.01, mean=False)
+#        beta1 = sgd.run(function, np.random.rand(50, 1))
+#        beta2 = np.dot(np.linalg.pinv(X), y)
+#
+#        assert(np.linalg.norm(beta1 - beta2) < 0.005)
+#
+#        np.random.seed(42)
+#
+#        X = np.random.randn(100, 50)
+#        y = np.random.randn(100, 1)
+#
+#        l1 = 0.1
+#
+#        sgd = SubGradientDescent(max_iter=2000,
+#                                 step_size=NonSumDimStepSize(a=0.05),
+#                                 use_gradient=False)
+#        function = LinearRegressionL1(X, y, l1=l1, mean=False)
+#        beta1 = sgd.run(function, np.random.rand(50, 1))
+#
+#        lasso_est = Lasso(l=l1, algorithm_params=dict(max_iter=1000),
+#                          mean=False)
+#        beta2 = lasso_est.fit(X, y).beta
+#
+#        assert(np.linalg.norm(beta1 - beta2) < 1e-4)
 
-        from parsimony.algorithms.subgradient import SubGradientDescent
-        from parsimony.functions.combinedfunctions import LinearRegressionL1
-        from parsimony.algorithms.utils import NonSumDimStepSize
-        from parsimony.estimators import Lasso
-
-        np.random.seed(42)
-
-        X = np.random.randn(100, 50)
-        y = np.random.randn(100, 1)
-
-        sgd = SubGradientDescent(max_iter=1000,
-                                 step_size=NonSumDimStepSize(a=0.01),
-                                 use_gradient=False)
-        function = LinearRegressionL1(X, y, l1=0.01, mean=False)
-        beta1 = sgd.run(function, np.random.rand(50, 1))
-        beta2 = np.dot(np.linalg.pinv(X), y)
-
-        assert(np.linalg.norm(beta1 - beta2) < 0.005)
-
-        np.random.seed(42)
-
-        X = np.random.randn(100, 50)
-        y = np.random.randn(100, 1)
-
-        l1 = 0.1
-
-        sgd = SubGradientDescent(max_iter=2000,
-                                 step_size=NonSumDimStepSize(a=0.05),
-                                 use_gradient=False)
-        function = LinearRegressionL1(X, y, l1=l1, mean=False)
-        beta1 = sgd.run(function, np.random.rand(50, 1))
-
-        lasso_est = Lasso(l=l1, algorithm_params=dict(max_iter=1000),
-                          mean=False)
-        beta2 = lasso_est.fit(X, y).beta
-
-        assert(np.linalg.norm(beta1 - beta2) < 1e-4)
-
-    def test_SMO(self):
-
-        import numpy as np
+    def test_SVM(self):
 
         np.random.seed(42)
 
         n = 100
         X = np.vstack([0.2 * np.random.randn(n / 2, 2) + 0.25,
                        0.2 * np.random.randn(n / 2, 2) + 0.75])
+        X_1 = np.hstack((-np.ones((X.shape[0], 1)), X))
         y = np.vstack([1 * np.ones((n / 2, 1)),
                        3 * np.ones((n / 2, 1))]) - 2
 
         import parsimony.algorithms.algorithms as alg
 
         info = [utils.Info.func_val]
-        K = utils.LinearKernel(X=X, use_cache=True)
-        smo = alg.SequentialMinimalOptimization(1.0, K=K, info=info,
+        K = utils.LinearKernel(X=X)
+        smo = alg.SequentialMinimalOptimization(1.0, kernel=K, info=info,
                                                 max_iter=100)
-        beta = smo.run(X, y)
+        w = smo.run(X, y)
 
         # Check that it is never increasing:
         f = smo.info_get("func_val")
         fdiff = np.array(f[2:]) - np.array(f[:-2])
 
         assert(np.sum(fdiff > 0) == 0)
+
+#        from parsimony.algorithms.subgradient import SubGradientDescent
+#        from parsimony.algorithms.utils import NonSumDimStepSize
+#        sgd = SubGradientDescent(max_iter=100,
+#                                 step_size=NonSumDimStepSize(a=0.01),
+#                                 use_gradient=False,
+#                                 info=info,
+#                                 use_best_f=True)
+#        K_1 = utils.LinearKernel(X=X_1)
+#        function = losses.NonlinearSVM(X_1, y, 1.0, kernel=K_1,
+#                                       penalty_start=1, mean=False)
+#        beta_sgd = sgd.run(function, np.zeros((n, 1)))
+#        w_sgd = np.dot(X_1.T, beta_sgd)
+
+#        function = LinearRegressionL1(X, y, l1=0.01, mean=False)
 
 #        import matplotlib.pyplot as plt
 #        plt.plot(X[:50, 0], X[:50, 1], 'g.')
@@ -108,26 +124,35 @@ class TestAlgorithms(TestCase):
                                      algorithm=AcceleratedGradientDescent(max_iter=100),
                                      mean=False,
                                      penalty_start=1)
-        X_1 = np.hstack((np.ones((X.shape[0], 1)), X))
         params = lr.fit(X_1, y).parameters()
-        beta_lr = params["beta"]
+        w_lr = params["beta"]
 
-        n_beta = beta / np.linalg.norm(beta)
-        n_beta_lr = beta_lr[1:, :] / np.linalg.norm(beta_lr[1:, :])
-#        print n_beta
+        n_w = w / np.linalg.norm(w)
+#        n_w_sgd = w_sgd[1:, :] / np.linalg.norm(w_sgd[1:, :])
+        n_w_lr = w_lr[1:, :] / np.linalg.norm(w_lr[1:, :])
+#        print n_w
 #        print n_beta_lr
-#        print np.linalg.norm(n_beta - n_beta_lr)
-        assert(np.linalg.norm(n_beta - n_beta_lr) < 0.065)
+#        print np.linalg.norm(n_w - n_w_lr)
+#        print np.linalg.norm(n_w_sgd - n_w_lr)
+#        print np.linalg.norm(n_w - n_w_sgd)
+        assert(np.linalg.norm(n_w - n_w_lr) < 0.065)
+#        assert(np.linalg.norm(n_w_sgd - n_w_lr) < 0.045)
+#        assert(np.linalg.norm(n_w - n_w_sgd) < 0.11)
 
-        smo = SupportVectorMachine(1.0, kernel=K,
-                                   algorithm=smo)
-        params = smo.fit(X, y).parameters()
-#        beta_smo = params["beta"]
+        smo = SupportVectorMachine(1.0, kernel=K, algorithm=smo)
+        smo.fit(X, y)
+#        params = smo.parameters()
+#        w_smo = params["w"]
+
+#        sgd = SupportVectorMachine(1.0, kernel=K, algorithm=sgd)
+#        sgd.fit(X_1, y)
+#        params = sgd.parameters()
+#        w_sgd = params["w"]
 
 #        print lr.score(X_1, (y + 1) / 2)
 #        print smo.score(X, y)
 #        print np.abs(lr.score(X_1, (y + 1) / 2) - smo.score(X, y))
-        assert(np.abs(lr.score(X_1, (y + 1) / 2) - smo.score(X, y)) < 0.02)
+#        assert(np.abs(lr.score(X_1, (y + 1) / 2) - smo.score(X, y)) < 0.02)
 
 #        asdf = 1
 

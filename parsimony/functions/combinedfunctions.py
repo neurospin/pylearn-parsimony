@@ -43,6 +43,226 @@ __all__ = ["CombinedFunction",
 # TODO: Add penalty_start and mean to all of these!
 
 
+class CombinedFunction(properties.CompositeFunction,
+                       properties.Gradient,
+                       properties.ProximalOperator,
+                       properties.ProjectionOperator,
+                       properties.StepSize):
+    """Combines one or more loss functions, any number of penalties and zero
+    or one proximal operator.
+
+    This function thus represents
+
+        f(x) = f_1(x) [ + f_2(x) ... ] [ + p_1(x) ... ] [ + P(x)],
+
+    subject to [ C_1(x) <= c_1,
+                 C_2(x) <= c_2,
+                 ... ],
+
+    where f_i are differentiable Functions, p_j are differentiable penalties
+    and P is a ProximalOperator. All functions and penalties must thus be
+    Gradient, unless it is a ProximalOperator.
+
+    If no ProximalOperator is given, then prox is the identity.
+    """
+    def __init__(self, functions=[], penalties=[], prox=[], constraints=[]):
+
+        self._f = list(functions)
+        self._p = list(penalties)
+        self._prox = list(prox)
+        self._c = list(constraints)
+
+    def reset(self):
+
+        for f in self._f:
+            f.reset()
+
+        for p in self._p:
+            p.reset()
+
+        for prox in self._prox:
+            prox.reset()
+
+        for c in self._c:
+            c.reset()
+
+    def add_loss(self, function):
+
+        if not isinstance(function, properties.Gradient):
+            raise ValueError("Loss functions must have gradients.")
+
+        self._f.append(function)
+
+    @deprecated("add_loss")
+    def add_function(self, function):
+
+        return self.add_loss(function)
+
+    def add_penalty(self, penalty):
+
+        if not isinstance(penalty, properties.Penalty):
+            raise ValueError("Not a penalty.")
+        elif isinstance(penalty, properties.Gradient):
+            self._p.append(penalty)
+        elif isinstance(penalty, properties.ProximalOperator):
+            if len(self._c) > 0:
+                # TODO: Yes we can! Fix this!
+                raise ValueError("Cannot have both ProximalOperator and "
+                                 "ProjectionOperator.")
+            else:
+                # TODO: We currently only allow one proximal operator. Fix!
+                self._prox[0] = penalty
+        else:
+            raise ValueError("The penalty is not smooth, nor has it a "
+                             "proximal operator.")
+
+    def add_constraint(self, constraint):
+
+        if not isinstance(constraint, properties.Constraint):
+            raise ValueError("Not a constraint.")
+        elif not isinstance(constraint, properties.ProjectionOperator):
+            raise ValueError("Constraints must have projection operators.")
+        elif not isinstance(self._prox[0], ZeroFunction):
+            # TODO: Yes we can! Fix this!
+            raise ValueError("Cannot have both ProjectionOperator and "
+                             "ProximalOperator.")
+        else:
+            self._c.append(constraint)
+
+    def add_smooth_penalty(self, penalty):
+
+        if not isinstance(penalty, properties.Penalty):
+            raise ValueError("Not a penalty.")
+        elif not isinstance(penalty, properties.Gradient):
+            raise ValueError("The penalty does not have a gradient.")
+        else:
+            self._p.append(penalty)
+
+    def add_prox(self, penalty):
+
+        if not isinstance(penalty, properties.ProximalOperator):
+            if isinstance(penalty, properties.ProjectionOperator):
+                # Use the projection operator as the proximal of the indicator
+                # function:
+                penalty.prox = penalty.proj
+                # TODO: We currently only allow one proximal operator. Fix this!
+                if len(self._prox) == 0:
+                    self._prox.append(penalty)
+                else:
+                    self._prox[0] = penalty
+            else:
+                raise ValueError("Not a proximal operator.")
+        elif len(self._c) > 0:
+            # TODO: Yes we can! Fix this!
+            raise ValueError("Cannot have both ProximalOperator and "
+                             "ProjectionOperator.")
+        else:
+            # TODO: We currently only allow one proximal operator. Fix this!
+            if len(self._prox) == 0:
+                self._prox.append(penalty)
+            else:
+                self._prox[0] = penalty
+
+    def add_nesterov(self, penalty):
+
+        if not isinstance(penalty, properties.NesterovFunction):
+            raise ValueError("Not a Nesterov function.")
+        else:
+            self._p.append(penalty)
+
+    def f(self, x):
+        """Function value.
+        """
+        val = 0.0
+        for f in self._f:
+            val += f.f(x)
+
+        for p in self._p:
+            val += p.f(x)
+
+        for prox in self._prox:
+            val += prox.f(x)
+
+        return val
+
+    def grad(self, x):
+        """Gradient of the differentiable part of the function.
+
+        From the interface "Gradient".
+        """
+        grad = 0.0
+
+        # Add gradients from the loss functions.
+        for f in self._f:
+            grad += f.grad(x)
+
+        # Add gradients from the penalties.
+        for p in self._p:
+            grad += p.grad(x)
+
+        return grad
+
+    def prox(self, x, factor=1.0, **kwargs):
+        """The proximal operator of the non-differentiable part of the
+        function.
+
+        From the interface "ProximalOperator".
+        """
+        if len(self._prox) == 0:
+            # We have no penalties with proximal operators. Do nothing!
+            return x
+        else:
+            # TODO: We currently only allow one proximal operator. Fix this!
+            return self._prox[0].prox(x, factor=factor, **kwargs)
+
+    def proj(self, x):
+        raise NotImplementedError("Not yet implemented.")
+
+    def step(self, x):
+        """The step size to use in descent methods.
+
+        From the interface "StepSize".
+
+        Parameters
+        ----------
+        x : Numpy array. The point at which to evaluate the step size.
+        """
+        all_lipschitz = True
+        for f in self._f:
+            if not isinstance(f, properties.LipschitzContinuousGradient):
+                all_lipschitz = False
+                break
+
+        for p in self._p:
+            if not isinstance(p, properties.LipschitzContinuousGradient):
+                all_lipschitz = False
+                break
+
+        step = 0.0
+        if all_lipschitz:
+            L = 0.0
+            for f in self._f:
+                L += f.L()
+            for p in self._p:
+                L += p.L()
+
+        if all_lipschitz and L > consts.TOLERANCE:
+            step = 1.0 / L
+        else:
+            # If not all functions have Lipschitz continuous gradients, try
+            # to find the step size through backtracking line search.
+            from parsimony.algorithms.utils import BacktrackingLineSearch
+            import parsimony.functions.penalties as penalties
+
+            p = -self.grad(x)
+            line_search = BacktrackingLineSearch(
+                condition=penalties.SufficientDescentCondition, max_iter=30)
+            step = line_search.run(self, x, p, rho=0.5, a=0.1,
+                                   condition_params=dict(c=1e-4))
+
+        return step
+
+
 class LinearRegressionL1(properties.CompositeFunction,
                          properties.Gradient,
                          properties.SubGradient,
@@ -143,212 +363,6 @@ class LinearRegressionL1(properties.CompositeFunction,
         x : Numpy array. The point at which to evaluate the step size.
         """
         return 1.0 / self.L()
-
-
-class CombinedFunction(properties.CompositeFunction,
-                       properties.Gradient,
-                       properties.ProximalOperator,
-                       properties.ProjectionOperator,
-                       properties.StepSize):
-    """Combines one or more loss functions, any number of penalties and zero
-    or one proximal operator.
-
-    This function thus represents
-
-        f(x) = f_1(x) [ + f_2(x) ... ] [ + p_1(x) ... ] [ + P(x)],
-
-    subject to [ C_1(x) <= c_1,
-                 C_2(x) <= c_2,
-                 ... ],
-
-    where f_i are differentiable Functions, p_j are differentiable penalties
-    and P is a ProximalOperator. All functions and penalties must thus be
-    Gradient, unless it is a ProximalOperator.
-
-    If no ProximalOperator is given, then prox is the identity.
-    """
-    def __init__(self, functions=[], penalties=[], prox=[], constraints=[]):
-
-        self._f = list(functions)
-        self._p = list(penalties)
-        self._prox = list(prox)
-        if len(self._prox) == 0:
-            self._prox.append(ZeroFunction())
-        self._c = list(constraints)
-
-    def reset(self):
-
-        for f in self._f:
-            f.reset()
-
-        for p in self._p:
-            p.reset()
-
-        for prox in self._prox:
-            prox.reset()
-
-        for c in self._c:
-            c.reset()
-
-    def add_loss(self, function):
-
-        if not isinstance(function, properties.Gradient):
-            raise ValueError("Loss functions must have gradients.")
-
-        self._f.append(function)
-
-    @deprecated("add_loss")
-    def add_function(self, function):
-
-        return self.add_loss(function)
-
-    def add_penalty(self, penalty):
-
-        if not isinstance(penalty, properties.Penalty):
-            raise ValueError("Not a penalty.")
-        elif isinstance(penalty, properties.Gradient):
-            self._p.append(penalty)
-        elif isinstance(penalty, properties.ProximalOperator):
-            if len(self._c) > 0:
-                # TODO: Yes we can! Fix this!
-                raise ValueError("Cannot have both ProximalOperator and "
-                                 "ProjectionOperator.")
-            else:
-                # TODO: We currently only allow one proximal operator. Fix!
-                self._prox[0] = penalty
-        else:
-            raise ValueError("The penalty is not smooth, nor has it a "
-                             "proximal operator.")
-
-    def add_constraint(self, constraint):
-
-        if not isinstance(constraint, properties.Constraint):
-            raise ValueError("Not a constraint.")
-        elif not isinstance(constraint, properties.ProjectionOperator):
-            raise ValueError("Constraints must have projection operators.")
-        elif not isinstance(self._prox[0], ZeroFunction):
-            # TODO: Yes we can! Fix this!
-            raise ValueError("Cannot have both ProjectionOperator and "
-                             "ProximalOperator.")
-        else:
-            self._c.append(constraint)
-
-    def add_smooth_penalty(self, penalty):
-
-        if not isinstance(penalty, properties.Penalty):
-            raise ValueError("Not a penalty.")
-        elif not isinstance(penalty, properties.Gradient):
-            raise ValueError("The penalty is not smooth, nor has it a "
-                             "proximal operator.")
-        else:
-            self._p.append(penalty)
-
-    def add_prox(self, penalty):
-
-        if not isinstance(penalty, properties.ProximalOperator):
-            raise ValueError("Not a proximal operator.")
-        elif len(self._c) > 0:
-            # TODO: Yes we can! Fix this!
-            raise ValueError("Cannot have both ProximalOperator and "
-                             "ProjectionOperator.")
-        else:
-            # TODO: We currently only allow one proximal operator. Fix this!
-            self._prox[0] = penalty
-
-    def add_nesterov(self, penalty):
-
-        if not isinstance(penalty, properties.NesterovFunction):
-            raise ValueError("Not a Nesterov function.")
-        else:
-            self._p.append(penalty)
-
-    def f(self, x):
-        """Function value.
-        """
-        val = 0.0
-        for f in self._f:
-            val += f.f(x)
-
-        for p in self._p:
-            val += p.f(x)
-
-        for prox in self._prox:
-            val += prox.f(x)
-
-        return val
-
-    def grad(self, x):
-        """Gradient of the differentiable part of the function.
-
-        From the interface "Gradient".
-        """
-        grad = 0.0
-
-        # Add gradients from the loss functions.
-        for f in self._f:
-            grad += f.grad(x)
-
-        # Add gradients from the penalties.
-        for p in self._p:
-            grad += p.grad(x)
-
-        return grad
-
-    def prox(self, x, factor=1.0, **kwargs):
-        """The proximal operator of the non-differentiable part of the
-        function.
-
-        From the interface "ProximalOperator".
-        """
-        # TODO: We currently only allow one proximal operator. Fix this!
-        return self._prox[0].prox(x, factor=factor, **kwargs)
-
-    def proj(self, x):
-        raise NotImplementedError("Not yet implemented.")
-
-    def step(self, x):
-        """The step size to use in descent methods.
-
-        From the interface "StepSize".
-
-        Parameters
-        ----------
-        x : Numpy array. The point at which to evaluate the step size.
-        """
-        all_lipschitz = True
-        for f in self._f:
-            if not isinstance(f, properties.LipschitzContinuousGradient):
-                all_lipschitz = False
-                break
-
-        for p in self._p:
-            if not isinstance(p, properties.LipschitzContinuousGradient):
-                all_lipschitz = False
-                break
-
-        step = 0.0
-        if all_lipschitz:
-            L = 0.0
-            for f in self._f:
-                L += f.L()
-            for p in self._p:
-                L += p.L()
-
-        if all_lipschitz and L > consts.TOLERANCE:
-            step = 1.0 / L
-        else:
-            # If not all functions have Lipschitz continuous gradients, try
-            # to find the step size through backtracking line search.
-            from parsimony.algorithms.utils import BacktrackingLineSearch
-            import parsimony.functions.penalties as penalties
-
-            p = -self.grad(x)
-            line_search = BacktrackingLineSearch(
-                condition=penalties.SufficientDescentCondition, max_iter=30)
-            step = line_search.run(self, x, p, rho=0.5, a=0.1,
-                                   condition_params=dict(c=1e-4))
-
-        return step
 
 
 class LinearRegressionL1L2TV(properties.CompositeFunction,

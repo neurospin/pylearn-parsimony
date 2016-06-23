@@ -23,6 +23,7 @@ try:
     from . import bases  # Only works when imported as a package.
 except ValueError:
     import parsimony.algorithms.bases as bases  # When run as a program.
+from parsimony.utils import check_arrays
 import parsimony.utils.consts as consts
 import parsimony.functions.penalties as penalties
 import parsimony.functions.properties as properties
@@ -476,14 +477,14 @@ class NewtonRaphson(bases.ExplicitAlgorithm,
             x = x_ - f / df
             # TODO: Handle the other cases!
             if not self.parameter_negative \
-                and not self.parameter_zero \
-                and self.parameter_positive \
-                and x < consts.TOLERANCE:
+                    and not self.parameter_zero \
+                    and self.parameter_positive \
+                    and x < consts.TOLERANCE:
                 x = consts.TOLERANCE
             elif not self.parameter_negative \
-                and self.parameter_zero \
-                and self.parameter_positive \
-                and x < 0.0:
+                    and self.parameter_zero \
+                    and self.parameter_positive \
+                    and x < 0.0:
                 x = 0.0
 
             # TODO: We seek a root, i.e. where f(x) = 0. The stopping criterion
@@ -650,63 +651,153 @@ class NonSumDimStepSize(StepSize):
         return self.a / np.sqrt(float(k))
 
 
+# TODO: Be clever if we cannot fit self._K in memory!
 class Kernel(object):
 
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, X=None, use_cache=True):
+    def __init__(self, X=None):
 
         self.X = X
-        self.use_cache = bool(use_cache)
-        if self.use_cache:
+
+        self._use_cache = (self.X is not None)
+        if self._use_cache:
+            self.shape = (self.X.shape[0], self.X.shape[0])
+
             self.reset()
 
     def reset(self):
-        if self.use_cache:
+        if self._use_cache:
             self._cache = dict()
+            self._vector_cache = dict()
+
+            self._K = np.zeros(self.shape)
+            self._K_computed = np.zeros(self.shape, dtype=np.bool)
+            self._K_num = 0
+
+    def __call__(self, x1, x2=None):
+
+        if x2 is not None:
+            if (isinstance(x1, (int, np.int64)) and
+                    isinstance(x2, (int, np.int64))):
+                return self._index(x1, x2)
+            else:
+                return self._vector(x1, x2)
+        else:
+            if self.X is None:
+                raise RuntimeError("The kernel is not based on a matrix, X!")
+
+            K_ = np.zeros((self.shape[0], 1))
+            if isinstance(x1, (int, np.int64)):
+                for i in xrange(self.shape[0]):
+                    K_[i, 0] = self._index(i, x1)
+            else:
+                for i in xrange(self.shape[0]):
+                    K_[i, 0] = self._vector(self.X[i, :], x1)
+
+            return K_
+
+    def dot(self, other):
+
+        if not isinstance(other, np.ndarray):
+            raise ValueError("Argument is not a numpy array!")
+
+        if self.X is None:
+            raise RuntimeError("The kernel is not based on a matrix, X!")
+
+        if len(other.shape) != 2:
+            raise ValueError("Shapes " + str(other.shape) + " and " +
+                             str(self.shape) + " not aligned!")
+
+        if other.shape[0] != self.shape[1]:
+            raise ValueError("Shapes " + str(other.shape) + " and " +
+                             str(self.shape) + " not aligned!")
+
+        if hasattr(self, "_K") and self._K_num == np.prod(self.shape):
+            val = self._K.dot(other)
+        else:
+            val = np.zeros((self.shape[0], 1))
+            for i in xrange(self.shape[0]):
+                for j in xrange(self.shape[0]):
+                    val[i, 0] += self._index(i, j) * other[j, 0]
+
+        return val
 
     @abc.abstractmethod
-    def __call__(self, x1, x2):
+    def _index(self, i1, i2):
+        raise NotImplementedError('Abstract method "_index" must be '
+                                  'specialised!')
 
-        raise NotImplementedError('Abstract method "__call__" must be '
+    @abc.abstractmethod
+    def _vector(self, x1, x2):
+        raise NotImplementedError('Abstract method "_vector" must be '
                                   'specialised!')
 
 
-class LinearKernel(Kernel):
+class ExplicitKernel(Kernel):
+
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def transform(self, w):
+        """The explicit non-linear transform of the input vector.
+        """
+        raise NotImplementedError('Abstract method "transform" must be '
+                                  'specialised!')
+
+
+class LinearKernel(ExplicitKernel):
 
     def __init__(self, **kwargs):
 
         super(LinearKernel, self).__init__(**kwargs)
-
-    def __call__(self, x1, x2):
-
-        if isinstance(x1, (int, np.int64)) and isinstance(x2, (int, np.int64)):
-            return self._index(x1, x2)
-        else:
-            return self._vectors(x1, x2)
 
     def _index(self, i1, i2):
 
         i1 = int(i1)
         i2 = int(i2)
 
-        if self.X is None:
-            raise RuntimeError('No matrix supplied!')
-
-        if self.use_cache:
-            if (i1, i2) in self._cache:
-                return self._cache[(i1, i2)]
+        if self._use_cache:
+#            if (i1, i2) in self._cache:
+#                return self._cache[(i1, i2)]
+            if self._K_computed[i1, i2]:
+                return self._K[i1, i2]
             else:
-                val = np.dot(self.X[i1, :].T, self.X[i2, :])
-                self._cache[(i1, i2)] = val
+                x1 = self.X[i1, :]
+                x2 = self.X[i2, :]
+
+                val = np.dot(x1.T, x2)
+
+#                self._cache[(i1, i2)] = val
+                self._K_computed[i1, i2] = True
+                self._K_computed[i2, i1] = True
+                self._K[i1, i2] = val
+                self._K[i2, i1] = val
+                self._K_num += 2
         else:
-            val = np.dot(self.X[i1, :].T, self.X[i2, :])
+            x1 = self.X[i1, :]
+            x2 = self.X[i2, :]
+
+            val = np.dot(x1.T, x2)
+
+        if isinstance(val, np.ndarray):
+            val = val[0, 0]
 
         return val
 
-    def _vectors(self, x1, x2):
+    def _vector(self, x1, x2):
 
-        return np.dot(x1.T, x2)
+        x1, x2 = check_arrays(x1, x2)
+
+        val = np.dot(x1.T, x2)
+
+        if isinstance(val, np.ndarray):
+            val = val[0, 0]
+
+        return val
+
+    def transform(self, w):
+        return w
 
 
 if __name__ == "__main__":

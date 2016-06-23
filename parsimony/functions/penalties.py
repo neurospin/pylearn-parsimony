@@ -19,6 +19,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @license: BSD 3-clause.
 """
 import numpy as np
+import scipy.optimize as optimize
 import scipy.sparse as sparse
 
 try:
@@ -32,8 +33,10 @@ import parsimony.utils.linalgs as linalgs
 __all__ = ["ZeroFunction", "L1", "L0", "LInf", "L2", "L2Squared",
            "L1L2Squared",
            "QuadraticConstraint", "RGCCAConstraint", "RidgeSquaredError",
+           "LinearConstraint",
            "LinearVariableConstraint",
-           "SufficientDescentCondition"]
+           "SufficientDescentCondition",
+           "KernelL2Squared"]
 
 
 class ZeroFunction(properties.AtomicFunction,
@@ -93,7 +96,7 @@ class ZeroFunction(properties.AtomicFunction,
         """
         return x
 
-    def proj(self, x):
+    def proj(self, x, **kwargs):
         """The corresponding projection operator.
 
         From the interface "ProjectionOperator".
@@ -1683,6 +1686,125 @@ class RidgeSquaredError(properties.CompositeFunction,
         return y
 
 
+class LinearConstraint(properties.IndicatorFunction,
+                       properties.Constraint,
+                       properties.ProjectionOperator):
+    """Represents a linear constraint
+
+        a'x + c = b,
+
+    where x is the variable.
+
+    Parameters
+    ----------
+    a : numpy
+        The linear operator.
+
+    b : float
+        The response.
+
+    c : float
+        The offset.
+    """
+    def __init__(self, a, b, c, penalty_start=0):
+
+        self.a = a
+        self.b = float(b)
+        self.c = float(c)
+
+        self.penalty_start = max(0, int(penalty_start))
+
+        self.reset()
+
+    def reset(self):
+
+        pass
+
+    def f(self, x):
+        """The function value of this indicator function. The function value is
+        0 if the constraint is feasible and infinite otherwise.
+
+        Parameters
+        ----------
+        x : numpy array
+            The point at which to evaluate the function.
+        """
+        if self.feasible(x):
+            return 0.0
+        else:
+            return np.inf
+
+    def feasible(self, x):
+        """Feasibility of the constraint at point x.
+
+        From the interface Constraint.
+
+        Parameters
+        ----------
+        x : numpy array
+            The point at which to evaluate the feasibility.
+        """
+        if self.penalty_start > 0:
+            x_ = x[self.penalty_start:, :]
+        else:
+            x_ = x
+
+        ax = np.dot(self.a.T, x_)
+
+        return maths.norm((ax + self.c) - self.b) < consts.TOLERANCE
+
+    def proj(self, x, **kwargs):
+        """The projection operator corresponding to the function.
+
+        From the interface ProjectionOperator.
+
+        Parameters
+        ----------
+        x : numpy array
+            The point to project onto the feasible set.
+        """
+        # Check feasibility
+        if self.feasible(x):
+            return x
+
+        if self.penalty_start > 0:
+            x_ = x[self.penalty_start:, :]
+        else:
+            x_ = x
+
+        def _f(t):
+            xx = x_ - t * self.a
+            return (np.dot(xx.T, self.a)[0, 0] + self.c) - self.b
+
+#        tmin = 0.0
+#        tmax = tmax1 = tmax2 = 1.0
+#        fmin = _f(tmin)
+#        sgn_fmin = np.sign(fmin)
+#        fmax1 = _f(tmax1)
+#        if np.sign(fmax1) == sgn_fmin:
+#            it = 0
+#            while True:
+#                tmax1 /= 2.0
+#                fmax1 = _f(tmax1)
+#                if np.sign(fmax1) != sgn_fmin:
+#                    tmax = tmax1
+#                    break
+#
+#                tmax2 *= 2.0
+#                fmax2 = _f(tmax2)
+#                if np.sign(fmax2) != sgn_fmin:
+#                    tmax = tmax2
+#                    break
+#                it += 1
+#                if it > 1000:
+#                    asdf = 1
+#
+#        t = optimize.bisect(_f, tmin, tmax)
+        t = optimize.fsolve(_f, 0.5)
+
+        return x_ - t * self.a
+
+
 class LinearVariableConstraint(properties.IndicatorFunction,
                                properties.Constraint,
                                properties.ProjectionOperator):
@@ -1950,6 +2072,125 @@ class SufficientDescentCondition(properties.Function,
 #            <= self.c2 * abs(grad_p)
 #
 #        return cond1 and cond2
+
+
+class KernelL2Squared(properties.AtomicFunction,
+                      properties.Gradient,
+                      properties.LipschitzContinuousGradient,
+                      properties.Penalty,
+                      properties.ProximalOperator):
+    """The proximal operator of the squared L2 function with a penalty
+    formulation
+
+        f(\beta) = (l / 2).\beta'.K.\beta,
+
+    where K is a Mercer kernel.
+
+    Parameters
+    ----------
+    l : float
+        Must be non-negative. The Lagrange multiplier, or regularisation
+        constant, of the function.
+
+    kernel : kernel object, optional
+        A Mercer kernel of type algorithms.utils.Kernel. Default (when None) is
+        a linear kernel.
+
+    penalty_start : int, optional
+        Must be non-negative. The number of columns, variables etc., to be
+        exempt from penalisation. Equivalently, the first index to be
+        penalised. Default is 0, all columns are included.
+    """
+    def __init__(self, l=1.0, kernel=None, penalty_start=0):
+
+        self.l = max(0.0, float(l))
+        if kernel is None:
+            import parsimony.algorithms.utils as alg_utils
+            self.kernel = alg_utils.LinearKernel()
+        else:
+            self.kernel = kernel
+        self.penalty_start = max(0, int(penalty_start))
+
+    def f(self, beta):
+        """Function value.
+
+        From the interface "Function".
+        """
+        if self.penalty_start > 0:
+            beta_ = beta[self.penalty_start:, :]
+        else:
+            beta_ = beta
+
+        return (self.l / 2.0) * np.dot(beta_.T,
+                                       self.kernel.dot(beta_))[0, 0]
+
+    def grad(self, beta):
+        """Gradient of the function.
+
+        From the interface "Gradient".
+
+        Example
+        -------
+        >>> import numpy as np
+        >>> from parsimony.functions.penalties import KernelL2Squared
+        >>> from parsimony.algorithms.utils import LinearKernel
+        >>>
+        >>> np.random.seed(42)
+        >>>
+        >>> X = np.random.randn(5, 10)
+        >>> beta = np.random.rand(5, 1)
+        >>> l2 = KernelL2Squared(l=3.14159, kernel=LinearKernel(X=X))
+        >>> np.linalg.norm(l2.grad(beta)
+        ...                - l2.approx_grad(beta, eps=1e-4)) < 5e-10
+        True
+        >>>
+        >>> np.random.seed(42)
+        >>>
+        >>> X = np.random.randn(50, 100)
+        >>> beta = np.random.rand(50, 1)
+        >>> l2 = KernelL2Squared(l=2.71828, kernel=LinearKernel(X=X))
+        >>> np.linalg.norm(l2.grad(beta)
+        ...                - l2.approx_grad(beta, eps=1e-4)) < 5e-8
+        True
+        """
+        if self.penalty_start > 0:
+            beta_ = beta.copy()
+            beta_[:self.penalty_start, :] = 0.0
+            grad = self.l * self.kernel.dot(beta_)
+            grad[:self.penalty_start, :] = 0.0
+        else:
+            grad = self.l * self.kernel.dot(beta)
+
+        return grad
+
+    def L(self):
+        """Lipschitz constant of the gradient.
+        """
+        # TODO: Implement this!
+        raise RuntimeError("Not implemented yet!")
+#        return self.l
+
+    def prox(self, beta, factor=1.0, **kwargs):
+        """The corresponding proximal operator.
+
+        From the interface "ProximalOperator".
+        """
+        # TODO: Implement this!
+        raise RuntimeError("Not implemented yet!")
+#        l = self.l * factor
+#        if self.penalty_start > 0:
+#            beta_ = beta[self.penalty_start:, :]
+#        else:
+#            beta_ = beta
+#
+#        if self.penalty_start > 0:
+#            prox = np.vstack((beta[:self.penalty_start, :],
+#                              beta_ * (1.0 / (1.0 + l))))
+#        else:
+#            prox = beta_ * (1.0 / (1.0 + l))
+#
+#        return prox
+
 
 if __name__ == "__main__":
     import doctest

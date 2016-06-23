@@ -27,9 +27,11 @@ except ValueError:
 import parsimony.utils as utils
 import parsimony.utils.consts as consts
 
+
 __all__ = ["LinearRegression", "RidgeRegression",
            "LogisticRegression", "RidgeLogisticRegression",
-           "LatentVariableVariance", "LinearFunction"]
+           "LatentVariableVariance", "LinearFunction",
+           "LinearSVM", "NonlinearSVM"]
 
 
 class LinearRegression(properties.CompositeFunction,
@@ -206,9 +208,9 @@ class RidgeRegression(properties.CompositeFunction,
         """
         self.X = X
         self.y = y
-        self.k = float(k)
+        self.k = max(0.0, float(k))
 
-        self.penalty_start = int(penalty_start)
+        self.penalty_start = max(0, int(penalty_start))
         self.mean = bool(mean)
 
         self.reset()
@@ -242,7 +244,7 @@ class RidgeRegression(properties.CompositeFunction,
             d = 2.0
 
         f = (1.0 / d) * np.sum((np.dot(self.X, beta) - self.y) ** 2.0) \
-                + (self.k / 2.0) * np.sum(beta_ ** 2.0)
+            + (self.k / 2.0) * np.sum(beta_ ** 2.0)
 
         return f
 
@@ -367,7 +369,7 @@ class LogisticRegression(properties.AtomicFunction,
         self.y = y
         if weights is None:
             # TODO: Make the weights sparse.
-            #weights = np.eye(self.X.shape[0])
+            # weights = np.eye(self.X.shape[0])
             weights = np.ones(y.shape).reshape(y.shape)
         # TODO: Allow the weight vector to be a list.
         self.weights = weights
@@ -394,7 +396,7 @@ class LogisticRegression(properties.AtomicFunction,
         """
         Xbeta = np.dot(self.X, beta)
         negloglike = -np.sum(self.weights *
-                                ((self.y * Xbeta) - np.log(1 + np.exp(Xbeta))))
+                             ((self.y * Xbeta) - np.log(1 + np.exp(Xbeta))))
 
         if self.mean:
             negloglike /= float(self.X.shape[0])
@@ -641,12 +643,12 @@ class RidgeLogisticRegression(properties.CompositeFunction,
 
         From the interface "LipschitzContinuousGradient".
         """
-        if self._L == None:
+        if self._L is None:
             # pi(x) * (1 - pi(x)) <= 0.25 = 0.5 * 0.5
             PWX = 0.5 * np.sqrt(self.weights) * self.X  # TODO: CHECK WITH FOUAD
             # PW = 0.5 * np.eye(self.X.shape[0]) ## miss np.sqrt(self.W)
-            #PW = 0.5 * np.sqrt(self.W)
-            #PWX = np.dot(PW, self.X)
+            # PW = 0.5 * np.sqrt(self.W)
+            # PWX = np.dot(PW, self.X)
             # TODO: Use RankOneSVD for speedup!
             s = np.linalg.svd(PWX, full_matrices=False, compute_uv=False)
             self._L = np.max(s) ** 2.0  # TODO: CHECK
@@ -871,6 +873,338 @@ class LinearFunction(properties.CompositeFunction,
         """The step size to use in descent methods.
         """
         return 1.0
+
+
+class LinearSVM(properties.Function,
+                properties.SubGradient):
+    """The regularised primal hinge loss function for linear support vector
+    machines, i.e.
+
+        f(w) = (1/n)).\sum_{i=1}^n max{0, 1 - y_i.<w, x_i>} + (l/2)||w||²_2.
+
+    Note that we assume that the bias (if any!) is included in the first
+    penalty_start columns of X, and those columns will not be penalised.
+    """
+    def __init__(self, X, y, l, kernel=None, penalty_start=0, mean=False):
+        """
+        Parameters
+        ----------
+        X : numpy array (n, p)
+            The data matrix.
+
+        y : numpy array (n, 1)
+            The output vector. Must only contain values of -1 and 1.
+
+        l : float
+            Must be non-negative. The ridge parameter.
+
+        kernel : kernel object, optional
+            The kernel for non-linear SVM, of type
+            parsimony.algorithms.utils.Kernel. Default is a linear kernel.
+
+        penalty_start : int
+            Must be non-negative. The number of columns, variables etc., to
+            except from penalisation. Equivalently, the first index to be
+            penalised. Default is 0, all columns are included.
+
+        mean : bool
+            Whether to compute the squared loss or the mean squared loss.
+            Default is False, the loss.
+        """
+        self.X = X
+        self.y = y
+
+        self.l = max(0.0, float(l))
+
+        if kernel is None:
+            from parsimony.algorithms.utils import LinearKernel
+            self.kernel = LinearKernel(X=self.X, use_cache=True)
+            self._reset_kernel = True
+        else:
+            self.kernel = kernel
+            self._reset_kernel = False
+
+        self.penalty_start = max(0, int(penalty_start))
+        self.mean = bool(mean)
+
+        self.reset()
+
+    def reset(self):
+        """Free any cached computations from previous use of this Function.
+
+        From the interface "Function".
+        """
+        if self._reset_kernel:
+            self.kernel.reset()
+
+    def f(self, w):
+        """Function value.
+
+        From the interface "Function".
+
+        Parameters
+        ----------
+        w : ndarray, (p, 1)
+            The coefficient vector. The point at which to evaluate the
+            function.
+        """
+        n = self.X.shape[0]
+
+        # Hinge loss.
+        f = 0.0
+        for i in xrange(n):
+            f += np.maximum(0.0,
+                            1.0 - self.y[i, 0] * self.kernel(self.X[i, :], w))
+
+        # Mean loss or just the loss.
+        if self.mean:
+            f = f / float(n)
+
+        # Add the l2 penalty.
+        if self.penalty_start > 0:
+            w_ = w[self.penalty_start:, :]
+        else:
+            w_ = w
+        f += (self.l / 2.0) * np.sum(w_ ** 2.0)
+
+        return f
+
+    def subgrad(self, w, clever=True, random_state=None, **kwargs):
+        """Subgradient of the function.
+
+        From the interface "SubGradient".
+
+        Parameters
+        ----------
+        w : numpy array (p-by-1)
+            The point at which to evaluate the subgradient.
+
+        clever : bool, optional
+            Whether or not to try to be "clever" when computing the
+            subgradient. If True, be "clever", i.e. use favourable values of
+            the subgradient; if False, use random uniform values. Default is
+            True.
+
+        random_state : numpy.random.RandomState, optional
+            An instance of numpy.random.RandomState that can be used to draw
+            random samples. Default is None, do not use a particular random
+            state.
+        """
+        if random_state is None:
+            random_state = np.random.RandomState()
+
+        n = self.X.shape[0]
+
+        grad = np.zeros((w.shape[0], 1))
+        for i in xrange(n):
+            xi = self.X[[i], :].T
+            f = 1.0 - self.y[i, 0] * self.kernel(xi, w)
+            if f > 0.0:
+                grad -= self.y[i, 0] * xi  # Minus, because its -y.xi
+            # The case when f <= 0.0 is handled through initialising grad to
+            # zero.
+            # Being clever here amounts to only handling the case when f > 0,
+            # and selecting a subgradient with only zeros otherwise. This means
+            # less computational work, but also since we are on the right side
+            # of the margin, there is no need to go anywhere.
+            if not clever:
+                if abs(f) < consts.FLOAT_EPSILON:
+                    a = random_state.uniform(0, 1)
+                    grad -= (a * self.y[i, 0]) * self.X[i, :]
+
+        # Add the gradient of the l2 regularisation.
+        if self.penalty_start > 0:
+            w_ = w[self.penalty_start:, :]
+        else:
+            w_ = w
+        grad[self.penalty_start:, :] += self.l * w_
+
+        return grad
+
+
+class NonlinearSVM(properties.KernelFunction,
+                   properties.SubGradient):
+    """The hinge loss function for non-linear support vector machines using a
+    Mercer kernel to express the weight vector, i.e.
+
+        f(beta) = (1/n).\sum_{i=1}^n max{0, 1 - y_i.K'_i.beta}
+                + (l/2)||beta'.K'.beta||²_2,
+
+    where K is the kernel, w = X'.beta, beta = y(.)alpha and alpha is the dual
+    variable (the Lagrange multipliers). Note, though, that we are still
+    minimising the primal function.
+
+    Note also that we assume that the bias (if any!) is included in one of the
+    first penalty_start columns of X, and hence correspond to the first
+    penalty_start rows and columns of the kernel.
+    """
+    def __init__(self, X, y, l, kernel=None, penalty_start=0, mean=False):
+        """
+        Parameters
+        ----------
+        X : numpy array (n, p)
+            The data matrix.
+
+        y : numpy array (n, 1)
+            The output vector. Must only contain values of -1 and 1.
+
+        kernel : algorithms.utils.Kernel, optional
+            The Mercer kernel. Default is a linear kernel.
+
+        penalty_start : int
+            Must be non-negative. The number of columns, variables etc., to
+            excempt from penalisation. Equivalently, the first index to be
+            penalised. Default is 0, all columns are included.
+
+        mean : bool
+            Whether to compute the squared loss or the mean squared loss.
+            Default is False, the loss.
+        """
+        self.X = X
+        self.y = y
+
+        self.l = max(0.0, float(l))
+
+        if kernel is None:
+            from parsimony.algorithms.utils import LinearKernel
+            kernel = LinearKernel(X=self.X, use_cache=True)
+            self._reset_kernel = True
+        else:
+            self._reset_kernel = False
+
+        super(NonlinearSVM, self).__init__(kernel=kernel)
+
+        self.penalty_start = max(0, int(penalty_start))
+        self.mean = bool(mean)
+
+        self.reset()
+
+    def reset(self):
+        """Free any cached computations from previous use of this Function.
+
+        From the interface "Function".
+        """
+        if self._reset_kernel:
+            self.kernel.reset()
+
+    def f(self, beta):
+        """Function value.
+
+        From the interface "Function".
+
+        Parameters
+        ----------
+        w : numpy array
+            The coefficient vector. The point at which to evaluate the
+            function.
+        """
+        n = self.X.shape[0]
+
+        # Hinge loss.
+        f = 0.0
+        for i in xrange(n):
+            Ki = self.kernel(i)
+            f += np.maximum(0.0, 1.0 - self.y[i, 0] * np.dot(Ki.T, beta))
+
+        # Mean loss or just the loss.
+        if self.mean:
+            f = f / float(n)
+
+        # Add the l2 penalty.
+        # Assumption: The number of non-zero elements in beta are few. This is
+        # at least true when p >> n.
+        # TODO: This needs some serious speed-ups!
+        idx = np.where(np.abs(beta) > consts.TOLERANCE)[0]
+        p = 0.0
+        for i in xrange(idx.shape[0]):
+            x1 = self.X[idx[i], :].copy()
+            x1[:self.penalty_start] = 0.0
+            for j in xrange(idx.shape[0]):
+                x2 = self.X[idx[j], :].copy()
+                x2[:self.penalty_start] = 0.0
+                p += beta[idx[i], 0] * beta[idx[j], 0] * self.kernel(x1, x2)
+        p *= (self.l / 2.0)
+
+        f += p
+
+        return f
+
+    def subgrad(self, beta, clever=True, random_state=None, **kwargs):
+        """Subgradient of the function.
+
+        From the interface "SubGradient".
+
+        Parameters
+        ----------
+        beta : ndarray (n, 1)
+            The point at which to evaluate the subgradient.
+
+        clever : bool, optional
+            Whether or not to try to be "clever" when computing the
+            subgradient. If True, be "clever", i.e. use favourable values of
+            the subgradient; if False, use uniform random values. Default is
+            True.
+
+        random_state : numpy.random.RandomState, optional
+            An instance of numpy.random.RandomState that can be used to draw
+            random samples. Default is None, do not use a particular random
+            state.
+        """
+        if (not clever) and (random_state is None):
+            random_state = np.random.RandomState()
+
+        n = self.X.shape[0]
+
+        grad = np.zeros((beta.shape[0], 1))
+        for i in xrange(n):
+            Ki = self.kernel(i)
+            f = 1.0 - self.y[i, 0] * np.dot(Ki.T, beta)[0, 0]
+            if f > 0.0:
+                grad -= self.y[i, 0] * Ki  # Minus, because its -y.Ki
+            # The case when f <= 0.0 is handled through initialising grad to
+            # zero.
+            # Being clever here amounts to only handling the case when f > 0,
+            # and selecting a subgradient with only zeros otherwise. This means
+            # less computational work, but also since we are on the right side
+            # of the margin, there is no need to go anywhere.
+            if not clever:
+                if abs(f) < consts.FLOAT_EPSILON:
+                    a = random_state.uniform(0, 1)
+                    grad -= (a * self.y[i, 0]) * Ki
+
+        # Mean loss or just the loss.
+        if self.mean:
+            grad /= float(n)
+
+        # Add the gradient of the l2 penalty.
+        # Assumption: The number of non-zero elements in beta are few. This is
+        # at least true when p >> n.
+        # TODO: This needs some serious speed-ups!
+        idx = np.where(np.abs(beta) > consts.TOLERANCE)[0]
+        p = np.zeros((grad.shape[0], 1))
+        for i in xrange(n):
+            val = 0.0
+            for j in xrange(idx.shape[0]):
+                x1 = self.X[idx[j], :].copy()
+                x1[:self.penalty_start] = 0.0
+                for k in xrange(idx.shape[0]):
+                    x2 = self.X[idx[k], :].copy()
+                    x2[:self.penalty_start] = 0.0
+
+                    if idx[j] == i and idx[k] == i:
+                        p += self.kernel(x1, x2)
+                    elif idx[j] == i:
+                        p += beta[k, 0] * self.kernel(x1, x2)
+                    elif idx[k] == i:
+                        p += beta[j, 0] * self.kernel(x1, x2)
+                    else:
+                        p += beta[j, 0] * beta[k, 0] * self.kernel(x1, x2)
+
+            p[i] = val
+
+        grad += p * self.l
+
+        return grad
 
 
 if __name__ == "__main__":

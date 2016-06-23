@@ -313,9 +313,9 @@ class FISTA(bases.ExplicitAlgorithm,
 
             betaold = betanew
             betanew = function.prox(z - step * function.grad(z),
-                          step,
-                          eps=1.0 / (float(i) ** (4.0 + consts.FLOAT_EPSILON)),
-                          max_iter=self.max_iter)
+                                    step,
+                                    eps=1.0 / (float(i) ** (4.0 + consts.FLOAT_EPSILON)),
+                                    max_iter=self.max_iter)
 
             if self.info_requested(Info.time):
                 t_.append(utils.time_cpu() - tm)

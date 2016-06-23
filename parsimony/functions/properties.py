@@ -124,7 +124,28 @@ class SplittableFunction(Function):
         """Function value.
         """
         return self.g.f(x) \
-             + self.h.f(x)
+            + self.h.f(x)
+
+
+class KernelFunction(Function):
+    """This is a function that uses Mercer kernels in the inner products.
+
+    Parameters
+    ----------
+    kernel : algorithms.utils.Kernel, optional
+        A Mercer kernel. Default (when None) is a linear kernel.
+    """
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, kernel=None, **kwargs):
+
+        super(KernelFunction, self).__init__(**kwargs)
+
+        if kernel is None:
+            import parsimony.algorithms.utils as alg_utils
+            self.kernel = alg_utils.LinearKernel()
+        else:
+            self.kernel = kernel
 
 
 class Penalty(object):

@@ -2354,14 +2354,26 @@ class SVMEstimator(BaseEstimator):
     ----------
     algorithm : ImplicitAlgorithm or ExplicitAlgorithm
         The algorithm that will be used to solve the SVM problem.
+
+    penalty_start : Non-negative integer. The number of columns, variables
+            etc., to be exempt from penalisation. Equivalently, the first
+            index to be penalised. Default is 0, all columns are included.
+
+    mean : bool, optional
+        Whether to compute the loss or the mean loss. Default is False, the
+        loss. Warning: May not be applicable to all algorithms!
     """
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, kernel, algorithm):
+    def __init__(self, kernel=None, algorithm=None,
+                 penalty_start=0, mean=True):
 
         super(SVMEstimator, self).__init__(algorithm=algorithm)
 
         self.kernel = kernel
+
+        self.penalty_start = max(0, int(penalty_start))
+        self.mean = bool(mean)
 
     def reset(self):
         """Resets the estimator such that it is as if just created.
@@ -2395,27 +2407,19 @@ class SVMEstimator(BaseEstimator):
         """
         X = check_arrays(X)
 
-        alphay = np.multiply(self.alpha, self.y)
+        beta = np.multiply(self.alpha, self.y)
 
         y = np.zeros((X.shape[0], 1))
         for j in xrange(X.shape[0]):
             x = X[j, :]
             val = 0.0
             for i in xrange(self.X.shape[0]):
-                val += alphay[i, 0] * self.kernel(self.X[i, :], x)
+                val += beta[i, 0] * self.kernel(self.X[i, :], x)
             val -= self.bias
 
             y[j, 0] = np.sign(val)
 
         return y
-
-    def parameters(self):
-        """Returns a dictionary with the estimator's fitted parameters, e.g.
-        the regression coefficients.
-        """
-        return {"w": self.w,
-                "alpha": self.alpha,
-                "bias": self.bias}
 
     def score(self, X, y):
         """Rate of correct classification.
@@ -2424,6 +2428,19 @@ class SVMEstimator(BaseEstimator):
         rate = np.mean(y == yhat)
 
         return rate
+
+    def parameters(self):
+        """Returns a dictionary with the estimator's fitted parameters, e.g.
+        the regression coefficients.
+
+        Note: The weight vector w is only correct if the kernel is an
+        ExplicitKernel. Otherwise, w is either not correct or None.
+
+        Note: The bias may not always be set. If not, it is set to 0.
+        """
+        return {"w": self.w,
+                "alpha": self.alpha,
+                "bias": self.bias}
 
 
 class SupportVectorMachine(SVMEstimator):
@@ -2450,10 +2467,9 @@ class SupportVectorMachine(SVMEstimator):
         Note that l = 1 / C is used in the primal formulation.
 
     kernel : kernel object, optional
-        The kernel for non-linear SVM, of type
-        parsimony.algorithms.utils.Kernel. Will override the algorithms kernel,
-        if there is one, and if they differ in type. Default is a linear
-        kernel.
+        The kernel for non-linear SVM, of type algorithms.utils.Kernel. Will
+        override the algorithms kernel, if there is one, and if they differ in
+        type. Default is a linear kernel.
 
     algorithm : ImplicitAlgorithm or ExplicitAlgorithm, optional
         The algorithm that will be used to solve the SVM problem. Should be one
@@ -2463,18 +2479,14 @@ class SupportVectorMachine(SVMEstimator):
 
             Default is SequentialMinimalOptimization(...).
 
-    start_vector : BaseStartVector, optional
-        Generates the start vector that will be used.
-
     algorithm_params : dict, optional
         The dictionary algorithm_params contains parameters that should be set
         in the algorithm. Passing algorithm=Algorithm(**params) is equivalent
         to passing algorithm=MyAlgorithm() and algorithm_params=params. Default
         is an empty dictionary.
 
-    mean : bool, optional
-        Whether to compute the loss or the mean loss. Default is False, the
-        loss. Warning: May not be applicable to all algorithms!
+    start_vector : BaseStartVector, optional
+        Generates the start vector that will be used.
 
     Examples
     --------
@@ -2502,15 +2514,15 @@ class SupportVectorMachine(SVMEstimator):
     """
     def __init__(self, C, kernel=None,
                  algorithm=None, algorithm_params=dict(),
-                 start_vector=start_vectors.RandomStartVector(),
-                 mean=True):
+                 start_vector=start_vectors.RandomStartVector()):
 
         self.C = max(consts.FLOAT_EPSILON, float(C))
 
         # Make sure we have a kernel:
         if kernel is None:
             if algorithm is not None:
-                kernel = algorithm.kernel_get()
+                if isinstance(algorithm, bases.KernelAlgorithm):
+                    kernel = algorithm.kernel_get()
             if kernel is None:
                 kernel = alg_utils.LinearKernel()
 
@@ -2535,7 +2547,6 @@ class SupportVectorMachine(SVMEstimator):
 
         self.algorithm_params = dict(algorithm_params)
         self.start_vector = start_vector
-        self.mean = bool(mean)
 
     def get_params(self):
         """Return a dictionary containing all the estimator's parameters.
@@ -2546,30 +2557,44 @@ class SupportVectorMachine(SVMEstimator):
                 "start_vector": self.start_vector,
                 "mean": self.mean}
 
-    def fit(self, X, y, beta=None):
+    def fit(self, X, y, w=None):
         """Fit the estimator to the data.
         """
         X, y = check_arrays(X, check_array_in(y, [-1, 1]))
 
         if isinstance(self.algorithm,
                       algorithms.SequentialMinimalOptimization):
-            self.beta = self.algorithm.run(X, y)
+            self.w = self.algorithm.run(X, y)
             self.alpha = self.algorithm.alpha
             self.bias = self.algorithm.bias
             self.X = X
             self.y = y
-        else:
-            pass
-#            function = losses.LogisticRegression(X, y,
-#                                                 mean=self.mean)
-#
-#            self.algorithm.check_compatibility(function,
-#                                               self.algorithm.INTERFACES)
-#
-#            if beta is None:
-#                beta = self.start_vector.get_vector(X.shape[1])
-#
-#            self.beta = self.algorithm.run(function, beta)
+
+        else:  # Subgradient descent
+            beta = np.zeros((X.shape[0], 1))
+
+            # Note: Recall that lambda = 1 / C.
+            l = 1 / self.C
+            function = losses.NonlinearSVM(X, y, l,
+                                           kernel=self.kernel,
+                                           penalty_start=self.penalty_start,
+                                           mean=self.mean)
+
+            self.algorithm.check_compatibility(function,
+                                               self.algorithm.INTERFACES)
+
+            # TODO: Add determinism through a random_state?
+            beta = self.start_vector.get_vector(X.shape[0])
+            beta = self.algorithm.run(function, beta)
+
+            if isinstance(self.kernel, alg_utils.ExplicitKernel):
+                self.w = self.kernel.transform(X).T.dot(beta)
+            else:
+                self.w = None
+            self.alpha = np.multiply(y, beta)
+            self.bias = 0.0  # Note: implicit bias through a column of -1s.
+            self.X = X
+            self.y = y
 
         return self
 
