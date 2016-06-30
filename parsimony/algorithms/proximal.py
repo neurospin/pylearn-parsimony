@@ -301,7 +301,7 @@ class FISTA(bases.ExplicitAlgorithm,
             self.info_set(Info.converged, False)
         if self.info_requested(Info.gap):
             gap_ = []
-        print("########", max(self.min_iter, self.max_iter) + 1)
+        #print("########", max(self.min_iter, self.max_iter) + 1)
         for i in range(1, max(self.min_iter, self.max_iter) + 1):
 
             if self.info_requested(Info.time):
@@ -477,11 +477,8 @@ class CONESTA(bases.ExplicitAlgorithm,
             init_time = utils.time_cpu()
 
         # Compute current gap, precision eps (gap decreased by tau) and mu.
-        old_mu = function.set_mu(consts.TOLERANCE)
+        function.set_mu(consts.TOLERANCE)
         gap = function.gap(beta, eps=self.eps, max_iter=self.max_iter)
-        function.set_mu(old_mu)
-        # Obtain the gap from the last FISTA run. May be small and negative
-        # close to machine epsilon.
         eps = self.tau * abs(gap)
         # TODO: Warn if gap < -consts.TOLERANCE: DONE see Special case 1
         gM = function.eps_max(1.0)
@@ -526,10 +523,10 @@ class CONESTA(bases.ExplicitAlgorithm,
             converged = False
 
             # Current precision.
-            derived_eps = max(eps, self.eps) - mu * gM
+            eps_mu = max(eps, self.eps) - mu * gM
 
             # Set current parameters to algorithm.
-            algorithm.set_params(eps=derived_eps,
+            algorithm.set_params(eps=eps_mu,
                                  max_iter=self.max_iter - self.num_iter)
             # Run FISTA.
             beta = algorithm.run(function, beta)
@@ -556,11 +553,11 @@ class CONESTA(bases.ExplicitAlgorithm,
 
             # Obtain the gap from the last FISTA run. May be small and negative
             # close to machine epsilon.
-            gap = abs(algorithm.info_get(Info.gap)[-1])
-            # TODO: Warn if gap < -consts.TOLERANCE.
+            gap_mu = abs(algorithm.info_get(Info.gap)[-1])
+            # TODO: Warn if gap_mu < -consts.TOLERANCE.
 
             if not self.simulation:
-                if gap < self.eps - mu * gM:
+                if gap_mu + mu * gM < self.eps:
 
                     if self.info_requested(Info.converged):
                         self.info_set(Info.converged, True)
@@ -570,8 +567,8 @@ class CONESTA(bases.ExplicitAlgorithm,
             if self.callback is not None:
                 self.callback(locals())
             if self.info_requested(Info.verbose):
-                print("CONESTA ite:%i, gap:%g, eps:%g, mu:%g, derived_eps:%g"\
-                    % (i, gap, eps, mu, derived_eps))
+                print("CONESTA ite:%i, gap_mu:%g, eps:%g, mu:%g, eps_mu:%g"\
+                    % (i, gap_mu, eps, mu, eps_mu))
 
             # Stopping criteria.
             if (converged or self.num_iter >= self.max_iter) \
@@ -579,8 +576,8 @@ class CONESTA(bases.ExplicitAlgorithm,
                 break
 
             # Update the precision eps.
-#            eps = self.tau * (gap + mu * gM)
-            eps = max(self.eps, self.tau * (gap + mu * gM))
+#            eps = self.tau * (gap_mu + mu * gM)
+            eps = max(self.eps, self.tau * (gap_mu + mu * gM))
             # Compute and update mu.
 #            mu = max(self.mu_min, min(function.mu_opt(eps), mu))
             mu =  min(function.mu_opt(eps), mu)
