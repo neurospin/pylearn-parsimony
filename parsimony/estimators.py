@@ -3221,14 +3221,17 @@ class GridSearchKFoldRegression(BaseEstimator):
                     self._best_results = score_values
                     self._best_params = params
 
-                    print params, value
+                    print params, value, "NEW BEST!"
+
                 elif not self.maximise and value < self._best_result:
                     self._best_result = value
                     self._best_results = score_values
                     self._best_params = params
 
-                    print params, value
+                    print params, value, "NEW BEST!"
 
+                else:
+                    print params, value
 
             idx[-1] = idx[-1] + 1
             for i in reversed(range(1, len(keys))):

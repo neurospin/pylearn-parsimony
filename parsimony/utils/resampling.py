@@ -100,7 +100,7 @@ def bootstrap(n, B=100, seed=None):
         yield sample
 
 
-def stratified_bootstrap(y, B=100, seed=None):
+def stratified_bootstrap(y, B=100, random_state=None, seed=None):
     """Stratified bootstrap sample iterator.
 
     Returns indices for a bootstrap training set.
@@ -113,16 +113,27 @@ def stratified_bootstrap(y, B=100, seed=None):
     B : Positive integer greater than or equal to two. The number of bootstrap
             samples to draw.
 
-    seed : Integer. A random seed to initialise the random number generator
-            with. Use in order to obtain deterministic results. The seed is not
-            used if the seed is None.
+    random_state : numpy.random.RandomState
+        A random state object to use when generating pseudo-random numbers.
+        Used in order to control the selection of bootstrap samples. Default is
+        None, which means that you don't care about how the bootstrap samples
+        were selected.
+
+    seed : int, deprecated
+        A random seed to initialise the random number generator with. Use in
+        order to obtain deterministic results. The seed is not used if the seed
+        is None. Deprecated, use random_state instead!
     """
     y = np.array(y)
     n = np.prod(y.shape)
     y = np.reshape(y, (n, 1))
 
-    if seed is not None:
-        np.random.seed(seed)
+    if random_state is None:
+        if seed is not None:
+            # np.random.seed(seed)
+            random_state = np.random.RandomState(seed)
+        else:
+            random_state = np.random.RandomState()
 
     # Assign the class labels to different folds
     labels, y_inverse = np.unique(y, return_inverse=True)
@@ -134,7 +145,8 @@ def stratified_bootstrap(y, B=100, seed=None):
             cls = y_inverse == i  # Find class among samples
             i = np.where(cls)[0]  # Class indices
             # Class sample
-            s = np.random.randint(0, c, size=c)
+            # s = np.random.randint(0, c, size=c)
+            s = random_state.randint(0, c, size=c)
 
             # Save the samples
             sample[cls] = i[s].reshape((c, 1))
