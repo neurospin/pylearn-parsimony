@@ -22,12 +22,11 @@ try:
     from . import bases  # When imported as a package.
 except ValueError:
     import parsimony.algorithms.bases as bases  # When run as a program.
-import parsimony.utils.consts as consts
+from parsimony.utils import time, consts, check_arrays, check_array_in
 try:
-    from . import utils  # When imported as a package.
-except ValueError:
-    import parsimony.algorithms.utils as utils  # When run as a program.
-from parsimony.utils import check_arrays, check_array_in
+    from . import utils as utils
+except:
+    import parsimony.algorithms.utils as utils
 
 __all__ = ["SequentialMinimalOptimization"]
 
@@ -144,7 +143,7 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
             self.info_set(utils.Info.ok, False)
 
         if self.info_requested(utils.Info.time):
-            _t = utils.time()
+            _t = time()
 
         if self.info_requested(utils.Info.func_val):
             self._f = []
@@ -181,7 +180,7 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
                 examineAll = True
 
         if self.info_requested(utils.Info.time):
-            self.info_set(utils.Info.time, _t)
+            self.info_set(utils.Info.time, time() - _t)
         if self.info_requested(utils.Info.func_val):
             self.info_set(utils.Info.func_val, self._f)
             del self._f  # Remove for future runs

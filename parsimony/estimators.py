@@ -2347,7 +2347,7 @@ class LinearRegressionL2SmoothedL1TV(RegressionEstimator):
         return np.sum((y_hat - y) ** 2.0) / float(n)
 
 
-class SVMEstimator(BaseEstimator):
+class SVMEstimator(RegressionEstimator):
     """Base estimator for support vector machines.
 
     Parameters
@@ -2384,12 +2384,12 @@ class SVMEstimator(BaseEstimator):
             del self.alpha
         if hasattr(self, "bias"):
             del self.bias
-        if hasattr(self, "X"):
-            del self.bias
-        if hasattr(self, "y"):
-            del self.bias
-        if hasattr(self, "kernel"):
-            del self.kernel
+#        if hasattr(self, "X"):
+#            del self.X
+#        if hasattr(self, "y"):
+#            del self.y
+#        if hasattr(self, "kernel"):
+#            del self.kernel
 
         if hasattr(self.algorithm, "reset"):
             self.algorithm.reset()
@@ -2440,7 +2440,8 @@ class SVMEstimator(BaseEstimator):
         """
         return {"w": self.w,
                 "alpha": self.alpha,
-                "bias": self.bias}
+                "bias": self.bias,
+                "beta": self.beta}
 
 
 class SupportVectorMachine(SVMEstimator):
@@ -2551,11 +2552,21 @@ class SupportVectorMachine(SVMEstimator):
     def get_params(self):
         """Return a dictionary containing all the estimator's parameters.
         """
-        return {"kernel": self.kernel,
+        return {"C": self.C,
+                "kernel": self.kernel,
                 "algorithm": self.algorithm,
                 "algorithm_params": self.algorithm_params,
                 "start_vector": self.start_vector,
                 "mean": self.mean}
+
+    def set_params(self, **kwargs):
+        """Set the given input parameters in the estimator.
+        """
+        super(SupportVectorMachine, self).set_params(**kwargs)
+
+        # Update the algorithm as well:
+        if "C" in kwargs:
+            self.algorithm.set_params(C=kwargs["C"])
 
     def fit(self, X, y, w=None):
         """Fit the estimator to the data.
@@ -2569,6 +2580,10 @@ class SupportVectorMachine(SVMEstimator):
             self.bias = self.algorithm.bias
             self.X = X
             self.y = y
+
+            _bias = np.array([[self.bias]])
+            self.beta = np.vstack((_bias,
+                                   self.w))
 
         else:  # Subgradient descent
             beta = np.zeros((X.shape[0], 1))
@@ -3113,7 +3128,7 @@ class Clustering(BaseEstimator):
         return wcss
 
 
-class GridSearchKFoldRegression(BaseEstimator):
+class GridSearchKFoldRegression(RegressionEstimator):
     """Estimator for performing a grid search with k-fold cross-validation over
     a range of parameters.
 
@@ -3214,7 +3229,7 @@ class GridSearchKFoldRegression(BaseEstimator):
                 self._best_results = score_values
                 self._best_params = params
 
-                print params, value
+                print params, value, "NEW BEST!"
             else:
                 if self.maximise and value > self._best_result:
                     self._best_result = value
@@ -3480,19 +3495,21 @@ class GridSearchKFold(BaseEstimator):
                 self._best_results = score_values
                 self._best_params = params
 
-                print params, value
+                print params, value, "NEW BEST!"
             else:
                 if self.maximise and value > self._best_result:
                     self._best_result = value
                     self._best_results = score_values
                     self._best_params = params
 
-                    print params, value
+                    print params, value, "NEW BEST!"
                 elif not self.maximise and value < self._best_result:
                     self._best_result = value
                     self._best_results = score_values
                     self._best_params = params
 
+                    print params, value, "NEW BEST!"
+                else:
                     print params, value
 
             # Go to the next parameter setting
@@ -3589,7 +3606,7 @@ class GridSearchKFold(BaseEstimator):
         return score_value
 
 
-class KFoldCrossValidationRegression(BaseEstimator):
+class KFoldCrossValidationRegression(RegressionEstimator):
     """Estimator for performing k-fold cross-validation with a regression
     estimator.
 

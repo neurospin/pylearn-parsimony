@@ -898,7 +898,6 @@ class MultiblockNesterovFunctionWrapper(MultiblockFunctionWrapper,
 class LatentVariableCovariance(mb_properties.MultiblockFunction,
                                mb_properties.MultiblockGradient,
                                mb_properties.MultiblockLipschitzContinuousGradient):
-                               # properties.Eigenvalues):
     """Represents
 
         Cov(X.w, Y.c) = (K / (n - 1)) * w'.X'.Y.c,
@@ -909,12 +908,13 @@ class LatentVariableCovariance(mb_properties.MultiblockFunction,
     ----------
     X : List with two numpy arrays. The two blocks.
 
-    unbiased : Boolean. Whether or not to use biased or unbiased sample
-            covariance. Default is True, the unbiased sample covariance is
-            used.
+    unbiased : bool
+        Whether or not to use biased or unbiased sample covariance. Default is
+        True, the unbiased sample covariance is used.
 
-    scalar_multiple : Non-negative float. Default is 1.0. A scalar multiple of
-            the function. Useful when the covariance is used as a "penalty".
+    scalar_multiple : float
+        Must be non-negative. Default is 1.0. A scalar multiple of the
+        function. Useful when the covariance is used as a "penalty".
     """
     def __init__(self, X, unbiased=True, scalar_multiple=1.0):
 
@@ -939,6 +939,7 @@ class LatentVariableCovariance(mb_properties.MultiblockFunction,
         """
         wX = np.dot(self.X[0], w[0]).T
         Yc = np.dot(self.X[1], w[1])
+
         wXYc = np.dot(wX, Yc)
 
         return -wXYc[0, 0] * (self.K / self.n)
@@ -985,20 +986,6 @@ class LatentVariableCovariance(mb_properties.MultiblockFunction,
         # Any positive real number suffices, but a small one will give a larger
         # step in e.g. proximal gradient descent.
         return np.sqrt(consts.TOLERANCE)  # 1.0
-
-#    def lambda_max(self):
-#        """ Largest eigenvalue of the corresponding covariance matrix.
-#
-#        From the interface "Eigenvalues".
-#        """
-#        # Note that we can save the state here since lmax(A) does not
-#
-#        from algorithms import FastSVDProduct
-#        svd = FastSVDProduct()
-#        v = svd(self.X[0].T, self.X[1], max_iter=100)
-#        s = np.dot(self.X[0].T, np.dot(self.X[1], v))
-#
-#        return np.sum(s ** 2.0) / (self.n ** 2.0)
 
 
 class LatentVariableCovarianceSquared(mb_properties.MultiblockFunction,
