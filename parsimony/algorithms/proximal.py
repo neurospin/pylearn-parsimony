@@ -264,7 +264,8 @@ class FISTA(bases.ExplicitAlgorithm,
     def __init__(self, use_gap=False,
                  info=[], eps=consts.TOLERANCE, max_iter=10000, min_iter=1,
                  callback=None,
-                 simulation=False):
+                 simulation=False,
+                 return_best=False):
 
         super(FISTA, self).__init__(info=info,
                                     max_iter=max_iter,
@@ -275,6 +276,7 @@ class FISTA(bases.ExplicitAlgorithm,
 
         self.callback = callback
         self.simulation = bool(simulation)
+        self.return_best = bool(return_best)
 
     @bases.force_reset
     @bases.check_compatibility
@@ -302,6 +304,10 @@ class FISTA(bases.ExplicitAlgorithm,
         if self.info_requested(Info.gap):
             gap_ = []
 
+        if self.return_best:
+            best_f = np.inf
+            best_beta = None
+
         for i in xrange(1, max(self.min_iter, self.max_iter) + 1):
 
             if self.info_requested(Info.time):
@@ -321,7 +327,14 @@ class FISTA(bases.ExplicitAlgorithm,
                 t_.append(utils.time_cpu() - tm)
             if self.info_requested(Info.fvalue) \
                     or self.info_requested(Info.func_val):
-                f_.append(function.f(betanew))
+
+                func_val = function.f(betanew)
+                f_.append(func_val)
+
+                if self.return_best and func_val < best_f:
+                    best_f = func_val
+                    best_beta = betanew
+
             if self.callback is not None:
                 self.callback(locals())
 
@@ -382,7 +395,10 @@ class FISTA(bases.ExplicitAlgorithm,
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, True)
 
-        return betanew
+        if self.return_best and best_beta is not None:
+            return best_beta
+        else:
+            return betanew
 
 
 class CONESTA(bases.ExplicitAlgorithm,
