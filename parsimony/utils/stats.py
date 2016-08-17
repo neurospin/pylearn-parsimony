@@ -706,7 +706,7 @@ def compute_ranks(X, method="average"):
     return R
 
 
-def nemenyi_test(X, p_value=0.05, return_ranks=False):
+def nemenyi_test(X, p_value=0.05, return_ranks=False, return_critval=False):
     """Performs the Nemenyi test for comparing a set of classifiers to each
     other.
 
@@ -723,6 +723,10 @@ def nemenyi_test(X, p_value=0.05, return_ranks=False):
     return_ranks : bool
         Whether or not to return the computed ranks. Default is False, do not
         return the ranks.
+
+    return_critval : bool
+        Whether or not to return the computed critical value. Default is False,
+        do not return the critical value.
     """
     num_datasets, num_models = X.shape
     R = compute_ranks(X)
@@ -735,9 +739,15 @@ def nemenyi_test(X, p_value=0.05, return_ranks=False):
             sign[j1, j2] = np.abs(np.mean(R[:, j1] - R[:, j2])) > CD
 
     if return_ranks:
-        return sign, R
+        if return_critval:
+            return sign, R, CD
+        else:
+            return sign, R
     else:
-        return sign
+        if return_critval:
+            return sign, CD
+        else:
+            return sign
 
 
 if __name__ == "__main__":
