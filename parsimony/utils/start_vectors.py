@@ -4,10 +4,11 @@ Created on Thu Mar 28 15:35:26 2013
 
 Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
-@author:  Tommy Löfstedt
-@email:   tommy.loefstedt@cea.fr
+@author:  Tommy Löfstedt, Edouard Duchesnay
+@email:   lofstedt.tommy@gmail.com, edouard.duchesnay@cea.fr
 @license: BSD 3-clause.
 """
+from six import with_metaclass
 import abc
 import numpy as np
 
@@ -17,7 +18,7 @@ __all__ = ['BaseStartVector', 'IdentityStartVector', 'RandomStartVector',
            'OnesStartVector', 'ZerosStartVector']
 
 
-class BaseStartVector(object):
+class BaseStartVector(with_metaclass(abc.ABCMeta, object)):
     """Base class for start vector generation.
 
     Parameters
@@ -30,7 +31,6 @@ class BaseStartVector(object):
             random numbers will change. Default is None. The seed is not used
             by all implementing classes.
     """
-    __metaclass__ = abc.ABCMeta
 
     def __init__(self, normalise=True, seed=None):
         super(BaseStartVector, self).__init__()

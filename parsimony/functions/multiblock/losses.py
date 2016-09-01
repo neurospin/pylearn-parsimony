@@ -19,7 +19,7 @@ import parsimony.utils as utils
 import parsimony.utils.maths as maths
 import parsimony.functions.properties as properties
 import parsimony.utils.consts as consts
-import properties as mb_properties
+from . import properties as mb_properties
 
 __all__ = ["CombinedMultiblockFunction",
            "MultiblockFunctionWrapper", "MultiblockNesterovFunctionWrapper",
@@ -75,9 +75,9 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
 
         if len(functions) != self.K:
             self._f = [0] * self.K
-            for i in xrange(self.K):
+            for i in range(self.K):
                 self._f[i] = [0] * self.K
-                for j in xrange(self.K):
+                for j in range(self.K):
                     self._f[i][j] = list()
         else:
             self._f = functions
@@ -85,13 +85,13 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
         if len(penalties) != self.K:
             self._p = [0] * self.K
             self._N = [0] * self.K
-            for i in xrange(self.K):
+            for i in range(self.K):
                 self._p[i] = list()
                 self._N[i] = list()
         else:
             self._p = [0] * self.K
             self._N = [0] * self.K
-            for i in xrange(self.K):
+            for i in range(self.K):
                 self._p[i] = list()
                 self._N[i] = list()
                 for di in penalties[i]:
@@ -102,14 +102,14 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
 
         if len(prox) != self.K:
             self._prox = [0] * self.K
-            for i in xrange(self.K):
+            for i in range(self.K):
                 self._prox[i] = list()
         else:
             self._prox = prox
 
         if len(constraints) != self.K:
             self._c = [0] * self.K
-            for i in xrange(self.K):
+            for i in range(self.K):
                 self._c[i] = list()
         else:
             self._c = constraints
@@ -277,29 +277,29 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
         """
         val = 0.0
 
-        for i in xrange(len(self._f)):
+        for i in range(len(self._f)):
             fi = self._f[i]
-            for j in xrange(len(fi)):
+            for j in range(len(fi)):
                 fij = self._f[i][j]
-                for k in xrange(len(fij)):
+                for k in range(len(fij)):
                     if isinstance(fij[k], mb_properties.MultiblockFunction):
                         val += fij[k].f([w[i], w[j]])
                     else:
                         val += fij[k].f(w[i])
 
-        for i in xrange(len(self._p)):
+        for i in range(len(self._p)):
             pi = self._p[i]
-            for k in xrange(len(pi)):
+            for k in range(len(pi)):
                 val += pi[k].f(w[i])
 
-        for i in xrange(len(self._N)):
+        for i in range(len(self._N)):
             Ni = self._N[i]
-            for k in xrange(len(Ni)):
+            for k in range(len(Ni)):
                 val += Ni[k].f(w[i])
 
-        for i in xrange(len(self._prox)):
+        for i in range(len(self._prox)):
             proxi = self._prox[i]
-            for k in xrange(len(proxi)):
+            for k in range(len(proxi)):
                 val += proxi[k].f(w[i])
 
         return val
@@ -313,29 +313,29 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
         """
         val = 0.0
 
-        for i in xrange(len(self._f)):
+        for i in range(len(self._f)):
             fi = self._f[i]
-            for j in xrange(len(fi)):
+            for j in range(len(fi)):
                 fij = self._f[i][j]
-                for k in xrange(len(fij)):
+                for k in range(len(fij)):
                     if isinstance(fij[k], mb_properties.MultiblockFunction):
                         val += fij[k].f([w[i], w[j]])
                     else:
                         val += fij[k].f(w[i])
 
-        for i in xrange(len(self._p)):
+        for i in range(len(self._p)):
             pi = self._p[i]
-            for k in xrange(len(pi)):
+            for k in range(len(pi)):
                 val += pi[k].f(w[i])
 
-        for i in xrange(len(self._N)):
+        for i in range(len(self._N)):
             Ni = self._N[i]
-            for k in xrange(len(Ni)):
+            for k in range(len(Ni)):
                 val += Ni[k].fmu(w[i])
 
-        for i in xrange(len(self._prox)):
+        for i in range(len(self._prox)):
             proxi = self._prox[i]
-            for k in xrange(len(proxi)):
+            for k in range(len(proxi)):
                 val += proxi[k].f(w[i])
 
         return val
@@ -356,19 +356,19 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
 
         # Add gradients from the loss functions.
         fi = self._f[index]
-        for j in xrange(len(fi)):
+        for j in range(len(fi)):
             fij = fi[j]
-            for k in xrange(len(fij)):
+            for k in range(len(fij)):
                 fijk = fij[k]
                 if isinstance(fijk, properties.Gradient):
                     grad += fijk.grad(w[index])
                 elif isinstance(fijk, mb_properties.MultiblockGradient):
                     grad += fijk.grad([w[index], w[j]], 0)
 
-        for i in xrange(len(self._f)):
+        for i in range(len(self._f)):
             fij = self._f[i][index]
             if i != index:  # Do not count these twice.
-                for k in xrange(len(fij)):
+                for k in range(len(fij)):
                     fijk = fij[k]
                     if isinstance(fijk, properties.Gradient):
                         # We shouldn't do anything here, right? This means e.g.
@@ -380,11 +380,11 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
 
         # Add gradients from the penalties.
         pi = self._p[index]
-        for k in xrange(len(pi)):
+        for k in range(len(pi)):
             grad += pi[k].grad(w[index])
 
         Ni = self._N[index]
-        for k in xrange(len(Ni)):
+        for k in range(len(Ni)):
             grad += Ni[k].grad(w[index])
 
         return grad
@@ -472,9 +472,9 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
 
         # Add Lipschitz constants from the loss functions.
         fi = self._f[index]
-        for j in xrange(len(fi)):
+        for j in range(len(fi)):
             fij = fi[j]
-            for k in xrange(len(fij)):
+            for k in range(len(fij)):
                 fijk = fij[k]
                 if isinstance(fijk, properties.Gradient):
                     if not isinstance(fijk,
@@ -494,10 +494,10 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
             if not all_lipschitz:
                 break
 
-        for i in xrange(len(self._f)):
+        for i in range(len(self._f)):
             fij = self._f[i][index]
             if i != index:  # Do not visit these twice.
-                for k in xrange(len(fij)):
+                for k in range(len(fij)):
                     fijk = fij[k]
                     if isinstance(fijk, properties.Gradient):
                         # We shouldn't do anything here, right? This means that
@@ -514,7 +514,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
 
         # Add Lipschitz constants from the penalties.
         pi = self._p[index]
-        for k in xrange(len(pi)):
+        for k in range(len(pi)):
             if not isinstance(pi[k], properties.LipschitzContinuousGradient):
                 all_lipschitz = False
                 break
@@ -522,7 +522,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
                 L += pi[k].L()  # w[index])
 
         Ni = self._N[index]
-        for k in xrange(len(Ni)):
+        for k in range(len(Ni)):
             if not isinstance(Ni[k], properties.LipschitzContinuousGradient):
                 all_lipschitz = False
                 break
@@ -764,7 +764,7 @@ class MultiblockNesterovFunctionWrapper(MultiblockFunctionWrapper,
         """
         A = self.A()
         Aa = A[0].T.dot(alpha[0])
-        for i in xrange(1, len(A)):
+        for i in range(1, len(A)):
             Aa += A[i].T.dot(alpha[i])
 
         return Aa
@@ -1116,10 +1116,10 @@ class GeneralisedMultiblock(mb_properties.MultiblockFunction,
 
     def reset(self):
 
-        for i in xrange(len(self.functions)):
-            for j in xrange(len(self.functions[i])):
+        for i in range(len(self.functions)):
+            for j in range(len(self.functions[i])):
                 if i == j:
-                    for k in xrange(len(self.functions[i][j])):
+                    for k in range(len(self.functions[i][j])):
                         self.functions[i][j][k].reset()
                 else:
                     if not self.functions[i][j] is None:
@@ -1129,12 +1129,12 @@ class GeneralisedMultiblock(mb_properties.MultiblockFunction,
         """Function value.
         """
         val = 0.0
-        for i in xrange(len(self.functions)):
+        for i in range(len(self.functions)):
             fi = self.functions[i]
-            for j in xrange(len(fi)):
+            for j in range(len(fi)):
                 fij = fi[j]
                 if i == j and isinstance(fij, (list, tuple)):
-                    for k in xrange(len(fij)):
+                    for k in range(len(fij)):
 #                        print "Diag: ", i
                         val += fij[k].f(w[i])
                 else:
@@ -1155,7 +1155,7 @@ class GeneralisedMultiblock(mb_properties.MultiblockFunction,
         """
         grad = 0.0
         fi = self.functions[index]
-        for j in xrange(len(fi)):
+        for j in range(len(fi)):
             fij = fi[j]
             if index != j:
                 if isinstance(fij, properties.Gradient):
@@ -1163,7 +1163,7 @@ class GeneralisedMultiblock(mb_properties.MultiblockFunction,
                 elif isinstance(fij, mb_properties.MultiblockGradient):
                     grad += fij.grad([w[index], w[j]], 0)
 
-        for i in xrange(len(self.functions)):
+        for i in range(len(self.functions)):
             fij = self.functions[i][index]
             if i != index:
                 if isinstance(fij, properties.Gradient):
@@ -1175,7 +1175,7 @@ class GeneralisedMultiblock(mb_properties.MultiblockFunction,
                     grad += fij.grad([w[i], w[index]], 1)
 
         fii = self.functions[index][index]
-        for k in xrange(len(fii)):
+        for k in range(len(fii)):
             if isinstance(fii[k], properties.Gradient):
                 grad += fii[k].grad(w[index])
 
@@ -1207,7 +1207,7 @@ class GeneralisedMultiblock(mb_properties.MultiblockFunction,
         # Find a projection operators.
 #        fii = self.functions[index][index]
         f = self.get_constraints(index)
-        for k in xrange(len(f)):
+        for k in range(len(f)):
             if isinstance(f[k], properties.ProjectionOperator):
                 w[index] = f[k].proj(w[index])
                 break
@@ -1225,7 +1225,7 @@ class GeneralisedMultiblock(mb_properties.MultiblockFunction,
         # Add the Lipschitz constants.
         L = 0.0
         fi = self.functions[index]
-        for j in xrange(len(fi)):
+        for j in range(len(fi)):
             if j != index and fi[j] is not None:
                 fij = fi[j]
                 if isinstance(fij, properties.LipschitzContinuousGradient):
@@ -1239,7 +1239,7 @@ class GeneralisedMultiblock(mb_properties.MultiblockFunction,
 
         if all_lipschitz:
             fii = self.functions[index][index]
-            for k in xrange(len(fii)):
+            for k in range(len(fii)):
                 if fi[j] is None:
                     continue
                 if isinstance(fii[k], properties.LipschitzContinuousGradient):

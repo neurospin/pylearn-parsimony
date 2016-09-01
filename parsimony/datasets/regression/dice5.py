@@ -244,7 +244,7 @@ def load(n_samples=100, shape=(30, 30, 1),
     ## 5. Model: y = X beta + noise
     beta3d = np.zeros(X3d.shape[1:])
 
-    for k in xrange(len(objects)):
+    for k in range(len(objects)):
         o = objects[k]
         beta3d[o.get_mask()] += o.beta
     beta3d = ndimage.gaussian_filter(beta3d, sigma=sigma_spatial_smoothing)

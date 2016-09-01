@@ -85,7 +85,7 @@ class GroupTotalVariation(properties.NesterovFunction,
         A = self.A()
 
         f = 0.0
-        for g in xrange(0, len(A), 3):
+        for g in range(0, len(A), 3):
             f += np.sum(np.sqrt(A[g + 0].dot(beta_) ** 2.0 +
                                 A[g + 1].dot(beta_) ** 2.0 +
                                 A[g + 2].dot(beta_) ** 2.0))
@@ -129,7 +129,7 @@ class GroupTotalVariation(properties.NesterovFunction,
         A = self.A()
 
         f = 0.0
-        for g in xrange(0, len(A), 3):
+        for g in range(0, len(A), 3):
             f += np.sum(np.sqrt(A[g + 0].dot(beta_) ** 2.0 +
                                 A[g + 1].dot(beta_) ** 2.0 +
                                 A[g + 2].dot(beta_) ** 2.0))
@@ -173,7 +173,7 @@ class GroupTotalVariation(properties.NesterovFunction,
 
         From the interface "NesterovFunction".
         """
-        for g in xrange(0, len(a), 3):
+        for g in range(0, len(a), 3):
 
             ax = a[g + 0]
             ay = a[g + 1]
@@ -202,7 +202,7 @@ class GroupTotalVariation(properties.NesterovFunction,
         """
         A = self.A()
         n = 0
-        for g in xrange(0, len(A), 3):
+        for g in range(0, len(A), 3):
             n += A[g].nnz  # The number of non-zero rows of Ag, the gth group.
 
         return float(n) / 2.0
@@ -219,7 +219,7 @@ class GroupTotalVariation(properties.NesterovFunction,
 
         A = self.A()
         max_norm = 0.0
-        for g in xrange(0, len(A), 3):
+        for g in range(0, len(A), 3):
 
             ax = A[g + 0].dot(beta_)
             ay = A[g + 1].dot(beta_)
@@ -260,7 +260,7 @@ def linear_operator_from_masks(masks, weights=None):
     A = []
 
     G = len(masks)
-    for g in xrange(G):
+    for g in range(G):
         mask = masks[g]
 
         if weights is None:
@@ -314,7 +314,7 @@ def linear_operator_from_rects(rects, shape, weights=None):
 
     A = []
     G = len(rects)
-    for g in xrange(G):
+    for g in range(G):
         rect = rects[g]
         if len(rect) == 1:
             rect = [(0, 1), (0, 1), rect[0]]

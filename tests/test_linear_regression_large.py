@@ -54,7 +54,7 @@ def fit_model(model_key):
         start_time = time.time()
         mod.fit(Xtr_, ytr.ravel())
         time_ellapsed = time.time() - start_time
-        print model_key, "(%.3f seconds)" % time_ellapsed
+        print(model_key, "(%.3f seconds)" % time_ellapsed)
         score = r2_score(yte, mod.predict(Xte_))
         mod.__title__ = "%s\nScore:%.2f, T:%.1f" %(model_key, score, time_ellapsed)
         mod.__info__ = dict(score=score, time_ellapsed=time_ellapsed)
@@ -86,10 +86,16 @@ X3d, y, beta3d = datasets.regression.dice5.load(
 
 
 ## TODO: REMOVE THIS DOWNLOAD when Git Large File Storage is released
-import urllib
-ftp_url = "ftp://ftp.cea.fr/pub/dsv/anatomist/parsimony/%s" %\
-    os.path.basename(weights_filename(shape, n_samples))
-urllib.urlretrieve(ftp_url, weights_filename(shape, n_samples))
+if not os.path.exists(weights_filename(shape, n_samples)):
+    ftp_url = "ftp://ftp.cea.fr/pub/dsv/anatomist/parsimony/%s" %\
+        os.path.basename(weights_filename(shape, n_samples))
+    try: # Python 3
+        import urllib.request, urllib.parse, urllib.error
+        urllib.request.urlretrieve(ftp_url, weights_filename(shape, n_samples))
+    except ImportError:
+        # Python 2
+        import urllib
+        urllib.urlretrieve(ftp_url, weights_filename(shape, n_samples))
 ## TO BE REMOVED END
 
 # Load true weights
@@ -262,7 +268,7 @@ if __name__ == "__main__":
     parser.add_argument('-s', '--save_weights', action='store_true', default=False,
                         help="Fit models, plot weight maps and save it into npz file")
     parser.add_argument('-m', '--models', help="test only models listed as args."
-                        "Possible models:" + ",".join(MODELS.keys()))
+                        "Possible models:" + ",".join(list(MODELS.keys())))
     options = parser.parse_args()
 
     if options.test:
@@ -280,9 +286,9 @@ if __name__ == "__main__":
         fit_all(MODELS)
         utils.plot.plot_map2d_of_models(MODELS, nrow=3, ncol=6, shape=shape,
                                         title_attr="__title__")
-        if raw_input("Save weights ? [n]/y") == "y":
+        if str(raw_input("Save weights ? [n]/y")) == "y":
             utils.testing.save_weights(MODELS, weights_filename(shape, n_samples))
-            print "Weights saved in", weights_filename(shape, n_samples)
+            print("Weights saved in", weights_filename(shape, n_samples))
 
     if options.plot:
         fit_all(MODELS)

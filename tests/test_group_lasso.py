@@ -8,6 +8,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
+#from .tests import TestCase
 from tests import TestCase
 
 from parsimony.algorithms.proximal import FISTA
@@ -30,7 +31,7 @@ class TestGroupLasso(TestCase):
 
         # Note that p must be even!
         n, p = 25, 20
-        groups = [range(0, p / 2), range(p / 2, p)]
+        groups = [list(range(0, int(p / 2))), list(range(int(p / 2), p))]
 #        weights = [1.5, 0.5]
 
         A = gl.linear_operator_from_groups(p, groups=groups)  # , weights=weights)
@@ -80,7 +81,7 @@ class TestGroupLasso(TestCase):
 
             params = {"loss": "square",
                       "regul": "group-lasso-l2",
-                      "groups": np.array([1] * (p / 2) + [2] * (p / 2),
+                      "groups": np.array([1] * (int(p / 2)) + [2] * (int(p / 2)),
                                          dtype=np.int32),
                       "lambda1": g,
                       "max_it": max_iter,
@@ -142,7 +143,7 @@ class TestGroupLasso(TestCase):
 
         # Note that p must be even!
         n, p = 25, 20
-        groups = [range(0, p / 2), range(p / 2, p)]
+        groups = [list(range(0, int(p / 2))), list(range(int(p / 2), p))]
 #        weights = [1.5, 0.5]
 
         A = gl.linear_operator_from_groups(p, groups=groups)  # , weights=weights)
@@ -194,7 +195,7 @@ class TestGroupLasso(TestCase):
 
             params = {"loss": "square",
                       "regul": "group-lasso-l2",
-                      "groups": np.array([1] * (p / 2) + [2] * (p / 2),
+                      "groups": np.array([1] * (int(p / 2)) + [2] * (int(p / 2)),
                                          dtype=np.int32),
                       "lambda1": g,
                       "max_it": max_iter,
@@ -256,7 +257,7 @@ class TestGroupLasso(TestCase):
 
         # Note that p should be divisible by 3!
         n, p = 25, 30
-        groups = [range(0, 2 * p / 3), range(p / 3, p)]
+        groups = [list(range(0, 2 * int(p / 3))), list(range(int(p / 3), p))]
         weights = [1.5, 0.5]
 
         A = gl.linear_operator_from_groups(p, groups=groups, weights=weights)
@@ -323,7 +324,7 @@ class TestGroupLasso(TestCase):
 
         # Note that p must be even!
         n, p = 25, 30
-        groups = [range(0, 2 * p / 3), range(p / 3, p)]
+        groups = [list(range(0, 2 * int(p / 3))), list(range(int(p / 3), p))]
         weights = [1.5, 0.5]
 
         A = gl.linear_operator_from_groups(p, groups=groups, weights=weights)
@@ -393,7 +394,7 @@ class TestGroupLasso(TestCase):
 
         # Note that p must be even!
         n, p = 25, 30
-        groups = [range(0, 2 * p / 3), range(p / 3, p)]
+        groups = [list(range(0, 2 * int(p / 3))), list(range(int(p / 3), p))]
         weights = [1.5, 0.5]
 
         A = gl.linear_operator_from_groups(p, groups=groups, weights=weights)
@@ -465,7 +466,7 @@ class TestGroupLasso(TestCase):
 
         # Note that p must be even!
         n, p = 25, 30
-        groups = [range(0, 2 * p / 3), range(p / 3, p)]
+        groups = [list(range(0, 2 * int(p / 3))), list(range(int(p / 3), p))]
         weights = [1.5, 0.5]
 
         A = gl.linear_operator_from_groups(p, groups=groups, weights=weights)

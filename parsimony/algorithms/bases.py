@@ -12,10 +12,11 @@ Created on Thu Feb 20 17:42:16 2014
 
 Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
-@author:  Tommy Löfstedt
-@email:   lofstedt.tommy@gmail.com
+@author:  Tommy Löfstedt, Edouard Duchesnay
+@email:   lofstedt.tommy@gmail.com, edouard.duchesnay@cea.fr
 @license: BSD 3-clause.
 """
+from six import with_metaclass
 import abc
 import functools
 
@@ -27,9 +28,7 @@ __all__ = ["BaseAlgorithm", "check_compatibility",
            "IterativeAlgorithm", "InformationAlgorithm", "KernelAlgorithm"]
 
 
-class BaseAlgorithm(object):
-
-    __metaclass__ = abc.ABCMeta
+class BaseAlgorithm(with_metaclass(abc.ABCMeta, object)):
 
     @staticmethod
     def check_compatibility(function, required_properties):
@@ -92,7 +91,7 @@ def force_reset(f):
     return wrapper
 
 
-class ImplicitAlgorithm(BaseAlgorithm):
+class ImplicitAlgorithm(with_metaclass(abc.ABCMeta, BaseAlgorithm)):
     """Implicit algorithms are algorithms that do not utilise a loss function.
 
     Implicit algorithms instead minimise or maximise some underlying function
@@ -102,7 +101,6 @@ class ImplicitAlgorithm(BaseAlgorithm):
     ----------
     X : One or more data matrices.
     """
-    __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def run(X, **kwargs):
@@ -110,7 +108,7 @@ class ImplicitAlgorithm(BaseAlgorithm):
                                   'specialised!')
 
 
-class ExplicitAlgorithm(BaseAlgorithm):
+class ExplicitAlgorithm(with_metaclass(abc.ABCMeta, BaseAlgorithm)):
     """Explicit algorithms are algorithms that minimises a given function.
 
     The function is explicitly minimised from properties of said function.
@@ -119,7 +117,6 @@ class ExplicitAlgorithm(BaseAlgorithm):
     the properties that function must implement. Defauls to a list with one
     element, the Function.
     """
-    __metaclass__ = abc.ABCMeta
 
     INTERFACES = [properties.Function]
 

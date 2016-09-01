@@ -99,7 +99,7 @@ class ExcessiveGapMethod(bases.ExplicitAlgorithm,
         A = function.A()
 
         u = [0] * len(A)
-        for i in xrange(len(A)):
+        for i in range(len(A)):
             u[i] = np.zeros((A[i].shape[0], 1))
 
         # L = lambda_max(A'A) / (lambda_min(X'X) + k)
@@ -137,7 +137,7 @@ class ExcessiveGapMethod(bases.ExplicitAlgorithm,
 
             function.set_mu(mu[k])
             alpha_hat = function.alpha(beta)
-            for i in xrange(len(alpha_hat)):
+            for i in range(len(alpha_hat)):
                 u[i] = (1.0 - tau) * alpha[i] + tau * alpha_hat[i]
 
             mu.append((1.0 - tau) * mu[k])

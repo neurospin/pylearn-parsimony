@@ -78,14 +78,14 @@ lr = estimators.LinearRegressionL2SmoothedL1TV(k, l, g, Al1tv,
                 algorithm_params=algorithm_params,
                 mean=mean)
 
-print "egm algorithm_params:", algorithm_params, "k, l, g", k, l, g
-print "algorithms.primaldual.__file__", primaldual.__file__
-print "hashlib.sha1(X).hexdigest():", hashlib.sha1(X).hexdigest()
-print "hashlib.sha1(y).hexdigest():", hashlib.sha1(y).hexdigest()
+print("egm algorithm_params:", algorithm_params, "k, l, g", k, l, g)
+print("algorithms.primaldual.__file__", primaldual.__file__)
+print("hashlib.sha1(X).hexdigest():", hashlib.sha1(X).hexdigest())
+print("hashlib.sha1(y).hexdigest():", hashlib.sha1(y).hexdigest())
 
 res = lr.fit(X, y)
 error = lr.score(X, y)
-print "error = ", error
+print("error = ", error)
 info = lr.get_info()
 beta_start = info[Info.beta]
 
@@ -115,7 +115,7 @@ lr_ = estimators.LinearRegressionL1L2TV(l, k, g,
                  rho=1.0)
 res = lr_.fit(X, y, beta_start)
 error = lr_.score(X, y)
-print "error = ", error
+print("error = ", error)
 info_ = lr_.get_info()
 
 y_ = info_[Info.fvalue]
@@ -126,8 +126,8 @@ plot.plot(t_[skip:], y_[skip:], 'b', linewidth=3)
 #plot.plot([0, np.max(t_)], [np.min(y), np.min(y)], 'r:')
 
 #print "f(beta*) :", func.f(beta_star)
-print "f(betak) :", func.f(lr.beta)
-print "f(betak_):", func.f(lr_.beta)
+print("f(betak) :", func.f(lr.beta))
+print("f(betak_):", func.f(lr_.beta))
 
 plot.ylabel(r"$\log\left(f(\beta^{(k)})\right)$")
 plot.xlabel(r"$\mathrm{Time}\,[s]$")
@@ -342,7 +342,7 @@ plot.show()
 #import parsimony.datasets.simulate.l1_l2_glmu as l1_l2_glmu
 #
 #n, p = 60, 90
-#groups = [range(0, 2 * p / 3), range(p / 3, p)]
+#groups = [range(0, 2 * int(p / 3)), range(int(p / 3), p)]
 #weights = [1.5, 0.5]
 #
 #A = gl.A_from_groups(p, groups=groups, weights=weights)

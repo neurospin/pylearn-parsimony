@@ -26,8 +26,8 @@ def k_fold(n, K=7):
     K : Positive integer greater than or equal to two. The number of folds.
     """
     all_ids = set(range(n))
-    for k in xrange(K):
-        test = range(k, n, K)
+    for k in range(K):
+        test = list(range(k, n, K))
         train = all_ids.difference(test)
 
         yield list(train), test
@@ -53,7 +53,7 @@ def stratified_k_fold(y, K=7):
     labels, y_inverse = np.unique(y, return_inverse=True)
     count = np.bincount(y_inverse)
     classes = -np.ones(n)
-    for i in xrange(count.shape[0]):
+    for i in range(count.shape[0]):
         c = count[i]
         v = np.mod(np.arange(c), K)
 
@@ -94,7 +94,7 @@ def bootstrap(n, B=100, seed=None):
     if seed is not None:
         np.random.seed(seed)
 
-    for b in xrange(B):
+    for b in range(B):
         sample = np.random.randint(0, n, size=n).tolist()
 
         yield sample
@@ -127,9 +127,9 @@ def stratified_bootstrap(y, B=100, seed=None):
     # Assign the class labels to different folds
     labels, y_inverse = np.unique(y, return_inverse=True)
     count = np.bincount(y_inverse).tolist()
-    for b in xrange(B):
+    for b in range(B):
         sample = -np.ones(y.shape, dtype=np.int)
-        for i in xrange(len(count)):
+        for i in range(len(count)):
             c = count[i]  # Current class
             cls = y_inverse == i  # Find class among samples
             i = np.where(cls)[0]  # Class indices

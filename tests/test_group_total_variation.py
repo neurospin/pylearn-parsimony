@@ -10,7 +10,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 import numpy as np
 
-from tests import TestCase
+from .tests import TestCase
 from parsimony.algorithms.proximal import FISTA
 
 

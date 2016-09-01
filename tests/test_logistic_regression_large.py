@@ -40,7 +40,7 @@ n_samples = 500
 #shape = (50, 50, 1)
 #hash_50x50x1 = '5286c0cee52be789948a9e83e22b1e46704305ce'
 shape = (30, 30, 1)
-hash_30x30x1 = '4de7a1040d45cc006a01c4dd385544af22ab8cf1'
+hash_30x30x1 = '9b77c4eaf8906b27267c39e5fd021bd4049a359a'
 
 n_train = 300
 
@@ -69,7 +69,7 @@ def fit_model(model_key):
         else:
             mod.fit(Xtr_, ytr.ravel())
         time_ellapsed = time.time() - start_time
-        print model_key, "(%.3f seconds)" % time_ellapsed
+        print(model_key, "(%.3f seconds)" % time_ellapsed)
         score = utils.stats.accuracy(mod.predict(Xte_), yte)
         mod.__title__ = "%s\nS:%.2f, T:%.1f" % (model_key,
                                                 score, time_ellapsed)
@@ -80,8 +80,8 @@ def fit_model(model_key):
                              mod.get_info()['num_iter'])
         except:
             pass
-    except Exception, e:
-        print e
+    except Exception as e:
+        print(e)
         ret = False
     assert ret
 
@@ -109,16 +109,22 @@ X3d, y, beta3d, proba = datasets.classification.dice5.load(
     sigma_spatial_smoothing=1, snr=10, random_seed=1)
 
 
-if hashlib.sha1(X3d).hexdigest() != hash_30x30x1:
+if hashlib.sha1(np.round(X3d, 8)).hexdigest() != hash_30x30x1:
     raise Exception("Generated dataset differs from the original one")
 
-## TODO: REMOVE THIS DOWNLOAD when Git Large File Storage is released
+# TODO: REMOVE THIS DOWNLOAD when Git Large File Storage is released
 if not os.path.exists(weights_filename(shape, n_samples)):
-    import urllib
     ftp_url = "ftp://ftp.cea.fr/pub/dsv/anatomist/parsimony/%s" %\
         os.path.basename(weights_filename(shape, n_samples))
-    urllib.urlretrieve(ftp_url, weights_filename(shape, n_samples))
-## TO BE REMOVED END
+    try: # Python 3
+        import urllib.request, urllib.parse, urllib.error
+        urllib.request.urlretrieve(ftp_url, weights_filename(shape, n_samples))
+    except ImportError:
+        # Python 2
+        import urllib
+        urllib.urlretrieve(ftp_url, weights_filename(shape, n_samples))
+# TO BE REMOVED END
+
 
 # Load true weights
 WEIGHTS_TRUTH = np.load(weights_filename(shape, n_samples))
@@ -152,7 +158,7 @@ from parsimony.algorithms.utils import Info
 info = [Info.converged,
         Info.num_iter,
         Info.time,
-        Info.fvalue]
+        Info.func_val]
 
 ###############################################################################
 ## Models
@@ -346,7 +352,7 @@ MODELS["2d_l1tv_inexactfista"] = \
 ###############################################################################
 def test_fit_all():
     global MODELS
-    print MODELS
+    print(MODELS)
     for model_key in MODELS:
         yield fit_model, model_key
 
@@ -404,7 +410,7 @@ if __name__ == "__main__":
                         help="Fit models, plot weight maps and save it "
                         "into npz file")
     parser.add_argument('-m', '--models', help="test only models listed as "
-                        "args. Possible models:" + ",".join(MODELS.keys()))
+                        "args. Possible models:" + ",".join(list(MODELS.keys())))
     options = parser.parse_args()
 
     if options.models:
@@ -423,18 +429,20 @@ if __name__ == "__main__":
 
     if options.save_weights:
         fit_all(MODELS)
-        utils.plots.map2d_of_models(MODELS, nrow=5, ncol=6, shape=shape,
-                                    title_attr="__title__")
-        if raw_input("Save weights ? [n]/y") == "y":
+#        utils.plots.map2d_of_models(MODELS, nrow=5, ncol=6, shape=shape,
+#                                    title_attr="__title__")
+        utils.plots.plot_map2d_of_models(MODELS, nrow=5, ncol=6, shape=shape,
+                                        title_attr="__title__")
+        if str(raw_input("Save weights ? [n]/y")) == "y":
             utils.testing.save_weights(MODELS,
                                        weights_filename(shape, n_samples))
             import string
-            print "Weights saved in", weights_filename(shape, n_samples)
+            print("Weights saved in", weights_filename(shape, n_samples))
             dataset_filename = string.replace(
                 weights_filename(shape, n_samples), "weights", "dataset")
             np.savez_compressed(file=dataset_filename,
                                 X3d=X3d, y=y, beta3d=beta3d, proba=proba)
-            print "Dataset saved in", dataset_filename
+            print("Dataset saved in", dataset_filename)
             # reload an check
             WEIGHTS_TRUTH = np.load(weights_filename(shape, n_samples))
             for test_func, model_key in test_weights_calculated_vs_precomputed():

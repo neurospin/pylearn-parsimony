@@ -8,7 +8,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
-from tests import TestCase
+from .tests import TestCase
 
 
 class TestL1(TestCase):

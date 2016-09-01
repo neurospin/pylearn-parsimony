@@ -1747,7 +1747,7 @@ class LinearVariableConstraint(properties.IndicatorFunction,
         r = xr[1]
 
         Ax = [0.0] * len(self.A)
-        for i in xrange(len(self.A)):
+        for i in range(len(self.A)):
             Ax[i] = self.A[i].dot(x_)
         Ax = np.vstack(Ax)
 
@@ -1786,7 +1786,7 @@ class LinearVariableConstraint(properties.IndicatorFunction,
 
         # Check feasibility
         Ax = [0.0] * len(A)
-        for i in xrange(len(A)):
+        for i in range(len(A)):
             Ax[i] = A[i].dot(x_)
         Ax = np.vstack(Ax)
         if maths.norm(Ax - r) < consts.TOLERANCE:
@@ -1803,7 +1803,7 @@ class LinearVariableConstraint(properties.IndicatorFunction,
             if len(A) >= 4:
                 AtA = AtA + A[3].T.dot(A[3])
             if len(A) > 4:
-                for i in xrange(4, len(A)):
+                for i in range(4, len(A)):
                     AtA = AtA + A[i].T.dot(A[i])
 
             AtA_I = AtA + sparse.eye(*AtA.shape, format=AtA.format)
@@ -1815,7 +1815,7 @@ class LinearVariableConstraint(properties.IndicatorFunction,
         Atr = 0.0
         start = 0
         end = 0
-        for i in xrange(len(A)):
+        for i in range(len(A)):
             end += A[i].shape[0]
             Atr += A[i].T.dot(r[start:end])
             start = end
@@ -1826,7 +1826,7 @@ class LinearVariableConstraint(properties.IndicatorFunction,
             z = np.dot(self._inv_AtA_I, Atr + x_)
 
         Az = [0.0] * len(A)
-        for i in xrange(len(A)):
+        for i in range(len(A)):
             Az[i] = A[i].dot(z)
         s = np.vstack(Az)
 

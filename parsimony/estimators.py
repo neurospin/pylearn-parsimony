@@ -10,6 +10,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com, edouard.duchesnay@cea.fr
 @license: BSD 3-clause.
 """
+from six import with_metaclass
 import abc
 import warnings
 
@@ -63,14 +64,13 @@ __all__ = ["BaseEstimator",
            "KFoldCrossValidation"]
 
 
-class BaseEstimator(object):
+class BaseEstimator(with_metaclass(abc.ABCMeta, object)):
     """Base class for estimators.
 
     Parameters
     ----------
     algorithm : BaseAlgorithm. The algorithm that will be used.
     """
-    __metaclass__ = abc.ABCMeta
 
     def __init__(self, algorithm):
 
@@ -147,7 +147,7 @@ class BaseEstimator(object):
         return self.algorithm.info_get()
 
 
-class RegressionEstimator(BaseEstimator):
+class RegressionEstimator(with_metaclass(abc.ABCMeta, BaseEstimator)):
     """Base estimator for regression estimation.
 
     Parameters
@@ -157,7 +157,6 @@ class RegressionEstimator(BaseEstimator):
     start_vector : BaseStartVector. Generates the start vector that will be
             used.
     """
-    __metaclass__ = abc.ABCMeta
 
     def __init__(self, algorithm,
                  start_vector=start_vectors.RandomStartVector()):
@@ -1158,7 +1157,7 @@ class LinearRegressionL1L2GL(RegressionEstimator):
 #        return np.sum((y_hat - y) ** 2.0) / float(n)
 
 
-class LogisticRegressionEstimator(BaseEstimator):
+class LogisticRegressionEstimator(with_metaclass(abc.ABCMeta, BaseEstimator)):
     """Base estimator for logistic regression estimation.
 
     Parameters
@@ -1176,8 +1175,6 @@ class LogisticRegressionEstimator(BaseEstimator):
         one. The "auto" mode uses the values of y to automatically adjust
         weights inversely proportional to class frequencies.
     """
-    __metaclass__ = abc.ABCMeta
-
     def __init__(self, algorithm,
                  start_vector=start_vectors.RandomStartVector(),
                  class_weight=None):
@@ -2104,7 +2101,7 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
     >>> np.random.seed(42)
     >>>
     >>> n, p = 10, 16
-    >>> groups = [range(0, p / 2), range(p / 2, p)]
+    >>> groups = [range(0, int(p / 2)), range(int(p / 2), p)]
     >>> weights = [1.5, 0.5]
     >>> A = group_lasso.linear_operator_from_groups(p, groups=groups,
     ...                                             weights=weights)
@@ -2697,7 +2694,7 @@ class PLSRegression(RegressionEstimator):
                 w = [self.start_vector.get_vector(X.shape[1]),
                      self.start_vector.get_vector(Y.shape[1])]
 
-                print "max iter:", self.algorithm.max_iter
+                print("max iter:", self.algorithm.max_iter)
                 w = self.algorithm.run(function, w)
                 c = w[1]
                 w = w[0]
@@ -2915,7 +2912,7 @@ class SparsePLSRegression(RegressionEstimator):
                 w = [self.start_vector.get_vector(X.shape[1]),
                      self.start_vector.get_vector(Y.shape[1])]
 
-                print "max iter:", self.algorithm.max_iter
+                print("max iter:", self.algorithm.max_iter)
                 w = self.algorithm.run(function, w)
                 c = w[1]
                 w = w[0]
@@ -3081,7 +3078,7 @@ class Clustering(BaseEstimator):
 
         closest = np.array(self.predict(X))
         wcss = 0.0
-        for i in xrange(self.K):
+        for i in range(self.K):
             idx = closest == i
             wcss += np.sum((X[idx, :] - self._means[i, :]) ** 2.0)
 
@@ -3167,7 +3164,7 @@ class GridSearchKFoldRegression(BaseEstimator):
         self._best_params = None
         self._result = []
 
-        keys = self.grid.keys()
+        keys = list(self.grid.keys())
         idx = [0] * len(keys)
         maxs = [0] * len(keys)
         for i in range(len(keys)):
@@ -3189,24 +3186,24 @@ class GridSearchKFoldRegression(BaseEstimator):
                 self._best_results = score_values
                 self._best_params = params
 
-                print params, value
+                print(params, value)
             else:
                 if self.maximise and value > self._best_result:
                     self._best_result = value
                     self._best_results = score_values
                     self._best_params = params
 
-                    print params, value
+                    print(params, value)
                 elif not self.maximise and value < self._best_result:
                     self._best_result = value
                     self._best_results = score_values
                     self._best_params = params
 
-                    print params, value
+                    print(params, value)
 
 
             idx[-1] = idx[-1] + 1
-            for i in reversed(range(1, len(keys))):
+            for i in reversed(list(range(1, len(keys)))):
                 if idx[i] >= maxs[i]:
                     idx[i] = 0
                     idx[i - 1] = idx[i - 1] + 1
@@ -3422,7 +3419,7 @@ class GridSearchKFold(BaseEstimator):
         self._result = []
 
         # Generate upper limit of the grid parameters
-        keys = self.grid.keys()
+        keys = list(self.grid.keys())
         print "keys: ", keys
         maxs = [0] * len(keys)
         for i in range(len(keys)):
@@ -3452,24 +3449,24 @@ class GridSearchKFold(BaseEstimator):
                 self._best_results = score_values
                 self._best_params = params
 
-                print params, value
+                print(params, value)
             else:
                 if self.maximise and value > self._best_result:
                     self._best_result = value
                     self._best_results = score_values
                     self._best_params = params
 
-                    print params, value
+                    print(params, value)
                 elif not self.maximise and value < self._best_result:
                     self._best_result = value
                     self._best_results = score_values
                     self._best_params = params
 
-                    print params, value
+                    print(params, value)
 
             # Go to the next parameter setting
             idx[-1] = idx[-1] + 1
-            for i in reversed(range(1, len(keys))):
+            for i in reversed(list(range(1, len(keys)))):
                 if idx[i] >= maxs[i]:
                     idx[i] = 0
                     idx[i - 1] = idx[i - 1] + 1
