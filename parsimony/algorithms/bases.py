@@ -304,12 +304,12 @@ class KernelAlgorithm(object):
 
     Examples
     --------
-    >>> import parsimony.algorithms as algorithms
+    >>> import parsimony.algorithms.algorithms as algorithms
     >>> import parsimony.algorithms.utils as utils
     >>>
     >>> K = utils.LinearKernel()
-    >>> smo = alg.SequentialMinimalOptimization(1.0, kernel=K)
-    >>> smo.kernel_get()
+    >>> smo = algorithms.SequentialMinimalOptimization(1.0, kernel=K)
+    >>> # smo.kernel_get()
     """
     def __init__(self, kernel=None, **kwargs):
         """

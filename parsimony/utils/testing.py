@@ -75,6 +75,7 @@ def save_weights(models_dict, filename):
         weights_dict[k] = w
     np.savez_compressed(filename, **weights_dict)
 
+
 # Tests utils
 def assert_close_vectors(a, b, msg="",
                          slope_tol=1e-2, corr_tol=1e-3, n2_tol=.05):
@@ -93,5 +94,3 @@ def assert_close_vectors(a, b, msg="",
     diff_n2_ratio = diff_n2 / min(np.sqrt(np.dot(a, a)), np.sqrt(np.dot(b, b)))
     assert (diff_n2_ratio < n2_tol), \
         "%s: |a-b|/min(|a|,|b|)=%f > n2 tolerance" % (msg, diff_n2_ratio)
-
-

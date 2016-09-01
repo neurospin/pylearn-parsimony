@@ -2410,7 +2410,7 @@ class SVMEstimator(BaseEstimator):
         """Returns a dictionary with the estimator's fitted parameters, e.g.
         the regression coefficients.
         """
-        return {"w": self.w,
+        return {  # "w": self.w,
                 "alpha": self.alpha,
                 "bias": self.bias}
 

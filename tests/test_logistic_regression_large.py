@@ -10,9 +10,12 @@ Copyright (c) 2013-2015, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 import os.path
 import argparse
-import numpy as np
 import collections
 import time
+import hashlib
+
+import numpy as np
+
 import parsimony.functions.nesterov.tv as nesterov_tv
 import parsimony.estimators as estimators
 import parsimony.algorithms as algorithms
@@ -22,7 +25,6 @@ from parsimony.utils import mesh
 import parsimony.config as config
 import parsimony.functions.nesterov.l1tv as l1tv
 import parsimony.utils.start_vectors as start_vectors
-import hashlib
 
 if not config.get_boolean("tests", "allow_downloads", False):
     raise Exception("Download of weight map is not authorized and it is "
@@ -116,8 +118,10 @@ if hashlib.sha1(np.round(X3d, 8)).hexdigest() != hash_30x30x1:
 if not os.path.exists(weights_filename(shape, n_samples)):
     ftp_url = "ftp://ftp.cea.fr/pub/dsv/anatomist/parsimony/%s" %\
         os.path.basename(weights_filename(shape, n_samples))
-    try: # Python 3
-        import urllib.request, urllib.parse, urllib.error
+    try:  # Python 3
+        import urllib.request
+        import urllib.parse
+        import urllib.error
         urllib.request.urlretrieve(ftp_url, weights_filename(shape, n_samples))
     except ImportError:
         # Python 2
@@ -234,11 +238,12 @@ MODELS["2d_l1l2_fista"] = \
                                             algorithm_params=algorithm_params)
 
 
-MODELS["2d_l1l2_inter_sklearn"] = \
-    sklearn.linear_model.SGDClassifier(loss='log', penalty='elasticnet',
-                                       alpha=alpha / 1000 * n_train,
-                                       l1_ratio=.5,
-                                       fit_intercept=True)
+if has_sklearn:
+    MODELS["2d_l1l2_inter_sklearn"] = \
+        sklearn.linear_model.SGDClassifier(loss='log', penalty='elasticnet',
+                                           alpha=alpha / 1000 * n_train,
+                                           l1_ratio=.5,
+                                           fit_intercept=True)
 
 MODELS["2d_l1l2_inter_fista"] = \
     estimators.ElasticNetLogisticRegression(alpha=alpha / 10, l=.5,
@@ -432,7 +437,7 @@ if __name__ == "__main__":
 #        utils.plots.map2d_of_models(MODELS, nrow=5, ncol=6, shape=shape,
 #                                    title_attr="__title__")
         utils.plots.plot_map2d_of_models(MODELS, nrow=5, ncol=6, shape=shape,
-                                        title_attr="__title__")
+                                         title_attr="__title__")
         if str(raw_input("Save weights ? [n]/y")) == "y":
             utils.testing.save_weights(MODELS,
                                        weights_filename(shape, n_samples))

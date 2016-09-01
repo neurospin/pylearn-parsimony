@@ -14,7 +14,10 @@ import numpy as np
 
 import parsimony.algorithms.utils as utils
 #from tests import TestCase
-from .tests import TestCase
+try:
+    from .tests import TestCase  # When imported as a package.
+except ValueError:
+    from tests import TestCase  # When run as a program.
 
 
 class TestAlgorithms(TestCase):
@@ -74,8 +77,8 @@ class TestAlgorithms(TestCase):
         import parsimony.algorithms.algorithms as alg
 
         info = [utils.Info.func_val]
-        K = utils.LinearKernel(X=X, use_cache=True)
-        smo = alg.SequentialMinimalOptimization(1.0, K=K, info=info,
+        K = utils.LinearKernel(X=X)
+        smo = alg.SequentialMinimalOptimization(1.0, kernel=K, info=info,
                                                 max_iter=100)
         beta = smo.run(X, y)
 

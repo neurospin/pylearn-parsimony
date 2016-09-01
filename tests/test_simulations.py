@@ -12,8 +12,10 @@ from nose.tools import assert_less, assert_equal
 
 import numpy as np
 
-from .tests import TestCase
-
+try:
+    from .tests import TestCase  # When imported as a package.
+except ValueError:
+    from tests import TestCase  # When run as a program.
 
 class TestSimulations(TestCase):
 
@@ -71,10 +73,10 @@ class TestSimulations(TestCase):
                      grad.L2Squared(k),
                      grad.SmoothedTotalVariation(g, A, mu=mu)]
         simulated_data = simulate.LinearRegressionData(penalties,
-                                                        M,
-                                                        e,
-                                                        snr=snr,
-                                                        intercept=False)
+                                                       M,
+                                                       e,
+                                                       snr=snr,
+                                                       intercept=False)
 #        np.random.seed(42)
         X, y, beta_star = simulated_data.load(beta)
 #        np.random.seed(42)
@@ -105,8 +107,8 @@ class TestSimulations(TestCase):
                                                        penalty_start=0))
                 function.add_penalty(L2Squared(k))
                 function.add_prox(L1(l))
-                beta_nonsmooth_penalty = \
-                        fista.run(function, beta_nonsmooth_penalty)
+                beta_nonsmooth_penalty = fista.run(function,
+                                                   beta_nonsmooth_penalty)
 
             mse = np.linalg.norm(beta_nonsmooth_penalty - beta_star)
             errs.append(mse)
@@ -120,7 +122,7 @@ class TestSimulations(TestCase):
 #        plot.plot(lagranges, errs)
 #        print lagranges[np.argmin(errs)]
         assert_equal(lagranges[np.argmin(errs)], v,
-                               msg="The found minimum is not correct!")
+                     msg="The found minimum is not correct!")
 #        print np.min(errs)
         assert_less(np.min(errs), 5e-3,
                     msg="Error is too large!")
@@ -128,7 +130,7 @@ class TestSimulations(TestCase):
 #        plot.plot(lagranges, effs)
 #        print lagranges[np.argmin(effs)]
         assert_equal(lagranges[np.argmin(effs)], v,
-                               msg="The found minimum is not correct!")
+                     msg="The found minimum is not correct!")
 #        print np.min(effs)
         assert_less(np.min(effs), 5e-5,
                     msg="Error is too large!")
@@ -545,10 +547,10 @@ class TestSimulations(TestCase):
                      grad.L2Squared(k),
                      grad.SmoothedTotalVariation(g, A, mu=mu)]
         simulated_data = simulate.LinearRegressionData(penalties,
-                                                        M,
-                                                        e,
-                                                        snr=snr,
-                                                        intercept=True)
+                                                       M,
+                                                       e,
+                                                       snr=snr,
+                                                       intercept=True)
 #        np.random.seed(42)
         X, y, beta_star = simulated_data.load(beta)
 #        np.random.seed(42)
@@ -578,17 +580,17 @@ class TestSimulations(TestCase):
                                                        penalty_start=1))
                 function.add_penalty(L2Squared(k, penalty_start=1))
                 function.add_prox(L1(L, penalty_start=1))
-                beta_nonsmooth_penalty = \
-                        fista.run(function, beta_nonsmooth_penalty)
+                beta_nonsmooth_penalty = fista.run(function,
+                                                   beta_nonsmooth_penalty)
 
             mse = np.linalg.norm(beta_nonsmooth_penalty - beta_star) \
-                    / np.linalg.norm(beta_star)
+                / np.linalg.norm(beta_star)
             errs.append(mse)
 
             f_nonsmooth_star = function.f(beta_star)
             f_nonsmooth_penalty = function.f(beta_nonsmooth_penalty)
             eff = abs(f_nonsmooth_penalty - f_nonsmooth_star) \
-                        / f_nonsmooth_star
+                / f_nonsmooth_star
             effs.append(eff)
 
 #        print lagranges
@@ -596,7 +598,7 @@ class TestSimulations(TestCase):
 #        plot.plot(lagranges, errs)
 #        print lagranges[np.argmin(errs)]
         assert_equal(lagranges[np.argmin(errs)], v,
-                               msg="The found minimum is not correct!")
+                     msg="The found minimum is not correct!")
 #        print np.min(errs)
         assert_less(np.min(errs), 5e-3,
                     msg="Error is too large!")
@@ -604,7 +606,7 @@ class TestSimulations(TestCase):
 #        plot.plot(lagranges, effs)
 #        print lagranges[np.argmin(effs)]
         assert_equal(lagranges[np.argmin(effs)], v,
-                               msg="The found minimum is not correct!")
+                     msg="The found minimum is not correct!")
 #        print np.min(effs)
         assert_less(np.min(effs), 5e-05,
                     msg="Error is too large!")
@@ -630,16 +632,16 @@ class TestSimulations(TestCase):
                 function.add_penalty(L2Squared(L, penalty_start=1))
                 function.add_prox(L1(l, penalty_start=1))
                 beta_nonsmooth_penalty = \
-                        fista.run(function, beta_nonsmooth_penalty)
+                    fista.run(function, beta_nonsmooth_penalty)
 
             mse = np.linalg.norm(beta_nonsmooth_penalty - beta_star) \
-                    / np.linalg.norm(beta_star)
+                / np.linalg.norm(beta_star)
             errs.append(mse)
 
             f_nonsmooth_star = function.f(beta_star)
             f_nonsmooth_penalty = function.f(beta_nonsmooth_penalty)
             eff = abs(f_nonsmooth_penalty - f_nonsmooth_star) \
-                        / f_nonsmooth_star
+                / f_nonsmooth_star
             effs.append(eff)
 
 #        print lagranges
@@ -647,7 +649,7 @@ class TestSimulations(TestCase):
 #        plot.plot(lagranges, errs)
 #        print lagranges[np.argmin(errs)]
         assert_equal(lagranges[np.argmin(errs)], v,
-                               msg="The found minimum is not correct!")
+                     msg="The found minimum is not correct!")
 #        print np.min(errs)
         assert_less(np.min(errs), 5e-3,
                     msg="Error is too large!")
@@ -655,7 +657,7 @@ class TestSimulations(TestCase):
 #        plot.plot(lagranges, effs)
 #        print lagranges[np.argmin(effs)]
         assert_equal(lagranges[np.argmin(effs)], v,
-                               msg="The found minimum is not correct!")
+                     msg="The found minimum is not correct!")
 #        print np.min(effs)
         assert_less(np.min(effs), 5e-06,
                     msg="Error is too large!")
@@ -681,17 +683,17 @@ class TestSimulations(TestCase):
                 function.add_penalty(tv.TotalVariation(l=g, A=A, mu=mu,
                                                        penalty_start=1))
                 function.add_prox(L1(l, penalty_start=1))
-                beta_nonsmooth_penalty = \
-                        fista.run(function, beta_nonsmooth_penalty)
+                beta_nonsmooth_penalty = fista.run(function,
+                                                   beta_nonsmooth_penalty)
 
             mse = np.linalg.norm(beta_nonsmooth_penalty - beta_star) \
-                    / np.linalg.norm(beta_star)
+                / np.linalg.norm(beta_star)
             errs.append(mse)
 
             f_nonsmooth_star = function.f(beta_star)
             f_nonsmooth_penalty = function.f(beta_nonsmooth_penalty)
             eff = abs(f_nonsmooth_penalty - f_nonsmooth_star) \
-                        / f_nonsmooth_star
+                / f_nonsmooth_star
             effs.append(eff)
 
 #        print lagranges
@@ -699,7 +701,7 @@ class TestSimulations(TestCase):
 #        plot.plot(lagranges, errs)
 #        print lagranges[np.argmin(errs)]
         assert_equal(lagranges[np.argmin(errs)], v,
-                               msg="The found minimum is not correct!")
+                     msg="The found minimum is not correct!")
 #        print np.min(errs)
         assert_less(np.min(errs), 5e-3,
                     msg="Error is too large!")
@@ -707,7 +709,7 @@ class TestSimulations(TestCase):
 #        plot.plot(lagranges, effs)
 #        print lagranges[np.argmin(effs)]
         assert_equal(lagranges[np.argmin(effs)], v,
-                               msg="The found minimum is not correct!")
+                     msg="The found minimum is not correct!")
 #        print np.min(effs)
         assert_less(np.min(effs), 5e-06,
                     msg="Error is too large!")
@@ -732,17 +734,17 @@ class TestSimulations(TestCase):
                                                        penalty_start=1))
                 function.add_penalty(L2Squared(k, penalty_start=1))
                 function.add_prox(L1(l, penalty_start=1))
-                beta_nonsmooth_penalty = \
-                        fista.run(function, beta_nonsmooth_penalty)
+                beta_nonsmooth_penalty = fista.run(function,
+                                                   beta_nonsmooth_penalty)
 
             mse = np.linalg.norm(beta_nonsmooth_penalty - beta_star) \
-                    / np.linalg.norm(beta_star)
+                / np.linalg.norm(beta_star)
             errs.append(mse)
 
             f_nonsmooth_star = function.f(beta_star)
             f_nonsmooth_penalty = function.f(beta_nonsmooth_penalty)
             eff = abs(f_nonsmooth_penalty - f_nonsmooth_star) \
-                        / f_nonsmooth_star
+                / f_nonsmooth_star
             effs.append(eff)
 
 #        print lagranges
@@ -776,7 +778,7 @@ class TestSimulations(TestCase):
                                           penalty_start=1)
 
         err = np.linalg.norm(estimator.beta - beta_star) \
-                    / np.linalg.norm(beta_star)
+            / np.linalg.norm(beta_star)
 #        print err
         assert_less(err, 0.24, msg="The found minimum is not correct!")
 
@@ -1111,7 +1113,8 @@ class TestSimulations(TestCase):
         k = 1.0 - l
         g = 1.618
 
-        groups = [list(range(0, 2 * int(p / 3))), list(range(int(p / 3), p - 1))]
+        groups = [list(range(0, 2 * int(p / 3))),
+                  list(range(int(p / 3), p - 1))]
         A = gl.linear_operator_from_groups(p - 1, groups=groups)
 
         snr = 100.0
@@ -1123,10 +1126,10 @@ class TestSimulations(TestCase):
                      grad.L2Squared(k),
                      grad.SmoothedGroupLasso(g, A, mu=mu)]
         simulated_data = simulate.LinearRegressionData(penalties,
-                                                        M,
-                                                        e,
-                                                        snr=snr,
-                                                        intercept=True)
+                                                       M,
+                                                       e,
+                                                       snr=snr,
+                                                       intercept=True)
 
 #        np.random.seed(42)
         X, y, beta_star = simulated_data.load(beta)
@@ -1156,17 +1159,17 @@ class TestSimulations(TestCase):
                                                           penalty_start=1))
                 function.add_penalty(L2Squared(k, penalty_start=1))
                 function.add_prox(L1(L, penalty_start=1))
-                beta_nonsmooth_penalty = \
-                        fista.run(function, beta_nonsmooth_penalty)
+                beta_nonsmooth_penalty = fista.run(function,
+                                                   beta_nonsmooth_penalty)
 
             mse = np.linalg.norm(beta_nonsmooth_penalty - beta_star) \
-                    / np.linalg.norm(beta_star)
+                / np.linalg.norm(beta_star)
             errs.append(mse)
 
             f_nonsmooth_star = function.f(beta_star)
             f_nonsmooth_penalty = function.f(beta_nonsmooth_penalty)
             eff = abs(f_nonsmooth_penalty - f_nonsmooth_star) \
-                        / f_nonsmooth_star
+                / f_nonsmooth_star
             effs.append(eff)
 
 #        print lagranges
@@ -1174,7 +1177,7 @@ class TestSimulations(TestCase):
 #        plot.plot(lagranges, errs)
 #        print lagranges[np.argmin(errs)]
         assert_equal(lagranges[np.argmin(errs)], v,
-                               msg="The found minimum is not correct!")
+                     msg="The found minimum is not correct!")
 #        print np.min(errs)
         assert_less(np.min(errs), 5e-2,
                     msg="Error is too large!")
@@ -1182,7 +1185,7 @@ class TestSimulations(TestCase):
 #        plot.plot(lagranges, effs)
 #        print lagranges[np.argmin(effs)]
         assert_equal(lagranges[np.argmin(effs)], v,
-                               msg="The found minimum is not correct!")
+                     msg="The found minimum is not correct!")
 #        print np.min(effs)
         assert_less(np.min(effs), 5e-4,
                     msg="Error is too large!")
@@ -1207,17 +1210,17 @@ class TestSimulations(TestCase):
                                                           penalty_start=1))
                 function.add_penalty(L2Squared(L, penalty_start=1))
                 function.add_prox(L1(l, penalty_start=1))
-                beta_nonsmooth_penalty = \
-                        fista.run(function, beta_nonsmooth_penalty)
+                beta_nonsmooth_penalty = fista.run(function,
+                                                   beta_nonsmooth_penalty)
 
             mse = np.linalg.norm(beta_nonsmooth_penalty - beta_star) \
-                    / np.linalg.norm(beta_star)
+                / np.linalg.norm(beta_star)
             errs.append(mse)
 
             f_nonsmooth_star = function.f(beta_star)
             f_nonsmooth_penalty = function.f(beta_nonsmooth_penalty)
             eff = abs(f_nonsmooth_penalty - f_nonsmooth_star) \
-                        / f_nonsmooth_star
+                / f_nonsmooth_star
             effs.append(eff)
 
 #        print lagranges
@@ -1225,7 +1228,7 @@ class TestSimulations(TestCase):
 #        plot.plot(lagranges, errs)
 #        print lagranges[np.argmin(errs)]
         assert_equal(lagranges[np.argmin(errs)], v,
-                               msg="The found minimum is not correct!")
+                     msg="The found minimum is not correct!")
 #        print np.min(errs)
         assert_less(np.min(errs), 5e-3,
                     msg="Error is too large!")
@@ -1233,7 +1236,7 @@ class TestSimulations(TestCase):
 #        plot.plot(lagranges, effs)
 #        print lagranges[np.argmin(effs)]
         assert_equal(lagranges[np.argmin(effs)], v,
-                               msg="The found minimum is not correct!")
+                     msg="The found minimum is not correct!")
 #        print np.min(effs)
         assert_less(np.min(effs), 5e-06,
                     msg="Error is too large!")
@@ -1259,17 +1262,17 @@ class TestSimulations(TestCase):
                 function.add_penalty(gl.GroupLassoOverlap(l=g, A=A, mu=mu,
                                                           penalty_start=1))
                 function.add_prox(L1(l, penalty_start=1))
-                beta_nonsmooth_penalty = \
-                        fista.run(function, beta_nonsmooth_penalty)
+                beta_nonsmooth_penalty = fista.run(function,
+                                                   beta_nonsmooth_penalty)
 
             mse = np.linalg.norm(beta_nonsmooth_penalty - beta_star) \
-                    / np.linalg.norm(beta_star)
+                / np.linalg.norm(beta_star)
             errs.append(mse)
 
             f_nonsmooth_star = function.f(beta_star)
             f_nonsmooth_penalty = function.f(beta_nonsmooth_penalty)
             eff = abs(f_nonsmooth_penalty - f_nonsmooth_star) \
-                        / f_nonsmooth_star
+                / f_nonsmooth_star
             effs.append(eff)
 
 #        print lagranges
@@ -1277,7 +1280,7 @@ class TestSimulations(TestCase):
 #        plot.plot(lagranges, errs)
 #        print lagranges[np.argmin(errs)]
         assert_equal(lagranges[np.argmin(errs)], v,
-                               msg="The found minimum is not correct!")
+                     msg="The found minimum is not correct!")
 #        print np.min(errs)
         assert_less(np.min(errs), 5e-3,
                     msg="Error is too large!")
@@ -1285,7 +1288,7 @@ class TestSimulations(TestCase):
 #        plot.plot(lagranges, effs)
 #        print lagranges[np.argmin(effs)]
         assert_equal(lagranges[np.argmin(effs)], v,
-                               msg="The found minimum is not correct!")
+                     msg="The found minimum is not correct!")
 #        print np.min(effs)
         assert_less(np.min(effs), 5e-06,
                     msg="Error is too large!")
@@ -1310,17 +1313,17 @@ class TestSimulations(TestCase):
                                                           penalty_start=1))
                 function.add_penalty(L2Squared(k, penalty_start=1))
                 function.add_prox(L1(l, penalty_start=1))
-                beta_nonsmooth_penalty = \
-                        fista.run(function, beta_nonsmooth_penalty)
+                beta_nonsmooth_penalty = fista.run(function,
+                                                   beta_nonsmooth_penalty)
 
             mse = np.linalg.norm(beta_nonsmooth_penalty - beta_star) \
-                    / np.linalg.norm(beta_star)
+                / np.linalg.norm(beta_star)
             errs.append(mse)
 
             f_nonsmooth_star = function.f(beta_star)
             f_nonsmooth_penalty = function.f(beta_nonsmooth_penalty)
             eff = abs(f_nonsmooth_penalty - f_nonsmooth_star) \
-                        / f_nonsmooth_star
+                / f_nonsmooth_star
             effs.append(eff)
 
 #        print lagranges
@@ -1328,7 +1331,7 @@ class TestSimulations(TestCase):
 #        plot.plot(lagranges, errs)
 #        print lagranges[np.argmin(errs)]
         assert_equal(lagranges[np.argmin(errs)], v,
-                               msg="The found minimum is not correct!")
+                     msg="The found minimum is not correct!")
 #        print np.min(errs)
         assert_less(np.min(errs), 0.017904,
                     msg="Error is too large!")
@@ -1336,7 +1339,7 @@ class TestSimulations(TestCase):
 #        plot.plot(lagranges, effs)
 #        print lagranges[np.argmin(effs)]
         assert_equal(lagranges[np.argmin(effs)], v,
-                               msg="The found minimum is not correct!")
+                     msg="The found minimum is not correct!")
 #        print np.min(effs)
         assert_less(np.min(effs), 5e-05,
                     msg="Error is too large!")
@@ -1354,7 +1357,7 @@ class TestSimulations(TestCase):
                                           penalty_start=1)
 
         err = np.linalg.norm(estimator.beta - beta_star) \
-                / np.linalg.norm(beta_star)
+            / np.linalg.norm(beta_star)
 #        print err
         assert_less(err, 0.47, msg="The found minimum is not correct!")
 

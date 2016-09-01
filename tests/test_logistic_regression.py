@@ -13,7 +13,10 @@ from nose.tools import assert_less, assert_equal, assert_almost_equal
 import numpy as np
 
 import parsimony.utils.consts as consts
-from .tests import TestCase
+try:
+    from .tests import TestCase  # When imported as a package.
+except ValueError:
+    from tests import TestCase  # When run as a program.
 
 # TODO: Test penalty_start.
 

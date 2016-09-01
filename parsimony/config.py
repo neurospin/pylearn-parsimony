@@ -17,7 +17,11 @@ Copyright (c) 2013-2015, CEA/DSV/I2BM/Neurospin. All rights reserved.
 import os.path
 import inspect
 import warnings
-import configparser
+try:
+    import configparser  # Python 3
+except ImportError:
+    import ConfigParser as configparser  # Python 2
+
 
 __all__ = ["get_option", "get_boolean", "get_float", "get_int", "set_option",
            "flush"]
@@ -45,13 +49,16 @@ class __Config(object):
                               RuntimeWarning)
         else:
             warnings.warn("Could not locate the config file.", RuntimeWarning)
-    """
-        def __del__(self):
-            # Save updates to configuration file. Cannot call flush here.
-            if not self.__flush_dry_run__:
+
+    def __del__(self):
+        # Save updates to configuration file. Cannot call flush here.
+        if not self.__flush_dry_run__:
+            if os.path.exists(self._ini_file):
                 with open(self._ini_file, "wb") as fid:
                     self._config.write(fid)
-    """
+            else:
+                warnings.warn("Could not locate the config file.",
+                              RuntimeWarning)
 
     def _ini_file_name(self, ini_file):
         """Extracts the directory of this module.

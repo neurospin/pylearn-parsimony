@@ -10,7 +10,10 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 import numpy as np
 
-from .tests import TestCase
+try:
+    from .tests import TestCase  # When imported as a package.
+except ValueError:
+    from tests import TestCase  # When run as a program.
 
 
 class TestTotalVariation(TestCase):
@@ -75,13 +78,13 @@ class TestTotalVariation(TestCase):
             beta_parsimony = fista.run(function, beta_parsimony)
 
         berr = np.linalg.norm(beta_parsimony - beta_star)
-        print("berr:", berr)
+#        print("berr:", berr)
         assert berr < 5e-2
 
         f_parsimony = function.f(beta_parsimony)
         f_star = function.f(beta_star)
         ferr = abs(f_parsimony - f_star)
-        print("ferr:", ferr)
+#        print("ferr:", ferr)
         assert ferr < 5e-4
 
         # Test proximal operator
@@ -96,13 +99,13 @@ class TestTotalVariation(TestCase):
         beta_parsimony = fista.run(function, beta_parsimony)
 
         berr = np.linalg.norm(beta_parsimony - beta_star)
-        print("berr:", berr)
+#        print("berr:", berr)
         assert berr < 5e-0
 
         f_parsimony = function.f(beta_parsimony)
         f_star = function.f(beta_star)
         ferr = abs(f_parsimony - f_star)
-        print("ferr:", ferr)
+#        print("ferr:", ferr)
         assert ferr < 5e-1
 
     def test_smooth(self):

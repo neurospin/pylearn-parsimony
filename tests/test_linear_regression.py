@@ -14,7 +14,10 @@ import numpy as np
 
 import parsimony.algorithms.proximal as proximal
 import parsimony.utils.consts as consts
-from .tests import TestCase
+try:
+    from .tests import TestCase  # When imported as a package.
+except ValueError:
+    from tests import TestCase  # When run as a program.
 
 
 class TestLinearRegression(TestCase):

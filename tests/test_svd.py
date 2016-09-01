@@ -16,9 +16,10 @@ import scipy as sp
 from parsimony.algorithms.nipals import RankOneSVD
 from parsimony.algorithms.nipals import RankOneSparseSVD
 import parsimony.utils as utils
-
-from .tests import TestCase
-
+try:
+    from .tests import TestCase  # When imported as a package.
+except ValueError:
+    from tests import TestCase  # When run as a program.
 
 def generate_sparse_matrix(shape, density=0.10):
     """
