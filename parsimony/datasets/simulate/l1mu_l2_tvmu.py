@@ -9,10 +9,10 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @license: BSD 3-clause.
 """
 import numpy as np
-from grad import grad_l1mu
-from grad import grad_l2_squared
-from grad import grad_tvmu
-from utils import bisection_method
+from .grad import grad_l1mu
+from .grad import grad_l2_squared
+from .grad import grad_tvmu
+from .utils import bisection_method
 
 __all__ = ['load']
 
@@ -78,10 +78,10 @@ def load(l, k, g, beta, M, e, mu, snr=None, shape=None):
 #            print "norm(Xbeta) = ", np.linalg.norm(np.dot(X, beta))
 #            print "norm(e) = ", np.linalg.norm(e)
 
-            print "snr = %.5f = %.5f = |X.b| / |e| = %.5f / %.5f" \
+            print("snr = %.5f = %.5f = |X.b| / |e| = %.5f / %.5f" \
                    % (snr, np.linalg.norm(np.dot(X, x * beta)) \
                                            / np.linalg.norm(e),
-                      np.linalg.norm(np.dot(X, x * beta)), np.linalg.norm(e))
+                      np.linalg.norm(np.dot(X, x * beta)), np.linalg.norm(e)))
 
             return (np.linalg.norm(np.dot(X, x * beta)) / np.linalg.norm(e)) \
                         - snr
@@ -107,7 +107,7 @@ def _generate(l, k, g, beta, M, e, mu, shape):
     alpha = np.divide(alpha, np.dot(M.T, e))
 
     X = np.zeros(M.shape)
-    for i in xrange(p):
+    for i in range(p):
         X[:, i] = M[:, i] * alpha[i, 0]
 
     y = np.dot(X, beta) - e

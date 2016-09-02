@@ -4,17 +4,19 @@ Created on Wed Jul 23 19:15:22 2014
 
 Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
-@author:  Tommy Löfstedt
-@email:   tommy.loefstedt@cea.fr
+@author:  Tommy Löfstedt, Edouard Duchesnay
+@email:   lofstedt.tommy@gmail.com, edouard.duchesnay@cea.fr
 @license: BSD 3-clause.
 """
+from six import with_metaclass
+from six import with_metaclass
 import abc
 import time
 
 import numpy as np
 import scipy.sparse as sparse
 
-import consts
+from . import consts
 
 __all__ = ["MultipartArray", "LinearOperator"]
 
@@ -31,7 +33,7 @@ class MultipartArray(object):
         self.shape[self.common_dim] = self.parts[0].shape[self.common_dim]
         self.multipart_shape = []
 
-        for i in xrange(len(self.parts)):
+        for i in range(len(self.parts)):
             if len(self.parts[i].shape) != 2:
                 raise ValueError("MultipartArray is only defined for 2D " \
                                  "arrays")
@@ -62,7 +64,7 @@ class MultipartArray(object):
 
     def __iop(self, other, op):
         if np.isscalar(other):
-            for i in xrange(len(self.parts)):
+            for i in range(len(self.parts)):
                 if op == self.__ops.add:
                     self.parts[i] += other
                 elif op == self.__ops.sub:
@@ -75,7 +77,7 @@ class MultipartArray(object):
                     raise ValueError("Operator not yet implemented!")
         elif isinstance(other, MultipartArray):
             other_parts = other.get_parts()
-            for i in xrange(len(self.parts)):
+            for i in range(len(self.parts)):
                 if op == self.__ops.add:
                     self.parts[i] += other_parts[i]
                 elif op == self.__ops.sub:
@@ -87,7 +89,7 @@ class MultipartArray(object):
         elif self.shape == other.shape:
             start = 0
             end = 0
-            for i in xrange(len(self.parts)):
+            for i in range(len(self.parts)):
                 if self.vertical:
                     end += self.parts[i].shape[0]
                     if op == self.__ops.add:
@@ -138,7 +140,7 @@ class MultipartArray(object):
     def __op(self, other, op):
         new_parts = [0] * len(self.parts)
         if np.isscalar(other):
-            for i in xrange(len(self.parts)):
+            for i in range(len(self.parts)):
                 if op == self.__ops.add:
                     new_parts[i] = self.parts[i] + other
                 elif op == self.__ops.sub:
@@ -151,7 +153,7 @@ class MultipartArray(object):
                     raise ValueError("Operator not yet implemented!")
         elif isinstance(other, MultipartArray):
             other_parts = other.get_parts()
-            for i in xrange(len(self.parts)):
+            for i in range(len(self.parts)):
                 if op == self.__ops.add:
                     new_parts[i] = self.parts[i] + other_parts[i]
                 elif op == self.__ops.sub:
@@ -163,7 +165,7 @@ class MultipartArray(object):
         elif self.shape == other.shape:
             start = 0
             end = 0
-            for i in xrange(len(self.parts)):
+            for i in range(len(self.parts)):
                 if self.vertical:
                     end += self.parts[i].shape[0]
                     if op == self.__ops.add:
@@ -214,19 +216,19 @@ class MultipartArray(object):
     def dot(self, other):
         if self.vertical:
             v = [0] * len(self.parts)
-            for i in xrange(len(self.parts)):
+            for i in range(len(self.parts)):
                 v[i] = self.parts[i].dot(other)
             v = MultipartArray(v, vertical=True)
         else:
             v = np.zeros((self.shape[0], 1))
             if isinstance(other, MultipartArray):
                 other_parts = other.get_parts()
-                for i in xrange(len(self.parts)):
+                for i in range(len(self.parts)):
                     v += self.parts[i].dot(other_parts[i])
             elif self.shape[1] == other.shape[0]:
                 start = 0
                 end = 0
-                for i in xrange(len(self.parts)):
+                for i in range(len(self.parts)):
                     end += self.parts[i].shape[1]
                     v += self.parts[i].dot(other[start:end, :])
                     start = end
@@ -237,7 +239,7 @@ class MultipartArray(object):
 
     def transpose(self):
         new_parts = [0] * len(self.parts)
-        for i in xrange(len(self.parts)):
+        for i in range(len(self.parts)):
             new_parts[i] = self.parts[i].transpose()
             vertical = not self.vertical
 
@@ -258,7 +260,7 @@ class MultipartArray(object):
 
     def copy(self):
         new_parts = [0] * len(self.parts)
-        for i in xrange(len(self.parts)):
+        for i in range(len(self.parts)):
             new_parts[i] = self.parts[i].copy()
 
         return MultipartArray(new_parts, vertical=self.vertical)
@@ -266,8 +268,8 @@ class MultipartArray(object):
     def __str__(self):
         string = "["
         if self.vertical:
-            for k in xrange(len(self.parts)):
-                for i in xrange(self.parts[k].shape[0]):
+            for k in range(len(self.parts)):
+                for i in range(self.parts[k].shape[0]):
                     if i > 0 or k > 0:
                         string += ' '
                     string += str(self.parts[k][i, :])
@@ -279,8 +281,8 @@ class MultipartArray(object):
                     string += '-' * (len(str(self.parts[k][i, :])) - 3)
                     string += "\n"
         else:
-            for i in xrange(self.parts[0].shape[0]):
-                for k in xrange(len(self.parts)):
+            for i in range(self.parts[0].shape[0]):
+                for k in range(len(self.parts)):
                     if k == 0 and i > 0:
                         string += ' '
                     string += str(self.parts[k][i, :])
@@ -302,9 +304,7 @@ class MultipartArray(object):
         return string
 
 
-class Solver(object):
-    __metaclass__ = abc.ABCMeta
-
+class Solver(with_metaclass(abc.ABCMeta, object)):
     def solve(A, b, eps=consts.TOLERANCE, max_iter=consts.MAX_ITER):
         """Solves a linear system on the form
 
@@ -554,7 +554,7 @@ class TridiagonalSolver(Solver):
         # Back substitution.
         i = n - 1
         x[i] = d_[i]
-        for i in reversed(xrange(n - 1)):
+        for i in reversed(range(n - 1)):
             x[i] = d_[i] - c_[i + 1] * x[i + 1]
 
         return x.reshape((n, 1))
@@ -598,7 +598,7 @@ class LinearOperator(list):
         filename = kwargs["filename"] if "filename" in kwargs else None
         if filename is not None:
             d = np.load(filename)
-            arr_k = [k for k in d.keys() if k.count("csr")]
+            arr_k = [k for k in list(d.keys()) if k.count("csr")]
             argv = [sparse.csr_matrix((d[k][0], d[k][1], d[k][2]),
                                       shape=d[k][3])
                     for k in arr_k]
@@ -615,9 +615,9 @@ class LinearOperator(list):
         arr_dict = {"csr_%i" % i:
                     [self[i].data, self[i].indices,
                      self[i].indptr, self[i].shape]
-                    for i in xrange(len(self))}
+                    for i in range(len(self))}
         # copy attributes
-        for k in self.__dict__.keys():
+        for k in list(self.__dict__.keys()):
             arr_dict[k] = getattr(self, k)
         np.savez_compressed(filename, **arr_dict)
 

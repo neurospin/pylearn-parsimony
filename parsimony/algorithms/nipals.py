@@ -182,7 +182,7 @@ class RankOneSVD(bases.ImplicitAlgorithm,
 
                 K = np.dot(X, X.T)
                 t = v0
-                for it in xrange(self.max_iter):
+                for it in range(self.max_iter):
                     t_ = t
                     t = np.dot(K, t_)
                     t *= 1.0 / maths.norm(t)
@@ -197,7 +197,7 @@ class RankOneSVD(bases.ImplicitAlgorithm,
 
                 K = np.dot(X.T, X)
                 v = v0
-                for it in xrange(self.max_iter):
+                for it in range(self.max_iter):
                     v_ = v
                     v = np.dot(K, v_)
                     v *= 1.0 / maths.norm(v)
@@ -364,7 +364,7 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
 
                 K = X.dot(X.T)
                 t = v0
-                for it in xrange(self.max_iter):
+                for it in range(self.max_iter):
                     t_ = t
                     t = K.dot(t_)
                     t *= 1.0 / maths.norm(t)
@@ -384,7 +384,7 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
 
                 K = X.T.dot(X)
                 v = v0
-                for it in xrange(self.max_iter):
+                for it in range(self.max_iter):
                     v_ = v
                     v = K.dot(v_)
                     v *= 1.0 / maths.norm(v)
@@ -498,7 +498,7 @@ class RankOneSVDProduct(bases.ImplicitAlgorithm,
 
         v = start_vector.get_vector(Y.shape[1])
 
-        for it in xrange(1, self.max_iter + 1):
+        for it in range(1, self.max_iter + 1):
             v_ = v
             v = np.dot(X, np.dot(Y, v_))
             v = np.dot(Y.T, np.dot(X.T, v))

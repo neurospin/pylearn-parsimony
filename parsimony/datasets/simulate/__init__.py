@@ -8,16 +8,16 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   tommy.loefstedt@cea.fr
 @license: BSD 3-clause.
 """
-import beta
-import correlation_matrices
-import grad
-import l1_l2_gl
-import l1_l2_glmu
-import l1_l2_tv
-import l1_l2_tvmu
-import l1mu_l2_tvmu
-import regression
-import utils
+from . import beta
+from . import correlation_matrices
+from . import grad
+from . import l1_l2_gl
+from . import l1_l2_glmu
+from . import l1_l2_tv
+from . import l1_l2_tvmu
+from . import l1mu_l2_tvmu
+from . import regression
+from . import utils
 
 from .simulate import LinearRegressionData
 

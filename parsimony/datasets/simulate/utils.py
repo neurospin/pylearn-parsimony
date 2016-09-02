@@ -105,7 +105,7 @@ def bisection_method(f, low=0.0, high=1.0, maxiter=30, eps=TOLERANCE):
     """
     # Find start values. If the low and high
     # values are feasible this will just break
-    for i in xrange(maxiter * 2):
+    for i in range(maxiter * 2):
         l = f(low)
         h = f(high)
 
@@ -118,7 +118,7 @@ def bisection_method(f, low=0.0, high=1.0, maxiter=30, eps=TOLERANCE):
             high *= 2.0
 
     # Use the bisection method to find where |f(x)|_2 < eps.
-    for i in xrange(maxiter):
+    for i in range(maxiter):
         mid = (low + high) / 2.0
         val = f(mid)
         if val < 0:

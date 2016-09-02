@@ -56,8 +56,8 @@ def cylinder(width, nangles):
 
     # build triangles
     tri = list()
-    for i in xrange(nangles):
-        for j in xrange(width):
+    for i in range(nangles):
+        for j in range(width):
             if (j+1 < width):  # tri bellow (clockwise)
                 tri.append([map_2dgrid_to_ptdx[i, j],
                             map_2dgrid_to_ptdx[i, j+1],

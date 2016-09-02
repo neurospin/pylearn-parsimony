@@ -13,7 +13,10 @@ from nose.tools import assert_less, assert_equal, assert_almost_equal
 import numpy as np
 
 import parsimony.utils.consts as consts
-from tests import TestCase
+try:
+    from .tests import TestCase  # When imported as a package.
+except ValueError:
+    from tests import TestCase  # When run as a program.
 
 # TODO: Test penalty_start.
 
@@ -732,7 +735,7 @@ class TestLogisticRegression(TestCase):
 
         # Note that p must be even!
         n, p = 50, 100
-        groups = [range(0, p / 2), range(p / 2, p)]
+        groups = [list(range(0, int(p / 2))), list(range(int(p / 2), p))]
 #        weights = [1.5, 0.5]
 
         A = gl.linear_operator_from_groups(p, groups=groups)  # , weights=weights)
@@ -766,7 +769,7 @@ class TestLogisticRegression(TestCase):
 
             params = {"loss": "logistic",
                       "regul": "group-lasso-l2",
-                      "groups": np.array([1] * (p / 2) + [2] * (p / 2),
+                      "groups": np.array([1] * int(p / 2) + [2] * int(p / 2),
                                          dtype=np.int32),
                       "lambda1": g,
                       "max_it": max_iter,
@@ -1146,7 +1149,7 @@ class TestLogisticRegression(TestCase):
 
         # Note that p must be even!
         n, p = 50, 100
-        groups = [range(0, p / 2), range(p / 2, p)]
+        groups = [list(range(0, int(p / 2))), list(range(int(p / 2), p))]
 #        weights = [1.5, 0.5]
 
         A = gl.linear_operator_from_groups(p, groups=groups)  # , weights=weights)
@@ -1181,7 +1184,7 @@ class TestLogisticRegression(TestCase):
 
             params = {"loss": "logistic",
                       "regul": "sparse-group-lasso-l2",
-                      "groups": np.array([1] * (p / 2) + [2] * (p / 2),
+                      "groups": np.array([1] * int(p / 2) + [2] * int(p / 2),
                                          dtype=np.int32),
                       "lambda1": g,
                       "lambda2": l,
@@ -1289,7 +1292,7 @@ class TestLogisticRegression(TestCase):
 #
 #        # Note that p must be even!
 #        n, p = 50, 100 + 1
-#        groups = [range(0, p / 2), range(p / 2, p - 1)]
+#        groups = [range(0, int(p / 2)), range(int(p / 2), p - 1)]
 #
 #        A = gl.linear_operator_from_groups(p - 1, groups=groups)
 #
@@ -1329,7 +1332,7 @@ class TestLogisticRegression(TestCase):
 #        try:
 #            import spams
 #
-#            gr = np.array([1] * (p / 2) + [2] * ((p / 2) + 1), dtype=np.int32)
+#            gr = np.array([1] * int(p / 2) + [2] * (int(p / 2) + 1), dtype=np.int32)
 #            params = {"loss": "logistic",
 #                      "regul": "sparse-group-lasso-l2",
 #                      "groups": gr,

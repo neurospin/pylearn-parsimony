@@ -152,7 +152,7 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
         it = 0
         while True:
 
-            for i in xrange(len(w)):
+            for i in range(len(w)):
 #                print "it: %d, i: %d" % (it, i)
 
 #                if True:
@@ -163,7 +163,7 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
 
                 # Run FISTA.
                 w_old = w[i]
-                for k in xrange(1, max(self.min_iter + 1,
+                for k in range(1, max(self.min_iter + 1,
                                        self.max_iter - self.num_iter + 1)):
 
                     if self.info_requested(Info.time):
@@ -209,7 +209,7 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
 
             # Test global stopping criterion.
             all_converged = True
-            for i in xrange(len(w)):
+            for i in range(len(w)):
 
                 # Wrap a function around the ith block.
                 func = mb_losses.MultiblockFunctionWrapper(function, w, i)
@@ -345,11 +345,11 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
 
         num_iter = [0] * len(w)
 
-        for it in xrange(1, self.outer_iter + 1):
+        for it in range(1, self.outer_iter + 1):
 
             all_converged = True
 
-            for i in xrange(len(w)):
+            for i in range(len(w)):
 #                print "it: %d, i: %d" % (it, i)
 
                 if function.has_nesterov_function(i):
@@ -386,7 +386,7 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
 
 #            print "f:", fval[-1]
 
-            for i in xrange(len(w)):
+            for i in range(len(w)):
 
                 # Take one ISTA step for use in the stopping criterion.
                 step = function.step(w, i)

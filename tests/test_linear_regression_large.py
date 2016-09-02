@@ -8,11 +8,13 @@ Copyright (c) 2013-2015, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   edouard.duchesnay@cea.fr
 @license: BSD 3-clause.
 """
+import time
 import os.path
 import argparse
-import numpy as np
 import collections
-import time
+
+import numpy as np
+
 import parsimony.functions.nesterov.tv as nesterov_tv
 import parsimony.estimators as estimators
 import parsimony.algorithms as algorithms
@@ -22,8 +24,9 @@ from parsimony.utils.stats import r2_score
 
 if not config.get_boolean("tests", "allow_downloads", False):
     raise Exception("Download of weight map is not authorized and it is "
-        "required to complete this test.\n"
-        "Please set allow_downloads = True in the file: config.ini")
+                    "required to complete this test.\n"
+                    "Please set allow_downloads = True in the file: "
+                    "config.ini")
 
 try:
     import sklearn.linear_model
@@ -41,6 +44,7 @@ np.random.seed(42)
 ## Utils
 ###############################################################################
 
+
 def fit_model(model_key):
     global MODELS
     mod = MODELS[model_key]
@@ -54,9 +58,10 @@ def fit_model(model_key):
         start_time = time.time()
         mod.fit(Xtr_, ytr.ravel())
         time_ellapsed = time.time() - start_time
-        print model_key, "(%.3f seconds)" % time_ellapsed
+        print(model_key, "(%.3f seconds)" % time_ellapsed)
         score = r2_score(yte, mod.predict(Xte_))
-        mod.__title__ = "%s\nScore:%.2f, T:%.1f" %(model_key, score, time_ellapsed)
+        mod.__title__ = "%s\nScore:%.2f, T:%.1f" % (model_key, score,
+                                                    time_ellapsed)
         mod.__info__ = dict(score=score, time_ellapsed=time_ellapsed)
     except:
         ret = False
@@ -80,16 +85,27 @@ def weights_filename(shape, n_samples):
 ## Datasets
 ###############################################################################
 import parsimony.datasets as datasets
-X3d, y, beta3d = datasets.regression.dice5.load(
-            n_samples=n_samples, shape=shape,
-            sigma_spatial_smoothing=1, r2=.8, random_seed=1)
+
+X3d, y, beta3d = datasets.regression.dice5.load(n_samples=n_samples,
+                                                shape=shape,
+                                                sigma_spatial_smoothing=1,
+                                                r2=.8,
+                                                random_seed=1)
 
 
 ## TODO: REMOVE THIS DOWNLOAD when Git Large File Storage is released
-import urllib
-ftp_url = "ftp://ftp.cea.fr/pub/dsv/anatomist/parsimony/%s" %\
-    os.path.basename(weights_filename(shape, n_samples))
-urllib.urlretrieve(ftp_url, weights_filename(shape, n_samples))
+if not os.path.exists(weights_filename(shape, n_samples)):
+    ftp_url = "ftp://ftp.cea.fr/pub/dsv/anatomist/parsimony/%s" %\
+        os.path.basename(weights_filename(shape, n_samples))
+    try:  # Python 3
+        import urllib.request
+        import urllib.parse
+        import urllib.error
+        urllib.request.urlretrieve(ftp_url, weights_filename(shape, n_samples))
+    except ImportError:
+        # Python 2
+        import urllib
+        urllib.urlretrieve(ftp_url, weights_filename(shape, n_samples))
 ## TO BE REMOVED END
 
 # Load true weights
@@ -164,10 +180,11 @@ MODELS["l1l2__fista"] = \
     estimators.ElasticNet(alpha=alpha, l=.5)
 
 
-MODELS["l1l2_inter__sklearn"] = \
-    sklearn.linear_model.ElasticNet(alpha=alpha,
-                                    l1_ratio=.5,
-                                    fit_intercept=True)
+if has_sklearn:
+    MODELS["l1l2_inter__sklearn"] = \
+        sklearn.linear_model.ElasticNet(alpha=alpha,
+                                        l1_ratio=.5,
+                                        fit_intercept=True)
 
 MODELS["l1l2_inter__fista"] = \
     estimators.ElasticNet(alpha=alpha, l=.5,
@@ -219,13 +236,17 @@ MODELS["l1l2tv_inter__inexactfista"] = \
         algorithm_params=dict(eps=5e-16, max_iter=100000))
 """
 
+
 ###############################################################################
 ## tests
 ###############################################################################
+
+
 def test_fit_all():
     global MODELS
     for model_key in MODELS:
         yield fit_model, model_key
+
 
 def test_weights_calculated_vs_precomputed():
     global MODELS
@@ -233,11 +254,14 @@ def test_weights_calculated_vs_precomputed():
         if hasattr(MODELS[model_key], "beta"):
             yield assert_weights_calculated_vs_precomputed, model_key
 
+
 def assert_weights_calculated_vs_precomputed(model_key):
-    utils.testing.assert_close_vectors(
-        MODELS[model_key].beta ,
-        WEIGHTS_TRUTH[model_key],
-        "%s: calculated weights differ from precomputed" % model_key)
+    utils.testing.assert_close_vectors(MODELS[model_key].beta,
+                                       WEIGHTS_TRUTH[model_key],
+                                       "%s: calculated weights differ from "
+                                       "precomputed" % model_key,
+                                       corr_tol=5e-3, n2_tol=0.06)
+
 
 def test_weights_vs_sklearn():
     if "l2__sklearn" in MODELS:
@@ -255,14 +279,17 @@ def test_weights_vs_sklearn():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-t', '--test', action='store_true', default=False,
+    parser.add_argument('-t', '--test', action='store_true', default=True,
                         help="Run tests")
     parser.add_argument('-p', '--plot', action='store_true', default=False,
                         help="Fit models and plot weight maps")
-    parser.add_argument('-s', '--save_weights', action='store_true', default=False,
-                        help="Fit models, plot weight maps and save it into npz file")
-    parser.add_argument('-m', '--models', help="test only models listed as args."
-                        "Possible models:" + ",".join(MODELS.keys()))
+    parser.add_argument('-s', '--save_weights', action='store_true',
+                        default=False,
+                        help="Fit models, plot weight maps and save it into "
+                             "npz file")
+    parser.add_argument('-m', '--models', help="test only models listed as "
+                                               "args."
+                        "Possible models:" + ",".join(list(MODELS.keys())))
     options = parser.parse_args()
 
     if options.test:
@@ -280,10 +307,12 @@ if __name__ == "__main__":
         fit_all(MODELS)
         utils.plot.plot_map2d_of_models(MODELS, nrow=3, ncol=6, shape=shape,
                                         title_attr="__title__")
-        if raw_input("Save weights ? [n]/y") == "y":
-            utils.testing.save_weights(MODELS, weights_filename(shape, n_samples))
-            print "Weights saved in", weights_filename(shape, n_samples)
+        if str(raw_input("Save weights ? [n]/y")) == "y":
+            utils.testing.save_weights(MODELS, weights_filename(shape,
+                                                                n_samples))
+            print("Weights saved in", weights_filename(shape, n_samples))
 
     if options.plot:
         fit_all(MODELS)
-        utils.plot.plot_map2d_of_models(MODELS, nrow=3, ncol=6, shape=shape, title_attr="__title__")
+        utils.plot.plot_map2d_of_models(MODELS, nrow=3, ncol=6, shape=shape,
+                                        title_attr="__title__")

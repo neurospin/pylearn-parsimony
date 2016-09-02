@@ -263,7 +263,7 @@ class Bisection(bases.ExplicitAlgorithm,
 
         # Find start values. If the low and high
         # values are feasible this will just break
-        for i in xrange(self.max_iter):
+        for i in range(self.max_iter):
             f_low = function.f(low)
             f_high = function.f(high)
 #            print "low :", low, ", f:", f_low

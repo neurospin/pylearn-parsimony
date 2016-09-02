@@ -10,7 +10,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 import os.path
 import numpy as np
-import utils
+from . import utils
 import tempfile
 
 
@@ -44,7 +44,7 @@ def orth_matrix(n=10):
     Y = utils.rand(n, 1)
     X = utils.zeros(n, n)
     if n > 2:
-        for j in xrange(n - 1):
+        for j in range(n - 1):
             x = utils.rand(n, 1)
             while abs(abs(utils.corr(x, Y)) - j / (n - 1.0)) > 0.005:
                 x = utils.rand(n, 1)
@@ -75,6 +75,7 @@ def save_weights(models_dict, filename):
         weights_dict[k] = w
     np.savez_compressed(filename, **weights_dict)
 
+
 # Tests utils
 def assert_close_vectors(a, b, msg="",
                          slope_tol=1e-2, corr_tol=1e-3, n2_tol=.05):
@@ -93,5 +94,3 @@ def assert_close_vectors(a, b, msg="",
     diff_n2_ratio = diff_n2 / min(np.sqrt(np.dot(a, a)), np.sqrt(np.dot(b, b)))
     assert (diff_n2_ratio < n2_tol), \
         "%s: |a-b|/min(|a|,|b|)=%f > n2 tolerance" % (msg, diff_n2_ratio)
-
-

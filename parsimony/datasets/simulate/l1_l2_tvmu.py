@@ -10,10 +10,10 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 import numpy as np
 
-from grad import grad_l1
-from grad import grad_l2_squared
-from grad import grad_tvmu
-from utils import bisection_method
+from .grad import grad_l1
+from .grad import grad_l2_squared
+from .grad import grad_tvmu
+from .utils import bisection_method
 
 __all__ = ['load']
 
@@ -116,10 +116,10 @@ def _generate(l, k, g, beta, M, e, A, mu, intercept):
 
     X = np.ones(M.shape)
     if intercept:
-        for i in xrange(p - 1):
+        for i in range(p - 1):
             X[:, i + 1] = M[:, i + 1] * alpha[i, 0]
     else:
-        for i in xrange(p):
+        for i in range(p):
             X[:, i] = M[:, i] * alpha[i, 0]
 
     y = np.dot(X, beta) - e
