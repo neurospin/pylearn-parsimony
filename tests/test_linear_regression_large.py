@@ -260,7 +260,7 @@ def assert_weights_calculated_vs_precomputed(model_key):
                                        WEIGHTS_TRUTH[model_key],
                                        "%s: calculated weights differ from "
                                        "precomputed" % model_key,
-                                       corr_tol=5e-3)
+                                       corr_tol=5e-3, n2_tol=0.06)
 
 
 def test_weights_vs_sklearn():
