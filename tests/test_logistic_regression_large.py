@@ -8,11 +8,12 @@ Copyright (c) 2013-2015, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   edouard.duchesnay@cea.fr
 @license: BSD 3-clause.
 """
-import os.path
-import argparse
-import collections
 import time
 import hashlib
+import os.path
+import argparse
+import warnings
+import collections
 
 import numpy as np
 
@@ -26,11 +27,13 @@ import parsimony.config as config
 import parsimony.functions.nesterov.l1tv as l1tv
 import parsimony.utils.start_vectors as start_vectors
 
+has_data = True
 if not config.get_boolean("tests", "allow_downloads", False):
-    raise Exception("Download of weight map is not authorized and it is "
-                    "required to complete this test.\n"
-                    "Please set allow_downloads = True in the file: "
-                    "config.ini")
+    warnings.warn("Download of weight map is not authorized and it is "
+                  "required to complete this test.\n"
+                  "Set allow_downloads = True in the file: "
+                  "config.ini, if you want to run this test!")
+    has_data = False
 
 try:
     import sklearn.linear_model
@@ -102,6 +105,7 @@ def weights_filename(shape, n_samples):
             tuple(list(shape) + [n_samples])))
     return filename
 
+
 ###############################################################################
 ## Dataset
 ###############################################################################
@@ -115,23 +119,26 @@ if hashlib.sha1(np.round(X3d, 8)).hexdigest() != hash_30x30x1:
     raise Exception("Generated dataset differs from the original one")
 
 # TODO: REMOVE THIS DOWNLOAD when Git Large File Storage is released
-if not os.path.exists(weights_filename(shape, n_samples)):
-    ftp_url = "ftp://ftp.cea.fr/pub/dsv/anatomist/parsimony/%s" %\
-        os.path.basename(weights_filename(shape, n_samples))
-    try:  # Python 3
-        import urllib.request
-        import urllib.parse
-        import urllib.error
-        urllib.request.urlretrieve(ftp_url, weights_filename(shape, n_samples))
-    except ImportError:
-        # Python 2
-        import urllib
-        urllib.urlretrieve(ftp_url, weights_filename(shape, n_samples))
+if has_data:
+    if not os.path.exists(weights_filename(shape, n_samples)):
+        ftp_url = "ftp://ftp.cea.fr/pub/dsv/anatomist/parsimony/%s" %\
+            os.path.basename(weights_filename(shape, n_samples))
+        try:  # Python 3
+            import urllib.request
+            import urllib.parse
+            import urllib.error
+            urllib.request.urlretrieve(ftp_url, weights_filename(shape,
+                                                                 n_samples))
+        except ImportError:
+            # Python 2
+            import urllib
+            urllib.urlretrieve(ftp_url, weights_filename(shape, n_samples))
 # TO BE REMOVED END
 
 
 # Load true weights
-WEIGHTS_TRUTH = np.load(weights_filename(shape, n_samples))
+if has_data:
+    WEIGHTS_TRUTH = np.load(weights_filename(shape, n_samples))
 
 
 # Ensure that train dataset is balanced
@@ -370,11 +377,12 @@ def test_weights_calculated_vs_precomputed():
 
 
 def assert_weights_calculated_vs_precomputed(model_key):
-    utils.testing.assert_close_vectors(
-        MODELS[model_key].beta,
-        WEIGHTS_TRUTH[model_key],
-        "%s: calculated weights differ from precomputed" % model_key,
-        slope_tol=2e-2, corr_tol=1e-2)
+    if has_data:
+        utils.testing.assert_close_vectors(
+            MODELS[model_key].beta,
+            WEIGHTS_TRUTH[model_key],
+            "%s: calculated weights differ from precomputed" % model_key,
+            slope_tol=2e-2, corr_tol=1e-2)
 
 
 def test_weights_vs_sklearn():
@@ -438,20 +446,21 @@ if __name__ == "__main__":
 #                                    title_attr="__title__")
         utils.plots.plot_map2d_of_models(MODELS, nrow=5, ncol=6, shape=shape,
                                          title_attr="__title__")
-        if str(raw_input("Save weights ? [n]/y")) == "y":
-            utils.testing.save_weights(MODELS,
-                                       weights_filename(shape, n_samples))
-            import string
-            print("Weights saved in", weights_filename(shape, n_samples))
-            dataset_filename = string.replace(
-                weights_filename(shape, n_samples), "weights", "dataset")
-            np.savez_compressed(file=dataset_filename,
-                                X3d=X3d, y=y, beta3d=beta3d, proba=proba)
-            print("Dataset saved in", dataset_filename)
-            # reload an check
-            WEIGHTS_TRUTH = np.load(weights_filename(shape, n_samples))
-            for test_func, model_key in test_weights_calculated_vs_precomputed():
-                test_func(model_key)
+        if has_data:
+            if str(raw_input("Save weights ? [n]/y")) == "y":
+                utils.testing.save_weights(MODELS,
+                                           weights_filename(shape, n_samples))
+                import string
+                print("Weights saved in", weights_filename(shape, n_samples))
+                dataset_filename = string.replace(
+                    weights_filename(shape, n_samples), "weights", "dataset")
+                np.savez_compressed(file=dataset_filename,
+                                    X3d=X3d, y=y, beta3d=beta3d, proba=proba)
+                print("Dataset saved in", dataset_filename)
+                # reload an check
+                WEIGHTS_TRUTH = np.load(weights_filename(shape, n_samples))
+                for test_func, model_key in test_weights_calculated_vs_precomputed():
+                    test_func(model_key)
 
     if options.plot:
         fit_all(MODELS)

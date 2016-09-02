@@ -2509,14 +2509,14 @@ class SupportVectorMachine(SVMEstimator):
     >>> y = np.vstack([1 * np.ones((n / 2, 1)),
     ...                3 * np.ones((n / 2, 1))]) - 2
     >>>
-    >>> K = utils.LinearKernel(X=X, use_cache=True)
+    >>> K = utils.LinearKernel(X=X)
     >>> svm = estimators.SupportVectorMachine(1.0,
     ...     algorithm=alg.SequentialMinimalOptimization(1.0, kernel=K,
     ...                                                 max_iter=100))
     >>> res = svm.fit(X, y)
-    >>> error = svm.score(X, y)
-    >>> print "error = ", error
-    error =  0.933333333333
+    >>> score = svm.score(X, y)
+    >>> print "score = ", score
+    score =  0.933333333333
     """
     def __init__(self, C, kernel=None,
                  algorithm=None, algorithm_params=dict(),

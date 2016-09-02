@@ -11,6 +11,7 @@ Copyright (c) 2013-2015, CEA/DSV/I2BM/Neurospin. All rights reserved.
 import time
 import os.path
 import argparse
+import warnings
 import collections
 
 import numpy as np
@@ -22,11 +23,13 @@ import parsimony.utils as utils
 import parsimony.config as config
 from parsimony.utils.stats import r2_score
 
+has_data = True
 if not config.get_boolean("tests", "allow_downloads", False):
-    raise Exception("Download of weight map is not authorized and it is "
-                    "required to complete this test.\n"
-                    "Please set allow_downloads = True in the file: "
-                    "config.ini")
+    warnings.warn("Download of weight map is not authorized and it is "
+                  "required to complete this test.\n"
+                  "Set allow_downloads = True in the file: "
+                  "config.ini, if you want to run this test!")
+    has_data = False
 
 try:
     import sklearn.linear_model
@@ -40,11 +43,10 @@ n_train = 300
 
 np.random.seed(42)
 
+
 ###############################################################################
 ## Utils
 ###############################################################################
-
-
 def fit_model(model_key):
     global MODELS
     mod = MODELS[model_key]
@@ -81,6 +83,7 @@ def weights_filename(shape, n_samples):
                 tuple(list(shape) + [n_samples])))
     return filename
 
+
 ###############################################################################
 ## Datasets
 ###############################################################################
@@ -92,24 +95,26 @@ X3d, y, beta3d = datasets.regression.dice5.load(n_samples=n_samples,
                                                 r2=.8,
                                                 random_seed=1)
 
-
 ## TODO: REMOVE THIS DOWNLOAD when Git Large File Storage is released
-if not os.path.exists(weights_filename(shape, n_samples)):
-    ftp_url = "ftp://ftp.cea.fr/pub/dsv/anatomist/parsimony/%s" %\
-        os.path.basename(weights_filename(shape, n_samples))
-    try:  # Python 3
-        import urllib.request
-        import urllib.parse
-        import urllib.error
-        urllib.request.urlretrieve(ftp_url, weights_filename(shape, n_samples))
-    except ImportError:
-        # Python 2
-        import urllib
-        urllib.urlretrieve(ftp_url, weights_filename(shape, n_samples))
+if has_data:
+    if not os.path.exists(weights_filename(shape, n_samples)):
+        ftp_url = "ftp://ftp.cea.fr/pub/dsv/anatomist/parsimony/%s" %\
+            os.path.basename(weights_filename(shape, n_samples))
+        try:  # Python 3
+            import urllib.request
+            import urllib.parse
+            import urllib.error
+            urllib.request.urlretrieve(ftp_url, weights_filename(shape,
+                                                                 n_samples))
+        except ImportError:
+            # Python 2
+            import urllib
+            urllib.urlretrieve(ftp_url, weights_filename(shape, n_samples))
 ## TO BE REMOVED END
 
 # Load true weights
-WEIGHTS_TRUTH = np.load(weights_filename(shape, n_samples))
+if has_data:
+    WEIGHTS_TRUTH = np.load(weights_filename(shape, n_samples))
 
 
 X = X3d.reshape((n_samples, np.prod(beta3d.shape)))
@@ -240,8 +245,6 @@ MODELS["l1l2tv_inter__inexactfista"] = \
 ###############################################################################
 ## tests
 ###############################################################################
-
-
 def test_fit_all():
     global MODELS
     for model_key in MODELS:
@@ -256,11 +259,12 @@ def test_weights_calculated_vs_precomputed():
 
 
 def assert_weights_calculated_vs_precomputed(model_key):
-    utils.testing.assert_close_vectors(MODELS[model_key].beta,
-                                       WEIGHTS_TRUTH[model_key],
-                                       "%s: calculated weights differ from "
-                                       "precomputed" % model_key,
-                                       corr_tol=5e-3, n2_tol=0.06)
+    if has_data:
+        utils.testing.assert_close_vectors(MODELS[model_key].beta,
+                                           WEIGHTS_TRUTH[model_key],
+                                           "%s: calculated weights differ "
+                                           "from precomputed" % model_key,
+                                           corr_tol=5e-3, n2_tol=0.06)
 
 
 def test_weights_vs_sklearn():
@@ -307,10 +311,11 @@ if __name__ == "__main__":
         fit_all(MODELS)
         utils.plot.plot_map2d_of_models(MODELS, nrow=3, ncol=6, shape=shape,
                                         title_attr="__title__")
-        if str(raw_input("Save weights ? [n]/y")) == "y":
-            utils.testing.save_weights(MODELS, weights_filename(shape,
-                                                                n_samples))
-            print("Weights saved in", weights_filename(shape, n_samples))
+        if has_data:
+            if str(raw_input("Save weights ? [n]/y")) == "y":
+                utils.testing.save_weights(MODELS, weights_filename(shape,
+                                                                    n_samples))
+                print("Weights saved in", weights_filename(shape, n_samples))
 
     if options.plot:
         fit_all(MODELS)
