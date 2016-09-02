@@ -8,10 +8,10 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   tommy.loefstedt@cea.fr, edouard.duchesnay@cea.fr
 @license: BSD 3-clause.
 """
-import Russett
-import simulate
-import regression
-import classification
+from . import Russett
+from . import simulate
+from . import regression
+from . import classification
 
 __all__ = ['Russett', 'simulate',
            'regression', 'classification']

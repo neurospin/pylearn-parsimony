@@ -79,6 +79,6 @@ def check_labels(y):
         return y
     # Ensure labels are 0, 1
     y_recoded = np.zeros(y.shape, dtype=np.float64)
-    for i in xrange(len(classes)):
+    for i in range(len(classes)):
         y_recoded[y == classes[i]] = classes_recoded[i]
     return y_recoded

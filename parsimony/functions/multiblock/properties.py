@@ -9,10 +9,11 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 Created on Mon Feb  3 09:55:51 2014
 
-@author:  Tommy Löfstedt
-@email:   lofstedt.tommy@gmail.com
+@author:  Tommy Löfstedt, Edouard Duchesnay
+@email:   lofstedt.tommy@gmail.com, edouard.duchesnay@cea.fr
 @license: BSD 3-clause.
 """
+from six import with_metaclass
 import abc
 
 import numpy as np
@@ -26,13 +27,12 @@ __all__ = ["MultiblockFunction", "MultiblockGradient",
            "MultiblockContinuation", "MultiblockStepSize"]
 
 
-class MultiblockFunction(properties.CompositeFunction):
+class MultiblockFunction(with_metaclass(abc.ABCMeta, properties.CompositeFunction)):
     """ This is a function that is the combination (i.e. sum) of other
     multiblock, composite or atomic functions. The difference from
     CompositeFunction is that this function assumes that relevant functions
     accept an index, i, that is the block we are working with.
     """
-    __metaclass__ = abc.ABCMeta
 
     constraints = dict()
 
@@ -55,9 +55,7 @@ class MultiblockFunction(properties.CompositeFunction):
             return []
 
 
-class MultiblockGradient(object):
-
-    __metaclass__ = abc.ABCMeta
+class MultiblockGradient(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
     def grad(self, x, index):
@@ -94,7 +92,7 @@ class MultiblockGradient(object):
 #            start = self.penalty_start
 #        else:
         start = 0
-        for i in xrange(start, p):
+        for i in range(start, p):
             x_[i, 0] -= eps
             loss1 = self.f(x)
             x_[i, 0] += 2.0 * eps
@@ -105,9 +103,7 @@ class MultiblockGradient(object):
         return grad
 
 
-class MultiblockLipschitzContinuousGradient(object):
-
-    __metaclass__ = abc.ABCMeta
+class MultiblockLipschitzContinuousGradient(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
     def L(self, w, index):
@@ -125,9 +121,7 @@ class MultiblockLipschitzContinuousGradient(object):
                                   'specialised!')
 
 
-class MultiblockProximalOperator(object):
-
-    __metaclass__ = abc.ABCMeta
+class MultiblockProximalOperator(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
     def prox(self, w, index, factor=1.0, eps=consts.TOLERANCE, max_iter=100):
@@ -147,9 +141,7 @@ class MultiblockProximalOperator(object):
                                   'specialised!')
 
 
-class MultiblockProjectionOperator(object):
-
-    __metaclass__ = abc.ABCMeta
+class MultiblockProjectionOperator(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
     def proj(self, w, index, eps=consts.TOLERANCE, max_iter=100):
@@ -166,9 +158,7 @@ class MultiblockProjectionOperator(object):
                                   'specialised!')
 
 
-class MultiblockContinuation(object):
-
-    __metaclass__ = abc.ABCMeta
+class MultiblockContinuation(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
     def mu_opt(self, eps, index):
@@ -222,9 +212,7 @@ class MultiblockContinuation(object):
                                   'specialised!')
 
 
-class MultiblockStepSize(object):
-
-    __metaclass__ = abc.ABCMeta
+class MultiblockStepSize(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
     def step(self, w, index):

@@ -9,7 +9,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @license: BSD 3-clause.
 """
 import numpy as np
-import utils
+from . import utils
 
 __all__ = ['random']
 
@@ -48,7 +48,7 @@ def random(shape, density=1.0, rng=utils.RandomUniform(0, 1).rand,
 
     if sort:
         beta = np.reshape(beta, shape)
-        for i in xrange(len(shape)):
+        for i in range(len(shape)):
             beta = np.sort(beta, axis=i)
 
     beta = np.reshape(beta, (p, 1))

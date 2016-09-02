@@ -8,11 +8,11 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
-import properties
-import gl
-import tv
-import grouptv
-import l1
-import l1tv
+from . import properties
+from . import gl
+from . import tv
+from . import grouptv
+from . import l1
+from . import l1tv
 
 __all__ = ["properties", "gl", "tv", "grouptv", "l1", "l1tv"]

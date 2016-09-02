@@ -1559,7 +1559,7 @@ class LinearRegressionL2SmoothedL1TV(properties.CompositeFunction,
         a[3] = (1.0 / L) * A[3].dot(beta_)
 
         u_new = [0] * len(alpha)
-        for i in xrange(len(alpha)):
+        for i in range(len(alpha)):
             u_new[i] = alpha[i] + a[i]
 
         return self.h.project(u_new)

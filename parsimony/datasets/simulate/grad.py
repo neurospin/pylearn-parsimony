@@ -5,24 +5,23 @@ Created on Thu Sep 26 12:06:07 2013
 Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt, Edouard Duchesnay
-@email:   tommy.loefstedt@cea.fr, edouard.duchesnay@cea.fr
+@email:   lofstedt.tommy@gmail.com, edouard.duchesnay@cea.fr
 @license: BSD 3-clause.
 """
+from six import with_metaclass
 import abc
 
 import numpy as np
 
-from utils import TOLERANCE
-from utils import RandomUniform
-from utils import norm2
+from .utils import TOLERANCE
+from .utils import RandomUniform
+from .utils import norm2
 
 __all__ = ["grad_l1", "grad_l1mu", "grad_l2", "grad_l2", "grad_l2_squared",
            "grad_tv", "grad_tvmu", "grad_grouptvmu"]
 
 
-class Function(object):
-
-    __metaclass__ = abc.ABCMeta
+class Function(with_metaclass(abc.ABCMeta, object)):
 
     def __init__(self, l, **kwargs):
 
@@ -181,9 +180,7 @@ def grad_l2_squared(beta, rng=None):
     return beta
 
 
-class NesterovFunction(Function):
-
-    __metaclass__ = abc.ABCMeta
+class NesterovFunction(with_metaclass(abc.ABCMeta, Function)):
 
     def __init__(self, l, A, mu=TOLERANCE, rng=RandomUniform(-1, 1),
                  norm=L2.grad, **kwargs):
@@ -196,7 +193,7 @@ class NesterovFunction(Function):
     def grad(self, x):
 
         grad_Ab = 0
-        for i in xrange(len(self.A)):
+        for i in range(len(self.A)):
             Ai = self.A[i]
             Ab = Ai.dot(x)
             grad_Ab += Ai.T.dot(self.norm(Ab, self.rng))
@@ -208,7 +205,7 @@ class NesterovFunction(Function):
         alpha = self.alpha(x)
 
         Aa = self.A[0].T.dot(alpha[0])
-        for i in xrange(1, len(self.A)):
+        for i in range(1, len(self.A)):
             Aa += self.A[i].T.dot(alpha[i])
 
         return self.l * Aa
@@ -217,7 +214,7 @@ class NesterovFunction(Function):
         """ Dual variable of the Nesterov function.
         """
         alpha = [0] * len(self.A)
-        for i in xrange(len(self.A)):
+        for i in range(len(self.A)):
             alpha[i] = self.A[i].dot(x) * (1.0 / self.mu)
 
         # Apply projection
@@ -227,7 +224,7 @@ class NesterovFunction(Function):
 
     def project(self, alpha):
 
-        for i in xrange(len(alpha)):
+        for i in range(len(alpha)):
             astar = alpha[i]
             normas = np.sqrt(np.sum(astar ** 2.0))
             if normas > 1.0:
@@ -269,7 +266,7 @@ class TotalVariation(Function):
             grad_Ab_norm2[lower] = (vec_rnd.T * (a / norm_vec)).T
 
         grad = np.vstack([self.A[i].T.dot(grad_Ab_norm2[:, i]) \
-                          for i in xrange(len(self.A))])
+                          for i in range(len(self.A))])
         grad = grad.sum(axis=0)
 
         return self.l * grad.reshape(x.shape)
@@ -294,7 +291,7 @@ def grad_tv(beta, A, rng=RandomUniform(0, 1)):
         a = rng(n_lower)
         grad_Ab_norm2[lower] = (vec_rnd.T * (a / norm_vec)).T
 
-    grad = np.vstack([A[i].T.dot(grad_Ab_norm2[:, i]) for i in xrange(len(A))])
+    grad = np.vstack([A[i].T.dot(grad_Ab_norm2[:, i]) for i in range(len(A))])
     grad = grad.sum(axis=0)
 
     return grad.reshape(beta.shape)
@@ -394,7 +391,7 @@ class SmoothedGroupTotalVariation(NesterovFunction):
         """ Projection onto the compact space of the smoothed Group TV
         function.
         """
-        for g in xrange(0, len(a), 3):
+        for g in range(0, len(a), 3):
 
             ax = a[g + 0]
             ay = a[g + 1]
@@ -424,7 +421,7 @@ def grad_grouptvmu(beta, A, mu):
 def _Nesterov_GroupTV_project(a):
     """ Projection onto the compact space of the smoothed Group TV function.
     """
-    for g in xrange(0, len(a), 3):
+    for g in range(0, len(a), 3):
 
         ax = a[g + 0]
         ay = a[g + 1]
@@ -447,7 +444,7 @@ def _Nesterov_GroupTV_project(a):
 def _Nesterov_grad(beta, A, rng=RandomUniform(-1, 1), grad_norm=grad_l2):
 
     grad_Ab = 0
-    for i in xrange(len(A)):
+    for i in range(len(A)):
         Ai = A[i]
         Ab = Ai.dot(beta)
         grad_Ab += Ai.T.dot(grad_norm(Ab, rng))
@@ -458,7 +455,7 @@ def _Nesterov_grad(beta, A, rng=RandomUniform(-1, 1), grad_norm=grad_l2):
 def _Nesterov_grad_smoothed(A, alpha):
 
     Aa = A[0].T.dot(alpha[0])
-    for i in xrange(1, len(A)):
+    for i in range(1, len(A)):
         Aa += A[i].T.dot(alpha[i])
 
     return Aa
@@ -468,7 +465,7 @@ def _Nestetov_alpha(beta, A, mu, proj):
     """ Dual variable of the Nesterov function.
     """
     alpha = [0] * len(A)
-    for i in xrange(len(A)):
+    for i in range(len(A)):
         alpha[i] = A[i].dot(beta) * (1.0 / mu)
 
     # Apply projection.
@@ -479,7 +476,7 @@ def _Nestetov_alpha(beta, A, mu, proj):
 
 def _Nesterov_project(alpha):
 
-    for i in xrange(len(alpha)):
+    for i in range(len(alpha)):
         astar = alpha[i]
         normas = np.sqrt(np.sum(astar ** 2.0))
         if normas > 1.0:

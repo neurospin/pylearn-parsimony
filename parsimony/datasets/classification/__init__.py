@@ -9,6 +9,6 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @license: BSD 3-clause.
 """
 
-import dice5
+from . import dice5
 
 __all__ = ['dice5']

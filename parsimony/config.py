@@ -17,7 +17,11 @@ Copyright (c) 2013-2015, CEA/DSV/I2BM/Neurospin. All rights reserved.
 import os.path
 import inspect
 import warnings
-import ConfigParser
+try:
+    import configparser  # Python 3
+except ImportError:
+    import ConfigParser as configparser  # Python 2
+
 
 __all__ = ["get_option", "get_boolean", "get_float", "get_int", "set_option",
            "flush"]
@@ -34,13 +38,13 @@ class __Config(object):
     def __init__(self, ini_file):
 
         self._ini_file = self._ini_file_name(str(ini_file))
-        self._config = ConfigParser.ConfigParser()
+        self._config = configparser.ConfigParser()
 
         if os.path.exists(self._ini_file):
             try:
                 self._config.read(self._ini_file)
 
-            except ConfigParser.ParsingError:
+            except configparser.ParsingError:
                 warnings.warn("Could not parse the config file.",
                               RuntimeWarning)
         else:
@@ -49,8 +53,12 @@ class __Config(object):
     def __del__(self):
         # Save updates to configuration file. Cannot call flush here.
         if not self.__flush_dry_run__:
-            with open(self._ini_file, "wb") as fid:
-                self._config.write(fid)
+            if os.path.exists(self._ini_file):
+                with open(self._ini_file, "wb") as fid:
+                    self._config.write(fid)
+            else:
+                warnings.warn("Could not locate the config file.",
+                              RuntimeWarning)
 
     def _ini_file_name(self, ini_file):
         """Extracts the directory of this module.

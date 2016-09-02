@@ -169,7 +169,7 @@ class LassoCoordinateDescent(bases.ImplicitAlgorithm,
         if self.mean:
             xTx *= 1.0 / float(n)
 
-        for i in xrange(1, self.max_iter + 1):
+        for i in range(1, self.max_iter + 1):
 
             if self.info_requested(Info.time):
                 tm = utils.time_cpu()
@@ -179,7 +179,7 @@ class LassoCoordinateDescent(bases.ImplicitAlgorithm,
             y_Xbeta = y - np.dot(X, beta)
 
             betaold = beta.copy()
-            for j in xrange(p):
+            for j in range(p):
 
                 xj = X[:, [j]]
                 betaj = beta[j, 0]
@@ -355,7 +355,7 @@ class ShootingAlgorithm(bases.ImplicitAlgorithm,
         if self.mean:
             xTx *= 1.0 / float(n)
 
-        for i in xrange(1, self.max_iter + 1):
+        for i in range(1, self.max_iter + 1):
 
             if self.info_requested(Info.time):
                 tm = utils.time_cpu()
@@ -365,7 +365,7 @@ class ShootingAlgorithm(bases.ImplicitAlgorithm,
             Xbeta_y = np.dot(X, beta) - y
 
             betaold = beta.copy()
-            for j in xrange(p):
+            for j in range(p):
 
                 xj = X[:, [j]]
                 betaj = beta[j]

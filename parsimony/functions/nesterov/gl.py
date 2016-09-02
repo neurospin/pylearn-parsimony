@@ -183,7 +183,7 @@ class GroupLassoOverlap(properties.NesterovFunction,
         alpha : List of numpy arrays (x-by-1). The not-yet-projected dual
                 variable alpha.
         """
-        for i in xrange(len(a)):
+        for i in range(len(a)):
             astar = a[i]
             normas = np.sqrt(np.sum(astar ** 2.0))
             if normas > 1.0:
@@ -219,7 +219,7 @@ class GroupLassoOverlap(properties.NesterovFunction,
 
         SS = 0.0
         A = self.A()
-        for i in xrange(len(A)):
+        for i in range(len(A)):
             SS = max(SS, maths.norm(A[i].dot(beta_)))
 
         return SS
@@ -257,11 +257,11 @@ def linear_operator_from_groups(num_variables, groups, weights=None,
         weights = [1.0] * len(groups)
 
     A = list()
-    for g in xrange(len(groups)):
+    for g in range(len(groups)):
         Gi = groups[g]
         lenGi = len(Gi)
         Ag = sparse.lil_matrix((lenGi, num_variables - penalty_start))
-        for i in xrange(lenGi):
+        for i in range(lenGi):
             w = weights[g]
             Ag[i, Gi[i] - penalty_start] = w
 

@@ -70,7 +70,7 @@ class SpamsGenerator:
 #            print "weight_l1 =", repr(weight_l1)
         except ImportError:
             # TODO: Don't use print directly.
-            print "Cannot import spams. Default values will be used."
+            print("Cannot import spams. Default values will be used.")
             X = np.asarray([
            [ 0.26856766,  0.30620391,  0.26995615,  0.3806023 ,  0.41311465,
             -0.24685479,  0.34108499, -0.22786788, -0.2267594 ,  0.30325884,
@@ -172,4 +172,4 @@ class SpamsGenerator:
 
 if __name__ == "__main__":
     spams_generator = SpamsGenerator()
-    print spams_generator.get_x_y_estimated_beta()
+    print(spams_generator.get_x_y_estimated_beta())
