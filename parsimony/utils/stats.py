@@ -14,6 +14,8 @@ import numpy as np
 from . import consts
 from . import deprecated
 
+from parsimony.utils import check_arrays
+
 __all__ = ["multivariate_normal", "sensitivity", "precision", "specificity",
            "npv", "F_score", "fleiss_kappa", "r2_score",
            "compute_ranks", "nemenyi_test"]
@@ -748,6 +750,58 @@ def nemenyi_test(X, p_value=0.05, return_ranks=False, return_critval=False):
             return sign, CD
         else:
             return sign
+
+
+def wilcoxon_test(x, Y, zero_method="zsplit", correction=False):
+    """Performs the Wilcoxon signed rank test for comparing one classifier
+    to several other classifiers.
+
+    It tests the null hypothesis that two related paired samples comes from the
+    same distribution. It is a non-parametric version of the paired t-test.
+
+    Parameters
+    ----------
+    x : numpy array of shape (n, 1)
+        The measurements for a single classifier.
+
+    Y : numpy array of shape (n, k)
+        The measurements for k other classifiers.
+
+    zero_method : string, {"pratt", "wilcox", "zsplit"}, optional
+        How to treat zero-differences in the ranking. Default is "zsplit",
+        splitting the zero-ranks between the positive and negative ranks.
+        See scipy.stats.wilcoxon for more details.
+
+    correction : bool, optional
+        Whether or not to apply continuity correction by adjusting the rank
+        statistic by 0.5 towards the mean. Default is False.
+
+    Returns
+    -------
+    statistics : list of float
+        The sum of the ranks of the differences, for each of the k classifiers.
+
+    p_values : list of float
+        The two-sided p-values for the tests.
+    """
+    x, Y = check_arrays(x, Y)
+
+    if zero_method not in ["pratt", "wilcox", "zsplit"]:
+        raise ValueError('zero_method must be in ["pratt", "wilcox", '
+                         '"zsplit"].')
+
+    correction = bool(correction)
+
+    [n, k] = Y.shape
+
+    statistics = [0] * k
+    p_values = [0] * k
+    for i in range(k):
+        statistics[i], p_values[i] = stat.wilcoxon(x, Y[:, i],
+                                                   zero_method=zero_method,
+                                                   correction=correction)
+
+    return statistics, p_values
 
 
 if __name__ == "__main__":

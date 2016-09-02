@@ -10,6 +10,7 @@ import numpy as np
 
 __all__ = ['cylinder']
 
+
 def cylinder(width, nangles):
     """
     Return a mesh of a cylinder that match the topology of a 2D grid.
