@@ -45,51 +45,81 @@ __all__ = ["CombinedFunction",
 
 class CombinedFunction(properties.CompositeFunction,
                        properties.Gradient,
+                       properties.SubGradient,
                        properties.ProximalOperator,
                        properties.ProjectionOperator,
                        properties.StepSize):
-    """Combines one or more loss functions, any number of penalties and zero
-    or one proximal operator.
+    """Combines one or more loss functions, any number of penalties, any number
+    of smoothed functions, any number of penalties with known proximal
+    operators and any number of constraints.
 
     This function thus represents
 
-        f(x) = f_1(x) [ + f_2(x) ... ] [ + p_1(x) ... ] [ + P(x)],
+        f(x) = f_1(x) [ + f_2(x) ... ] [ + d_1(x) ... ] [ + N_1(x) ...]
+            [ + p_1(x) ...],
 
     subject to [ C_1(x) <= c_1,
                  C_2(x) <= c_2,
                  ... ],
 
-    where f_i are differentiable Functions, p_j are differentiable penalties
-    and P is a ProximalOperator. All functions and penalties must thus be
-    Gradient, unless it is a ProximalOperator.
+    where f_i are differentiable or subdifferentiable loss Functions, d_j are
+    differentiable or subdifferentiable penalties, N_k are
+    smoothed NesterovFunctions and p_l are ProximalOperators. The C_m are
+    ProjectionOperators and function as constraints. All functions and
+    penalties must thus be Gradient or SubGradient, unless they are
+    ProximalOperators or ProjectionOperators.
 
-    If no ProximalOperator is given, then prox is the identity.
+    Parameters
+    ----------
+    functions : list of Function
+        A list of the loss function(s), whose sum is to be minimised.
+
+    penalties : list of Penalty
+        A list of the penalties.
+
+    smoothed : list
+        A list of the smoothed (Nesterov) penalties.
+
+    prox : list of ProximalOperator
+        A list of penalties that can be expressed as proximal operators.
+
+    constraints : list of ProjectionOperator
+        A list of the constraints of the function.
     """
-    def __init__(self, functions=[], penalties=[], prox=[], constraints=[]):
+    def __init__(self, functions=[], penalties=[], smoothed=[], prox=[],
+                 constraints=[]):
 
         self._f = list(functions)
-        self._p = list(penalties)
-        self._prox = list(prox)
+        self._d = list(penalties)
+        self._N = list(smoothed)
+        self._p = list(prox)
         self._c = list(constraints)
+
+        self.reset()
 
     def reset(self):
 
         for f in self._f:
             f.reset()
 
+        for d in self._d:
+            d.reset()
+
+        for N in self._N:
+            N.reset()
+
         for p in self._p:
             p.reset()
-
-        for prox in self._prox:
-            prox.reset()
 
         for c in self._c:
             c.reset()
 
     def add_loss(self, function):
 
-        if not isinstance(function, properties.Gradient):
-            raise ValueError("Loss functions must have gradients.")
+        if not isinstance(function, properties.Gradient) \
+                and not isinstance(function, properties.SubGradient):
+            raise ValueError("Loss functions must have gradients or "
+                             "subgradients.")
 
         self._f.append(function)
 
@@ -102,19 +132,41 @@ class CombinedFunction(properties.CompositeFunction,
 
         if not isinstance(penalty, properties.Penalty):
             raise ValueError("Not a penalty.")
-        elif isinstance(penalty, properties.Gradient):
-            self._p.append(penalty)
+        elif isinstance(penalty, properties.Gradient) \
+                or isinstance(penalty, properties.SubGradient):
+            self._d.append(penalty)
         elif isinstance(penalty, properties.ProximalOperator):
-            if len(self._c) > 0:
-                # TODO: Yes we can! Fix this!
-                raise ValueError("Cannot have both ProximalOperator and "
-                                 "ProjectionOperator.")
-            else:
-                # TODO: We currently only allow one proximal operator. Fix!
-                self._prox[0] = penalty
+            self._p.append(penalty)
+        elif isinstance(penalty, properties.NesterovFunction):
+            self._d.append(penalty)
         else:
-            raise ValueError("The penalty is not smooth, nor has it a "
-                             "proximal operator.")
+            raise ValueError("The penalty is not smooth, nor smoothed, and it "
+                             "does not have a proximal operator.")
+
+    def add_smoothed(self, penalty):
+
+        if isinstance(penalty, properties.NesterovFunction):
+            self._d.append(penalty)
+        else:
+            raise ValueError("Not a smoothed function.")
+
+    @deprecated("add_smoothed")
+    def add_nesterov(self, penalty):
+
+        return self.add_smoothed(penalty)
+
+    def add_prox(self, penalty):
+
+        if isinstance(penalty, properties.ProximalOperator):
+            self._p.append(penalty)
+
+#            if isinstance(penalty, properties.ProjectionOperator):
+#                # Use the projection operator as the proximal of the indicator
+#                # function:
+#                penalty.prox = penalty.proj
+#                self._p.append(penalty)
+        else:
+            raise ValueError("Not a proximal operator.")
 
     def add_constraint(self, constraint):
 
@@ -122,66 +174,34 @@ class CombinedFunction(properties.CompositeFunction,
             raise ValueError("Not a constraint.")
         elif not isinstance(constraint, properties.ProjectionOperator):
             raise ValueError("Constraints must have projection operators.")
-        elif not isinstance(self._prox[0], ZeroFunction):
-            # TODO: Yes we can! Fix this!
-            raise ValueError("Cannot have both ProjectionOperator and "
-                             "ProximalOperator.")
         else:
             self._c.append(constraint)
 
+    @deprecated("add_penalty")
     def add_smooth_penalty(self, penalty):
 
-        if not isinstance(penalty, properties.Penalty):
-            raise ValueError("Not a penalty.")
-        elif not isinstance(penalty, properties.Gradient):
-            raise ValueError("The penalty does not have a gradient.")
-        else:
-            self._p.append(penalty)
-
-    def add_prox(self, penalty):
-
-        if not isinstance(penalty, properties.ProximalOperator):
-            if isinstance(penalty, properties.ProjectionOperator):
-                # Use the projection operator as the proximal of the indicator
-                # function:
-                penalty.prox = penalty.proj
-                # TODO: We currently only allow one proximal operator. Fix this!
-                if len(self._prox) == 0:
-                    self._prox.append(penalty)
-                else:
-                    self._prox[0] = penalty
-            else:
-                raise ValueError("Not a proximal operator.")
-        elif len(self._c) > 0:
-            # TODO: Yes we can! Fix this!
-            raise ValueError("Cannot have both ProximalOperator and "
-                             "ProjectionOperator.")
-        else:
-            # TODO: We currently only allow one proximal operator. Fix this!
-            if len(self._prox) == 0:
-                self._prox.append(penalty)
-            else:
-                self._prox[0] = penalty
-
-    def add_nesterov(self, penalty):
-
-        if not isinstance(penalty, properties.NesterovFunction):
-            raise ValueError("Not a Nesterov function.")
-        else:
-            self._p.append(penalty)
+        self.add_penalty(penalty)
 
     def f(self, x):
         """Function value.
+
+        Parameters
+        ----------
+        x : numpy array (p-by-1)
+            The parameter vector at which to evaluate the function.
         """
         val = 0.0
         for f in self._f:
             val += f.f(x)
 
+        for d in self._d:
+            val += d.f(x)
+
+        for N in self._N:
+            val += N.f(x)
+
         for p in self._p:
             val += p.f(x)
-
-        for prox in self._prox:
-            val += prox.f(x)
 
         return val
 
@@ -189,34 +209,186 @@ class CombinedFunction(properties.CompositeFunction,
         """Gradient of the differentiable part of the function.
 
         From the interface "Gradient".
+
+        Parameters
+        ----------
+        x : numpy array (p-by-1)
+            The parameter vector at which to compute the proximal operator.
         """
         grad = 0.0
 
-        # Add gradients from the loss functions.
+        # Add gradients from the loss functions:
         for f in self._f:
             grad += f.grad(x)
 
-        # Add gradients from the penalties.
-        for p in self._p:
-            grad += p.grad(x)
+        # Add gradients from the penalties:
+        for d in self._d:
+            grad += d.grad(x)
+
+        # Add gradients from the smoothed functions:
+        for N in self._N:
+            grad += N.grad(x)
 
         return grad
 
+    def subgrad(self, x, clever=True, random_state=None,
+                force_subgradient=False, **kwargs):
+        """Subgradient of the function.
+
+        If some functions are smooth and have gradients, they will be used
+        instead of the subgradient. Turn this behaviour off by setting
+        force_subgradient=True.
+
+        From the interface "SubGradient".
+
+        Parameters
+        ----------
+        x : numpy array (p-by-1)
+            The point at which to evaluate the subgradient.
+
+        clever : bool
+            Whether or not to try to be "clever" when computing the
+            subgradient. If True, be "clever" in the sence that values of the
+            subgradient are chosen that are assumed to improve the estimations;
+            if False, use random uniform values. Default is True.
+
+        random_state : numpy.random.RandomState, optional
+            An instance of numpy.random.RandomState that can be used to draw
+            random samples. Default is None, do not use a particular random
+            state.
+
+        force_subgradient : bool
+            If some functions or penalties are smooth, and thus have gradients,
+            those gradients will be used instead of the subgradients. If you
+            want to force the use of subgradients, set force_subgradient to
+            True. Note that this will only apply to function that implement the
+            SubGradient interface. Default is False, use gradients when
+            possible.
+        """
+        subgrad = 0.0
+
+        # Add gradients or subgradients from the loss functions:
+        for f in self._f:
+            if force_subgradient:
+                if isinstance(f, properties.SubGradient):
+                    subgrad += f.subgrad(x)
+                else:
+                    subgrad += f.grad(x)
+
+            else:
+                if isinstance(f, properties.Gradient):
+                    subgrad += f.grad(x)
+                else:
+                    subgrad += f.subgrad(x)
+
+        # Add gradients or subgradients from the smooth penalties:
+        for d in self._d:
+            if force_subgradient:
+                if isinstance(d, properties.SubGradient):
+                    subgrad += d.subgrad(x)
+                else:
+                    subgrad += d.grad(x)
+
+            else:
+                if isinstance(d, properties.Gradient):
+                    subgrad += d.grad(x)
+                else:
+                    subgrad += d.subgrad(x)
+
+        # Add gradients from the smoothed penalties:
+        for N in self._N:
+            if force_subgradient:
+                if isinstance(N, properties.SubGradient):
+                    subgrad += N.subgrad(x)
+                else:
+                    subgrad += N.grad(x)
+
+            else:
+                if isinstance(N, properties.Gradient):
+                    subgrad += N.grad(x)
+                else:
+                    subgrad += N.subgrad(x)
+
     def prox(self, x, factor=1.0, **kwargs):
-        """The proximal operator of the non-differentiable part of the
+        """The proximal operators of the non-differentiable part of the
         function.
 
         From the interface "ProximalOperator".
-        """
-        if len(self._prox) == 0:
-            # We have no penalties with proximal operators. Do nothing!
-            return x
-        else:
-            # TODO: We currently only allow one proximal operator. Fix this!
-            return self._prox[0].prox(x, factor=factor, **kwargs)
 
-    def proj(self, x):
-        raise NotImplementedError("Not yet implemented.")
+        Parameters
+        ----------
+        x : numpy array (p-by-1)
+            The parameter vector at which to compute the proximal operator.
+
+        factor : float
+            A factor by which the penalties should be multiplied.
+        """
+        prox = self._p
+        proj = self._c
+
+        # We have no penalties with proximal operators:
+        if len(prox) == 0 and len(proj) == 0:
+            prox_x = x  # Do nothing!
+
+        # There is one proximal operator and no constraints:
+        elif len(prox) == 1 and len(proj) == 0:
+            prox_x = prox[0].prox(x, factor=factor, **kwargs)
+
+        # There are two proximal operators, and no constraints:
+        elif len(prox) == 2 and len(proj) == 0:
+            from parsimony.algorithms.proximal import DykstrasProximalAlgorithm
+            prox_combo = DykstrasProximalAlgorithm(**kwargs)
+
+            prox_x = prox_combo.run(prox, x, factor=factor)
+
+        # There are no proximal operators, but one or two constraints:
+        elif len(prox) == 0 and (len(proj) == 1 or len(proj) == 2):
+            prox_x = self.proj(x, **kwargs)
+
+        # There are at least one proximal operator and at least one constraint:
+        else:
+            from parsimony.algorithms.proximal \
+                import ParallelDykstrasProximalAlgorithm
+            combo = ParallelDykstrasProximalAlgorithm(**kwargs)
+
+            prox_x = combo.run(x, prox=prox, proj=proj, factor=factor)
+
+        return prox_x
+
+    def proj(self, x, **kwargs):
+        """The projection operator of a constraints of the function.
+
+        From the interface "ProjectionOperator".
+
+        Parameters
+        ----------
+        x : numpy array (p-by-1)
+            The parameter vector to project.
+        """
+        prox = self._p
+        proj = self._c
+
+        # We have no penalties with projection operators:
+        if len(prox) == 0 and len(proj) == 0:
+            proj_x = x  # Do nothing!
+
+        # There is one projection operator and no proximal operators:
+        elif len(proj) == 1 and len(prox) == 0:
+            proj_x = proj[0].proj(x, **kwargs)
+
+        elif len(proj) == 2 and len(prox) == 0:
+            from parsimony.algorithms.proximal \
+                import DykstrasProjectionAlgorithm
+            proj_combo = DykstrasProjectionAlgorithm(**kwargs)
+
+            proj_x = proj_combo.run(proj, x)
+
+        # There are no constraints, but one or two proximal operators, or any
+        # number of constraints and any number of proximal oeprators:
+        else:
+            proj_x = self.prox(x, **kwargs)
+
+        return proj_x
 
     def step(self, x):
         """The step size to use in descent methods.
@@ -225,7 +397,8 @@ class CombinedFunction(properties.CompositeFunction,
 
         Parameters
         ----------
-        x : Numpy array. The point at which to evaluate the step size.
+        x : numpy array (p-by-1)
+            The point at which to evaluate the step size.
         """
         all_lipschitz = True
         for f in self._f:
@@ -233,8 +406,13 @@ class CombinedFunction(properties.CompositeFunction,
                 all_lipschitz = False
                 break
 
-        for p in self._p:
-            if not isinstance(p, properties.LipschitzContinuousGradient):
+        for d in self._d:
+            if not isinstance(d, properties.LipschitzContinuousGradient):
+                all_lipschitz = False
+                break
+
+        for N in self._N:
+            if not isinstance(N, properties.LipschitzContinuousGradient):
                 all_lipschitz = False
                 break
 
@@ -243,8 +421,10 @@ class CombinedFunction(properties.CompositeFunction,
             L = 0.0
             for f in self._f:
                 L += f.L()
-            for p in self._p:
-                L += p.L()
+            for d in self._d:
+                L += d.L()
+            for N in self._N:
+                L += N.L()
 
         if all_lipschitz and L > consts.TOLERANCE:
             step = 1.0 / L

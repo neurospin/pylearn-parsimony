@@ -50,23 +50,26 @@ class ZeroFunction(properties.AtomicFunction,
         """
         Parameters
         ----------
-        l : Non-negative float. The Lagrange multiplier, or regularisation
-                constant, of the function.
+        l : float
+            A non-negative float. The Lagrange multiplier, or regularisation
+            constant, of the function.
 
-        c : Float. The limit of the constraint. The function is feasible if
-                ||\beta||_1 <= c. The default value is c=0, i.e. the default is
-                a regularisation formulation.
+        c : float
+            The limit of the constraint. The function is feasible if
+            ||\beta||_1 <= c. The default value is c=0, i.e. the default is a
+            regularisation formulation.
 
-        penalty_start : Non-negative integer. The number of columns, variables
-                etc., to be exempt from penalisation. Equivalently, the first
-                index to be penalised. Default is 0, all columns are included.
+        penalty_start : int
+            A non-negative integer. The number of columns, variables etc., to
+            be exempt from penalisation. Equivalently, the first index to be
+            penalised. Default is 0, all columns are included.
         """
         self.l = float(l)
         self.c = float(c)
         if self.c < 0.0:
-            raise ValueError("A negative constraint parameter does not make " \
+            raise ValueError("A negative constraint parameter does not make "
                              "sense, since the function is always zero.")
-        self.penalty_start = int(penalty_start)
+        self.penalty_start = max(0, int(penalty_start))
 
         self.reset()
 

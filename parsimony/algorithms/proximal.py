@@ -1115,23 +1115,23 @@ class DykstrasProximalAlgorithm(bases.ExplicitAlgorithm):
     INTERFACES = [properties.Function,
                   properties.ProximalOperator]
 
-    def __init__(self, eps=consts.TOLERANCE,
-                 max_iter=1000, min_iter=1):
-                 # TODO: Investigate what is a good default value here!
+    def __init__(self, eps=consts.TOLERANCE, max_iter=1000, min_iter=1):
+                 # TODO: Investigate what good default value are here!
 
         self.eps = eps
         self.max_iter = max_iter
         self.min_iter = min_iter
 
-    def run(self, function, x):
+    def run(self, function, x, factor=1.0):
         """Finds the proximal operator of the sum of two proximal operators.
 
         Parameters
         ----------
-        function : List or tuple with two Functions. The two functions.
+        function : list or tuple with two Functions
+            The two functions.
 
-        x : Numpy array. The point that we wish to compute the proximal
-                operator of.
+        x : numpy array (p-by-1)
+            The point at which we want to compute the proximal operator.
         """
         self.check_compatibility(function[0], self.INTERFACES)
         self.check_compatibility(function[1], self.INTERFACES)
@@ -1145,9 +1145,9 @@ class DykstrasProximalAlgorithm(bases.ExplicitAlgorithm):
             p_old = p_new
             q_old = q_new
 
-            y_old = function[0].prox(x_old + p_old)
+            y_old = function[0].prox(x_old + p_old, factor=factor)
             p_new = x_old + p_old - y_old
-            x_new = function[1].prox(y_old + q_old)
+            x_new = function[1].prox(y_old + q_old, factor=factor)
             q_new = y_old + q_old - x_new
 
             if maths.norm(x_new - x_old) / maths.norm(x_old) < self.eps \
@@ -1167,9 +1167,8 @@ class DykstrasProjectionAlgorithm(bases.ExplicitAlgorithm):
     INTERFACES = [properties.Function,
                   properties.ProjectionOperator]
 
-    def __init__(self, eps=consts.TOLERANCE,
-                 max_iter=1000, min_iter=1):
-                 # TODO: Investigate what is a good default value here!
+    def __init__(self, eps=consts.TOLERANCE, max_iter=1000, min_iter=1):
+                 # TODO: Investigate what good default values are here!
 
         self.eps = eps
         self.max_iter = max_iter
@@ -1180,9 +1179,11 @@ class DykstrasProjectionAlgorithm(bases.ExplicitAlgorithm):
 
         Parameters
         ----------
-        function : List or tuple with two Functions. The two functions.
+        function : list or tuple with two Functions
+            The two functions.
 
-        x : Numpy array. The point that we wish to project.
+        x : numpy array (p-by-1)
+            The point that we wish to project.
         """
         self.check_compatibility(function[0], self.INTERFACES)
         self.check_compatibility(function[1], self.INTERFACES)

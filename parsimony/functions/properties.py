@@ -411,8 +411,9 @@ class SubGradient(with_metaclass(abc.ABCMeta, object)):
 
         clever : bool
             Whether or not to try to be "clever" when computing the
-            subgradient. If True, be "clever"; if False, use random uniform
-            values. Default is True.
+            subgradient. If True, be "clever" in the sence that values of the
+            subgradient are chosen that are assumed to improve the estimations;
+            if False, use random uniform values. Default is True.
 
         random_state : numpy.random.RandomState, optional
             An instance of numpy.random.RandomState that can be used to draw
