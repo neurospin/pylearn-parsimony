@@ -81,11 +81,11 @@ class KMeans(bases.ImplicitAlgorithm):
 
         best_wcss = np.infty
         best_mus = None
-        for repeat in xrange(self.repeat):
+        for repeat in range(self.repeat):
 
             mus = self._init_mus(X, K)
 
-            for it in xrange(self.max_iter):
+            for it in range(self.max_iter):
                 closest = self._closest_centers(X, mus, K)
                 old_mus = mus
                 mus = self._new_centers(X, closest, K)
@@ -113,7 +113,7 @@ class KMeans(bases.ImplicitAlgorithm):
             xmin = np.min(X, axis=0)
             diff = xmax - xmin
             mus = np.zeros((K, X.shape[1]))
-            for i in xrange(K):
+            for i in range(K):
                 mu = np.multiply(diff, np.random.rand(X.shape[1])) + xmin
                 mus[i, :] = mu
         else:
@@ -143,7 +143,7 @@ class KMeans(bases.ImplicitAlgorithm):
         mus = np.zeros((K, X.shape[1]))
         closest = np.array(closest)
         global_mean = None
-        for i in xrange(K):
+        for i in range(K):
             idx = closest == i
             X_ = X[idx, :]
             if X_.shape[0] == 0:  # No point was closest to this centre!
@@ -161,7 +161,7 @@ class KMeans(bases.ImplicitAlgorithm):
         """
         closest = np.array(closest)
         wcss = 0.0
-        for i in xrange(K):
+        for i in range(K):
             idx = closest == i
             wcss += np.sum((X[idx, :] - mus[i, :]) ** 2.0)
 

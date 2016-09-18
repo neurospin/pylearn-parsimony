@@ -50,23 +50,26 @@ class ZeroFunction(properties.AtomicFunction,
         """
         Parameters
         ----------
-        l : Non-negative float. The Lagrange multiplier, or regularisation
-                constant, of the function.
+        l : float
+            A non-negative float. The Lagrange multiplier, or regularisation
+            constant, of the function.
 
-        c : Float. The limit of the constraint. The function is feasible if
-                ||\beta||_1 <= c. The default value is c=0, i.e. the default is
-                a regularisation formulation.
+        c : float
+            The limit of the constraint. The function is feasible if
+            ||\beta||_1 <= c. The default value is c=0, i.e. the default is a
+            regularisation formulation.
 
-        penalty_start : Non-negative integer. The number of columns, variables
-                etc., to be exempt from penalisation. Equivalently, the first
-                index to be penalised. Default is 0, all columns are included.
+        penalty_start : int
+            A non-negative integer. The number of columns, variables etc., to
+            be exempt from penalisation. Equivalently, the first index to be
+            penalised. Default is 0, all columns are included.
         """
         self.l = float(l)
         self.c = float(c)
         if self.c < 0.0:
-            raise ValueError("A negative constraint parameter does not make " \
+            raise ValueError("A negative constraint parameter does not make "
                              "sense, since the function is always zero.")
-        self.penalty_start = int(penalty_start)
+        self.penalty_start = max(0, int(penalty_start))
 
         self.reset()
 
@@ -1869,7 +1872,7 @@ class LinearVariableConstraint(properties.IndicatorFunction,
         r = xr[1]
 
         Ax = [0.0] * len(self.A)
-        for i in xrange(len(self.A)):
+        for i in range(len(self.A)):
             Ax[i] = self.A[i].dot(x_)
         Ax = np.vstack(Ax)
 
@@ -1908,7 +1911,7 @@ class LinearVariableConstraint(properties.IndicatorFunction,
 
         # Check feasibility
         Ax = [0.0] * len(A)
-        for i in xrange(len(A)):
+        for i in range(len(A)):
             Ax[i] = A[i].dot(x_)
         Ax = np.vstack(Ax)
         if maths.norm(Ax - r) < consts.TOLERANCE:
@@ -1925,7 +1928,7 @@ class LinearVariableConstraint(properties.IndicatorFunction,
             if len(A) >= 4:
                 AtA = AtA + A[3].T.dot(A[3])
             if len(A) > 4:
-                for i in xrange(4, len(A)):
+                for i in range(4, len(A)):
                     AtA = AtA + A[i].T.dot(A[i])
 
             AtA_I = AtA + sparse.eye(*AtA.shape, format=AtA.format)
@@ -1937,7 +1940,7 @@ class LinearVariableConstraint(properties.IndicatorFunction,
         Atr = 0.0
         start = 0
         end = 0
-        for i in xrange(len(A)):
+        for i in range(len(A)):
             end += A[i].shape[0]
             Atr += A[i].T.dot(r[start:end])
             start = end
@@ -1948,7 +1951,7 @@ class LinearVariableConstraint(properties.IndicatorFunction,
             z = np.dot(self._inv_AtA_I, Atr + x_)
 
         Az = [0.0] * len(A)
-        for i in xrange(len(A)):
+        for i in range(len(A)):
             Az[i] = A[i].dot(z)
         s = np.vstack(Az)
 

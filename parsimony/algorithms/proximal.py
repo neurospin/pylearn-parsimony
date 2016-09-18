@@ -140,7 +140,7 @@ class ISTA(bases.ExplicitAlgorithm,
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
 
-        for i in xrange(1, self.max_iter + 1):
+        for i in range(1, self.max_iter + 1):
 
             if self.info_requested(Info.time):
                 tm = utils.time_cpu()
@@ -149,9 +149,9 @@ class ISTA(bases.ExplicitAlgorithm,
 
             betaold = betanew
             betanew = function.prox(betaold - step * function.grad(betaold),
-                          step,
-                          eps=1.0 / (float(i) ** (2.0 + consts.FLOAT_EPSILON)),
-                          max_iter=self.max_iter)
+                                    step,
+                                    eps=1.0 / (float(i) ** (2.0 + consts.FLOAT_EPSILON)),
+                                    max_iter=self.max_iter)
 
             if self.info_requested(Info.time):
                 t.append(utils.time_cpu() - tm)
@@ -268,8 +268,8 @@ class FISTA(bases.ExplicitAlgorithm,
                  return_best=False):
 
         super(FISTA, self).__init__(info=info,
-                                    max_iter=max_iter,
-                                    min_iter=min_iter)
+                                    max_iter=int(max_iter),
+                                    min_iter=int(min_iter))
 
         self.use_gap = bool(use_gap)
         self.eps = max(consts.FLOAT_EPSILON, float(eps))
@@ -308,7 +308,8 @@ class FISTA(bases.ExplicitAlgorithm,
             best_f = np.inf
             best_beta = None
 
-        for i in xrange(1, max(self.min_iter, self.max_iter) + 1):
+        #print("########", max(self.min_iter, self.max_iter) + 1)
+        for i in range(1, max(self.min_iter, self.max_iter) + 1):
 
             if self.info_requested(Info.time):
                 tm = utils.time_cpu()
@@ -351,7 +352,7 @@ class FISTA(bases.ExplicitAlgorithm,
 
                 if not self.simulation:
                     if self.info_requested(Info.verbose):
-                        print "FISTA ite:%i, gap:%g" % (i, gap)
+                        print("FISTA ite:%i, gap:%g" % (i, gap))
                     if gap < self.eps:
                         if self.info_requested(Info.converged):
                             self.info_set(Info.converged, True)
@@ -361,7 +362,7 @@ class FISTA(bases.ExplicitAlgorithm,
                 if not self.simulation:
                     eps_cur = maths.norm(betanew - z)
                     if self.info_requested(Info.verbose):
-                        print "FISTA ite:%i, eps_cur:%g" %  (i, eps_cur)
+                        print("FISTA ite: %i, eps_cur:%g" % (i, eps_cur))
                     if step > 0.0:
                         if (1.0 / step) * eps_cur < self.eps \
                                 and i >= self.min_iter:
@@ -493,18 +494,15 @@ class CONESTA(bases.ExplicitAlgorithm,
             init_time = utils.time_cpu()
 
         # Compute current gap, precision eps (gap decreased by tau) and mu.
-        old_mu = function.set_mu(consts.TOLERANCE)
+        function.set_mu(consts.TOLERANCE)
         gap = function.gap(beta, eps=self.eps, max_iter=self.max_iter)
-        function.set_mu(old_mu)
-        # Obtain the gap from the last FISTA run. May be small and negative
-        # close to machine epsilon.
         eps = self.tau * abs(gap)
-        # TODO: Warn if gap < -consts.TOLERANCE: DONE see Special case 1
+        # Warning below if gap < -consts.TOLERANCE: See Special case 1
         gM = function.eps_max(1.0)
         loop = True
 
         # Special case 1: gap is very small: stopping criterion satisfied
-        if gap < self.eps: # - mu * gM has been removed since mu = 0
+        if gap < self.eps:  # "- mu * gM" has been removed since mu == 0
             warnings.warn(
                 "Stopping criterion satisfied before the first iteration."
                 " Either beta_start a the solution (given eps)."
@@ -542,10 +540,10 @@ class CONESTA(bases.ExplicitAlgorithm,
             converged = False
 
             # Current precision.
-            derived_eps = max(eps, self.eps) - mu * gM
+            eps_mu = max(eps, self.eps) - mu * gM
 
             # Set current parameters to algorithm.
-            algorithm.set_params(eps=derived_eps,
+            algorithm.set_params(eps=eps_mu,
                                  max_iter=self.max_iter - self.num_iter)
             # Run FISTA.
             beta = algorithm.run(function, beta)
@@ -572,11 +570,11 @@ class CONESTA(bases.ExplicitAlgorithm,
 
             # Obtain the gap from the last FISTA run. May be small and negative
             # close to machine epsilon.
-            gap = abs(algorithm.info_get(Info.gap)[-1])
-            # TODO: Warn if gap < -consts.TOLERANCE.
+            gap_mu = abs(algorithm.info_get(Info.gap)[-1])
+            # TODO: Warn if gap_mu < -consts.TOLERANCE.
 
             if not self.simulation:
-                if gap < self.eps - mu * gM:
+                if gap_mu + mu * gM < self.eps:
 
                     if self.info_requested(Info.converged):
                         self.info_set(Info.converged, True)
@@ -586,8 +584,8 @@ class CONESTA(bases.ExplicitAlgorithm,
             if self.callback is not None:
                 self.callback(locals())
             if self.info_requested(Info.verbose):
-                print "CONESTA ite:%i, gap:%g, eps:%g, mu:%g, derived_eps:%g"\
-                    % (i, gap, eps, mu, derived_eps)
+                print("CONESTA ite:%i, gap_mu: %g, eps: %g, mu: %g, "
+                      "eps_mu: %g" % (i, gap_mu, eps, mu, eps_mu))
 
             # Stopping criteria.
             if (converged or self.num_iter >= self.max_iter) \
@@ -595,11 +593,11 @@ class CONESTA(bases.ExplicitAlgorithm,
                 break
 
             # Update the precision eps.
-#            eps = self.tau * (gap + mu * gM)
-            eps = max(self.eps, self.tau * (gap + mu * gM))
+#            eps = self.tau * (gap_mu + mu * gM)
+            eps = max(self.eps, self.tau * (gap_mu + mu * gM))
             # Compute and update mu.
 #            mu = max(self.mu_min, min(function.mu_opt(eps), mu))
-            mu =  min(function.mu_opt(eps), mu)
+            mu = min(function.mu_opt(eps), mu)
             function.set_mu(mu)
 
             i = i + 1
@@ -860,8 +858,7 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
             if self.callback is not None:
                 self.callback(locals())
             if self.info_requested(Info.verbose):
-                print "StaticCONESTA ite:%i, eps:%g, mu:%g"\
-                    % (i, eps, mu)
+                print("StaticCONESTA ite: %i, eps: %g, mu: %g" % (i, eps, mu))
 
             # All combined stopping criteria.
             if (converged or self.num_iter >= self.max_iter) \
@@ -1028,7 +1025,7 @@ class ADMM(bases.ExplicitAlgorithm,
         y_new = xy[1]
         z_new = x_new.copy()
         u_new = y_new.copy()
-        for i in xrange(1, self.max_iter + 1):
+        for i in range(1, self.max_iter + 1):
 
             if self.info_requested(Info.time):
                 tm = utils.time_cpu()
@@ -1118,23 +1115,23 @@ class DykstrasProximalAlgorithm(bases.ExplicitAlgorithm):
     INTERFACES = [properties.Function,
                   properties.ProximalOperator]
 
-    def __init__(self, eps=consts.TOLERANCE,
-                 max_iter=1000, min_iter=1):
-                 # TODO: Investigate what is a good default value here!
+    def __init__(self, eps=consts.TOLERANCE, max_iter=1000, min_iter=1):
+                 # TODO: Investigate what good default value are here!
 
         self.eps = eps
         self.max_iter = max_iter
         self.min_iter = min_iter
 
-    def run(self, function, x):
+    def run(self, function, x, factor=1.0):
         """Finds the proximal operator of the sum of two proximal operators.
 
         Parameters
         ----------
-        function : List or tuple with two Functions. The two functions.
+        function : list or tuple with two Functions
+            The two functions.
 
-        x : Numpy array. The point that we wish to compute the proximal
-                operator of.
+        x : numpy array (p-by-1)
+            The point at which we want to compute the proximal operator.
         """
         self.check_compatibility(function[0], self.INTERFACES)
         self.check_compatibility(function[1], self.INTERFACES)
@@ -1142,15 +1139,15 @@ class DykstrasProximalAlgorithm(bases.ExplicitAlgorithm):
         x_new = x
         p_new = np.zeros(x.shape)
         q_new = np.zeros(x.shape)
-        for i in xrange(1, self.max_iter + 1):
+        for i in range(1, self.max_iter + 1):
 
             x_old = x_new
             p_old = p_new
             q_old = q_new
 
-            y_old = function[0].prox(x_old + p_old)
+            y_old = function[0].prox(x_old + p_old, factor=factor)
             p_new = x_old + p_old - y_old
-            x_new = function[1].prox(y_old + q_old)
+            x_new = function[1].prox(y_old + q_old, factor=factor)
             q_new = y_old + q_old - x_new
 
             if maths.norm(x_new - x_old) / maths.norm(x_old) < self.eps \
@@ -1170,9 +1167,8 @@ class DykstrasProjectionAlgorithm(bases.ExplicitAlgorithm):
     INTERFACES = [properties.Function,
                   properties.ProjectionOperator]
 
-    def __init__(self, eps=consts.TOLERANCE,
-                 max_iter=1000, min_iter=1):
-                 # TODO: Investigate what is a good default value here!
+    def __init__(self, eps=consts.TOLERANCE, max_iter=1000, min_iter=1):
+                 # TODO: Investigate what good default values are here!
 
         self.eps = eps
         self.max_iter = max_iter
@@ -1183,9 +1179,11 @@ class DykstrasProjectionAlgorithm(bases.ExplicitAlgorithm):
 
         Parameters
         ----------
-        function : List or tuple with two Functions. The two functions.
+        function : list or tuple with two Functions
+            The two functions.
 
-        x : Numpy array. The point that we wish to project.
+        x : numpy array (p-by-1)
+            The point that we wish to project.
         """
         self.check_compatibility(function[0], self.INTERFACES)
         self.check_compatibility(function[1], self.INTERFACES)
@@ -1193,7 +1191,7 @@ class DykstrasProjectionAlgorithm(bases.ExplicitAlgorithm):
         x_new = x
         p_new = np.zeros(x.shape)
         q_new = np.zeros(x.shape)
-        for i in xrange(1, self.max_iter + 1):
+        for i in range(1, self.max_iter + 1):
 
             x_old = x_new
             p_old = p_new
@@ -1253,22 +1251,22 @@ class ParallelDykstrasProjectionAlgorithm(bases.ExplicitAlgorithm):
         x_new = x_old = x
         p = [0.0] * len(functions)
         z = [0.0] * len(functions)
-        for i in xrange(num):
+        for i in range(num):
             z[i] = np.copy(x)
 
-        for i in xrange(1, self.max_iter + 1):
+        for i in range(1, self.max_iter + 1):
 
-            for i in xrange(num):
+            for i in range(num):
                 p[i] = functions[i].proj(z[i])
 
             # TODO: Does the weights really matter when the function is the
             # indicator function?
             x_old = x_new
             x_new = np.zeros(x_old.shape)
-            for i in xrange(num):
+            for i in range(num):
                 x_new += weights[i] * p[i]
 
-            for i in xrange(num):
+            for i in range(num):
                 z[i] = x + z[i] - p[i]
 
             if maths.norm(x_new - x_old) / maths.norm(x_old) < self.eps \
@@ -1336,33 +1334,33 @@ class ParallelDykstrasProximalAlgorithm(bases.ExplicitAlgorithm):
         x_new = x_old = x
         p = [0.0] * (num_prox + num_proj)
         z = [0.0] * (num_prox + num_proj)
-        for i in xrange(num_prox + num_proj):
+        for i in range(num_prox + num_proj):
             z[i] = np.copy(x)
 
-        for i in xrange(1, self.max_iter + 1):
+        for i in range(1, self.max_iter + 1):
 
-            for i in xrange(num_prox):
+            for i in range(num_prox):
                 p[i] = prox[i].prox(z[i], factor)
-            for i in xrange(num_proj):
+            for i in range(num_proj):
                 p[num_prox + i] = proj[i].proj(z[num_prox + i])
 
             x_old = x_new
             x_new = np.zeros(x_old.shape)
-            for i in xrange(num_prox + num_proj):
+            for i in range(num_prox + num_proj):
                 x_new += weights[i] * p[i]
 
             if maths.norm(x_new - x_old) / maths.norm(x_old) < self.eps \
                     and i >= self.min_iter:
 
                 all_feasible = True
-                for i in xrange(num_proj):
+                for i in range(num_proj):
                     if proj[i].f(p[num_prox + i]) > 0.0:
                         all_feasible = False
 
                 if all_feasible:
                     break
 
-            for i in xrange(num_prox + num_proj):
+            for i in range(num_prox + num_proj):
                 z[i] = x_new + z[i] - p[i]
 
         return x_new

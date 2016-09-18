@@ -90,7 +90,7 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
     >>> y = np.vstack([1 * np.ones((n / 2, 1)),
     ...                3 * np.ones((n / 2, 1))]) - 2
     >>>
-    >>> K = utils.LinearKernel(X=X, use_cache=True)
+    >>> K = utils.LinearKernel(X=X)
     >>> smo = alg.SequentialMinimalOptimization(1.0, kernel=K, max_iter=100)
     >>> w = smo.run(X, y)
     >>> yhat = np.zeros(y.shape)

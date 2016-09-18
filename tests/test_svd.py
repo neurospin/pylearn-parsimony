@@ -16,9 +16,10 @@ import scipy as sp
 from parsimony.algorithms.nipals import RankOneSVD
 from parsimony.algorithms.nipals import RankOneSparseSVD
 import parsimony.utils as utils
-
-from tests import TestCase
-
+try:
+    from .tests import TestCase  # When imported as a package.
+except ValueError:
+    from tests import TestCase  # When run as a program.
 
 def generate_sparse_matrix(shape, density=0.10):
     """
@@ -36,7 +37,7 @@ def generate_sparse_matrix(shape, density=0.10):
     # shape = (5, 5)
     # density = 0.1
     num_elements = 1
-    for i in xrange(len(shape)):
+    for i in range(len(shape)):
         num_elements = num_elements * shape[i]
     zero_vec = np.zeros(num_elements, dtype=float)
     indices = np.random.random_integers(0,

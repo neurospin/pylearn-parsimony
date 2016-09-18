@@ -81,22 +81,32 @@ def check_array_in(array1, array2):
     Examples
     --------
     >>> import numpy as np
-    >>> check_array_in([1, 2], [0, 1])
-    False
-    >>> check_array_in(np.array([0, 1, 0, 1]), [0, 1])
-    True
-    >>> check_array_in([0, 1, 31415926, 27182818], np.array([0, 1, 31415926]))
-    False
-    >>> check_array_in([0, 1, 31415926, 2718282], [0, 1, 31415926, 2718282])
-    True
-    >>> check_array_in(np.random.randint(0, 3, 1000), [0, 1, 2])
-    True
-    >>> check_array_in(np.random.randint(0, 1000, 100000),
-    ...                np.arange(0, 999))
-    False
-    >>> check_array_in(np.random.randint(0, 1000, 100000),
-    ...                np.arange(0, 1000))
-    True
+    >>> import parsimony.utils as utils
+    >>> np.random.seed(42)
+    >>> utils.check_array_in([1, 2], [0, 1])
+    Traceback (most recent call last):
+    ...
+    ValueError: At least one elements of array1 could not be found in array2.
+    >>> utils.check_array_in(np.array([0, 1, 0, 1]), [0, 1])
+    array([0, 1, 0, 1])
+    >>> utils.check_array_in([0, 1, 31415926, 27182818],
+    ...                      np.array([0, 1, 31415926]))
+    Traceback (most recent call last):
+    ...
+    ValueError: At least one elements of array1 could not be found in array2.
+    >>> utils.check_array_in([0, 1, 31415926, 2718282],
+    ...                      [0, 1, 31415926, 2718282])
+    [0, 1, 31415926, 2718282]
+    >>> utils.check_array_in(np.random.randint(0, 3, 1000), [0, 1, 2])  # doctest: +ELLIPSIS
+    array([2, ..., 0])
+    >>> utils.check_array_in(np.random.randint(0, 1000, 100000),
+    ...                      np.arange(0, 999))
+    Traceback (most recent call last):
+    ...
+    ValueError: At least one elements of array1 could not be found in array2.
+    >>> utils.check_array_in(np.random.randint(0, 1000, 100000),
+    ...                      np.arange(0, 1000))  # doctest: +ELLIPSIS
+    array([971, 552,  14, ..., 525, 650, 332])
     """
     _array1 = np.asarray(array1, dtype=np.float).ravel()
     _array2 = np.asarray(array2, dtype=np.float).ravel()

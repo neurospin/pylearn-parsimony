@@ -81,7 +81,7 @@ class ObjImage(object):
         # Image of objects label
         labels_im = np.zeros(Xim.shape[1:], dtype=int)
         label = 0
-        for k in xrange(len(objects)):
+        for k in range(len(objects)):
             o = objects[k]
             label += 1
             o.label = label
@@ -158,7 +158,7 @@ def get_objects_edges(objects):
 ############################################################################
 ## Spatial smoothing
 def spatial_smoothing(Xim, sigma, mu_e=None, sigma_pix=None):
-    for i in xrange(Xim.shape[0]):
+    for i in range(Xim.shape[0]):
         Xim[i, :] = ndimage.gaussian_filter(Xim[i, :],
             sigma=sigma)
     X = Xim.reshape((Xim.shape[0], np.prod(Xim.shape[1:])))

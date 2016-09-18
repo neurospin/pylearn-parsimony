@@ -14,7 +14,10 @@ import numpy as np
 
 import parsimony.algorithms.proximal as proximal
 import parsimony.utils.consts as consts
-from tests import TestCase
+try:
+    from .tests import TestCase  # When imported as a package.
+except ValueError:
+    from tests import TestCase  # When run as a program.
 
 
 class TestLinearRegression(TestCase):
@@ -1158,7 +1161,7 @@ class TestLinearRegression(TestCase):
         np.random.seed(42)
 
         n, p = 60, 90
-        groups = [range(0, 2 * p / 3), range(p / 3, p)]
+        groups = [list(range(0, 2 * int(p / 3))), list(range(int(p / 3), p))]
         weights = [1.5, 0.5]
 
         A = gl.linear_operator_from_groups(p, groups=groups, weights=weights)
@@ -1268,7 +1271,7 @@ class TestLinearRegression(TestCase):
         np.random.seed(42)
 
         n, p = 60, 90 + 1
-        groups = [range(1, 2 * p / 3), range(p / 3, p)]
+        groups = [list(range(1, 2 * int(p / 3))), list(range(int(p / 3), p))]
         weights = [1.5, 0.5]
 
         A = gl.linear_operator_from_groups(p, groups=groups, weights=weights,
@@ -1575,7 +1578,7 @@ class TestLinearRegression(TestCase):
         np.random.seed(42)
 
         n, p = 60, 90
-        groups = [range(0, 2 * p / 3), range(p / 3, p)]
+        groups = [list(range(0, 2 * int(p / 3))), list(range(int(p / 3), p))]
         weights = [1.5, 0.5]
 
         A = gl.linear_operator_from_groups(p, groups=groups, weights=weights)
@@ -1868,7 +1871,7 @@ class TestLinearRegression(TestCase):
         np.random.seed(42)
 
         n, p = 60, 90
-        groups = [range(0, 2 * p / 3), range(p / 3, p)]
+        groups = [list(range(0, 2 * int(p / 3))), list(range(int(p / 3), p))]
         weights = [1.5, 0.5]
 
         A = gl.linear_operator_from_groups(p, groups=groups, weights=weights)
@@ -2208,7 +2211,7 @@ class TestLinearRegression(TestCase):
         np.random.seed(42)
 
         n, p = 60, 90
-        groups = [range(0, 2 * p / 3), range(p / 3, p)]
+        groups = [list(range(0, 2 * int(p / 3))), list(range(int(p / 3), p))]
         weights = [1.5, 0.5]
 
         A = gl.linear_operator_from_groups(p, groups=groups, weights=weights)
@@ -2642,7 +2645,7 @@ class TestLinearRegression(TestCase):
         np.random.seed(42)
 
         n, p = 60, 90
-        groups = [range(0, 2 * p / 3), range(p / 3, p)]
+        groups = [list(range(0, 2 * int(p / 3))), list(range(int(p / 3), p))]
         weights = [1.5, 0.5]
 
         A = gl.linear_operator_from_groups(p, groups=groups, weights=weights)

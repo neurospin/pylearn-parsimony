@@ -4,22 +4,21 @@ Created on Mon May 12 15:46:47 2014
 
 Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
-@author:  Tommy Löfstedt
-@email:   tommy.loefstedt@cea.fr
+@author:  Tommy Löfstedt, Edouard Duchesnay
+@email:   lofstedt.tommy@gmail.com, edouard.duchesnay@cea.fr
 @license: BSD 3-clause.
 """
+from six import with_metaclass
 import abc
 
 import numpy as np
 
-import utils
+from . import utils
 
 __all__ = ["SimulatedData", "LinearRegressionData"]
 
 
-class SimulatedData(object):
-
-    __metaclass__ = abc.ABCMeta
+class SimulatedData(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
     def load(self, beta):
@@ -124,7 +123,7 @@ class LinearRegressionData(SimulatedData):
 
         start = 1 if self.intercept else 0
         X = np.ones(self.X0.shape)
-        for i in xrange(start, p):
+        for i in range(start, p):
             X[:, i] = self.X0[:, i] * alpha[i - start, 0]
 
         y = np.dot(X, beta) - self.e

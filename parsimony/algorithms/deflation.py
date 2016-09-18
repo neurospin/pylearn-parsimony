@@ -7,10 +7,11 @@ Created on Fri Mar 21 15:18:56 2014
 
 Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
-@author:  Tommy Löfstedt
-@email:   lofstedt.tommy@gmail.com
+@author:  Tommy Löfstedt, Edouard Duchesnay
+@email:   lofstedt.tommy@gmail.com, edouard.duchesnay@cea.fr
 @license: BSD 3-clause.
 """
+from six import with_metaclass
 import abc
 
 import numpy as np
@@ -20,9 +21,7 @@ __all__ = ["ProjectionDeflation",
            "RankOneDeflation"]
 
 
-class Deflation(object):
-    __metaclass__ = abc.ABCMeta
-
+class Deflation(with_metaclass(abc.ABCMeta, object)):
     @abc.abstractmethod
     def deflate(self, X, w):
         raise NotImplementedError('Abstract method "deflate" must be ' \

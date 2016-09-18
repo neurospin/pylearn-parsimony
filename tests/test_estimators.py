@@ -10,7 +10,10 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 from nose.tools import assert_less
 
-from tests import TestCase
+try:
+    from .tests import TestCase  # When imported as a package.
+except ValueError:
+    from tests import TestCase  # When run as a program.
 
 
 class TestEstimators(TestCase):

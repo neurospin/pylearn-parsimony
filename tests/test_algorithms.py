@@ -12,10 +12,13 @@ from nose.tools import assert_less
 
 import numpy as np
 
-from tests import TestCase
-
 import parsimony.algorithms.utils as utils
 import parsimony.functions.losses as losses
+#from tests import TestCase
+try:
+    from .tests import TestCase  # When imported as a package.
+except ValueError:
+    from tests import TestCase  # When run as a program.
 
 
 class TestAlgorithms(TestCase):
@@ -242,7 +245,7 @@ class TestAlgorithms(TestCase):
 #        # Note that p should be divisible by 3!
 #        n, p = 75, 90
 #        penalty_start = 0
-#        groups = [range(penalty_start, 2 * p / 3), range(p / 3, p)]
+#        groups = [range(penalty_start, 2 * int(p / 3)), range(int(p / 3), p)]
 #        weights = [1.5, 0.5]
 #
 #        l = 0.618
