@@ -94,7 +94,7 @@ class BaseEstimator(object):
     def reset(self):
         """Resets the estimator such that it is as if just created.
         """
-        raise NotImplementedError('Abstract method "parameters" must be '
+        raise NotImplementedError('Abstract method "reset" must be '
                                   'specialised!')
 
     def fit(self, X):
@@ -165,6 +165,16 @@ class RegressionEstimator(BaseEstimator):
         super(RegressionEstimator, self).__init__(algorithm=algorithm)
 
         self.start_vector = start_vector
+
+    def reset(self):
+        """Resets the estimator such that it is as if just created.
+        """
+        if hasattr(self, "beta"):
+            del self.beta
+
+        if hasattr(self, "algorithm"):
+            if hasattr(self.algorithm, "reset"):
+                self.algorithm.reset()
 
     @abc.abstractmethod
     def fit(self, X, y):
