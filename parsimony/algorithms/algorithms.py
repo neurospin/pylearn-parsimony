@@ -345,6 +345,147 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
         return f
 
 
+class MajorizationMinimization(bases.ExplicitAlgorithm,
+                               bases.IterativeAlgorithm,
+                               bases.InformationAlgorithm):
+    """An implementation of the MM algorithm for general input functions.
+
+    Accepts two functions, f and g, such that g majorizes f at a point y, i.e.
+
+        f(x) <= g(x | y) for all x, and
+        f(y) = g(y).
+
+    Parameters
+    ----------
+    algorithm : bases.ExplicitAlgorithm
+        An algorithm that can be used to minimise g.
+
+    max_mm_iter : int
+        Must be non-negative. Maximum allowed number of iterations in the inner
+        MM minimisation. Default is 1.
+
+    max_iter : int
+        Must be non-negative. Maximum allowed number of iterations. Default is
+        20000.
+
+    min_iter : int
+        Must be non-negative and less than or equal to max_iter. Minimum number
+        of iterations that must be performed. Default is 1.
+
+    info : list or tuple of utils.consts.Info
+        What, if any, extra run information should be stored. Default is an
+        empty list, which means that no run information is computed nor
+        returned.
+
+    Returns
+    -------
+    x : numpy array
+        The parameter vector that minimises f.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import parsimony.algorithms.algorithms as alg
+    >>> import parsimony.algorithms.utils as utils
+    >>>
+    >>> np.random.seed(42)
+    >>> n = 30
+    >>> X = np.vstack([0.3 * np.random.randn(n / 2, 2) + 0.25,
+    ...                0.3 * np.random.randn(n / 2, 2) + 0.75])
+    >>> y = np.vstack([1 * np.ones((n / 2, 1)),
+    ...                3 * np.ones((n / 2, 1))]) - 2
+    >>>
+    """
+    INFO_PROVIDED = [utils.Info.ok,
+                     utils.Info.time,
+                     utils.Info.func_val,
+                     utils.Info.converged]
+
+    def __init__(self, algorithm, eps=5e-8, max_mm_iter=1,
+                 max_iter=consts.MAX_ITER, min_iter=1, info=[]):
+
+        super(MajorizationMinimization, self).__init__(info=info,
+                                                       max_iter=max_iter,
+                                                       min_iter=min_iter)
+
+        self.algorithm = algorithm
+        self.eps = max(consts.FLOAT_EPSILON, float(eps))
+        self.max_mm_iter = max(1, int(max_mm_iter))
+
+        self.algorithm.max_iter = max_mm_iter
+
+    def set_params(self, **kwargs):
+
+        if "max_mm_iter" in kwargs:
+            self.max_mm_iter = kwargs.pop("max_mm_iter", self.max_mm_iter)
+            self.algorithm.max_iter = self.max_mm_iter
+
+        super(MajorizationMinimization, self).set_params(**kwargs)
+
+    @bases.force_reset
+    def run(self, f, g, x):
+        """Find the best separating margin for the samples in X.
+
+        Parameters
+        ----------
+        f : Function
+            The original function to minimise.
+
+        g : Function
+            The function that majorises f.
+
+        x : array_like
+            The point at which to start the minimisation process.
+        """
+        x = check_arrays(x)
+
+        if self.info_requested(utils.Info.ok):
+            self.info_set(utils.Info.ok, False)
+        if self.info_requested(utils.Info.time):
+            _t = []
+        if self.info_requested(utils.Info.func_val):
+            _f = []
+        if self.info_requested(utils.Info.converged):
+            self.info_set(utils.Info.converged, False)
+
+        xnew = xold = x
+        for i in range(1, self.max_iter + 1):
+
+            if self.info_requested(utils.Info.time):
+                tm = utils.time()
+
+            xold = xnew
+            xnew = self.algorithm.run(g, xold)
+
+            if self.info_requested(utils.Info.time):
+                _t.append(utils.time() - tm)
+            if self.info_requested(utils.Info.func_val):
+                _f.append(f.f(xnew))
+
+            if self.callback is not None:
+                self.callback(locals())
+
+            if i >= self.min_iter and np.linalg.norm(xnew - xold) < self.eps:
+
+                if self.info_requested(utils.Info.converged):
+                    self.info_set(utils.Info.converged, True)
+
+                break
+
+        self.num_iter = i
+
+        if self.info_requested(utils.Info.num_iter):
+            self.info_set(utils.Info.num_iter, self.num_iter)
+        if self.info_requested(utils.Info.time):
+            self.info_set(utils.Info.time, _t)
+        if self.info_requested(utils.Info.func_val):
+            self.info_set(utils.Info.func_val, _f)
+        if self.info_requested(utils.Info.ok):
+            self.info_set(utils.Info.ok, True)
+
+        return xnew
+
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

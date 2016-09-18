@@ -151,16 +151,25 @@ class IterativeAlgorithm(object):
 
     Parameters
     ----------
-    max_iter : Non-negative integer. The maximum number of allowed iterations.
+    max_iter : int
+        A non-negative integer. The maximum number of allowed iterations.
 
-    min_iter : Non-negative integer. The minimum number of required iterations.
+    min_iter : int
+        A non-negative integer. The minimum number of required iterations.
+
+    callback : Callable
+        A callable that accepts a dictionary with parameters and their values.
+        Usually callback will be called with the output of locals() at each
+        iteration of the algorithm.
     """
-    def __init__(self, max_iter=consts.MAX_ITER, min_iter=1, **kwargs):
+    def __init__(self, max_iter=consts.MAX_ITER, min_iter=1, callback=None,
+                 **kwargs):
 
         super(IterativeAlgorithm, self).__init__(**kwargs)
 
         self.max_iter = max_iter
         self.min_iter = min_iter
+        self.callback = callback
         self.num_iter = 0
 
         self.iter_reset()
