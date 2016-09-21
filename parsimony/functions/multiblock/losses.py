@@ -32,43 +32,55 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
                                  mb_properties.MultiblockProjectionOperator,
                                  # mb_properties.MultiblockContinuation,
                                  mb_properties.MultiblockStepSize):
-    """Combines one or more loss functions, any number of penalties and zero
-    or one proximal operator.
+    """Combines one or more loss functions, any number of penalties, any number
+    of smoothed functions, any number of penalties with known proximal
+    operators and any number of constraints.
 
     This function thus represents
 
-        f(x) = g_1(x) [ + g_2(x) ... ] [ + d_1(x) ... ] [ + N_1(x) ...]
-           [ + h_1(x) ...],
+        f(x) = f_1(x) [ + f_2(x) ... ] [ + d_1(x) ... ] [ + N_1(x) ...]
+            [ + p_1(x) ...],
 
     subject to [ C_1(x) <= c_1,
                  C_2(x) <= c_2,
                  ... ],
 
-    where g_i are differentiable Functions that may be multiblock, d_j are
-    differentiable penalties, h_k are a ProximalOperators and N_l are
-    NesterovFunctions. All functions and penalties must thus have Gradients,
-    unless they are ProximalOperators.
-
-    If no ProximalOperator is given, prox will be the identity.
+    where f_i are differentiable loss Functions, d_j are differentiable
+    penalties, N_k are smoothed NesterovFunctions and p_l are
+    ProximalOperators. The C_m are ProjectionOperators and function as
+    constraints. All functions and penalties must thus be Gradient, unless they
+    are ProximalOperators or ProjectionOperators.
 
     Parameters
     ----------
-    X : List of numpy arrays. The blocks of data in the multiblock model.
+    X : list of numpy arrays
+        The blocks of data in the multiblock model.
 
-    functions : List of lists of lists. A function matrix, with element
-            i,j connecting block i to block j.
+    functions : list of lists of lists
+        A function matrix, with element i,j connecting block i to block j.
 
-    penalties : A list of lists. Element i of the outer list is also a list
-            that contains the penalties for block i.
+    penalties : a list of lists of penalties
+        Element i of the outer list is also a list and contains the penalties
+        for block i.
 
-    prox : A list of lists. Element i of the outer list is also a list that
-            contains the penalties that can be expressed as proximal operators
-            for block i.
+    smoothed : a list if lists of smoothed penalties
+        Element i of the outer list is also a list and contains the smoothed
+        penalties for block i.
 
-    constraints : A list of lists. Element i of the outer list is also a list
-            that contains the constraints for block i.
+    prox : a list of lists of proximal operators
+        Element i of the outer list is also a list and contains the penalties
+        that can be expressed as proximal operators for block i.
+
+    constraints : a list of lists of projection operators
+        Element i of the outer list is also a list and contains the constraints
+        for block i.
     """
-    def __init__(self, X, functions=[], penalties=[], prox=[], constraints=[]):
+    def __init__(self, X, functions=[], penalties=[], smoothed=[], prox=[],
+                 constraints=[]):
+
+        super(CombinedMultiblockFunction, self).__setattr__("_method_map",
+                                                            dict())
+        self._param_map = dict()
 
         self.K = len(X)
         self.X = X
@@ -83,29 +95,33 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
             self._f = functions
 
         if len(penalties) != self.K:
-            self._p = [0] * self.K
+            self._d = [0] * self.K
+            for i in range(self.K):
+                self._d[i] = list()
+        else:
+            self._d = [0] * self.K
+            for i in range(self.K):
+                self._d[i] = list()
+                for di in penalties[i]:
+                    self._d[i].append(di)
+
+        if len(smoothed) != self.K:
             self._N = [0] * self.K
             for i in range(self.K):
-                self._p[i] = list()
                 self._N[i] = list()
         else:
-            self._p = [0] * self.K
             self._N = [0] * self.K
             for i in range(self.K):
-                self._p[i] = list()
                 self._N[i] = list()
                 for di in penalties[i]:
-                    if isinstance(di, properties.NesterovFunction):
-                        self._N[i].append(di)
-                    else:
-                        self._p[i].append(di)
+                    self._N[i].append(di)
 
         if len(prox) != self.K:
-            self._prox = [0] * self.K
+            self._p = [0] * self.K
             for i in range(self.K):
-                self._prox[i] = list()
+                self._p[i] = list()
         else:
-            self._prox = prox
+            self._p = prox
 
         if len(constraints) != self.K:
             self._c = [0] * self.K
@@ -114,7 +130,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
         else:
             self._c = constraints
 
-        self._param_map = dict()
+        self.reset()
 
     def reset(self):
 
@@ -123,24 +139,24 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
                 for fijk in fij:
                     fijk.reset()
 
-        for pi in self._p:
-            for pik in pi:
-                pik.reset()
+        for di in self._d:
+            for dik in di:
+                dik.reset()
 
         for Ni in self._N:
             for Nik in Ni:
                 Nik.reset()
 
-        for proxi in self._prox:
-            for proxik in proxi:
-                proxik.reset()
+        for pi in self._p:
+            for pik in pi:
+                pik.reset()
 
         for ci in self._c:
             for cik in ci:
                 cik.reset()
 
     def set_params(self, **kwargs):
-        """Set the given input parameters in the estimator.
+        """Set the given input parameters in the corresponding function.
         """
         for k in kwargs:
             if k in self._param_map:
@@ -151,130 +167,219 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
             else:
                 self.__setattr__(k, kwargs[k])
 
-    def add_function(self, function, i, j, accepts_params=None):
-        """Add a function that connects blocks i and j.
+    def _accept_params(self, function, accepts_params):
+        if accepts_params is not None:
+            if isinstance(accepts_params, tuple):
+                accepts_params = [accepts_params]
+            for param in accepts_params:
+                self._param_map[param[0]] = (function, param[1])
+
+    def _accept_methods(self, function, accepts_methods):
+        if accepts_methods is not None:
+            if isinstance(accepts_methods, tuple):
+                accepts_methods = [accepts_methods]
+            for method in accepts_methods:
+                if not hasattr(function, method[1]):
+                    raise AttributeError("Target function does not have an %s "
+                                         "attribute!" % (method[1],))
+                else:
+                    if method[0] in self._method_map:
+                        self._method_map[method[0]].append((function, method[1]))
+                    else:
+                        self._method_map[method[0]] = [(function, method[1])]
+
+#    def __getattribute__(self, name):
+#        mmap = super(CombinedMultiblockFunction,
+#                     self).__getattribute__("_method_map")
+#        if name in mmap:
+#            mm = mmap[name]
+#            fun = getattr(mm[0], mm[1])
+#            return fun
+#        else:
+#            return super(CombinedMultiblockFunction,
+#                         self).__getattribute__(name)
+
+    def __getattr__(self, name):
+#        mmap = super(CombinedMultiblockFunction,
+#                     self).__getattribute__("_method_map")
+        mmap = self._method_map
+        if name in mmap:
+            mms = mmap[name]  # A list of function-name pairs
+            funs = []
+            for mm in mms:
+                fun = getattr(mm[0], mm[1])
+                funs.append(fun)
+
+            if len(funs) > 1:
+
+                def function(*args, **kwargs):
+                    results = []
+                    for fun in funs:
+                        result = fun(*args, **kwargs)
+                        results.append(result)
+                    return results
+
+                return function
+            else:
+                return funs[0]
+        else:
+            return super(CombinedMultiblockFunction,
+                         self).__getattribute__(name)
+
+    def add_loss(self, function, i, j,
+                 accepts_params=None, accepts_methods=None):
+        """Add a loss function that connects blocks i and j.
 
         Parameters
         ----------
-        function : Function or MultiblockFunction. A function that connects
-                block i and block j.
+        function : Function or MultiblockFunction
+            A loss function that connects block i and block j.
 
-        i : Non-negative integer. Index of the first block. Zero based, so 0
-                is the first block.
+        i : int
+            Non-negative integer. Index of the first block. Zero based, so 0
+            is the first block.
 
-        j : Non-negative integer. Index of the second block. Zero based, so 0
-                is the first block.
+        j : int
+            Non-negative integer. Index of the second block. Zero based, so 0
+            is the first block.
 
-        accepts_params : Dictionary of 2-tuples. The outer function will
-                accept parameters with the name of the first element of the
-                tuple, and map them to this function with the name of the
-                second element of the tuple.
+        accepts_params : 2-tuple or list of 2-tuples
+            The outer function will accept parameters with the name of the
+            first element of any tuple, and map them to this function with the
+            name of the second element of the tuple.
+
+        accepts_methods : 2-tuple or list of 2-tuples
+            The outer function will accept methods with the name of the
+            first element of any of the tuples, and map them to this function
+            with the method name of the second element of the tuple.
         """
         if not isinstance(function, properties.Gradient):
             if not isinstance(function, mb_properties.MultiblockGradient):
-                raise ValueError("Functions must have gradients.")
+                raise ValueError("Loss functions must have gradients.")
 
         self._f[i][j].append(function)
 
-        if accepts_params is not None:
-            self._param_map[accepts_params[0]] = (function, accepts_params[1])
+        self._accept_params(function, accepts_params)
+        self._accept_methods(function, accepts_methods)
+
+    @utils.deprecated("add_loss")
+    def add_function(self, function, i, j, accepts_params=None):
+
+        return self.add_loss(function, i, j, accepts_params=accepts_params)
 
     def add_penalty(self, penalty, i, accepts_params=None):
         """Add a penalty, i.e. a constraint on the Lagrange form, for block i.
 
         Parameters
         ----------
-        penalty : Penalty. A function that penalises the objective function.
+        penalty : Penalty
+            A function that penalises the objective function.
 
-        i : Non-negative integer. Index of the block to penalise. Zero based,
-                so 0 is the first block.
+        i : int
+            Non-negative integer. Index of the block to penalise. Zero based,
+            so 0 is the first block.
 
-        accepts_params : Dictionary of 2-tuples. The outer function will
-                accept parameters with the name of the first element of the
-                tuple, and map them to this function with the name of the
-                second element of the tuple.
+        accepts_params : 2-tuple or list of 2-tuples
+            The outer function will accept parameters with the name of the
+            first element of any tuple, and map them to this function with the
+            name of the second element of the tuple.
         """
         if not isinstance(penalty, properties.Penalty):
             raise ValueError("Not a penalty.")
-
-        if isinstance(penalty, properties.NesterovFunction):
+        elif isinstance(penalty, properties.Gradient):
+            self._d[i].append(penalty)
+        elif isinstance(penalty, properties.ProximalOperator):
+            self._p[i].append(penalty)
+        elif isinstance(penalty, properties.NesterovFunction):
             self._N[i].append(penalty)
         else:
-            if isinstance(penalty, properties.Gradient):
-                self._p[i].append(penalty)
-            else:
-                if isinstance(penalty, properties.ProximalOperator):
-                    self._prox[i].append(penalty)
-                else:
-                    raise ValueError("Non-smooth and no proximal operator.")
+            raise ValueError("The penalty is not smooth, nor smoothed, and it "
+                             "does not have a proximal operator.")
 
-        if accepts_params is not None:
-            self._param_map[accepts_params[0]] = (penalty, accepts_params[1])
+        self._accept_params(penalty, accepts_params)
 
-    @utils.deprecated("add_penalty")
+    def add_smoothed(self, penalty, accepts_params=None):
+        """Add a smoothed penalty, i.e. a smoothed constraint on the Lagrange
+        form, for block i.
+
+        Parameters
+        ----------
+        penalty : Penalty
+            A function that penalises the objective function.
+
+        i : int
+            Non-negative integer. Index of the block to penalise. Zero based,
+            so 0 is the first block.
+
+        accepts_params : 2-tuple or list of 2-tuples
+            The outer function will accept parameters with the name of the
+            first element of any tuple, and map them to this function with the
+            name of the second element of the tuple.
+        """
+        if isinstance(penalty, properties.NesterovFunction):
+            self._N.append(penalty)
+        else:
+            raise ValueError("Not a smoothed function.")
+
+        self._accept_params(penalty, accepts_params)
+
     def add_prox(self, penalty, i, accepts_params=None):
         """Add a penalty for block i that has a known or computable proximal
         operator.
 
         Parameters
         ----------
-        penalty : ProximalOperator. A function that penalises the
-                objective function.
+        penalty : ProximalOperator
+            A function that penalises the objective function.
 
-        i : Non-negative integer. Index of the block to penalise. Zero based,
-                so 0 is the first block.
+        i : int
+            Non-negative integer. Index of the block to penalise. Zero based,
+            so 0 is the first block.
 
-        accepts_params : Dictionary of 2-tuples. The outer function will
-                accept parameters with the name of the first element of the
-                tuple, and map them to this function with the name of the
-                second element of the tuple.
+        accepts_params : 2-tuple or list of 2-tuples
+            The outer function will accept parameters with the name of the
+            first element of any tuple, and map them to this function with the
+            name of the second element of the tuple.
         """
-        if not isinstance(penalty, properties.ProximalOperator):
+        if isinstance(penalty, properties.ProximalOperator):
+            self._p[i].append(penalty)
+        else:
             raise ValueError("Not a proximal operator.")
 
-        self._prox[i].append(penalty)
-
-        if accepts_params is not None:
-            self._param_map[accepts_params[0]] = (penalty, accepts_params[1])
+        self._accept_params(penalty, accepts_params)
 
     def add_constraint(self, constraint, i, accepts_params=None):
         """Add a constraint for block i.
 
         Parameters
         ----------
-        constraint : Constraint. A function that constrains the possible
-                solutions of the objective function.
+        constraint : Constraint
+            A function that constrains the possible solutions of the objective
+            function.
 
-        i : Non-negative integer. Index of the block to penalise. Zero based,
-                so 0 is the first block.
+        i : int
+            Non-negative integer. Index of the block to penalise. Zero based,
+            so 0 is the first block.
 
-        accepts_params : Dictionary of 2-tuples. The outer function will
-                accept parameters with the name of the first element of the
-                tuple, and map them to this function with the name of the
-                second element of the tuple.
+        accepts_params : 2-tuple or list of 2-tuples
+            The outer function will accept parameters with the name of the
+            first element of any tuple, and map them to this function with the
+            name of the second element of the tuple.
         """
         if not isinstance(constraint, properties.Constraint):
             raise ValueError("Not a constraint.")
-        if not isinstance(constraint, properties.ProjectionOperator):
+        elif not isinstance(constraint, properties.ProjectionOperator):
             raise ValueError("Constraints must have projection operators.")
+        else:
+            self._c[i].append(constraint)
 
-        self._c[i].append(constraint)
-
-        if accepts_params is not None:
-            self._param_map[accepts_params[0]] = (constraint,
-                                                  accepts_params[1])
+        self._accept_params(constraint, accepts_params)
 
     def has_nesterov_function(self, index):
 
         return len(self._N[index]) > 0
 
-    def f(self, w):
-        """Function value.
-
-        Parameters
-        ----------
-        w : List of numpy arrays. The weight vectors.
-        """
+    def _only_f(self, w):
         val = 0.0
 
         for i in range(len(self._f)):
@@ -287,20 +392,37 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
                     else:
                         val += fij[k].f(w[i])
 
-        for i in range(len(self._p)):
-            pi = self._p[i]
-            for k in range(len(pi)):
-                val += pi[k].f(w[i])
+        return val
+
+    def _non_f(self, w):
+        val = 0.0
+
+        for i in range(len(self._d)):
+            di = self._d[i]
+            for k in range(len(di)):
+                val += di[k].f(w[i])
 
         for i in range(len(self._N)):
             Ni = self._N[i]
             for k in range(len(Ni)):
                 val += Ni[k].f(w[i])
 
-        for i in range(len(self._prox)):
-            proxi = self._prox[i]
-            for k in range(len(proxi)):
-                val += proxi[k].f(w[i])
+        for i in range(len(self._p)):
+            pi = self._p[i]
+            for k in range(len(pi)):
+                val += pi[k].f(w[i])
+
+        return val
+
+    def f(self, w):
+        """Function value.
+
+        Parameters
+        ----------
+        w : list of numpy arrays
+            The parameter vectors at which to evaluate the function.
+        """
+        val = self._only_f(w) + self._non_f(w)
 
         return val
 
@@ -309,52 +431,33 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
 
         Parameters
         ----------
-        w : List of numpy arrays. The weight vectors.
+        w : list of numpy arrays
+            The parameter vectors at which to evaluate the function.
         """
-        val = 0.0
+        val = self._f(w)
 
-        for i in range(len(self._f)):
-            fi = self._f[i]
-            for j in range(len(fi)):
-                fij = self._f[i][j]
-                for k in range(len(fij)):
-                    if isinstance(fij[k], mb_properties.MultiblockFunction):
-                        val += fij[k].f([w[i], w[j]])
-                    else:
-                        val += fij[k].f(w[i])
-
-        for i in range(len(self._p)):
-            pi = self._p[i]
-            for k in range(len(pi)):
-                val += pi[k].f(w[i])
+        for i in range(len(self._d)):
+            di = self._d[i]
+            for k in range(len(di)):
+                val += di[k].f(w[i])
 
         for i in range(len(self._N)):
             Ni = self._N[i]
             for k in range(len(Ni)):
                 val += Ni[k].fmu(w[i])
 
-        for i in range(len(self._prox)):
-            proxi = self._prox[i]
-            for k in range(len(proxi)):
-                val += proxi[k].f(w[i])
+        for i in range(len(self._p)):
+            pi = self._p[i]
+            for k in range(len(pi)):
+                val += pi[k].f(w[i])
 
         return val
 
-    def grad(self, w, index):
-        """Gradient of the differentiable part of the function.
+    def _grad_only_f(self, w, index):
 
-        From the interface "MultiblockGradient".
-
-        Parameters
-        ----------
-        w : List of numpy arrays. The weight vectors, w[index] is the point at
-                which to evaluate the gradient.
-
-        index : Non-negative integer. Which variable the step is for.
-        """
         grad = np.zeros(w[index].shape)
 
-        # Add gradients from the loss functions.
+        # Add gradients from the loss functions (row):
         fi = self._f[index]
         for j in range(len(fi)):
             fij = fi[j]
@@ -365,6 +468,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
                 elif isinstance(fijk, mb_properties.MultiblockGradient):
                     grad += fijk.grad([w[index], w[j]], 0)
 
+        # Add gradients from the loss functions (column):
         for i in range(len(self._f)):
             fij = self._f[i][index]
             if i != index:  # Do not count these twice.
@@ -372,20 +476,46 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
                     fijk = fij[k]
                     if isinstance(fijk, properties.Gradient):
                         # We shouldn't do anything here, right? This means e.g.
-                        # that this (block i) is the y of a logistic regression.
+                        # that this (block i) is the y of a logistic regression
+                        # model.
                         pass
 #                        grad += fij.grad(w[i])
                     elif isinstance(fijk, mb_properties.MultiblockGradient):
                         grad += fijk.grad([w[i], w[index]], 1)
 
-        # Add gradients from the penalties.
-        pi = self._p[index]
-        for k in range(len(pi)):
-            grad += pi[k].grad(w[index])
+        return grad
 
+    def _grad_non_f(self, w, index):
+        grad = np.zeros(w[index].shape)
+
+        # Add gradients from the penalties:
+        di = self._d[index]
+        for k in range(len(di)):
+            grad += di[k].grad(w[index])
+
+        # Add gradients from the smoothed penalties:
         Ni = self._N[index]
         for k in range(len(Ni)):
             grad += Ni[k].grad(w[index])
+
+        return grad
+
+    def grad(self, w, index):
+        """Gradient of the differentiable part of the function.
+
+        From the interface "MultiblockGradient".
+
+        Parameters
+        ----------
+        w : list of numpy arrays
+            The weight vectors, w[index] is the point at which to evaluate the
+            gradient.
+
+        index : int
+            Non-negative integer. Which parameter vector (block) the gradient
+            is computed with respect to.
+        """
+        grad = self._grad_only_f(w, index) + self._grad_non_f(w, index)
 
         return grad
 
@@ -397,25 +527,41 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
 
         Parameters
         ----------
-        w : List of numpy arrays. The weight vectors.
+        w : list of numpy arrays
+            The parameter vectors at which to compute the proximal operator.
 
-        index : Non-negative integer. Which variable the step is for.
+        index : int
+            Non-negative integer. The variable for which to compute the
+            proximal operator.
 
-        factor : Positive float. A factor by which the Lagrange multiplier is
-                scaled. This is usually the step size.
+        factor : float
+            Positive float. A factor by which the Lagrange multiplier is
+            scaled. This is usually the step size.
         """
-        prox = self._prox[index]
+        prox = self._p[index]
         proj = self._c[index]
 
+        # We have no penalties with proximal operators and no constraints:
         if len(prox) == 0 and len(proj) == 0:
-            prox_w = w[index]
+            prox_w = w[index]  # Do nothing!
 
+        # There is one proximal operator and no constraints:
         elif len(prox) == 1 and len(proj) == 0:
-            prox_w = prox[0].prox(w[index])
+            prox_w = prox[0].prox(w[index], factor=factor,
+                                  eps=consts.TOLERANCE, max_iter=100)
 
+        # There are two proximal operators, and no constraints:
+        elif len(prox) == 2 and len(proj) == 0:
+            from parsimony.algorithms.proximal import DykstrasProximalAlgorithm
+            prox_combo = DykstrasProximalAlgorithm(eps=eps, max_iter=max_iter)
+
+            prox_w = prox_combo.run(prox, w[index], factor=factor)
+
+        # There are no proximal operators, but one or two constraints:
         elif len(prox) == 0 and (len(proj) == 1 or len(proj) == 2):
             prox_w = self.proj(w, index, eps=eps, max_iter=max_iter)
 
+        # There are at least one proximal operator and at least one constraint:
         else:
             from parsimony.algorithms.proximal \
                 import ParallelDykstrasProximalAlgorithm
@@ -434,23 +580,33 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
 
         Parameters
         ----------
-        w : List of numpy arrays. The weight vectors.
+        w : list of numpy arrays
+            The weight vectors.
 
-        index : Non-negative integer. Which variable the step is for.
+        index : int
+            Non-negative integer. Which variable the projection is for.
         """
-        prox = self._prox[index]
+        prox = self._p[index]
         proj = self._c[index]
-        if len(proj) == 1 and len(prox) == 0:
+
+        # We have no penalties with projection operators:
+        if len(prox) == 0 and len(proj) == 0:
+            proj_w = w[index]  # Do nothing!
+
+        # There is one projection operator and no proximal operators:
+        elif len(proj) == 1 and len(prox) == 0:
             proj_w = proj[0].proj(w[index], eps=eps, max_iter=max_iter)
 
+        # There are two projection operators and no proximal operators:
         elif len(proj) == 2 and len(prox) == 0:
             from parsimony.algorithms.proximal \
                 import DykstrasProjectionAlgorithm
             combo = DykstrasProjectionAlgorithm(eps=eps,
                                                 max_iter=max_iter, min_iter=1)
-
             proj_w = combo.run(proj, w[index])
 
+        # There are no constraints, but one or two proximal operators, or any
+        # number of constraints and any number of proximal oeprators:
         else:
             proj_w = self.prox(w, index, eps=eps, max_iter=max_iter)
 
@@ -463,9 +619,11 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
 
         Parameters
         ----------
-        w : Numpy array. The point at which to determine the step size.
+        w : list of numpy arrays
+            The point at which to determine the step size.
 
-        index : Non-negative integer. The variable which the step is for.
+        index : int
+            Non-negative integer. The variable which the step is for.
         """
         all_lipschitz = True
         L = 0.0
@@ -491,8 +649,8 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
                     else:
                         L += fijk.L([w[index], w[j]], 0)
 
-            if not all_lipschitz:
-                break
+                if not all_lipschitz:
+                    break
 
         for i in range(len(self._f)):
             fij = self._f[i][index]
@@ -513,13 +671,13 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
                             L += fijk.L([w[i], w[index]], 1)
 
         # Add Lipschitz constants from the penalties.
-        pi = self._p[index]
-        for k in range(len(pi)):
-            if not isinstance(pi[k], properties.LipschitzContinuousGradient):
+        di = self._d[index]
+        for k in range(len(di)):
+            if not isinstance(di[k], properties.LipschitzContinuousGradient):
                 all_lipschitz = False
                 break
             else:
-                L += pi[k].L()  # w[index])
+                L += di[k].L()  # w[index])
 
         Ni = self._N[index]
         for k in range(len(Ni)):

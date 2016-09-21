@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-The :mod:`parsimony.functions.properties` module contains properties that
-describes the functionality of the multiblock functions.
+The :mod:`parsimony.functions.multiblock.properties` module contains properties
+that describes the functionality of the multiblock functions.
 
-Try to keep the inheritance tree loop-free unless absolutely impossible.
+Try to keep the inheritance tree loop-free unless absolutely necessary.
 
-Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2016, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 Created on Mon Feb  3 09:55:51 2014
 
@@ -27,32 +27,33 @@ __all__ = ["MultiblockFunction", "MultiblockGradient",
            "MultiblockContinuation", "MultiblockStepSize"]
 
 
-class MultiblockFunction(with_metaclass(abc.ABCMeta, properties.CompositeFunction)):
-    """ This is a function that is the combination (i.e. sum) of other
+class MultiblockFunction(with_metaclass(abc.ABCMeta,
+                                        properties.CompositeFunction)):
+    """This is a function that is the combination (i.e. sum) of other
     multiblock, composite or atomic functions. The difference from
     CompositeFunction is that this function assumes that relevant functions
     accept an index, i, that is the block we are working with.
     """
-
-    constraints = dict()
-
-    def add_constraint(self, function, index):
-        """Add a constraint to this function.
-        """
-        if index in self.constraints:
-            self.constraints[index].append(function)
-        else:
-            self.constraints[index] = [function]
-
-    def get_constraints(self, index):
-        """Returns the constraint functions for the function with the given
-        index. Returns an empty list if no constraint functions exist for the
-        given index.
-        """
-        if index in self.constraints:
-            return self.constraints[index]
-        else:
-            return []
+    pass
+#    constraints = dict()
+#
+#    def add_constraint(self, function, index):
+#        """Add a constraint to this function.
+#        """
+#        if index in self.constraints:
+#            self.constraints[index].append(function)
+#        else:
+#            self.constraints[index] = [function]
+#
+#    def get_constraints(self, index):
+#        """Returns the constraint functions for the function with the given
+#        index. Returns an empty list if no constraint functions exist for the
+#        given index.
+#        """
+#        if index in self.constraints:
+#            return self.constraints[index]
+#        else:
+#            return []
 
 
 class MultiblockGradient(with_metaclass(abc.ABCMeta, object)):
@@ -103,7 +104,8 @@ class MultiblockGradient(with_metaclass(abc.ABCMeta, object)):
         return grad
 
 
-class MultiblockLipschitzContinuousGradient(with_metaclass(abc.ABCMeta, object)):
+class MultiblockLipschitzContinuousGradient(with_metaclass(abc.ABCMeta,
+                                                           object)):
 
     @abc.abstractmethod
     def L(self, w, index):

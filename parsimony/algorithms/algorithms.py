@@ -28,6 +28,8 @@ try:
 except:
     import parsimony.algorithms.utils as utils
 
+import parsimony.functions.properties as properties
+
 __all__ = ["SequentialMinimalOptimization"]
 
 
@@ -352,13 +354,21 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
 
     Accepts two functions, f and g, such that g majorizes f at a point y, i.e.
 
-        f(x) <= g(x | y) for all x, and
+        f(x) <= g(x | y) for all x,
+
+    and
+
         f(y) = g(y).
 
     Parameters
     ----------
     algorithm : bases.ExplicitAlgorithm
         An algorithm that can be used to minimise g.
+
+    function : Function
+        The original function that is to be minimised. Used if g in run() is a
+        MajoriserFunction. Also, used if Info.func_val is supplied, it will
+        then be used when computing the function value.
 
     max_mm_iter : int
         Must be non-negative. Maximum allowed number of iterations in the inner
@@ -385,8 +395,11 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
     Examples
     --------
     >>> import numpy as np
+    >>> import parsimony.algorithms as algs
     >>> import parsimony.algorithms.algorithms as alg
     >>> import parsimony.algorithms.utils as utils
+    >>> import parsimony.functions.losses as losses
+    >>> import parsimony.functions.taylor as taylor
     >>>
     >>> np.random.seed(42)
     >>> n = 30
@@ -394,14 +407,34 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
     ...                0.3 * np.random.randn(n / 2, 2) + 0.75])
     >>> y = np.vstack([1 * np.ones((n / 2, 1)),
     ...                3 * np.ones((n / 2, 1))]) - 2
-    >>>
+    >>> function = losses.LinearRegression(X, y)
+    >>> taylor_wrapper = taylor.FirstOrderTaylorWrapper()
+    >>> x = np.random.randn(X.shape[1], 1)
+    >>> gd = algs.gradient.GradientDescent()
+    >>> opt1 = gd.run(function, x)
+    >>> round(function.f(opt1), 13)
+    0.3910141418207
+    >>> np.round(function.grad(opt1), 13)
+    array([[ -1.91855000e-08],
+           [  1.85334000e-08]])
+    >>> mm = alg.MajorizationMinimization(gd)
+    >>> opt2 = mm.run(function, taylor_wrapper, x)
+    >>> round(function.f(opt2), 13)
+    0.3910141418207
+    >>> np.round(function.grad(opt2), 13)
+    array([[ -1.91855000e-08],
+           [  1.85334000e-08]])
+    >>> function.f(opt1) - function.f(opt2) < 5e-13
+    True
+    >>> np.linalg.norm(function.grad(opt1) - function.grad(opt2)) < 5e-13
+    True
     """
     INFO_PROVIDED = [utils.Info.ok,
                      utils.Info.time,
                      utils.Info.func_val,
                      utils.Info.converged]
 
-    def __init__(self, algorithm, eps=5e-8, max_mm_iter=1,
+    def __init__(self, algorithm, function, eps=5e-8, max_mm_iter=1,
                  max_iter=consts.MAX_ITER, min_iter=1, info=[]):
 
         super(MajorizationMinimization, self).__init__(info=info,
@@ -409,6 +442,7 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
                                                        min_iter=min_iter)
 
         self.algorithm = algorithm
+        self.function = function
         self.eps = max(consts.FLOAT_EPSILON, float(eps))
         self.max_mm_iter = max(1, int(max_mm_iter))
 
@@ -423,16 +457,13 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
         super(MajorizationMinimization, self).set_params(**kwargs)
 
     @bases.force_reset
-    def run(self, f, g, x):
+    def run(self, g, x):
         """Find the best separating margin for the samples in X.
 
         Parameters
         ----------
-        f : Function
-            The original function to minimise.
-
-        g : Function
-            The function that majorises f.
+        g : MajoriserFunction
+            The function that majorises self.function.
 
         x : array_like
             The point at which to start the minimisation process.
@@ -455,12 +486,17 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
                 tm = utils.time()
 
             xold = xnew
-            xnew = self.algorithm.run(g, xold)
+            if isinstance(g, properties.MajoriserFunction):
+                maj_f = g(self.function, xold)
+            else:
+                g.at_point(xold)
+                maj_f = g
+            xnew = self.algorithm.run(maj_f, xold)
 
             if self.info_requested(utils.Info.time):
                 _t.append(utils.time() - tm)
             if self.info_requested(utils.Info.func_val):
-                _f.append(f.f(xnew))
+                _f.append(g.f(xnew))
 
             if self.callback is not None:
                 self.callback(locals())

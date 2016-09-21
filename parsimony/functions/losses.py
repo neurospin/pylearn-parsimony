@@ -44,14 +44,18 @@ class LinearRegression(properties.CompositeFunction,
         """
         Parameters
         ----------
-        X : Numpy array (n-by-p). The regressor matrix.
+        X : numpy array (n-by-p)
+            The regressor matrix.
 
-        y : Numpy array (n-by-1). The regressand vector.
+        y : numpy array (n-by-1)
+            The regressand vector.
 
-        k : Non-negative float. The ridge parameter.
+        k : float
+            Non-negative float. The ridge parameter.
 
-        mean : Boolean. Whether to compute the squared loss or the mean
-                squared loss. Default is True, the mean squared loss.
+        mean : bool
+            Whether to compute the squared loss or the mean squared loss.
+            Default is True, the mean squared loss.
         """
         self.X = X
         self.y = y
@@ -74,8 +78,9 @@ class LinearRegression(properties.CompositeFunction,
 
         Parameters
         ----------
-        beta : Numpy array. Regression coefficient vector. The point at which
-                to evaluate the function.
+        beta : numpy array
+            Regression coefficient vector. The point at which to evaluate the
+            function.
         """
         if self.mean:
             d = 2.0 * float(self.X.shape[0])
@@ -93,7 +98,8 @@ class LinearRegression(properties.CompositeFunction,
 
         Parameters
         ----------
-        beta : The point at which to evaluate the gradient.
+        beta : numpy array
+            The point at which to evaluate the gradient.
 
         Examples
         --------
@@ -172,9 +178,10 @@ class LinearRegression(properties.CompositeFunction,
 
         Parameters
         ----------
-        beta : Numpy array. The point at which to determine the step size.
+        beta : numpy array
+            The point at which to determine the step size.
         """
-        return 1.0 / self.L()
+        return 1.0 / self.L(beta)
 
 
 class RidgeRegression(properties.CompositeFunction,

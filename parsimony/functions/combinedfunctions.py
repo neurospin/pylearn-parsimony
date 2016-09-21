@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-The :mod:`parsimony.functions.objectives.functions` module contains ready-made
-common combinations of loss functions and penalties that can be used right
-away to analyse real data.
+The :mod:`parsimony.functions.objectives.combinedfunctions` module contains
+ready-made common combinations of loss functions and penalties that can be used
+right away to analyse real data.
 
 Created on Mon Apr 22 10:54:29 2013
 
@@ -71,14 +71,14 @@ class CombinedFunction(properties.CompositeFunction,
 
     Parameters
     ----------
-    functions : list of Function
+    functions : list of functions
         A list of the loss function(s), whose sum is to be minimised.
 
-    penalties : list of Penalty
+    penalties : list of penalties
         A list of the penalties.
 
-    smoothed : list
-        A list of the smoothed (Nesterov) penalties.
+    smoothed : list of smoothed penalties
+        A list of the smoothed penalties.
 
     prox : list of ProximalOperator
         A list of penalties that can be expressed as proximal operators.
@@ -94,6 +94,8 @@ class CombinedFunction(properties.CompositeFunction,
         self._N = list(smoothed)
         self._p = list(prox)
         self._c = list(constraints)
+
+        self._param_map = dict()
 
         self.reset()
 
@@ -114,8 +116,38 @@ class CombinedFunction(properties.CompositeFunction,
         for c in self._c:
             c.reset()
 
-    def add_loss(self, function):
+    def set_params(self, **kwargs):
+        """Set the given input parameters in the corresponding function.
+        """
+        for k in kwargs:
+            if k in self._param_map:
+                param_map = self._param_map[k]
+                param = dict()
+                param[param_map[1]] = kwargs[k]
+                param_map[0].set_params(param)
+            else:
+                self.__setattr__(k, kwargs[k])
 
+    def _accept_params(self, function, accepts_params):
+        if accepts_params is not None:
+            if isinstance(accepts_params, tuple):
+                accepts_params = [accepts_params]
+            for param in accepts_params:
+                self._param_map[param[0]] = (function, param[1])
+
+    def add_loss(self, function, accepts_params=None):
+        """Add a loss function that connects blocks i and j.
+
+        Parameters
+        ----------
+        function : Function or MultiblockFunction
+            The loss function to add.
+
+        accepts_params : 2-tuple or list of 2-tuples
+            The outer function will accept parameters with the name of the
+            first element of any tuple, and map them to this function with the
+            name of the second element of the tuple.
+        """
         if not isinstance(function, properties.Gradient) \
                 and not isinstance(function, properties.SubGradient):
             raise ValueError("Loss functions must have gradients or "
@@ -123,13 +155,26 @@ class CombinedFunction(properties.CompositeFunction,
 
         self._f.append(function)
 
+        self._accept_params(function, accepts_params)
+
     @deprecated("add_loss")
     def add_function(self, function):
 
         return self.add_loss(function)
 
-    def add_penalty(self, penalty):
+    def add_penalty(self, penalty, accepts_params=None):
+        """Add a penalty, i.e. a constraint on the Lagrange form.
 
+        Parameters
+        ----------
+        penalty : Penalty
+            A function that penalises the objective function.
+
+        accepts_params : 2-tuple or list of 2-tuples
+            The outer function will accept parameters with the name of the
+            first element of any tuple, and map them to this function with the
+            name of the second element of the tuple.
+        """
         if not isinstance(penalty, properties.Penalty):
             raise ValueError("Not a penalty.")
         elif isinstance(penalty, properties.Gradient) \
@@ -138,38 +183,61 @@ class CombinedFunction(properties.CompositeFunction,
         elif isinstance(penalty, properties.ProximalOperator):
             self._p.append(penalty)
         elif isinstance(penalty, properties.NesterovFunction):
-            self._d.append(penalty)
+            self._N.append(penalty)
         else:
             raise ValueError("The penalty is not smooth, nor smoothed, and it "
                              "does not have a proximal operator.")
 
-    def add_smoothed(self, penalty):
+        self._accept_params(penalty, accepts_params)
+
+    def add_smoothed(self, penalty, accepts_params=None):
 
         if isinstance(penalty, properties.NesterovFunction):
-            self._d.append(penalty)
+            self._N.append(penalty)
         else:
             raise ValueError("Not a smoothed function.")
+
+        self._accept_params(penalty, accepts_params)
 
     @deprecated("add_smoothed")
     def add_nesterov(self, penalty):
 
         return self.add_smoothed(penalty)
 
-    def add_prox(self, penalty):
+    def add_prox(self, penalty, accepts_params=None):
+        """Add a penalty that has a known or computable proximal operator.
 
+        Parameters
+        ----------
+        penalty : ProximalOperator
+            A function that penalises the objective function.
+
+        accepts_params : 2-tuple or list of 2-tuples
+            The outer function will accept parameters with the name of the
+            first element of any tuple, and map them to this function with the
+            name of the second element of the tuple.
+        """
         if isinstance(penalty, properties.ProximalOperator):
             self._p.append(penalty)
-
-#            if isinstance(penalty, properties.ProjectionOperator):
-#                # Use the projection operator as the proximal of the indicator
-#                # function:
-#                penalty.prox = penalty.proj
-#                self._p.append(penalty)
         else:
             raise ValueError("Not a proximal operator.")
 
-    def add_constraint(self, constraint):
+        self._accept_params(penalty, accepts_params)
 
+    def add_constraint(self, constraint, accepts_params=None):
+        """Add a constraint.
+
+        Parameters
+        ----------
+        constraint : Constraint
+            A function that constrains the possible solutions of the objective
+            function.
+
+        accepts_params : 2-tuple or list of 2-tuples
+            The outer function will accept parameters with the name of the
+            first element of any tuple, and map them to this function with the
+            name of the second element of the tuple.
+        """
         if not isinstance(constraint, properties.Constraint):
             raise ValueError("Not a constraint.")
         elif not isinstance(constraint, properties.ProjectionOperator):
@@ -177,22 +245,23 @@ class CombinedFunction(properties.CompositeFunction,
         else:
             self._c.append(constraint)
 
+        self._accept_params(constraint, accepts_params)
+
     @deprecated("add_penalty")
     def add_smooth_penalty(self, penalty):
 
         self.add_penalty(penalty)
 
-    def f(self, x):
-        """Function value.
-
-        Parameters
-        ----------
-        x : numpy array (p-by-1)
-            The parameter vector at which to evaluate the function.
-        """
+    def _f(self, x):
         val = 0.0
+
         for f in self._f:
             val += f.f(x)
+
+        return val
+
+    def _non_f(self, x):
+        val = 0.0
 
         for d in self._d:
             val += d.f(x)
@@ -205,6 +274,40 @@ class CombinedFunction(properties.CompositeFunction,
 
         return val
 
+    def f(self, x):
+        """Function value.
+
+        Parameters
+        ----------
+        x : numpy array (p-by-1)
+            The parameter vector at which to evaluate the function.
+        """
+        val = self._f(x) + self._non_f(x)
+
+        return val
+
+    def _grad_f(self, x):
+        grad = np.zeros(x.shape)
+
+        # Add gradients from the loss functions:
+        for f in self._f:
+            grad += f.grad(x)
+
+        return grad
+
+    def _grad_non_f(self, x):
+        grad = np.zeros(x.shape)
+
+        # Add gradients from the penalties:
+        for d in self._d:
+            grad += d.grad(x)
+
+        # Add gradients from the smoothed functions:
+        for N in self._N:
+            grad += N.grad(x)
+
+        return grad
+
     def grad(self, x):
         """Gradient of the differentiable part of the function.
 
@@ -215,19 +318,7 @@ class CombinedFunction(properties.CompositeFunction,
         x : numpy array (p-by-1)
             The parameter vector at which to compute the proximal operator.
         """
-        grad = 0.0
-
-        # Add gradients from the loss functions:
-        for f in self._f:
-            grad += f.grad(x)
-
-        # Add gradients from the penalties:
-        for d in self._d:
-            grad += d.grad(x)
-
-        # Add gradients from the smoothed functions:
-        for N in self._N:
-            grad += N.grad(x)
+        grad = self._grad_f(x) + self._grad_non_f(x)
 
         return grad
 
@@ -310,7 +401,7 @@ class CombinedFunction(properties.CompositeFunction,
                     subgrad += N.subgrad(x)
 
     def prox(self, x, factor=1.0, **kwargs):
-        """The proximal operators of the non-differentiable part of the
+        """The proximal operator of the non-differentiable part of the
         function.
 
         From the interface "ProximalOperator".
@@ -321,12 +412,13 @@ class CombinedFunction(properties.CompositeFunction,
             The parameter vector at which to compute the proximal operator.
 
         factor : float
-            A factor by which the penalties should be multiplied.
+            Positive float. A factor by which the Lagrange multiplier is
+            scaled. This is usually the step size.
         """
         prox = self._p
         proj = self._c
 
-        # We have no penalties with proximal operators:
+        # We have no penalties with proximal operators and no constraints:
         if len(prox) == 0 and len(proj) == 0:
             prox_x = x  # Do nothing!
 
@@ -376,6 +468,7 @@ class CombinedFunction(properties.CompositeFunction,
         elif len(proj) == 1 and len(prox) == 0:
             proj_x = proj[0].proj(x, **kwargs)
 
+        # There are two projection operators and no proximal operators:
         elif len(proj) == 2 and len(prox) == 0:
             from parsimony.algorithms.proximal \
                 import DykstrasProjectionAlgorithm
@@ -398,7 +491,7 @@ class CombinedFunction(properties.CompositeFunction,
         Parameters
         ----------
         x : numpy array (p-by-1)
-            The point at which to evaluate the step size.
+            The point at which to determine the step size.
         """
         all_lipschitz = True
         for f in self._f:

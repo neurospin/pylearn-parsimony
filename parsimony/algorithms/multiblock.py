@@ -28,51 +28,156 @@ import parsimony.functions.properties as properties
 import parsimony.functions.multiblock.properties as multiblock_properties
 import parsimony.functions.multiblock.losses as mb_losses
 
-__all__ = ["MultiblockFISTA"]
+__all__ = ["BlockRelaxationWrapper", "MultiblockFISTA"]
 
 
-#class GeneralisedMultiblockISTA(ExplicitAlgorithm):
-#    """ The iterative shrinkage threshold algorithm in a multiblock setting.
-#    """
-#    INTERFACES = [functions.MultiblockFunction,
-#                  functions.MultiblockGradient,
-#                  functions.MultiblockProximalOperator,
-#                  functions.StepSize,
-#                 ]
-#
-#    def __init__(self, step=None, output=False,
-#                 eps=consts.TOLERANCE,
-#                 max_iter=consts.MAX_ITER, min_iter=1):
-#
-#        self.step = step
-#        self.output = output
-#        self.eps = eps
-#        self.max_iter = max_iter
-#        self.min_iter = min_iter
-#
-#    def __call__(self, function, w):
-#
-#        self.check_compatability(function, self.INTERFACES)
-#
-#        for it in xrange(10):  # TODO: Get number of iterations!
-#            print "it:", it
-#
-#            for i in xrange(len(w)):
-#                print "  i:", i
-#
-#                for k in xrange(10000):
-#                    print "    k:", k
-#
-#                    t = function.step(w, i)
-#                    w[i] = w[i] - t * function.grad(w, i)
-#                    w = function.prox(w, i, t)
-##                    = w[:i] + [wi] + w[i+1:]
-#
-#                    print "    f:", function.f(w)
-#
-##                w[i] = wi
-#
-#        return w
+class BlockRelaxationWrapper(bases.ExplicitAlgorithm,
+                             bases.IterativeAlgorithm,
+                             bases.InformationAlgorithm):
+    """Utilises block relaxation to minimise over one block at the time.
+
+    Parameters
+    ----------
+    info : list or tuple of utils.Info
+        What, if any, extra run information should be stored. Default is an
+        empty list, which means that no run information is computed nor
+        returned.
+
+    eps : float
+        Positive float. Tolerance for the stopping criterion.
+
+    max_iter : int
+        Non-negative integer. Maximum total allowed number of iterations.
+
+    min_iter : int
+        Non-negative integer less than or equal to max_iter. Minimum number of
+        iterations that must be performed. Default is 1.
+    """
+    INTERFACES = [multiblock_properties.MultiblockFunction]
+
+    INFO_PROVIDED = [Info.ok,
+                     Info.num_iter,
+                     Info.time,
+                     Info.func_val,
+                     Info.converged]
+
+    def __init__(self, algorithm, info=[], eps=consts.TOLERANCE,
+                 max_iter=consts.MAX_ITER, min_iter=1):
+
+        # Add info requests to the algorithm.
+        for nfo in info:
+            if algorithm.info_provided(nfo):
+                if not algorithm.info_requested(nfo):
+                    algorithm.info_add_request(nfo)
+
+        super(BlockRelaxationWrapper, self).__init__(info=info,
+                                                     max_iter=max_iter,
+                                                     min_iter=min_iter)
+
+        self.algorithm = algorithm
+
+        self.eps = max(consts.FLOAT_EPSILON, float(eps))
+
+    def reset(self):
+
+        self.info_reset()
+        self.iter_reset()
+
+    @bases.force_reset
+    @bases.check_compatibility
+    def run(self, function, w):
+        """Apply the algorithm to minimise function, starting at the positions
+        of the vectors in the list w.
+
+        Parameters
+        ----------
+        function : MultiblockFunction
+            The function to minimise.
+
+        w : list of numpy arrays
+            Each element of the list is the parameter vector corresponding to a
+            block.
+        """
+        # Not ok until the end.
+        if self.info_requested(Info.ok):
+            self.info_set(Info.ok, False)
+
+        # Initialise info variables. Info variables have the prefix "_".
+        if self.info_requested(Info.time):
+            _t = []
+        if self.info_requested(Info.func_val):
+            _f = []
+        if self.info_requested(Info.converged):
+            self.info_set(Info.converged, False)
+
+        w_old = [0] * len(w)
+        it = 0
+        while True:
+
+            for i in range(len(w)):
+
+                # Wrap a function around the ith block:
+                func = mb_losses.MultiblockFunctionWrapper(function, w, i)
+                if hasattr(function, "at_point"):
+                    def new_at_point(self, w):
+                        return function.at_point(self.w[:self.index] +
+                                                 [w] +
+                                                 self.w[self.index + 1:])
+
+                    import types
+                    func.at_point = types.MethodType(new_at_point, func)
+
+                w_old[i] = w[i]
+                self.algorithm.reset()
+                w[i] = self.algorithm.run(func, w_old[i])
+
+                # Store info from algorithm:
+                if self.info_requested(Info.time):
+                    time = self.algorithm.info_get(Info.time)
+                    _t.extend(time)
+                if self.info_requested(Info.func_val):
+                    func_val = self.algorithm.info_get(Info.func_val)
+                    _f.extend(func_val)
+
+                # Update iteration counts.
+                self.num_iter += self.algorithm.num_iter
+
+            # Test global stopping criterion.
+            all_converged = True
+            for i in range(len(w)):
+
+                # Wrap a function around the ith block.
+                func = mb_losses.MultiblockFunctionWrapper(function, w, i)
+
+                # Test if converged for block i.
+                if maths.norm(w[i] - w_old[i]) > self.eps:
+                    all_converged = False
+                    break
+
+            # Converged in all blocks!
+            if all_converged:
+                if self.info_requested(Info.converged):
+                    self.info_set(Info.converged, True)
+
+                break
+
+            # Stop after maximum number of iterations.
+            if self.num_iter >= self.max_iter:
+                break
+
+            it += 1
+
+        # Store information.
+        if self.info_requested(Info.num_iter):
+            self.info_set(Info.num_iter, self.num_iter)
+        if self.info_requested(Info.time):
+            self.info_set(Info.time, _t)
+        if self.info_requested(Info.func_val):
+            self.info_set(Info.func_val, _f)
+        if self.info_requested(Info.ok):
+            self.info_set(Info.ok, True)
+
+        return w
 
 
 class MultiblockFISTA(bases.ExplicitAlgorithm,

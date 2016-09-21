@@ -56,6 +56,18 @@ class BaseAlgorithm(with_metaclass(abc.ABCMeta, object)):
         raise NotImplementedError('Method "get_params" has not been '
                                   'implemented.')
 
+    def reset(self):
+        """Resets the algorithm so that it is as if just created.
+
+        Override in order to reset more things, but remember to call the base
+        class' reset() method.
+        """
+        # TODO: Keep this list up to date!
+        if isinstance(self, IterativeAlgorithm):
+            self.iter_reset()
+        if isinstance(self, InformationAlgorithm):
+            self.info_reset()
+
 
 # TODO: Replace the one in BaseAlgorithm.
 def check_compatibility(f):
@@ -93,7 +105,6 @@ def force_reset(f):
 
 class ImplicitAlgorithm(with_metaclass(abc.ABCMeta, BaseAlgorithm)):
     """Implicit algorithms are algorithms that do not utilise a loss function.
-
     Implicit algorithms instead minimise or maximise some underlying function
     implicitly, usually from the data.
 
@@ -101,7 +112,6 @@ class ImplicitAlgorithm(with_metaclass(abc.ABCMeta, BaseAlgorithm)):
     ----------
     X : One or more data matrices.
     """
-
     @abc.abstractmethod
     def run(X, **kwargs):
         raise NotImplementedError('Abstract method "run" must be '
@@ -110,14 +120,12 @@ class ImplicitAlgorithm(with_metaclass(abc.ABCMeta, BaseAlgorithm)):
 
 class ExplicitAlgorithm(with_metaclass(abc.ABCMeta, BaseAlgorithm)):
     """Explicit algorithms are algorithms that minimises a given function.
-
     The function is explicitly minimised from properties of said function.
 
     Implementing classes should update the INTERFACES class variable with
-    the properties that function must implement. Defauls to a list with one
+    the properties that function must implement. Defaults to a list with one
     element, the Function.
     """
-
     INTERFACES = [properties.Function]
 
     @abc.abstractmethod
@@ -274,6 +282,11 @@ class InformationAlgorithm(object):
         otherwise.
         """
         return nfo in self.info
+
+    def info_add_request(self, nfo):
+        """Add a request to the algorithm's list of requested info.
+        """
+        return self.info.append(nfo)
 
     def info_reset(self):
         """Resets the information saved in the previous run. The info_ret

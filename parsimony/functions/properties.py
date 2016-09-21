@@ -14,9 +14,8 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com, edouard.duchesnay@cea.fr
 @license: BSD 3-clause.
 """
-from six import with_metaclass
-from six import with_metaclass
 import abc
+from six import with_metaclass
 
 import numpy as np
 import scipy.sparse as sparse
@@ -32,6 +31,8 @@ __all__ = ["Function", "AtomicFunction", "CompositeFunction",
            "SubGradient", "Gradient", "Hessian", "LipschitzContinuousGradient",
            "StepSize",
            "GradientMap", "DualFunction", "Eigenvalues", "StronglyConvex",
+           "NesterovFunction",
+           "MajoriserFunction",
            "OR"]
 
 
@@ -68,25 +69,14 @@ class AtomicFunction(with_metaclass(abc.ABCMeta, Function)):
     itself. Instead it should be combined with other atomic functions and
     composite functions into composite functions.
     """
+    pass
 
 
 class CompositeFunction(with_metaclass(abc.ABCMeta, Function)):
     """This is a function that is the combination (e.g. sum) of other
     composite or atomic functions. It may also be a constrained function.
     """
-
-#    constraints = list()
-#
-#    def add_constraint(self, function):
-#        """Add a constraint to this function.
-#        """
-#        self.constraints.append(function)
-#
-#    def get_constraints(self):
-#        """Returns the constraint functions for this function. Returns an
-#        empty list if no constraint functions exist.
-#        """
-#        return self.constraints
+    pass
 
 
 class IndicatorFunction(with_metaclass(abc.ABCMeta, Function)):
@@ -157,6 +147,7 @@ class Penalty(with_metaclass(abc.ABCMeta, object)):
             etc., to except from penalisation. Equivalently, the first index
             to be penalised. Default is 0, all columns are included.
     """
+    pass
 
 
 # TODO: Should all constraints have the projection operator?
@@ -363,8 +354,8 @@ class Gradient(with_metaclass(abc.ABCMeta, object)):
 
         Parameters
         ----------
-        beta : Numpy array (p-by-1). The point at which to evaluate the
-                gradient.
+        beta : numpy array (p-by-1)
+            The point at which to evaluate the gradient.
         """
         raise NotImplementedError('Abstract method "grad" must be '
                                   'specialised!')
@@ -467,8 +458,8 @@ class LipschitzContinuousGradient(with_metaclass(abc.ABCMeta, object)):
 
         Parameters
         ----------
-        beta : Numpy array. The point at which to evaluate the Lipschitz
-                constant. Optional.
+        beta : numpy array (p-by-1), optional
+            The point at which to evaluate the Lipschitz constant.
         """
         raise NotImplementedError('Abstract method "L" must be '
                                   'specialised!')
@@ -481,8 +472,9 @@ class LipschitzContinuousGradient(with_metaclass(abc.ABCMeta, object)):
 
         Parameters
         ----------
-        shape : List or tuple. Usually has the form (p, 1). The shape of the
-                points which we draw randomly.
+        shape : list or tuple
+            Usually has the shape (p, 1). The shape of the points which we draw
+            randomly.
         """
         L = -float("inf")
         for i in range(max_iter):
@@ -578,22 +570,6 @@ class StronglyConvex(with_metaclass(abc.ABCMeta, object)):
         """
         raise NotImplementedError('Abstract method "parameter" is not '
                                   'implemented!')
-
-
-class OR(object):
-    def __init__(self, *classes):
-        self.classes = classes
-
-    def evaluate(self, function):
-        for c in self.classes:
-            if isinstance(function, c):
-                return True
-        return False
-
-    def __str__(self):
-        string = str(self.classes[0])
-        for i in range(1, len(self.classes)):
-            string = string + " OR " + str(self.classes[i])
 
 
 class NesterovFunction(with_metaclass(abc.ABCMeta, Gradient,
@@ -1021,3 +997,37 @@ class NesterovFunction(with_metaclass(abc.ABCMeta, Gradient,
                            y))
 
         return y
+
+
+class MajoriserFunction(with_metaclass(abc.ABCMeta, object)):
+    """A function wrapper that majorises another function.
+    """
+    @abc.abstractmethod
+    def __call__(self, f, x):
+        """
+        Parameters
+        ----------
+        f : Function
+            The function to majorise.
+
+        x : numpy array
+            The point at which to majorise the function, f.
+        """
+        raise NotImplementedError('Abstract method "__call__" must be '
+                                  'specialised!')
+
+
+class OR(object):
+    def __init__(self, *classes):
+        self.classes = classes
+
+    def evaluate(self, function):
+        for c in self.classes:
+            if isinstance(function, c):
+                return True
+        return False
+
+    def __str__(self):
+        string = str(self.classes[0])
+        for i in range(1, len(self.classes)):
+            string = string + " OR " + str(self.classes[i])
