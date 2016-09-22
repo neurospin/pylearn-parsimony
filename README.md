@@ -2,7 +2,7 @@ ParsimonY: structured and sparse machine learning in Python
 ===========================================================
 
 ParsimonY contains the following features:
-* `parsimony` provides structured and sparse penalties in machine learning. It currently contains:
+* `parsimony` provides structured and sparse penalties in machine learning. It contains, among other things:
     * Loss functions:
         * Linear regression
         * Logistic regression
@@ -29,24 +29,38 @@ ParsimonY contains the following features:
 
 Installation
 ------------
-The reference environment for pylearn-parsimony is Ubuntu 12.04 LTS with
-Python 2.7.3, Numpy 1.6.1 and Scipy 0.9.0. More recent versions likely work,
+The reference environment for pylearn-parsimony is Ubuntu 14.04 LTS with
+Python 2.7.6, Numpy 1.8.2 and Scipy 0.13.3. More recent versions likely work,
 but have not been tested thoroughly.
 
 Unless you already have Numpy and Scipy installed, you need to install them:
 ```
 $ sudo apt-get install python-numpy python-scipy
 ```
+or
+```
+$ sudo apt-get install python3-numpy python3-scipy
+```
 
 In order to run the tests, you may also need to install Nose:
 ```
 $ sudo apt-get install python-nose
+```
+or
+```
+$ sudo apt-get install python3-nose
 ```
 
 In order to show plots, you may need to install Matplotlib:
 ```
 $ sudo apt-get install python-matplotlib
 ```
+or
+```
+$ sudo apt-get install python3-matplotlib
+```
+
+
 
 **Downloading a stable release**
 
@@ -68,6 +82,10 @@ git clone https://github.com/neurospin/pylearn-parsimony.git
 To install on your system, go to the pylearn-parsimony directory and type:
 ```
 $ sudo python setup.py install
+```
+or
+```
+$ sudo python3 setup.py install
 ```
 
 Or, you can simply set your ``$PYTHONPATH`` variable to point parsimony:
@@ -111,8 +129,8 @@ ols = estimators.LinearRegression(algorithm_params=dict(max_iter=1000))
 Then we fit the model, estimate beta, and predict on test set.
 ```python
 res = ols.fit(X_train, y_train)
-print "Estimated beta error = ", np.linalg.norm(ols.beta - beta)
-print "Prediction error = ", np.linalg.norm(ols.predict(X_test) - y_test)
+print("Estimated beta error = ", np.linalg.norm(ols.beta - beta))
+print("Prediction error = ", np.linalg.norm(ols.predict(X_test) - y_test))
 ```
 
 Now we build an estimator with the OLS loss function and a Total Variation
@@ -132,8 +150,8 @@ olstv = estimators.LinearRegressionL1L2TV(k, l, g, A, mu=0.0001,
 We fit the model, estimate beta, and predict on the test set.
 ```python
 res = olstv.fit(X_train, y_train)
-print "Estimated beta error = ", np.linalg.norm(olstv.beta - beta)
-print "Prediction error = ", np.linalg.norm(olstv.predict(X_test) - y_test)
+print("Estimated beta error = ", np.linalg.norm(olstv.beta - beta))
+print("Prediction error = ", np.linalg.norm(olstv.predict(X_test) - y_test))
 ```
 
 Important links
