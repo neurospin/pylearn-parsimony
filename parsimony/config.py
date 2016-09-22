@@ -52,13 +52,17 @@ class __Config(object):
 
     def __del__(self):
         # Save updates to configuration file. Cannot call flush here.
-        if not self.__flush_dry_run__:
-            if os.path.exists(self._ini_file):
-                with open(self._ini_file, "wb") as fid:
-                    self._config.write(fid)
-            else:
-                warnings.warn("Could not locate the config file.",
-                              RuntimeWarning)
+        try:
+            if not self.__flush_dry_run__:
+                if os.path.exists(self._ini_file):
+                    with open(self._ini_file, "wb") as fid:
+                        self._config.write(fid)
+                else:
+                    warnings.warn("Could not locate the config file.",
+                                  RuntimeWarning)
+        except Exception:
+            # TODO: Anything we can do to resolve this?
+            pass  # Couldn't save. Objects used are probably deleted already.
 
     def _ini_file_name(self, ini_file):
         """Extracts the directory of this module.
