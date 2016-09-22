@@ -235,12 +235,18 @@ class FirstOrderTaylorWrapper(properties.MajoriserFunction):
             raise RuntimeError("The function appears to already be a Taylor "
                                "approximation!")
         else:
-            fun._taylor_f_at_point = fun._f(point)
+            if isinstance(fun, combinedfunctions.CombinedFunction):
+                fun._taylor_f_at_point = fun._f(point)
+            else:
+                fun._taylor_f_at_point = fun.f(point)
         if hasattr(fun, "_taylor_grad_f_at_point"):
             raise RuntimeError("The function appears to already be a Taylor "
                                "approximation!")
         else:
-            fun._taylor_grad_f_at_point = fun._grad_f(point)
+            if isinstance(fun, combinedfunctions.CombinedFunction):
+                fun._taylor_grad_f_at_point = fun._grad_f(point)
+            else:
+                fun._taylor_grad_f_at_point = fun.grad(point)
 
         # Redefine the function value
         def new_f(self, x):
@@ -249,7 +255,8 @@ class FirstOrderTaylorWrapper(properties.MajoriserFunction):
                          x - self._taylor_point)
 
             # Add function values from the penalties:
-            val += self._non_f(x)
+            if isinstance(fun, combinedfunctions.CombinedFunction):
+                val += self._non_f(x)
 
             return val[0, 0]
 
@@ -260,7 +267,8 @@ class FirstOrderTaylorWrapper(properties.MajoriserFunction):
             grad = self._taylor_grad_f_at_point
 
             # Add gradients from the penalties:
-            grad = grad + self._grad_non_f(x)
+            if isinstance(fun, combinedfunctions.CombinedFunction):
+                grad = grad + self._grad_non_f(x)
 
             return grad
 

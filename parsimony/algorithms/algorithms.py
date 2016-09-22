@@ -417,8 +417,8 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
     >>> np.round(function.grad(opt1), 13)
     array([[ -1.91855000e-08],
            [  1.85334000e-08]])
-    >>> mm = alg.MajorizationMinimization(gd)
-    >>> opt2 = mm.run(function, taylor_wrapper, x)
+    >>> mm = alg.MajorizationMinimization(gd, function)
+    >>> opt2 = mm.run(taylor_wrapper, x)
     >>> round(function.f(opt2), 13)
     0.3910141418207
     >>> np.round(function.grad(opt2), 13)

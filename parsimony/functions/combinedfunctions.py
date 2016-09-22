@@ -252,7 +252,7 @@ class CombinedFunction(properties.CompositeFunction,
 
         self.add_penalty(penalty)
 
-    def _f(self, x):
+    def _only_f(self, x):
         val = 0.0
 
         for f in self._f:
@@ -282,11 +282,11 @@ class CombinedFunction(properties.CompositeFunction,
         x : numpy array (p-by-1)
             The parameter vector at which to evaluate the function.
         """
-        val = self._f(x) + self._non_f(x)
+        val = self._only_f(x) + self._non_f(x)
 
         return val
 
-    def _grad_f(self, x):
+    def _grad_only_f(self, x):
         grad = np.zeros(x.shape)
 
         # Add gradients from the loss functions:
@@ -318,7 +318,7 @@ class CombinedFunction(properties.CompositeFunction,
         x : numpy array (p-by-1)
             The parameter vector at which to compute the proximal operator.
         """
-        grad = self._grad_f(x) + self._grad_non_f(x)
+        grad = self._grad_only_f(x) + self._grad_non_f(x)
 
         return grad
 
