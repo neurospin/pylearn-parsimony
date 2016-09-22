@@ -1,5 +1,7 @@
 include LICENSE
 include README.md
+include parsimony/config.ini
 recursive-include examples *.py
 recursive-include tests *.py
 exclude tests/_playhouse.py
+recursive-include doc *.*

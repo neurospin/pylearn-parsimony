@@ -76,13 +76,14 @@ params = dict(name="pylearn-parsimony",
 try:
     from setuptools import setup
 
-    params["install_requires"] = ["numpy>=1.6.1",
-                                  "scipy>=0.9.0",
+    params["install_requires"] = ["numpy>=1.8.2",
+                                  "scipy>=0.13.3",
                                   ]
-    params["extras_require"] = {"examples": ["matplotlib>=1.1.1rc"],
-                                "tests": ["doctest", "nose>=1.1.2"],
+    params["extras_require"] = {"examples": ["matplotlib>=1.3.1"],
+                                "tests": ["doctest", "nose>=1.3.1"],
                                 }
 except:
     from distutils.core import setup
 
 setup(**params)
+
