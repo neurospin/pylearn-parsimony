@@ -20,6 +20,10 @@ def read_version():
     # Default value if we cannot find the __version__ field in the init file:
     version = "0.3.x"
 
+    # TODO: Possibly more robust way to find the directory:
+    # filename = inspect.getframeinfo(inspect.currentframe()).filename
+    # path = os.path.dirname(os.path.abspath(filename))
+
     init_file = os.path.dirname(os.path.realpath(__file__)) + "/parsimony/__init__.py"
     if os.path.exists(init_file):
         with open(init_file, 'r') as f:
@@ -43,7 +47,7 @@ params = dict(name="pylearn-parsimony",
               keywords="machine learning, structured, sparse, regularization, penalties, non-smooth",
               url="https://github.com/neurospin/pylearn-parsimony",
               long_description=read("README.md"),
-              package_dir={"": "./"},
+              package_dir={"": "."},
               packages=["parsimony",
                         "parsimony.algorithms",
                         "parsimony.datasets",

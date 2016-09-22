@@ -19,7 +19,7 @@ from parsimony import algorithms
 from parsimony import estimators
 
 # WARNING! The following line is read by setup.py during install. Don't move or
-# change the syntax unless warranted!
+# change the syntax here unless you know exactly what you are doing!
 __version__ = "0.3"
 
 __all__ = ["algorithms", "config", "datasets", "estimators", "functions",
