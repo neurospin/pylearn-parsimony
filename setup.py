@@ -20,7 +20,7 @@ def read_version():
     # Default value if we cannot find the __version__ field in the init file:
     version = "0.3.x"
 
-    init_file = os.path.dirname(__file__) + "/parsimony/__init__.py"
+    init_file = os.path.dirname(os.path.realpath(__file__)) + "/parsimony/__init__.py"
     if os.path.exists(init_file):
         with open(init_file, 'r') as f:
             for line in f:
