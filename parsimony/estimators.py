@@ -248,7 +248,7 @@ class LinearRegression(RegressionEstimator):
     ...                                  algorithm_params=dict(max_iter=1000),
     ...                                  mean=False)
     >>> error = lr.fit(X, y).score(X, y)
-    >>> print "error = ", error
+    >>> print("error = ", error)
     error =  0.0116466703591
     """
     def __init__(self, algorithm=None, algorithm_params=dict(),
@@ -353,7 +353,7 @@ class RidgeRegression(RegressionEstimator):
     ...                                 algorithm_params=dict(max_iter=1000),
     ...                                 mean=False)
     >>> error = rr.fit(X, y).score(X, y)
-    >>> print "error = ", error
+    >>> print("error = ", error)
     error =  0.377679437659
     """
     def __init__(self, l, algorithm=None, algorithm_params=dict(),
@@ -466,7 +466,7 @@ class Lasso(RegressionEstimator):
     ...                          algorithm_params=dict(max_iter=1000),
     ...                          mean=False)
     >>> error = lasso.fit(X, y).score(X, y)
-    >>> print "error = ", error
+    >>> print("error = ", error)
     error =  0.395494642796
     """
     def __init__(self, l,
@@ -586,7 +586,7 @@ class ElasticNet(RegressionEstimator):
     ...                            algorithm_params=dict(max_iter=1000),
     ...                            mean=False)
     >>> error = en.fit(X, y).score(X, y)
-    >>> print "error = ", round(error, 13)
+    >>> print("error = ", round(error, 13))
     error =  0.492096328053
     """
     def __init__(self, l, alpha=1.0, algorithm=None, algorithm_params=dict(),
@@ -1090,19 +1090,19 @@ class LinearRegressionL1L2GL(RegressionEstimator):
 ##    ...                     algorithm=proximal.StaticCONESTA(max_iter=1000))
 ##    >>> res = ridge_l1_tv.fit(X, y)
 ##    >>> error = np.sum(np.abs(np.dot(X, ridge_l1_tv.beta) - y))
-##    >>> print "error = ", error
+##    >>> print("error = ", error)
 ##    error =  4.70079220678
 ##    >>> ridge_l1_tv = estimators.RidgeRegression_L1_TV(k, l, g, A,
 ##    ...                     algorithm=proximal.DynamicCONESTA(max_iter=1000))
 ##    >>> res = ridge_l1_tv.fit(X, y)
 ##    >>> error = np.sum(np.abs(np.dot(X, ridge_l1_tv.beta) - y))
-##    >>> print "error = ", error
+##    >>> print("error = ", error)
 ##    error =  4.70096544168
 ##    >>> ridge_l1_tv = estimators.RidgeRegression_L1_TV(k, l, g, A,
 ##    ...                     algorithm=proximal.FISTA(max_iter=1000))
 ##    >>> res = ridge_l1_tv.fit(X, y)
 ##    >>> error = np.sum(np.abs(np.dot(X, ridge_l1_tv.beta) - y))
-##    >>> print "error = ", error
+##    >>> print("error = ", error)
 ##    error =  4.24400179809
 #    """
 #    def __init__(self, k, l, g, A, mu=None,
@@ -1302,7 +1302,7 @@ class LogisticRegression(LogisticRegressionEstimator):
     ...                      mean=False)
     >>> res = lr.fit(X, y)
     >>> error = lr.score(X, y)
-    >>> print "error = ", error
+    >>> print("error = ", error)
     error =  1.0
     """
     def __init__(self, algorithm=None, algorithm_params=dict(),
@@ -1485,7 +1485,7 @@ class RidgeLogisticRegression(LogisticRegressionEstimator):
     ...                      mean=False)
     >>> res = lr.fit(X, y)
     >>> pred = lr.score(X, y)
-    >>> print "prediction rate = %.1f" % pred
+    >>> print("prediction rate = %.1f" % pred)
     prediction rate = 0.9
     """
     def __init__(self, l,
@@ -1609,7 +1609,7 @@ class LassoLogisticRegression(LogisticRegressionEstimator):
     ...                      mean=False)
     >>> res = lr.fit(X, y)
     >>> pred = lr.score(X, y)
-    >>> print "prediction rate = %.1f" % pred
+    >>> print("prediction rate = %.1f" % pred)
     prediction rate = 1.0
     """
     def __init__(self, l,
@@ -1730,7 +1730,7 @@ class ElasticNetLogisticRegression(LogisticRegressionEstimator):
     >>> lr = estimators.ElasticNetLogisticRegression(l, alpha)
     >>> res = lr.fit(X, y)
     >>> score = lr.score(X, y)
-    >>> print "Prediction rate: %.2f" % (score,)
+    >>> print("Prediction rate: %.2f" % (score,))
     Prediction rate: 0.80
     """
     def __init__(self, l, alpha=1.0,
@@ -1873,21 +1873,21 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
     ...                      mean=False)
     >>> res = lr.fit(X, y)
     >>> error = lr.score(X, y)
-    >>> print "error = ", error
+    >>> print("error = ", error)
     error =  0.7
     >>> lr = estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
     ...                                algorithm=proximal.FISTA(max_iter=1000),
     ...                                mean=False)
     >>> lr = lr.fit(X, y)
     >>> error = lr.score(X, y)
-    >>> print "error = ", error
+    >>> print("error = ", error)
     error =  0.7
     >>> lr = estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
     ...                                 algorithm=proximal.ISTA(max_iter=1000),
     ...                                 mean=False)
     >>> lr = lr.fit(X, y)
     >>> error = lr.score(X, y)
-    >>> print "error = ", error
+    >>> print("error = ", error)
     error =  0.7
     """
     def __init__(self, l1, l2, tv,
@@ -1995,7 +1995,7 @@ class LogisticRegressionL1L2TVInexactFISTA(LogisticRegressionL1L2TV):
     >>> Al1tv = l1tv.linear_operator_from_shape(shape, num_variables=p)
     >>> lr = estimators.LogisticRegressionL1L2TVInexactFISTA(l1, l2, tv, Al1tv,
     ...                                                      mean=False)
-    >>> print lr.fit(X, y).score(X, y)
+    >>> print(lr.fit(X, y).score(X, y))
     0.7
     """
     def __init__(self, l1, l2, tv,
@@ -2126,21 +2126,21 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
     ...                      mean=False)
     >>> res = lr.fit(X, y)
     >>> error = lr.score(X, y)
-    >>> print "error = ", error
+    >>> print("error = ", error)
     error =  0.7
     >>> lr = estimators.LogisticRegressionL1L2GL(l1, l2, gl, A=A,
     ...                                algorithm=proximal.FISTA(max_iter=1000),
     ...                                mean=False)
     >>> lr = lr.fit(X, y)
     >>> error = lr.score(X, y)
-    >>> print "error = ", error
+    >>> print("error = ", error)
     error =  0.7
     >>> lr = estimators.LogisticRegressionL1L2GL(l1, l2, gl, A,
     ...                                 algorithm=proximal.ISTA(max_iter=1000),
     ...                                 mean=False)
     >>> lr = lr.fit(X, y)
     >>> error = lr.score(X, y)
-    >>> print "error = ", error
+    >>> print("error = ", error)
     error =  0.7
     """
     def __init__(self, l1, l2, gl,
@@ -2525,7 +2525,7 @@ class SupportVectorMachine(SVMEstimator):
     ...                                                 max_iter=100))
     >>> res = svm.fit(X, y)
     >>> score = svm.score(X, y)
-    >>> print "score = ", score
+    >>> print("score = ", score)
     score =  0.933333333333
     """
     def __init__(self, C, kernel=None,
@@ -2673,7 +2673,7 @@ class PLSRegression(RegressionEstimator):
     >>> plsr = estimators.PLSRegression(K=4, algorithm=nipals.PLSR(),
     ...                                 algorithm_params=dict(max_iter=100))
     >>> error = plsr.fit(X, y).score(X, y)
-    >>> print "error = ", error
+    >>> print("error = ", error)
     error =  0.0222345224457
     """
 #    >>>
@@ -2686,7 +2686,7 @@ class PLSRegression(RegressionEstimator):
 #    ...                                 algorithm_params=dict(max_iter=100))
 #    >>> plsr.fit(X, y)
 #    >>> error = plsr.score(X, y)
-#    >>> print "error = ", error
+#    >>> print("error = ", error)
 #    error =  0.0222345202333
     def __init__(self, K=2, algorithm=None, algorithm_params=dict(),
                  start_vector=start_vectors.RandomStartVector(),
@@ -2854,7 +2854,7 @@ class SparsePLSRegression(RegressionEstimator):
     ...                                    algorithm=nipals.SparsePLSR(),
     ...                                    algorithm_params=dict(max_iter=100))
     >>> error = plsr.fit(X, y).score(X, y)
-    >>> print plsr.W
+    >>> print(plsr.W)
     [[ 0.37053417]
      [ 0.54969643]
      [ 0.29593809]
@@ -2865,9 +2865,9 @@ class SparsePLSRegression(RegressionEstimator):
      [ 0.35883331]
      [ 0.        ]
      [ 0.        ]]
-    >>> print plsr.C
+    >>> print(plsr.C)
     [[ 0.32949094]]
-    >>> print "error = ", error
+    >>> print("error = ", error)
     error =  0.0547513077301
     """
 #    >>>
@@ -2879,7 +2879,7 @@ class SparsePLSRegression(RegressionEstimator):
 #    ...                                 algorithm=multiblock.MultiblockFISTA(),
 #    ...                                 algorithm_params=dict(max_iter=100))
 #    >>> error = plsr.fit(X, y).score(X, y)
-#    >>> print plsr.W
+#    >>> print(plsr.W)
 #    [[ 0.37053423]
 #     [ 0.54969634]
 #     [ 0.29593824]
@@ -2890,9 +2890,9 @@ class SparsePLSRegression(RegressionEstimator):
 #     [ 0.35883343]
 #     [ 0.        ]
 #     [ 0.        ]]
-#    >>> print plsr.C
+#    >>> print(plsr.C)
 #    [[ 0.32949093]]
-#    >>> print "error = ", error
+#    >>> print("error = ", error)
 #    error =  0.0547513070388
     def __init__(self, l, K=2, algorithm=None, algorithm_params=dict(),
                  start_vector=start_vectors.RandomStartVector(),
@@ -3067,7 +3067,7 @@ class Clustering(BaseEstimator):
     >>> lloyds = cluster.KMeans(K, max_iter=100, repeat=10)
     >>> KMeans = estimators.Clustering(K, algorithm=lloyds)
     >>> error = KMeans.fit(X).score(X)
-    >>> print error
+    >>> print(error)
     27.6675491884
     >>>
     >>> #import matplotlib.pyplot as plot
@@ -3479,7 +3479,7 @@ class GridSearchKFold(BaseEstimator):
 
         # Generate upper limit of the grid parameters
         keys = list(self.grid.keys())
-        print "keys: ", keys
+        print("keys: ", keys)
         maxs = [0] * len(keys)
         for i in range(len(keys)):
             maxs[i] = len(self.grid[keys[i]])
