@@ -248,8 +248,8 @@ class LinearRegression(RegressionEstimator):
     ...                                  algorithm_params=dict(max_iter=1000),
     ...                                  mean=False)
     >>> error = lr.fit(X, y).score(X, y)
-    >>> print("error = ", error)
-    error =  0.0116466703591
+    >>> print("error = %.10f" % (error,))
+    error = 0.0116466704
     """
     def __init__(self, algorithm=None, algorithm_params=dict(),
                  start_vector=start_vectors.RandomStartVector(),
@@ -353,8 +353,8 @@ class RidgeRegression(RegressionEstimator):
     ...                                 algorithm_params=dict(max_iter=1000),
     ...                                 mean=False)
     >>> error = rr.fit(X, y).score(X, y)
-    >>> print("error = ", error)
-    error =  0.377679437659
+    >>> print("error = %.10f" % (error,))
+    error = 0.3776794377
     """
     def __init__(self, l, algorithm=None, algorithm_params=dict(),
                  start_vector=start_vectors.RandomStartVector(),
@@ -466,8 +466,8 @@ class Lasso(RegressionEstimator):
     ...                          algorithm_params=dict(max_iter=1000),
     ...                          mean=False)
     >>> error = lasso.fit(X, y).score(X, y)
-    >>> print("error = ", error)
-    error =  0.395494642796
+    >>> print("error = %.12f" % (error,))
+    error = 0.395494642796
     """
     def __init__(self, l,
                  algorithm=None, algorithm_params=dict(),
@@ -586,8 +586,8 @@ class ElasticNet(RegressionEstimator):
     ...                            algorithm_params=dict(max_iter=1000),
     ...                            mean=False)
     >>> error = en.fit(X, y).score(X, y)
-    >>> print("error = ", round(error, 13))
-    error =  0.492096328053
+    >>> print("error = %.12f" % (round(error, 13),))
+    error = 0.492096328053
     """
     def __init__(self, l, alpha=1.0, algorithm=None, algorithm_params=dict(),
                  start_vector=start_vectors.RandomStartVector(),
@@ -1090,20 +1090,20 @@ class LinearRegressionL1L2GL(RegressionEstimator):
 ##    ...                     algorithm=proximal.StaticCONESTA(max_iter=1000))
 ##    >>> res = ridge_l1_tv.fit(X, y)
 ##    >>> error = np.sum(np.abs(np.dot(X, ridge_l1_tv.beta) - y))
-##    >>> print("error = ", error)
-##    error =  4.70079220678
+##    >>> print("error = %f" % (error,))
+##    error = 4.70079220678
 ##    >>> ridge_l1_tv = estimators.RidgeRegression_L1_TV(k, l, g, A,
 ##    ...                     algorithm=proximal.DynamicCONESTA(max_iter=1000))
 ##    >>> res = ridge_l1_tv.fit(X, y)
 ##    >>> error = np.sum(np.abs(np.dot(X, ridge_l1_tv.beta) - y))
-##    >>> print("error = ", error)
-##    error =  4.70096544168
+##    >>> print("error = %f" % (error,))
+##    error = 4.70096544168
 ##    >>> ridge_l1_tv = estimators.RidgeRegression_L1_TV(k, l, g, A,
 ##    ...                     algorithm=proximal.FISTA(max_iter=1000))
 ##    >>> res = ridge_l1_tv.fit(X, y)
 ##    >>> error = np.sum(np.abs(np.dot(X, ridge_l1_tv.beta) - y))
-##    >>> print("error = ", error)
-##    error =  4.24400179809
+##    >>> print("error = %f" % (error,))
+##    error = 4.24400179809
 #    """
 #    def __init__(self, k, l, g, A, mu=None,
 #                 algorithm=StaticCONESTA(),
@@ -1302,8 +1302,8 @@ class LogisticRegression(LogisticRegressionEstimator):
     ...                      mean=False)
     >>> res = lr.fit(X, y)
     >>> error = lr.score(X, y)
-    >>> print("error = ", error)
-    error =  1.0
+    >>> print("error = %.1f" % (error,))
+    error = 1.0
     """
     def __init__(self, algorithm=None, algorithm_params=dict(),
                  class_weight=None,
@@ -1485,7 +1485,7 @@ class RidgeLogisticRegression(LogisticRegressionEstimator):
     ...                      mean=False)
     >>> res = lr.fit(X, y)
     >>> pred = lr.score(X, y)
-    >>> print("prediction rate = %.1f" % pred)
+    >>> print("prediction rate = %.1f" % (pred,))
     prediction rate = 0.9
     """
     def __init__(self, l,
@@ -1609,7 +1609,7 @@ class LassoLogisticRegression(LogisticRegressionEstimator):
     ...                      mean=False)
     >>> res = lr.fit(X, y)
     >>> pred = lr.score(X, y)
-    >>> print("prediction rate = %.1f" % pred)
+    >>> print("prediction rate = %.1f" % (pred,))
     prediction rate = 1.0
     """
     def __init__(self, l,
@@ -1873,22 +1873,22 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
     ...                      mean=False)
     >>> res = lr.fit(X, y)
     >>> error = lr.score(X, y)
-    >>> print("error = ", error)
-    error =  0.7
+    >>> print("error = %.1f" % (error,))
+    error = 0.7
     >>> lr = estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
     ...                                algorithm=proximal.FISTA(max_iter=1000),
     ...                                mean=False)
     >>> lr = lr.fit(X, y)
     >>> error = lr.score(X, y)
-    >>> print("error = ", error)
-    error =  0.7
+    >>> print("error = %.1f" % (error,))
+    error = 0.7
     >>> lr = estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
     ...                                 algorithm=proximal.ISTA(max_iter=1000),
     ...                                 mean=False)
     >>> lr = lr.fit(X, y)
     >>> error = lr.score(X, y)
-    >>> print("error = ", error)
-    error =  0.7
+    >>> print("error = %.1f" % (error,))
+    error = 0.7
     """
     def __init__(self, l1, l2, tv,
                  A=None, mu=consts.TOLERANCE,
@@ -2126,22 +2126,22 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
     ...                      mean=False)
     >>> res = lr.fit(X, y)
     >>> error = lr.score(X, y)
-    >>> print("error = ", error)
-    error =  0.7
+    >>> print("error = %.1f" % (error,))
+    error = 0.7
     >>> lr = estimators.LogisticRegressionL1L2GL(l1, l2, gl, A=A,
     ...                                algorithm=proximal.FISTA(max_iter=1000),
     ...                                mean=False)
     >>> lr = lr.fit(X, y)
     >>> error = lr.score(X, y)
-    >>> print("error = ", error)
-    error =  0.7
+    >>> print("error = %.1f" % (error,))
+    error = 0.7
     >>> lr = estimators.LogisticRegressionL1L2GL(l1, l2, gl, A,
     ...                                 algorithm=proximal.ISTA(max_iter=1000),
     ...                                 mean=False)
     >>> lr = lr.fit(X, y)
     >>> error = lr.score(X, y)
-    >>> print("error = ", error)
-    error =  0.7
+    >>> print("error = %.1f" % (error,))
+    error = 0.7
     """
     def __init__(self, l1, l2, gl,
                  A=None, mu=consts.TOLERANCE,
@@ -2525,8 +2525,8 @@ class SupportVectorMachine(SVMEstimator):
     ...                                                 max_iter=100))
     >>> res = svm.fit(X, y)
     >>> score = svm.score(X, y)
-    >>> print("score = ", score)
-    score =  0.933333333333
+    >>> print("score = %.12f" % (score,))
+    score = 0.933333333333
     """
     def __init__(self, C, kernel=None,
                  algorithm=None, algorithm_params=dict(),
@@ -2673,8 +2673,8 @@ class PLSRegression(RegressionEstimator):
     >>> plsr = estimators.PLSRegression(K=4, algorithm=nipals.PLSR(),
     ...                                 algorithm_params=dict(max_iter=100))
     >>> error = plsr.fit(X, y).score(X, y)
-    >>> print("error = ", error)
-    error =  0.0222345224457
+    >>> print("error = %.10f" % (error,))
+    error = 0.0222345224
     """
 #    >>>
 #    >>> np.random.seed(42)
@@ -2686,8 +2686,8 @@ class PLSRegression(RegressionEstimator):
 #    ...                                 algorithm_params=dict(max_iter=100))
 #    >>> plsr.fit(X, y)
 #    >>> error = plsr.score(X, y)
-#    >>> print("error = ", error)
-#    error =  0.0222345202333
+#    >>> print("error = %f" % (error,))
+#    error = 0.0222345202333
     def __init__(self, K=2, algorithm=None, algorithm_params=dict(),
                  start_vector=start_vectors.RandomStartVector(),
                  unbiased=True, mean=True):
@@ -2752,7 +2752,7 @@ class PLSRegression(RegressionEstimator):
                 w = [self.start_vector.get_vector(X.shape[1]),
                      self.start_vector.get_vector(Y.shape[1])]
 
-                print("max iter:", self.algorithm.max_iter)
+                print("max iter: %d" % (self.algorithm.max_iter,))
                 w = self.algorithm.run(function, w)
                 c = w[1]
                 w = w[0]
@@ -2867,8 +2867,8 @@ class SparsePLSRegression(RegressionEstimator):
      [ 0.        ]]
     >>> print(plsr.C)
     [[ 0.32949094]]
-    >>> print("error = ", error)
-    error =  0.0547513077301
+    >>> print("error = %.12f" % (error,))
+    error = 0.054751307730
     """
 #    >>>
 #    >>> np.random.seed(42)
@@ -2892,8 +2892,8 @@ class SparsePLSRegression(RegressionEstimator):
 #     [ 0.        ]]
 #    >>> print(plsr.C)
 #    [[ 0.32949093]]
-#    >>> print("error = ", error)
-#    error =  0.0547513070388
+#    >>> print("error = %f" % (error,))
+#    error = 0.0547513070388
     def __init__(self, l, K=2, algorithm=None, algorithm_params=dict(),
                  start_vector=start_vectors.RandomStartVector(),
                  unbiased=True, mean=True):
@@ -2970,7 +2970,7 @@ class SparsePLSRegression(RegressionEstimator):
                 w = [self.start_vector.get_vector(X.shape[1]),
                      self.start_vector.get_vector(Y.shape[1])]
 
-                print("max iter:", self.algorithm.max_iter)
+                print("max iter: %d" % (self.algorithm.max_iter,))
                 w = self.algorithm.run(function, w)
                 c = w[1]
                 w = w[0]
@@ -3244,22 +3244,22 @@ class GridSearchKFoldRegression(RegressionEstimator):
                 self._best_results = score_values
                 self._best_params = params
 
-                print(params, value, "NEW BEST!")
+                print("%s, %d, %s" % (str(params), value, "NEW BEST!"))
             else:
                 if self.maximise and value > self._best_result:
                     self._best_result = value
                     self._best_results = score_values
                     self._best_params = params
 
-                    print(params, value, "NEW BEST!")
+                    print("%s, %d, %s" % (str(params), value, "NEW BEST!"))
                 elif not self.maximise and value < self._best_result:
                     self._best_result = value
                     self._best_results = score_values
                     self._best_params = params
 
-                    print(params, value, "NEW BEST!")
+                    print("%s, %d, %s" % (str(params), value, "NEW BEST!"))
                 else:
-                    print(params, value)
+                    print("%s, %d" % (str(params), value))
 
             idx[-1] = idx[-1] + 1
             for i in reversed(list(range(1, len(keys)))):
@@ -3479,7 +3479,7 @@ class GridSearchKFold(BaseEstimator):
 
         # Generate upper limit of the grid parameters
         keys = list(self.grid.keys())
-        print("keys: ", keys)
+        print("keys: %s" % (str(keys),))
         maxs = [0] * len(keys)
         for i in range(len(keys)):
             maxs[i] = len(self.grid[keys[i]])
@@ -3508,22 +3508,22 @@ class GridSearchKFold(BaseEstimator):
                 self._best_results = score_values
                 self._best_params = params
 
-                print(params, value, "NEW BEST!")
+                print("%s, %d, %s" % (str(params), value, "NEW BEST!"))
             else:
                 if self.maximise and value > self._best_result:
                     self._best_result = value
                     self._best_results = score_values
                     self._best_params = params
 
-                    print(params, value, "NEW BEST!")
+                    print("%s, %d, %s" % (str(params), value, "NEW BEST!"))
                 elif not self.maximise and value < self._best_result:
                     self._best_result = value
                     self._best_results = score_values
                     self._best_params = params
 
-                    print(params, value, "NEW BEST!")
+                    print("%s, %d, %s" % (str(params), value, "NEW BEST!"))
                 else:
-                    print(params, value)
+                    print("%s, %d" % (str(params), value))
 
             # Go to the next parameter setting
             idx[-1] = idx[-1] + 1
