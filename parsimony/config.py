@@ -85,13 +85,13 @@ class __Config(object):
         option = str(option)
 
         if not self._config.has_section(section):  # Subsumed by the below?
-            return default
-        if not self._config.has_option(section, option):
-            return default
+            value = default
+        elif not self._config.has_option(section, option):
+            value = default
+        else:
+            value = self._config.get(section, option)
 
-        value = self._config.get(section, option)
-
-        return value
+        return str(value)
 
     def get_boolean(self, section, option, default=False):
         """Fetches a boolean configuration option from a section of the ini
@@ -101,13 +101,13 @@ class __Config(object):
         option = str(option)
 
         if not self._config.has_section(section):  # Subsumed by the below?
-            return default
-        if not self._config.has_option(section, option):
-            return default
+            value = default
+        elif not self._config.has_option(section, option):
+            value = default
+        else:
+            value = self._config.getboolean(section, option)
 
-        value = self._config.getboolean(section, option)
-
-        return value
+        return bool(value)
 
     def get_float(self, section, option, default=0.0):
         """Fetches a floating point configuration option from a section of the
@@ -117,13 +117,13 @@ class __Config(object):
         option = str(option)
 
         if not self._config.has_section(section):  # Subsumed by the below?
-            return default
-        if not self._config.has_option(section, option):
-            return default
+            value = default
+        elif not self._config.has_option(section, option):
+            value = default
+        else:
+            value = self._config.getfloat(section, option)
 
-        value = self._config.getfloat(section, option)
-
-        return value
+        return float(value)
 
     def get_int(self, section, option, default=0):
         """Fetches an integer configuration option from a section of the ini
@@ -133,13 +133,13 @@ class __Config(object):
         option = str(option)
 
         if not self._config.has_section(section):  # Subsumed by the below?
-            return default
-        if not self._config.has_option(section, option):
-            return default
+            value = default
+        elif not self._config.has_option(section, option):
+            value = default
+        else:
+            value = self._config.getint(section, option)
 
-        value = self._config.getint(section, option)
-
-        return value
+        return int(value)
 
     def set_option(self, section, option, value, flush_file=False):
         """Sets a configuration option.
@@ -395,7 +395,7 @@ def get_int(section, option, default=0):
     >>> config.get_int("test_section", "testing_get_int")
     11630
     >>> config.get_float("test_section", "testing_non_existent", 12407)
-    12407
+    12407.0
     """
 #    if __config__ is None:
 #        if not __load_config__():

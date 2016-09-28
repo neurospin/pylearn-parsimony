@@ -85,7 +85,7 @@ class SubGradientDescent(bases.ExplicitAlgorithm,
     >>> beta1 = sgd.run(function, np.random.rand(50, 1))
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
     >>> round(np.linalg.norm(beta1 - beta2), 13)
-    2.3739638e-06
+    2.4114977e-06
     """
     INTERFACES = [properties.Function,
                   properties.OR(properties.Gradient,

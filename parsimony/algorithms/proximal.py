@@ -410,29 +410,36 @@ class CONESTA(bases.ExplicitAlgorithm,
 
     Parameters
     ----------
-    mu_min : Non-negative float. A "very small" mu to use as a lower bound for
-            mu.
+    mu_min : float
+        A non-negative float. A "very small" mu to use as a lower bound for mu.
 
-    tau : Float, 0 < tau < 1. The rate at which eps is decreasing. Default
-            is 0.5.
+    tau : float
+        A float between 0 < tau < 1. The rate at which eps is decreasing.
+        Default is 0.5.
 
-    eps : Positive float. Tolerance for the stopping criterion.
+    eps : float
+        A positive float. Tolerance for the stopping criterion.
 
-    info : List or tuple of utils.Info. What, if any, extra run information
-            should be stored. Default is an empty list, which means that no
-            run information is computed nor returned.
+    info : List or tuple of utils.Info.
+        What, if any, extra run information should be stored. Default is an
+        empty list, which means that no run information is computed nor
+        returned.
 
-    max_iter : Non-negative integer. Maximum allowed number of iterations.
+    max_iter : int
+        Non-negative integer. Maximum allowed number of iterations.
 
-    min_iter : Non-negative integer less than or equal to max_iter. Minimum
-            number of iterations that must be performed. Default is 1.
+    min_iter : int
+        Non-negative integer less than or equal to max_iter. Minimum number of
+        iterations that must be performed. Default is 1.
 
-    eps_max: float, a maximum value for eps computed from the gap. If
-        np.isfinite(tau * gap(beta)) then use eps_max to avoid NaN. Default
-        is a large value: 10.
+    eps_max: float
+        A maximum value for eps computed from the gap. If
+        np.isfinite(tau * gap(beta)) then use eps_max to avoid NaN. Default is
+        a large value: 10.
 
-    callback: a callable object that will be call at the end of each iteration
-        with locals() as arguments.
+    callback: Callable
+        A callable object that will be called at the end of each iteration with
+        locals() as arguments.
     """
     INTERFACES = [properties.NesterovFunction,
                   properties.StepSize,
