@@ -37,21 +37,26 @@ class ExcessiveGapMethod(bases.ExplicitAlgorithm,
 
     Parameters
     ----------
-    output : Boolean. Whether or not to return extra output information. If
-            output is True, running the algorithm will return a tuple with two
-            elements. The first element is the found regression vector, and the
-            second is the extra output information.
+    output : bool
+        Whether or not to return extra output information. If output is True,
+        running the algorithm will return a tuple with two elements. The first
+        element is the found regression vector, and the second is the extra
+        output information.
 
-    eps : Positive float. Tolerance for the stopping criterion.
+    eps : float
+        A positive float. Tolerance for the stopping criterion.
 
-    info : List or tuple of utils.consts.Info. What, if any, extra run
-            information should be stored. Default is an empty list, which means
-            that no run information is computed nor returned.
+    info : list or tuple of utils.consts.Info
+        What, if any, extra run information should be stored. Default is an
+        empty list, which means that no run information is computed nor
+        returned.
 
-    max_iter : Non-negative integer. Maximum allowed number of iterations.
+    max_iter : int
+        Non-negative integer. Maximum allowed number of iterations.
 
-    min_iter : Non-negative integer less than or equal to max_iter. Minimum
-            number of iterations that must be performed. Default is 1.
+    min_iter : int
+        Non-negative integer less than or equal to max_iter. Minimum number of
+        iterations that must be performed. Default is 1.
     """
     INTERFACES = [properties.NesterovFunction,
                   properties.GradientMap,
@@ -62,7 +67,8 @@ class ExcessiveGapMethod(bases.ExplicitAlgorithm,
                      Info.converged,
                      Info.num_iter,
                      Info.time,
-                     Info.fvalue,
+                     Info.fvalue,  # TODO: Removed in future versions!
+                     Info.func_val,
                      Info.mu,
                      Info.bound,
                      Info.gap,
@@ -119,7 +125,8 @@ class ExcessiveGapMethod(bases.ExplicitAlgorithm,
 
         if self.info_requested(Info.time):
             t = []
-        if self.info_requested(Info.fvalue):
+        if (self.info_requested(Info.fvalue)  # TODO: Remove fvalue!
+                or self.info_requested(Info.func_val)):
             f = []
         if self.info_requested(Info.bound):
             bound = []
@@ -150,7 +157,8 @@ class ExcessiveGapMethod(bases.ExplicitAlgorithm,
 
             if self.info_requested(Info.time):
                 t.append(utils.time_cpu() - tm)
-            if self.info_requested(Info.fvalue):
+            if (self.info_requested(Info.fvalue)  # TODO: Remove fvalue!
+                    or self.info_requested(Info.func_val)):
                 mu_old = function.get_mu()
                 function.set_mu(0.0)
                 f.append(function.f(beta))
@@ -181,8 +189,10 @@ class ExcessiveGapMethod(bases.ExplicitAlgorithm,
             self.info_set(Info.num_iter, k + 1)
         if self.info_requested(Info.time):
             self.info_set(Info.time, t)
-        if self.info_requested(Info.fvalue):
-            self.info_set(Info.fvalue, f)
+        if (self.info_requested(Info.fvalue)  # TODO: Remove fvalue!
+                or self.info_requested(Info.func_val)):
+            self.info_set(Info.fvalue, f)  # TODO: Remove fvalue!
+            self.info_set(Info.func_val, f)
         if self.info_requested(Info.mu):
             self.info_set(Info.mu, mu)
         if self.info_requested(Info.bound):
