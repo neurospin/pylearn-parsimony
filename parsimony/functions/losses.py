@@ -111,9 +111,9 @@ class LinearRegression(properties.CompositeFunction,
         >>> y = np.random.rand(100, 1)
         >>> lr = LinearRegression(X=X, y=y)
         >>> beta = np.random.rand(150, 1)
-        >>> round(np.linalg.norm(lr.grad(beta)
-        ...       - lr.approx_grad(beta, eps=1e-4)), 9)
-        1.3e-08
+        >>> np.linalg.norm(lr.grad(beta)
+        ...       - lr.approx_grad(beta, eps=1e-4)) < 5e-8
+        True
         """
         grad = np.dot(self.X.T, np.dot(self.X, beta) - self.y)
 
@@ -274,9 +274,9 @@ class RidgeRegression(properties.CompositeFunction,
         >>> y = np.random.rand(100, 1)
         >>> rr = RidgeRegression(X=X, y=y, k=3.14159265)
         >>> beta = np.random.rand(150, 1)
-        >>> round(np.linalg.norm(rr.grad(beta)
-        ...       - rr.approx_grad(beta, eps=1e-4)), 9)
-        1.3e-08
+        >>> np.linalg.norm(rr.grad(beta)
+        ...       - rr.approx_grad(beta, eps=1e-4)) < 5e-8
+        True
         """
         gradOLS = np.dot((np.dot(self.X, beta) - self.y).T, self.X).T
 
@@ -429,18 +429,18 @@ class LogisticRegression(properties.AtomicFunction,
         >>> y = np.random.randint(0, 2, (100, 1))
         >>> lr = LogisticRegression(X=X, y=y, mean=True)
         >>> beta = np.random.rand(150, 1)
-        >>> round(np.linalg.norm(lr.grad(beta)
-        ...       - lr.approx_grad(beta, eps=1e-4)), 10)
-        4e-10
+        >>> np.linalg.norm(lr.grad(beta)
+        ...       - lr.approx_grad(beta, eps=1e-4)) < 5e-10
+        True
         >>>
         >>> np.random.seed(42)
         >>> X = np.random.rand(100, 150)
         >>> y = np.random.randint(0, 2, (100, 1))
         >>> lr = LogisticRegression(X=X, y=y, mean=False)
         >>> beta = np.random.rand(150, 1)
-        >>> round(np.linalg.norm(lr.grad(beta)
-        ...       - lr.approx_grad(beta, eps=1e-4)), 9)
-        3.9e-08
+        >>> np.linalg.norm(lr.grad(beta)
+        ...       - lr.approx_grad(beta, eps=1e-4)) < 5e-8
+        True
         """
         Xbeta = np.dot(self.X, beta)
 #        pi = 1.0 / (1.0 + np.exp(-Xbeta))

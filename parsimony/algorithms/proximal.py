@@ -98,9 +98,9 @@ class ISTA(bases.ExplicitAlgorithm,
     >>> round(np.linalg.norm(beta1 - beta2), 13)
     0.8272330310458
     >>> np.linalg.norm(beta2.ravel(), 0)
-    50
+    50.0
     >>> np.linalg.norm(beta1.ravel(), 0)
-    7
+    7.0
     """
     INTERFACES = [properties.Function,
                   properties.Gradient,
@@ -262,9 +262,9 @@ class FISTA(bases.ExplicitAlgorithm,
     >>> round(np.linalg.norm(beta1 - beta2), 14)
     0.82723292510703
     >>> np.linalg.norm(beta2.ravel(), 0)
-    50
+    50.0
     >>> np.linalg.norm(beta1.ravel(), 0)
-    7
+    7.0
     """
     INTERFACES = [properties.Function,
                   properties.Gradient,
@@ -712,9 +712,9 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
     >>> round(np.linalg.norm(beta1 - beta2), 13)
     0.8272329573827
     >>> np.linalg.norm(beta2.ravel(), 0)
-    50
+    50.0
     >>> np.linalg.norm(beta1.ravel(), 0)
-    7
+    7.0
     >>>
     >>> np.random.seed(42)
     >>> X = np.random.rand(100, 50)
