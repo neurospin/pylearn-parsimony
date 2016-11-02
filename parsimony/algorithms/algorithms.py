@@ -387,6 +387,10 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
         empty list, which means that no run information is computed nor
         returned.
 
+    callback: Callable
+        A callable object that will be called at the end of each iteration with
+        locals() as arguments.
+
     Returns
     -------
     x : numpy array
@@ -435,7 +439,7 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
                      utils.Info.converged]
 
     def __init__(self, algorithm, function, eps=5e-8, max_mm_iter=1,
-                 max_iter=consts.MAX_ITER, min_iter=1, info=[]):
+                 max_iter=consts.MAX_ITER, min_iter=1, info=[], callback=None):
 
         super(MajorizationMinimization, self).__init__(info=info,
                                                        max_iter=max_iter,
@@ -447,6 +451,8 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
         self.max_mm_iter = max(1, int(max_mm_iter))
 
         self.algorithm.max_iter = max_mm_iter
+
+        self.callback = callback
 
     def set_params(self, **kwargs):
 
