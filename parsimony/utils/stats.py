@@ -11,8 +11,14 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 import scipy.stats as stat
 import numpy as np
 
-from . import consts
-from . import deprecated
+try:
+    from . import consts  # When imported as a package.
+except ValueError:
+    from utils import consts  # When run as a program.
+try:
+    from . import deprecated  # When imported as a package.
+except ValueError:
+    from utils import deprecated  # When run as a program.
 
 from parsimony.utils import check_arrays
 
@@ -54,8 +60,8 @@ def multivariate_normal(mu, Sigma, n=1):
     >>> M = stats.multivariate_normal(mu, Sigma, n)
     >>> mean = np.mean(M, axis=0)
     >>> S = np.dot((M - mean).T, (M - mean)) * (1.0 / float(n - 1))
-    >>> round(np.linalg.norm(Sigma - S), 14)
-    0.51886218849785
+    >>> round(np.linalg.norm(Sigma - S), 13)
+    0.5188621884979
     """
     # Type check.
     n = max(1, int(n))

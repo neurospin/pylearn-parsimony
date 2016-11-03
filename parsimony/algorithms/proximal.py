@@ -97,10 +97,10 @@ class ISTA(bases.ExplicitAlgorithm,
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
     >>> round(np.linalg.norm(beta1 - beta2), 13)
     0.8272330310458
-    >>> np.linalg.norm(beta2.ravel(), 0)
-    50.0
-    >>> np.linalg.norm(beta1.ravel(), 0)
-    7.0
+    >>> int(np.linalg.norm(beta2.ravel(), 0))
+    50
+    >>> int(np.linalg.norm(beta1.ravel(), 0))
+    7
     """
     INTERFACES = [properties.Function,
                   properties.Gradient,
@@ -261,10 +261,10 @@ class FISTA(bases.ExplicitAlgorithm,
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
     >>> round(np.linalg.norm(beta1 - beta2), 14)
     0.82723292510703
-    >>> np.linalg.norm(beta2.ravel(), 0)
-    50.0
-    >>> np.linalg.norm(beta1.ravel(), 0)
-    7.0
+    >>> int(np.linalg.norm(beta2.ravel(), 0))
+    50
+    >>> int(np.linalg.norm(beta1.ravel(), 0))
+    7
     """
     INTERFACES = [properties.Function,
                   properties.Gradient,
@@ -711,10 +711,10 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
     >>> round(np.linalg.norm(beta1 - beta2), 13)
     0.8272329573827
-    >>> np.linalg.norm(beta2.ravel(), 0)
-    50.0
-    >>> np.linalg.norm(beta1.ravel(), 0)
-    7.0
+    >>> int(np.linalg.norm(beta2.ravel(), 0))
+    50
+    >>> int(np.linalg.norm(beta1.ravel(), 0))
+    7
     >>>
     >>> np.random.seed(42)
     >>> X = np.random.rand(100, 50)

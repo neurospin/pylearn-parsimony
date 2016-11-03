@@ -19,8 +19,12 @@ from functools import wraps
 from time import time, clock
 
 import numpy as np
-from . import consts
 import collections
+
+try:
+    from . import consts
+except ValueError:
+    from parsimony.utils import consts
 
 # TODO: This depends on the OS. We should try to be clever here ...
 time_cpu = clock  # UNIX-based system measures CPU time used.
@@ -606,3 +610,7 @@ class AnonymousClass(object):
 #
 #    def __str__(self):
 #        return "Keys: %s. Dict: %s." % (str(self.__keys), str(self.__dict))
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

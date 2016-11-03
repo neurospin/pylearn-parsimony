@@ -8,7 +8,9 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   jinpeng.li@cea.fr, lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
+import os
 import unittest
+import tempfile
 
 import numpy as np
 import scipy as sp
@@ -20,6 +22,7 @@ try:
     from .tests import TestCase  # When imported as a package.
 except ValueError:
     from tests import TestCase  # When run as a program.
+
 
 def generate_sparse_matrix(shape, density=0.10):
     """
@@ -100,7 +103,16 @@ class TestSVD(TestCase):
         X = generate_sparse_matrix(shape=(nrow, ncol),
                                    density=density)
         # For debug
-        np.save("/tmp/X_%d_%d.npy" % (nrow, ncol), X)
+#        np.save("/tmp/X_%d_%d.npy" % (nrow, ncol), X)
+        fd = None
+        try:
+            fd, tmpfilename = tempfile.mkstemp(suffix=".npy",
+                                               prefix="X_%d_%d" % (nrow, ncol))
+            np.save(tmpfilename, X)
+        finally:
+            if fd is not None:
+                os.close(fd)
+
         # svd from parsimony
         fast_sparse_svd = RankOneSparseSVD(max_iter=1000)
         parsimony_v = fast_sparse_svd.run(X)

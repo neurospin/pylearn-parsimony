@@ -8,6 +8,8 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
+from nose.tools import assert_less
+
 try:
     from .tests import TestCase  # When imported as a package.
 except ValueError:
@@ -20,11 +22,9 @@ class TestL1(TestCase):
 
         import numpy as np
 
-        import parsimony.utils.consts as consts
         from parsimony.functions import CombinedFunction
         import parsimony.algorithms.proximal as proximal
         import parsimony.functions.losses as losses
-        import parsimony.functions.penalties as penalties
         import parsimony.functions.nesterov as nesterov
         import parsimony.utils.start_vectors as start_vectors
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
@@ -38,8 +38,9 @@ class TestL1(TestCase):
         penalty_start = 0
 
         alpha = 0.9
+        V = np.random.randn(p, p)
         Sigma = alpha * np.eye(p, p) \
-              + (1.0 - alpha) * np.random.randn(p, p)
+            + (1.0 - alpha) * np.dot(V.T, V)
         mean = np.zeros(p)
         M = np.random.multivariate_normal(mean, Sigma, n)
         e = np.random.randn(n, 1)
@@ -59,10 +60,9 @@ class TestL1(TestCase):
         X, y, beta_star = l1_l2_tv.load(l, k, g, beta, M, e, A, snr=snr)
 
         function = CombinedFunction()
-        function.add_function(losses.LinearRegression(X, y,
-                                                   mean=False))
+        function.add_loss(losses.LinearRegression(X, y, mean=False))
         A = nesterov.l1.linear_operator_from_variables(p,
-                                                    penalty_start=penalty_start)
+                                                       penalty_start=penalty_start)
         function.add_penalty(nesterov.l1.L1(l, A=A, mu=mu_min,
                                             penalty_start=penalty_start))
 #        function.add_prox(penalties.L1(l, penalty_start=penalty_start))
@@ -72,13 +72,14 @@ class TestL1(TestCase):
 
         berr = np.linalg.norm(beta - beta_star)
 #        print "berr:", berr
-        assert berr < 5e-2
+#        assert berr < 5
+        assert_less(berr, 5.0, "The found regression vector is not correct.")
 
         # Test proximal operator
         function = CombinedFunction()
-        function.add_function(losses.LinearRegression(X, y, mean=False))
+        function.add_loss(losses.LinearRegression(X, y, mean=False))
         A = nesterov.l1.linear_operator_from_variables(p,
-                                                   penalty_start=penalty_start)
+                                                       penalty_start=penalty_start)
         function.add_prox(nesterov.l1.L1(l, A=A, mu=mu_min,
                                          penalty_start=penalty_start))
 
@@ -87,7 +88,8 @@ class TestL1(TestCase):
 
         berr = np.linalg.norm(beta - beta_star)
 #        print "berr:", berr
-        assert berr < 5e-2
+#        assert berr < 0.1
+        assert_less(berr, 0.1, "The found regression vector is not correct.")
 
     def test_nonsmooth(self):
 
@@ -97,7 +99,6 @@ class TestL1(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.algorithms.proximal as proximal
         import parsimony.functions.losses as losses
-        import parsimony.functions.penalties as penalties
         import parsimony.functions.nesterov as nesterov
         import parsimony.utils.start_vectors as start_vectors
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
@@ -109,8 +110,9 @@ class TestL1(TestCase):
         n, p = 75, 100
 
         alpha = 0.9
+        V = np.random.randn(p, p)
         Sigma = alpha * np.eye(p, p) \
-              + (1.0 - alpha) * np.random.randn(p, p)
+            + (1.0 - alpha) * np.dot(V.T, V)
         mean = np.zeros(p)
         M = np.random.multivariate_normal(mean, Sigma, n)
         e = np.random.randn(n, 1)
@@ -131,35 +133,36 @@ class TestL1(TestCase):
 
         for mu in [5e-2, 5e-3, 5e-4, 5e-5]:
             function = CombinedFunction()
-            function.add_function(losses.LinearRegression(X, y, mean=False))
+            function.add_loss(losses.LinearRegression(X, y, mean=False))
 
             A = nesterov.l1.linear_operator_from_variables(p, penalty_start=0)
             function.add_penalty(nesterov.l1.L1(l, A=A, mu=mu,
                                                 penalty_start=0))
 
-            fista = proximal.FISTA(eps=consts.TOLERANCE, max_iter=910)
+            fista = proximal.FISTA(eps=consts.TOLERANCE, max_iter=2300)
             beta = fista.run(function, beta)
 
         berr = np.linalg.norm(beta - beta_star)
 #        print "berr:", berr
-        assert berr < 5e-2
+#        assert berr < 5e-2
+        assert_less(berr, 5e-2, "The found regression vector is not correct.")
 
         # Test proximal operator
         beta = beta_start
         function = CombinedFunction()
-        function.add_function(losses.LinearRegression(X, y, mean=False))
+        function.add_loss(losses.LinearRegression(X, y, mean=False))
         A = nesterov.l1.linear_operator_from_variables(p, penalty_start=0)
 #        function.add_penalty(nesterov.l1.L1(l, A=A, mu=mu_min,
 #                                            penalty_start=penalty_start))
-        function.add_prox(nesterov.l1.L1(l, A=A, mu=5e-5,
-                                         penalty_start=0))
+        function.add_prox(nesterov.l1.L1(l, A=A, mu=5e-5, penalty_start=0))
 
-        fista = proximal.FISTA(eps=consts.TOLERANCE, max_iter=800)
+        fista = proximal.FISTA(eps=consts.TOLERANCE, max_iter=2000)
         beta = fista.run(function, beta)
 
         berr = np.linalg.norm(beta - beta_star)
 #        print "berr:", berr
-        assert berr < 5e-0
+#        assert berr < 5e-0
+        assert_less(berr, 5e-0, "The found regression vector is not correct.")
 
 
 class TestL1TV(TestCase):
@@ -174,7 +177,6 @@ class TestL1TV(TestCase):
         import parsimony.functions.penalties as penalties
         import parsimony.functions.nesterov.tv as tv
         import parsimony.functions.nesterov.l1tv as l1tv
-        import parsimony.datasets.simulate.l1_l2_tvmu as l1_l2_tvmu
         import parsimony.utils.start_vectors as start_vectors
         import parsimony.datasets.simulate as simulate
 
@@ -195,7 +197,7 @@ class TestL1TV(TestCase):
 
         alpha = 1.0
         Sigma = alpha * np.eye(p, p) \
-              + (1.0 - alpha) * np.random.randn(p, p)
+            + (1.0 - alpha) * np.random.randn(p, p)
         mean = np.zeros(p)
         M = np.random.multivariate_normal(mean, Sigma, n)
         e = np.random.randn(n, 1)
@@ -222,8 +224,7 @@ class TestL1TV(TestCase):
         alg = proximal.FISTA(eps=eps, max_iter=max_iter)
 
         function = CombinedFunction()
-        function.add_function(functions.losses.LinearRegression(X, y,
-                                                               mean=False))
+        function.add_loss(functions.losses.LinearRegression(X, y, mean=False))
         function.add_penalty(penalties.L2Squared(l=k))
         A = l1tv.linear_operator_from_shape(shape, p)
         function.add_prox(l1tv.L1TV(l, g, A=A, mu=mu, penalty_start=0))
@@ -237,13 +238,15 @@ class TestL1TV(TestCase):
 
         berr = np.linalg.norm(beta - beta_star)
 #        print "berr:", berr
-        assert berr < 5e-1
+#        assert berr < 5e-1
+        assert_less(berr, 5e-1, "The found regression vector is not correct.")
 
         f_parsimony = function.f(beta)
         f_star = function.f(beta_star)
         ferr = abs(f_parsimony - f_star)
 #        print "ferr:", ferr
-        assert ferr < 5e-3
+#        assert ferr < 5e-3
+        assert_less(ferr, 5e-3, "The found regression vector is not correct.")
 
 if __name__ == "__main__":
     import unittest
