@@ -8,7 +8,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com, edouard.duchesnay@cea.fr
 @license: BSD 3-clause.
 """
-from .utils import time_cpu, time_wall, time, deprecated, corr
+from .utils import time_cpu, time_wall, time, deprecated, corr, project
 from .utils import optimal_shrinkage, AnonymousClass
 from .check_arrays import check_arrays, check_array_in
 from .plots import map2d
@@ -25,7 +25,7 @@ from . import penalties
 from . import mesh
 
 
-__all__ = ["time_cpu", "time_wall", "time", "deprecated", "corr",
+__all__ = ["time_cpu", "time_wall", "time", "deprecated", "corr", "project",
            "check_arrays", "check_array_in",
            "optimal_shrinkage", "AnonymousClass",
            "map2d",
