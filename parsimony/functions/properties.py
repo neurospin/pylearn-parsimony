@@ -28,8 +28,8 @@ __all__ = ["Function", "AtomicFunction", "CompositeFunction",
            "ProximalOperator", "ProjectionOperator",
            "CombinedProjectionOperator",
            "Continuation",
-           "SubGradient", "Gradient", "Hessian", "LipschitzContinuousGradient",
-           "StepSize",
+           "Gradient", "Derivative", "SubGradient", "Hessian",
+           "LipschitzContinuousGradient",  "StepSize",
            "GradientMap", "DualFunction", "Eigenvalues", "StronglyConvex",
            "NesterovFunction",
            "MajoriserFunction",
@@ -387,6 +387,44 @@ class Gradient(with_metaclass(abc.ABCMeta, object)):
             grad[i, 0] = (loss2 - loss1) / (2.0 * eps)
 
         return grad
+
+
+class Derivative(with_metaclass(abc.ABCMeta, object)):
+
+    @abc.abstractmethod
+    def derivative(self, beta):
+        """Derivative of the univariate function.
+
+        Parameters
+        ----------
+        x : numpy array (p-by-1)
+            The point at which to evaluate the derivative.
+        """
+        raise NotImplementedError('Abstract method "derivative" must be '
+                                  'specialised!')
+
+    def approx_derivative(self, x, eps=1e-4):
+        """Numerical approximation of the derivative (finite difference by the
+        central difference).
+
+        Parameters
+        ----------
+        x : float
+            The point at which to evaluate the derivative.
+
+        eps : float
+            Positive. The precision of the numerical solution. Smaller is
+            better in general, but too small may result in floating point
+            precision errors.
+        """
+        x -= eps * 0.5
+        loss1 = self.f(x)
+        x += eps
+        loss2 = self.f(x)
+        x -= eps * 0.5
+        diff = (loss2 - loss1) / eps
+
+        return diff
 
 
 class SubGradient(with_metaclass(abc.ABCMeta, object)):
@@ -1031,3 +1069,8 @@ class OR(object):
         string = str(self.classes[0])
         for i in range(1, len(self.classes)):
             string = string + " OR " + str(self.classes[i])
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
