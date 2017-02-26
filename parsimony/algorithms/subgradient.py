@@ -84,8 +84,8 @@ class SubGradientDescent(bases.ExplicitAlgorithm,
     >>> function = RidgeRegression(X, y, k=0.0, mean=False)
     >>> beta1 = sgd.run(function, np.random.rand(50, 1))
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
-    >>> round(np.linalg.norm(beta1 - beta2), 13)
-    2.4114977e-06
+    >>> round(np.linalg.norm(beta1 - beta2) / np.linalg.norm(beta2), 13) < 5e-6
+    True
     """
     INTERFACES = [properties.Function,
                   properties.OR(properties.Gradient,

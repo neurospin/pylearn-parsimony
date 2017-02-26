@@ -48,16 +48,24 @@ class ISTA(bases.ExplicitAlgorithm,
 
     Parameters
     ----------
-    eps : Positive float. Tolerance for the stopping criterion.
+    eps : float
+        Positive float. Tolerance for the stopping criterion.
 
-    info : List or tuple of utils.consts.Info. What, if any, extra run
-            information should be stored. Default is an empty list, which
-            means that no run information is computed nor returned.
+    info : List or tuple of utils.consts.Info
+        What, if any, extra run information should be stored. Default is an
+        empty list, which means that no run information is computed nor
+        returned.
 
-    max_iter : Non-negative integer. Maximum allowed number of iterations.
+    max_iter : int
+        Non-negative integer. Maximum allowed number of iterations.
 
-    min_iter : Non-negative integer less than or equal to max_iter. Minimum
-            number of iterations that must be performed. Default is 1.
+    min_iter : int
+        Non-negative integer less than or equal to max_iter. Minimum number of
+        iterations that must be performed. Default is 1.
+
+    callback: Callable
+        A callable object that will be called at the end of each iteration with
+        locals() as arguments.
 
     Examples
     --------
@@ -89,9 +97,9 @@ class ISTA(bases.ExplicitAlgorithm,
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
     >>> round(np.linalg.norm(beta1 - beta2), 13)
     0.8272330310458
-    >>> np.linalg.norm(beta2.ravel(), 0)
+    >>> int(np.linalg.norm(beta2.ravel(), 0))
     50
-    >>> np.linalg.norm(beta1.ravel(), 0)
+    >>> int(np.linalg.norm(beta1.ravel(), 0))
     7
     """
     INTERFACES = [properties.Function,
@@ -106,13 +114,15 @@ class ISTA(bases.ExplicitAlgorithm,
                      Info.func_val,
                      Info.converged]
 
-    def __init__(self, eps=consts.TOLERANCE,
-                 info=[], max_iter=20000, min_iter=1):
+    def __init__(self, eps=consts.TOLERANCE, info=[],
+                 max_iter=20000, min_iter=1, callback=None):
 
         super(ISTA, self).__init__(info=info,
                                    max_iter=max_iter,
                                    min_iter=min_iter)
         self.eps = eps
+
+        self.callback = callback
 
     @bases.force_reset
     @bases.check_compatibility
@@ -159,6 +169,9 @@ class ISTA(bases.ExplicitAlgorithm,
                     or self.info_requested(Info.func_val):
                 f.append(function.f(betanew))
 
+            if self.callback is not None:
+                self.callback(locals())
+
             if (1.0 / step) * maths.norm(betanew - betaold) < self.eps \
                     and i >= self.min_iter:
 
@@ -190,27 +203,33 @@ class FISTA(bases.ExplicitAlgorithm,
 
     Parameters
     ----------
-    eps : Positive float. Tolerance for the stopping criterion.
+    eps : float
+        Must be positive. The tolerance for the stopping criterion.
 
-    use_gap : Boolean. If true, FISTA will use a dual gap, from the interface
-            DualFunction, in the stopping criterion as
+    use_gap : bool
+        If true, FISTA will use a dual gap, from the interface DualFunction, in
+        the stopping criterion as
 
                     if function.gap(beta) < eps:
                         break
 
-            Default is False, since the gap may be very expensive to compute.
+        Default is False, since the gap may be very expensive to compute.
 
-    info : List or tuple of utils.consts.Info. What, if any, extra run
-            information should be stored. Default is an empty list, which means
-            that no run information is computed nor returned.
+    info : List or tuple of utils.consts.Info
+        What, if any, extra run information should be stored. Default is an
+        empty list, which means that no run information is computed nor
+        returned.
 
-    max_iter : Non-negative integer. Maximum allowed number of iterations.
+    max_iter : int
+        Non-negative integer. Maximum allowed number of iterations.
 
-    min_iter : Non-negative integer less than or equal to max_iter. Minimum
-            number of iterations that must be performed. Default is 1.
+    min_iter : int
+        Non-negative integer less than or equal to max_iter. Minimum number of
+        iterations that must be performed. Default is 1.
 
-    callback: a callable object that will be call at the end of each iteration
-        with locals() as arguments.
+    callback: Callable
+        A callable object that will be called at the end of each iteration with
+        locals() as arguments.
 
     Example
     -------
@@ -242,9 +261,9 @@ class FISTA(bases.ExplicitAlgorithm,
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
     >>> round(np.linalg.norm(beta1 - beta2), 14)
     0.82723292510703
-    >>> np.linalg.norm(beta2.ravel(), 0)
+    >>> int(np.linalg.norm(beta2.ravel(), 0))
     50
-    >>> np.linalg.norm(beta1.ravel(), 0)
+    >>> int(np.linalg.norm(beta1.ravel(), 0))
     7
     """
     INTERFACES = [properties.Function,
@@ -699,9 +718,9 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
     >>> round(np.linalg.norm(beta1 - beta2), 13)
     0.8272329573827
-    >>> np.linalg.norm(beta2.ravel(), 0)
+    >>> int(np.linalg.norm(beta2.ravel(), 0))
     50
-    >>> np.linalg.norm(beta1.ravel(), 0)
+    >>> int(np.linalg.norm(beta1.ravel(), 0))
     7
     >>>
     >>> np.random.seed(42)

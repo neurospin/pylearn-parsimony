@@ -10,8 +10,6 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 import numpy as np
 import scipy.stats as ss
-import matplotlib.pyplot as plot
-
 
 __all__ = ["map2d", "map2d_of_models", "classes", "errorbars",
            "voronoi_tesselation"]
@@ -64,8 +62,10 @@ def map2d(map2d, plot=None, title=None, limits=None, center_cmap=True):
 
 
 def map2d_of_models(models_dict, nrow, ncol, shape, title_attr=None):
-    """Plot 2 weight maps of models"""
-    #from .plots import plot_map2d
+    """Plot 2 weight maps of models
+    """
+
+    import matplotlib.pyplot as plt
 
     ax_i = 1
     for k in list(models_dict.keys()):
@@ -80,13 +80,15 @@ def map2d_of_models(models_dict, nrow, ncol, shape, title_attr=None):
             title = getattr(mod, title_attr)
         else:
             title = None
-        ax = plot.subplot(nrow, ncol, ax_i)
+        ax = plt.subplot(nrow, ncol, ax_i)
         map2d(w.reshape(shape), ax, title=title)
         ax_i += 1
-    plot.show()
+    plt.show()
 
 
 def classes(X, classes, title=None, xlabel=None, ylabel=None, show=True):
+
+    import matplotlib.pyplot as plt
 
     if isinstance(classes, np.ndarray):
         classes = classes.ravel().tolist()
@@ -102,27 +104,29 @@ def classes(X, classes, title=None, xlabel=None, ylabel=None, show=True):
 #            print cl.shape
 #            print X[cl, 0].shape
 #            print X[cl, 1].shape
-            plot.plot(X[cl, 0], X[cl, 1],
-                      color=COLORS[i % len(COLORS)],
-                      marker='.',
-                      markersize=15,
-                      linestyle="None")
+            plt.plot(X[cl, 0], X[cl, 1],
+                     color=COLORS[i % len(COLORS)],
+                     marker='.',
+                     markersize=15,
+                     linestyle="None")
 
         if title is not None:
-            plot.title(title, fontsize=22)
+            plt.title(title, fontsize=22)
 
         if xlabel is not None:
-            plot.xlabel(xlabel, fontsize=16)
+            plt.xlabel(xlabel, fontsize=16)
         if ylabel is not None:
-            plot.ylabel(ylabel, fontsize=16)
+            plt.ylabel(ylabel, fontsize=16)
 
         if show:
-            plot.show()
+            plt.show()
 
 
 def errorbars(X, classes=None, means=None, alpha=0.05,
               title=None, xlabel=None, ylabel=None, colors=None,
               new_figure=True, show=True, latex=True, ylim=None):
+
+    import matplotlib.pyplot as plt
 
     B, n = X.shape
     if classes is None:
@@ -142,12 +146,12 @@ def errorbars(X, classes=None, means=None, alpha=0.05,
     labels = labels.ravel().tolist()
 
     if new_figure:
-        plot.figure()
+        plt.figure()
     if latex:
-        plot.rc('text', usetex=True)
-        plot.rc('font', family='serif')
+        plt.rc('text', usetex=True)
+        plt.rc('font', family='serif')
     if means is not None:
-        plot.plot(x, means, '*',
+        plt.plot(x, means, '*',
                   markerfacecolor="black", markeredgecolor="black",
                   markersize=10)
 
@@ -156,39 +160,41 @@ def errorbars(X, classes=None, means=None, alpha=0.05,
     for i in range(len(labels)):
         ind = np.where(classes == labels[i])[0]
 
-        plot.errorbar(x[ind],
-                      data_mu[ind],
-                      yerr=ci[ind],
-                      fmt='o' + colors[i % len(colors)],
-                      color=colors[i % len(colors)],
-                      ecolor=colors[i % len(colors)],
-                      elinewidth=2,
-                      markeredgewidth=2,
-                      markeredgecolor=colors[i % len(colors)],
-                      capsize=5)
+        plt.errorbar(x[ind],
+                     data_mu[ind],
+                     yerr=ci[ind],
+                     fmt='o' + colors[i % len(colors)],
+                     color=colors[i % len(colors)],
+                     ecolor=colors[i % len(colors)],
+                     elinewidth=2,
+                     markeredgewidth=2,
+                     markeredgecolor=colors[i % len(colors)],
+                     capsize=5)
 
-    plot.xlim((0, n + 1))
+    plt.xlim((0, n + 1))
     if ylim is not None:
-        plot.ylim(ylim)
+        plt.ylim(ylim)
     else:
         mn = np.min(data_mu - ci)
         mx = np.max(data_mu + ci)
         d = mx - mn
-        plot.ylim((mn - d * 0.05, mx + d * 0.05))
+        plt.ylim((mn - d * 0.05, mx + d * 0.05))
 
     if xlabel is not None:
-        plot.xlabel(xlabel)
+        plt.xlabel(xlabel)
     if ylabel is not None:
-        plot.ylabel(ylabel)
+        plt.ylabel(ylabel)
     if title is not None:
-        plot.title(title)
+        plt.title(title)
     if show:
-        plot.show()
+        plt.show()
 
 
 def voronoi_tesselation(mu, rect=None, nx=100, ny=100,
                         colors=None, alpha=0.3, show=True,
                         markersize=10):
+
+    import matplotlib.pyplot as plt
 
     mu = np.array(mu)  # A 2D data structure -> numpy array
 
@@ -207,19 +213,19 @@ def voronoi_tesselation(mu, rect=None, nx=100, ny=100,
     for i in range(len(regions)):
         region = regions[i]
         polygon = vertices[region]
-        plot.fill(*list(zip(*polygon)), alpha=alpha, color=colors[i])
-        plot.plot(mu[i, 0], mu[i, 1], marker='o', color=colors[i],
+        plt.fill(*list(zip(*polygon)), alpha=alpha, color=colors[i])
+        plt.plot(mu[i, 0], mu[i, 1], marker='o', color=colors[i],
                   markersize=markersize)
 
     if rect is None:
-        plot.xlim(vor.min_bound[0] * 0.9, vor.max_bound[0] * 1.1)
-        plot.ylim(vor.min_bound[1] * 0.9, vor.max_bound[1] * 1.1)
+        plt.xlim(vor.min_bound[0] * 0.9, vor.max_bound[0] * 1.1)
+        plt.ylim(vor.min_bound[1] * 0.9, vor.max_bound[1] * 1.1)
     else:
-        plot.xlim(rect[0], rect[1])
-        plot.ylim(rect[2], rect[3])
+        plt.xlim(rect[0], rect[1])
+        plt.ylim(rect[2], rect[3])
 
     if show:
-        plot.show()
+        plt.show()
 
 
 def _voronoi_finite_polygons_2d(vor, radius=None):
@@ -302,3 +308,7 @@ def _voronoi_finite_polygons_2d(vor, radius=None):
         new_regions.append(new_region.tolist())
 
     return new_regions, np.asarray(new_vertices)
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

@@ -19,15 +19,19 @@ from functools import wraps
 from time import time, clock
 
 import numpy as np
-from . import consts
 import collections
+
+try:
+    from . import consts
+except ValueError:
+    from parsimony.utils import consts
 
 # TODO: This depends on the OS. We should try to be clever here ...
 time_cpu = clock  # UNIX-based system measures CPU time used.
 time_wall = time  # UNIX-based system measures time in seconds since the epoch.
 time = time_cpu  # TODO: Make it so that this can be changed by settings.
 
-__all__ = ["time_cpu", "time_wall", "time", "deprecated", "corr",
+__all__ = ["time_cpu", "time_wall", "time", "deprecated", "corr", "project",
            "optimal_shrinkage", "AnonymousClass"]
 
 # _DEBUG = True
@@ -125,6 +129,25 @@ def corr(a, b):
         return ip[0, 0]
     else:
         return ip
+
+
+def project(v, u):
+    """ Project v onto u.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import parsimony.utils.utils as utils
+    >>> np.random.seed(42)
+    >>> a = np.random.rand(10, 1)
+    >>> b = np.random.rand(10, 1)
+    >>> utils.corr(a, b)  # doctest: +ELLIPSIS
+    0.704...
+    >>> c = utils.project(a, b)
+    >>> utils.corr(c, b)
+    1.0
+    """
+    return (np.dot(v.T, u) / np.dot(u.T, u)) * u
 
 
 #def cov(a, b):
@@ -587,3 +610,7 @@ class AnonymousClass(object):
 #
 #    def __str__(self):
 #        return "Keys: %s. Dict: %s." % (str(self.__keys), str(self.__dict))
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

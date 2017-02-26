@@ -67,10 +67,10 @@ class Info(object):
 
 
 class AlgorithmSnapshot:
-    """
-    Snapshot the algorithm state to disk. Its save_* methods should be provided
-    as callback argument to FISTA or CONESTA. This callback will be called at
-    each iteration.
+    """Save a Snapshot of the algorithm state to disk.
+
+    The save_* methods can be provided as callback argument to either FISTA or
+    CONESTA. This callback will be called at each iteration.
 
     Parameters
     ----------
@@ -86,11 +86,14 @@ class AlgorithmSnapshot:
     >>> import parsimony.estimators as estimators
     >>> import parsimony.algorithms.proximal as proximal
     >>> from parsimony.algorithms.utils import AlgorithmSnapshot
+    >>>
     >>> prefix = os.path.join(tempfile.mkdtemp(), "snapshots")
     >>> snapshot = AlgorithmSnapshot(prefix, saving_period=10).save_fista
+    >>>
     >>> np.random.seed(42)
     >>> X = np.random.rand(10, 16)
     >>> y = np.random.rand(10, 1)
+    >>>
     >>> en = estimators.ElasticNet(0.1,
     ...          algorithm=proximal.FISTA(max_iter=50, callback=snapshot))
     >>> en = en.fit(X, y)
@@ -129,7 +132,7 @@ class AlgorithmSnapshot:
         if algo.info_requested(Info.mu):
             snapshot[Info.mu] = algo_locals["mu_"]
         cpt_str = str(self.cpt).zfill(int(np.log10(algo.max_iter)+1))
-        output_filename = self.output_prefix + 'conesta_ite:%s.npz' % (cpt_str)
+        output_filename = self.output_prefix + 'conesta_ite_%s.npz' % (cpt_str)
         # print "AlgorithmSnapshot.save_conesta: save in ", output_filename
         np.savez_compressed(output_filename, **snapshot)
 
@@ -150,7 +153,7 @@ class AlgorithmSnapshot:
         if algo.info_requested(Info.gap):
             snapshot[Info.gap] = algo_locals["gap_"]
         cpt_str = str(self.cpt).zfill(int(np.log10(algo.max_iter)+1))
-        output_filename = self.output_prefix + 'fista_ite:%s.npz' % (cpt_str)
+        output_filename = self.output_prefix + 'fista_ite_%s.npz' % (cpt_str)
         # print "AlgorithmSnapshot.save_fista: save in ", output_filename
         np.savez_compressed(output_filename, **snapshot)
 

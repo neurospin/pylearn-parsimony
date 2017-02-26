@@ -1554,9 +1554,9 @@ class RidgeSquaredError(properties.CompositeFunction,
         >>> y = np.random.rand(100, 1)
         >>> rr = RidgeRegression(X=X, y=y, k=3.14159265)
         >>> beta = np.random.rand(150, 1)
-        >>> round(np.linalg.norm(rr.grad(beta)
-        ...       - rr.approx_grad(beta, eps=1e-4)), 9)
-        1.3e-08
+        >>> np.linalg.norm(rr.grad(beta)
+        ...       - rr.approx_grad(beta, eps=1e-4)) < 5e-8
+        True
         """
         if self.penalty_start > 0:
             x_ = x[self.penalty_start:, :]

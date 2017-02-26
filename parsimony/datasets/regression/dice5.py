@@ -10,7 +10,11 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 import numpy as np
 from scipy import ndimage
-from ..utils import Dot, ObjImage, spatial_smoothing, corr_to_coef
+
+try:
+    from ..utils import Dot, ObjImage, spatial_smoothing, corr_to_coef
+except:
+    from parsimony.datasets.utils import Dot, ObjImage, spatial_smoothing, corr_to_coef
 
 
 def load(n_samples=100, shape=(30, 30, 1),
@@ -149,12 +153,15 @@ def load(n_samples=100, shape=(30, 30, 1),
     Examples
     --------
     >>> import numpy as np
-    >>> import matplotlib.pyplot as plot
     >>> from  parsimony import datasets
     >>> n_samples = 100
     >>> shape = (11, 11, 1)
-    >>> X3d, y, beta3d = datasets.regression.dice5.load(n_samples=n_samples,
-    ...     shape=shape, r2=.5, random_seed=1)
+    >>> try:
+    ...     import matplotlib.pyplot as plot
+    ...     X3d, y, beta3d = datasets.regression.dice5.load(n_samples=n_samples,
+    ...         shape=shape, r2=.5, random_seed=1)
+    ... except:
+    ...     pass
     """
     if shape[0] < 5 or shape[1] < 5:
         raise ValueError("Shape too small. The minimun is (5, 5, 0)")

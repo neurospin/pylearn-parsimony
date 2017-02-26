@@ -37,9 +37,9 @@ def cylinder(width, nangles):
     -------
     >>> from parsimony.utils import mesh
     >>> xyz, tri = mesh.cylinder(width=5, nangles=10)
-    >>> print xyz.shape
+    >>> print (int(xyz.shape[0]), int(xyz.shape[1]))
     (50, 3)
-    >>> print tri.shape
+    >>> print (int(tri.shape[0]), int(tri.shape[1]))
     (80, 3)
     """
     scale = width / 5.
@@ -70,3 +70,7 @@ def cylinder(width, nangles):
     tri = np.array(tri)
 
     return xyz, tri
+
+if __name__ == "__main__":
+    import unittest
+    unittest.main()

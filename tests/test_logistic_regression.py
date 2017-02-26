@@ -15,7 +15,7 @@ import numpy as np
 import parsimony.utils.consts as consts
 try:
     from .tests import TestCase  # When imported as a package.
-except ValueError:
+except:
     from tests import TestCase  # When run as a program.
 
 # TODO: Test penalty_start.
@@ -194,7 +194,7 @@ class TestLogisticRegression(TestCase):
 
         algorithm = proximal.ISTA(eps=eps, max_iter=max_iter)
         function = CombinedFunction()
-        function.add_function(losses.LogisticRegression(X, y, mean=True))
+        function.add_loss(losses.LogisticRegression(X, y, mean=True))
         function.add_prox(penalties.L1(l))
         beta_start = start_vector.get_vector(p)
 
@@ -327,8 +327,8 @@ class TestLogisticRegression(TestCase):
 
         algorithm = proximal.ISTA(eps=eps, max_iter=max_iter)
         function = CombinedFunction()
-        function.add_function(losses.LogisticRegression(X_parsimony, y,
-                                                        mean=True))
+        function.add_loss(losses.LogisticRegression(X_parsimony, y,
+                                                    mean=True))
         function.add_prox(penalties.L1(l, penalty_start=1))
         beta_start = start_vector.get_vector(p)
 
@@ -458,7 +458,7 @@ class TestLogisticRegression(TestCase):
 
         gd = gradient.GradientDescent(eps=eps, max_iter=max_iter)
         function = CombinedFunction()
-        function.add_function(losses.LogisticRegression(X, y, mean=True))
+        function.add_loss(losses.LogisticRegression(X, y, mean=True))
         function.add_penalty(penalties.L2Squared(k))
         beta_start = start_vector.get_vector(p)
 
@@ -571,7 +571,7 @@ class TestLogisticRegression(TestCase):
                                               mean=True)
 
         function_2 = functions.CombinedFunction()
-        function_2.add_function(losses.LogisticRegression(X, y, mean=True))
+        function_2.add_loss(losses.LogisticRegression(X, y, mean=True))
         function_2.add_penalty(penalties.L2Squared(l, penalty_start=0))
 
         beta = start_vector.get_vector(p)
@@ -623,8 +623,8 @@ class TestLogisticRegression(TestCase):
 
         gd = gradient.GradientDescent(eps=eps, max_iter=max_iter)
         function = CombinedFunction()
-        function.add_function(losses.LogisticRegression(X_parsimony, y,
-                                                        mean=True))
+        function.add_loss(losses.LogisticRegression(X_parsimony, y,
+                                                    mean=True))
         function.add_penalty(penalties.L2Squared(k, penalty_start=1))
         beta_start = start_vector.get_vector(p)
 
@@ -741,14 +741,15 @@ class TestLogisticRegression(TestCase):
         A = gl.linear_operator_from_groups(p, groups=groups)  # , weights=weights)
 
         alpha = 0.9
+        V = np.random.randn(p, p)
         Sigma = alpha * np.eye(p, p) \
-              + (1.0 - alpha) * np.random.randn(p, p)
+              + (1.0 - alpha) * np.dot(V.T, V)
         mean = np.zeros(p)
         X = np.random.multivariate_normal(mean, Sigma, n)
         y = np.array(np.random.randint(0, 2, (n, 1)), dtype=X.dtype)
 
         eps = 1e-8
-        max_iter = 7000
+        max_iter = 10000
 
         l = 0.0
         k = 0.0
@@ -757,7 +758,7 @@ class TestLogisticRegression(TestCase):
 
         algorithm = proximal.ISTA(eps=eps, max_iter=max_iter)
         function = CombinedFunction()
-        function.add_function(losses.LogisticRegression(X, y, mean=True))
+        function.add_loss(losses.LogisticRegression(X, y, mean=True))
         function.add_penalty(gl.GroupLassoOverlap(l=g, A=A, mu=mu,
                                                   penalty_start=0))
         beta_start = start_vector.get_vector(p)
@@ -791,54 +792,59 @@ class TestLogisticRegression(TestCase):
         except ImportError:
 
             beta_spams = np.asarray(
-                    [[-0.72542349], [0.02830505], [-0.21973781], [0.41495258],
-                     [0.229409], [-0.32370782], [-0.15752327], [0.0632292],
-                     [1.06252282], [0.66542057], [-0.84258213], [0.69489539],
-                     [0.72518289], [0.46540807], [-0.34997616], [-0.34717853],
-                     [0.78537712], [1.09381737], [-0.33570154], [0.25842894],
-                     [-0.00959316], [0.92931029], [0.16074866], [0.11725611],
-                     [1.18146773], [0.03350294], [0.8230971], [0.98554419],
-                     [-0.61217155], [0.40936428], [-0.43282706], [0.19459689],
-                     [-0.44080338], [-0.33548882], [0.32473485], [0.56413217],
-                     [-0.66081985], [-0.43362073], [0.58328254], [0.41602645],
-                     [-0.01677669], [0.06827701], [-0.57902052], [0.64755089],
-                     [0.5010607], [0.09013846], [0.03085689], [0.0684073],
-                     [0.2971785], [1.03409051], [0.2652446], [1.23882265],
-                     [-0.27871008], [0.05570645], [-0.76659011], [-0.66016803],
-                     [-0.51300177], [-0.2289061], [0.40504384], [-0.8754489],
-                     [0.65528664], [0.76493272], [0.45700299], [-0.43729913],
-                     [0.16797076], [-0.12563883], [-0.05556865], [0.01500861],
-                     [0.27430934], [0.36472081], [-0.12008283], [-1.04799662],
-                     [-0.78768917], [-0.93620521], [0.21787308], [0.44862306],
-                     [-0.20981051], [0.75096296], [-0.0357571], [0.40723417],
-                     [0.65944272], [1.12012117], [0.70820101], [0.57642298],
-                     [0.12019244], [-0.54588467], [-0.68402079], [-0.86922667],
-                     [0.41024387], [-0.28984963], [-0.22063841], [-0.06986448],
-                     [0.5727723], [-0.24701453], [-0.73092213], [0.31178252],
-                     [-1.05972579], [0.19986263], [-0.1638552], [0.6232789]])
-
-#        mu = None
-        logreg_est = estimators.LogisticRegressionL1L2GL(l, k, g,
-                                      A=A, mu=mu,
-                                      algorithm=proximal.ISTA(),
-                                      algorithm_params=dict(eps=eps,
-                                                            max_iter=max_iter),
-                                      penalty_start=0,
-                                      mean=True,
-                                      class_weight=None)
-        logreg_est.fit(X, y)
+                    [[4.69125211e-04], [-5.76698788e-02], [-2.40078974e-01],
+                     [-6.61532107e-03], [-3.03512327e-01], [-1.83545174e-01],
+                     [-2.86425232e-01], [9.25436278e-02], [-3.69882368e-02],
+                     [-2.58152199e-01], [-1.57006492e-01], [-2.12059086e-01],
+                     [-3.64822932e-01], [-1.77213770e-02], [1.37712226e-01],
+                     [1.36983267e-01], [1.21019611e-01], [-1.14300309e-01],
+                     [-1.07108453e-01], [2.94683117e-01], [4.62945669e-02],
+                     [2.04873107e-01], [1.14232456e-01], [-1.02701573e-01],
+                     [-1.66498758e-01], [-3.40062598e-01], [5.78832448e-02],
+                     [-3.17271478e-02], [-2.17243625e-01], [7.18038071e-02],
+                     [-2.67045631e-01], [-2.09562234e-01], [1.79610439e-01],
+                     [-5.40938258e-01], [-5.36039494e-01], [-2.89187125e-02],
+                     [4.33817576e-01], [2.67831633e-01], [-1.63875210e-01],
+                     [-4.31756685e-01], [2.24698003e-01], [3.49821459e-01],
+                     [2.31160454e-01], [-7.42394377e-02], [1.13454429e-01],
+                     [2.86104705e-01], [3.23831912e-01], [7.53906314e-02],
+                     [2.92770430e-01], [-7.43106086e-02], [3.48688828e-01],
+                     [-9.88751796e-02], [3.50475276e-02], [-1.00405317e-01],
+                     [-4.16408430e-01], [4.55376777e-02], [2.01379801e-01],
+                     [2.05662044e-01], [2.78957686e-01], [-2.66772715e-02],
+                     [-5.66780405e-02], [6.13880915e-02], [3.53253584e-02],
+                     [2.83592934e-01], [-2.01475234e-01], [7.37472943e-02],
+                     [3.38869207e-02], [4.57371333e-01], [2.33202529e-01],
+                     [8.48612914e-02], [-1.53078084e-01], [-4.68795061e-02],
+                     [2.60334837e-01], [5.34128752e-01], [3.09231961e-01],
+                     [6.75427437e-02], [-3.70493876e-01], [-3.85837135e-02],
+                     [-1.32100270e-01], [-2.41449544e-01], [1.12424646e-01],
+                     [4.00124617e-01], [2.69803273e-01], [1.75762562e-01],
+                     [1.24632543e-01], [2.61731447e-01], [2.66625353e-01],
+                     [3.10319953e-01], [-2.33788511e-01], [-3.89499749e-01],
+                     [-8.00569373e-02], [4.50647251e-01], [3.38820788e-01],
+                     [-6.44928333e-02], [2.23326668e-01], [3.05168971e-01],
+                     [2.92517617e-01], [-3.49537305e-01], [2.57928416e-02],
+                     [-1.42370130e-01]])
 
         re = maths.norm(beta - beta_spams) / maths.norm(beta_spams)
 #        print "re:", re
-        assert_almost_equal(re, 0.065260,
-                            msg="The found regression vector is not correct.",
-                            places=5)
+        assert_less(re, 0.1, "The found regression vector is not correct.")
+
+#        mu = None
+        logreg_est = estimators.LogisticRegressionL1L2GL(l, k, g,
+                                                         A=A, mu=mu,
+                                                         algorithm=proximal.ISTA(),
+                                                         algorithm_params=dict(eps=eps,
+                                                                               max_iter=max_iter),
+                                                         penalty_start=0,
+                                                         mean=True,
+                                                         class_weight=None)
+        logreg_est.fit(X, y)
 
         re = maths.norm(logreg_est.beta - beta_spams) / maths.norm(beta_spams)
-#        print "re:", re
-        assert_almost_equal(re, 0.067734,
-                            msg="The found regression vector is not correct.",
-                            places=5)
+#        print "re:", res
+        assert_less(re, 0.18, "The found regression vector is not correct.")
 
         f_parsimony = function.f(beta)
         f_spams = function.f(beta_spams)
@@ -847,10 +853,8 @@ class TestLogisticRegression(TestCase):
         else:
             err = abs(f_parsimony - f_spams)
 #        print "err:", err
-        assert_almost_equal(err, 0.003466,
-                            msg="The found regression vector does not give " \
-                                "the correct function value.",
-                            places=5)
+        assert_less(re, 0.18, "The found regression vector does not give "
+                              "the correct function value.")
 
         f_logreg = function.f(logreg_est.beta)
         if abs(f_spams) > consts.TOLERANCE:
@@ -858,10 +862,8 @@ class TestLogisticRegression(TestCase):
         else:
             err = abs(f_logreg - f_spams)
 #        print "err:", err
-        assert_almost_equal(err, 0.003163,
-                            msg="The found regression vector does not give " \
-                                "the correct function value.",
-                            places=5)
+        assert_less(err, 0.018, "The found regression vector does not give "
+                                "the correct function value.")
 
     def test_l1_l2(self):
         # Spams: http://spams-devel.gforge.inria.fr/doc-python/html/doc_spams006.html#toc23
@@ -903,7 +905,7 @@ class TestLogisticRegression(TestCase):
 
         algorithm = proximal.ISTA(eps=eps, max_iter=max_iter)
         function = CombinedFunction()
-        function.add_function(losses.LogisticRegression(X, y, mean=True))
+        function.add_loss(losses.LogisticRegression(X, y, mean=True))
         function.add_penalty(penalties.L2Squared(k))
         function.add_prox(penalties.L1(l))
         beta_start = start_vector.get_vector(p)
@@ -1039,7 +1041,7 @@ class TestLogisticRegression(TestCase):
         algorithm = proximal.ISTA(eps=eps, max_iter=max_iter)
         function = CombinedFunction()
         logreg = losses.LogisticRegression(X_parsimony, y, mean=True)
-        function.add_function(logreg)
+        function.add_loss(logreg)
         function.add_penalty(penalties.L2Squared(k, penalty_start=1))
         function.add_prox(penalties.L1(l, penalty_start=1))
         beta_start = start_vector.get_vector(p)
@@ -1155,14 +1157,15 @@ class TestLogisticRegression(TestCase):
         A = gl.linear_operator_from_groups(p, groups=groups)  # , weights=weights)
 
         alpha = 0.9
+        V = np.random.randn(p, p)
         Sigma = alpha * np.eye(p, p) \
-              + (1.0 - alpha) * np.random.randn(p, p)
+              + (1.0 - alpha) * np.dot(V.T, V)
         mean = np.zeros(p)
         X = np.random.multivariate_normal(mean, Sigma, n)
         y = np.array(np.random.randint(0, 2, (n, 1)), dtype=X.dtype)
 
         eps = 1e-8
-        max_iter = 6600
+        max_iter = 7000
 
         l = 0.01
         k = 0.0
@@ -1171,7 +1174,7 @@ class TestLogisticRegression(TestCase):
 
         algorithm = proximal.ISTA(eps=eps, max_iter=max_iter)
         function = CombinedFunction()
-        function.add_function(losses.LogisticRegression(X, y, mean=True))
+        function.add_loss(losses.LogisticRegression(X, y, mean=True))
         function.add_penalty(gl.GroupLassoOverlap(l=g, A=A, mu=mu,
                                                   penalty_start=0))
         function.add_prox(penalties.L1(l))
@@ -1207,46 +1210,43 @@ class TestLogisticRegression(TestCase):
         except ImportError:
 
             beta_spams = np.asarray(
-                    [[-0.49445071], [0.], [0.], [0.], [0.], [0.], [0.], [0.],
-                     [0.90020246], [0.40967343], [-0.17363366], [0.],
-                     [0.4458841], [0.07978072], [0.], [0.], [0.56516372],
-                     [0.3811369], [0.], [0.07324983], [0.], [0.41067348], [0.],
-                     [0.], [0.79465353], [0.], [0.], [0.22514379],
-                     [-0.28391624], [0.], [0.], [0.], [0.], [0.], [0.],
-                     [0.57412006], [-0.08485725], [0.], [0.], [0.], [0.], [0.],
-                     [-0.16013528], [0.], [0.], [0.], [0.], [0.], [0.],
-                     [1.01262503], [0.], [1.24327631], [0.], [0.],
-                     [-0.35373743], [0.], [-0.02456871], [0.], [0.],
-                     [-0.44805359], [0.], [0.39618791], [0.], [0.], [0.], [0.],
-                     [0.], [0.], [0.], [0.], [0.], [-0.4650603], [-0.86402976],
-                     [-0.64165934], [0.], [0.], [0.], [0.24080178], [0.], [0.],
-                     [0.02534903], [0.57627445], [0.], [0.], [0.],
-                     [-0.03991855], [-0.35161357], [-0.35708467], [0.], [0.],
-                     [0.], [0.], [0.], [0.], [0.], [0.26739579], [-0.6467167],
-                     [0.], [0.], [0.19439507]])
+                    [[0.], [0.], [-0.00934964], [0.], [-0.0074088],
+                     [-0.14827099], [-0.18044253], [0.], [0.], [-0.06314177],
+                     [-0.0551803], [-0.0217575], [-0.1135496], [0.], [0.],
+                     [0.], [0.], [0.], [0.], [0.12632767], [0.], [0.01291467],
+                     [0.], [0.], [-0.08366792], [0.], [0.], [0.],
+                     [-0.19079434], [0.], [-0.03669943], [-0.15409229], [0.],
+                     [-0.47015998], [-0.50519523], [0.], [0.58914607],
+                     [0.0450907], [-0.15123913], [-0.19329313], [0.],
+                     [0.04939714], [0.], [0.], [0.], [0.], [0.11611083], [0.],
+                     [0.09014531], [0.], [0.15084944], [0.], [0.], [0.],
+                     [-0.10566928], [0.], [0.], [0.], [0.], [0.], [0.], [0.],
+                     [0.], [0.31381153], [0.], [0.], [0.], [0.20906125], [0.],
+                     [0.], [0.], [0.], [0.], [0.39929206], [0.], [0.],
+                     [-0.23697064], [0.], [0.], [0.], [0.], [0.41784515],
+                     [0.24064194], [0.], [0.06022185], [0.], [0.], [0.], [0.],
+                     [-0.55848663], [0.], [0.17684783], [0.21456589], [0.],
+                     [0.], [0.24244112], [0.22099273], [-0.304989], [0.],
+                     [0.]])
 
 #        mu = None
         logreg_est = estimators.LogisticRegressionL1L2GL(l, k, g,
-                                      A=A, mu=mu,
-                                      algorithm=proximal.ISTA(),
-                                      algorithm_params=dict(eps=eps,
-                                                            max_iter=max_iter),
-                                      penalty_start=0,
-                                      mean=True,
-                                      class_weight=None)
+                                                         A=A, mu=mu,
+                                                         algorithm=proximal.ISTA(),
+                                                         algorithm_params=dict(eps=eps,
+                                                                               max_iter=max_iter),
+                                                         penalty_start=0,
+                                                         mean=True,
+                                                         class_weight=None)
         logreg_est.fit(X, y)
 
         re = maths.norm(beta - beta_spams) / maths.norm(beta_spams)
 #        print "re:", re
-        assert_almost_equal(re, 0.000915,
-                            msg="The found regression vector is not correct.",
-                            places=5)
+        assert_less(re, 0.1, "The found regression vector is not correct.")
 
         re = maths.norm(logreg_est.beta - beta_spams) / maths.norm(beta_spams)
 #        print "re:", re
-        assert_almost_equal(re, 0.000989,
-                            msg="The found regression vector is not correct.",
-                            places=5)
+        assert_less(re, 0.1, "The found regression vector is not correct.")
 
         f_parsimony = function.f(beta)
         f_spams = function.f(beta_spams)
@@ -1255,10 +1255,8 @@ class TestLogisticRegression(TestCase):
         else:
             err = abs(f_parsimony - f_spams)
 #        print "err:", err
-        assert_almost_equal(err, 5.848802e-08,
-                            msg="The found regression vector does not give " \
-                                "the correct function value.",
-                            places=5)
+        assert_less(err, 0.001, "The found regression vector does not give "
+                                "the correct function value.")
 
         f_logreg = function.f(logreg_est.beta)
         if abs(f_spams) > consts.TOLERANCE:
@@ -1266,10 +1264,8 @@ class TestLogisticRegression(TestCase):
         else:
             err = abs(f_logreg - f_spams)
 #        print "err:", err
-        assert_almost_equal(err, 6.826259e-08,
-                            msg="The found regression vector does not give " \
-                                "the correct function value.",
-                            places=5)
+        assert_less(err, 0.0005, "The found regression vector does not give "
+                                 "the correct function value.")
 
 #    def test_logistic_regression_l1_gl_intercept(self):
 #        # Spams: http://spams-devel.gforge.inria.fr/doc-python/html/doc_spams006.html#toc23
@@ -1420,8 +1416,9 @@ class TestLogisticRegression(TestCase):
         A = tv.linear_operator_from_shape(shape)
 
         alpha = 0.9
+        V = np.random.randn(p, p)
         Sigma = alpha * np.eye(p, p) \
-              + (1.0 - alpha) * np.random.randn(p, p)
+              + (1.0 - alpha) * np.dot(V.T, V)
         mean = np.zeros(p)
         X = np.random.multivariate_normal(mean, Sigma, n)
 
@@ -1477,7 +1474,7 @@ class TestLogisticRegression(TestCase):
         logreg_fista.fit(X, y)
         err = logreg_fista.score(X, y)
 #        print err
-        assert_equal(err, 0.49,
+        assert_equal(err, 1.0,
                      msg="The found regression vector is not correct.")
 
         mu = 5e-4
@@ -1490,7 +1487,7 @@ class TestLogisticRegression(TestCase):
         logreg_ista.fit(X, y)
         err = logreg_ista.score(X, y)
 #        print err
-        assert_equal(err, 0.49,
+        assert_equal(err, 1.0,
                      msg="The found regression vector is not correct.")
 
 if __name__ == "__main__":

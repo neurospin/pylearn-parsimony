@@ -9,10 +9,12 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @license: BSD 3-clause.
 """
 import numpy as np
-from ..regression import dice5 as dice5regression
+try:
+    from ..regression import dice5 as dice5regression
+except:
+    from parsimony.datasets.regression import dice5 as dice5regression
 
 
-############################################################################
 def load(n_samples=100, shape=(30, 30, 1),
          snr=2., sigma_logit=5., random_seed=None,
          **kwargs):
@@ -45,10 +47,13 @@ def load(n_samples=100, shape=(30, 30, 1),
     --------
     >>> import numpy as np
     >>> np.random.seed(42)
-    >>> import matplotlib.pyplot as plot
-    >>> from  parsimony import datasets
-    >>> X3d, y, beta3d, proba = datasets.classification.dice5.load(
-    ...     n_samples=100, shape=(11, 11, 1), random_seed=1)
+    >>> from parsimony import datasets
+    >>> try:
+    ...     import matplotlib.pyplot as plot
+    ...     X3d, y, beta3d, proba = datasets.classification.dice5.load(
+    ...         n_samples=100, shape=(11, 11, 1), random_seed=1)
+    ... except:
+    ...     pass
     """
     X3d, y, beta3d = dice5regression.load(n_samples=n_samples, shape=shape,
                                           random_seed=random_seed,
@@ -59,3 +64,7 @@ def load(n_samples=100, shape=(30, 30, 1),
     y[proba < 0.5] = 0
 
     return X3d, y, beta3d, proba
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
