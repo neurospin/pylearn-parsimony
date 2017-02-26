@@ -637,29 +637,36 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
 
     Parameters
     ----------
-    mu_min : Non-negative float. A "very small" mu to use as a lower bound for
-            mu.
+    mu_min : float
+        Non-negative. A "very small" mu to use as a lower bound for mu.
 
-    tau : Float, 0 < tau < 1. The rate at which eps is decreasing. Default
-            is 0.5.
+    tau : float
+        Within  0 < tau < 1. The rate at which eps is decreasing. Default is
+        0.5.
 
-    exponent : Float, in [1.001, 2.0]. The assumed convergence rate of
-            ||beta* - beta_k||_2 for k=1,2,... is O(1 / k^exponent). Default
-            is 1.5.
+    exponent : float
+        Within [1.001, 2.0]. The assumed convergence rate of
+        ||beta* - beta_k||_2 for k=1,2,... is O(1 / k^exponent). Default is
+        1.5.
 
-    eps : Positive float. Tolerance for the stopping criterion.
+    eps : float
+        Positive float. Tolerance for the stopping criterion.
 
-    info : List or tuple of utils.Info. What, if any, extra run information
-            should be stored. Default is an empty list, which means that no
-            run information is computed nor returned.
+    info : List or tuple of utils.Info.
+        What, if any, extra run information should be stored. Default is an
+        empty list, which means that no run information is computed nor
+        returned.
 
-    max_iter : Non-negative integer. Maximum allowed number of iterations.
+    max_iter : int
+        Non-negative integer. Maximum allowed number of iterations.
 
-    min_iter : Non-negative integer less than or equal to max_iter. Minimum
-            number of iterations that must be performed. Default is 1.
+    min_iter : int
+        Non-negative integer less than or equal to max_iter. Minimum number of
+        iterations that must be performed. Default is 1.
 
-    callback: a callable object that will be call at the end of each iteration
-        with locals() as arguments.
+    callback: Callable
+        A callable object that will be called at the end of each iteration with
+        locals() as arguments.
 
     Example
     -------
