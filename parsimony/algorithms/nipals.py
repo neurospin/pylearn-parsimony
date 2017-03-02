@@ -147,9 +147,9 @@ class RankOneSVD(bases.ImplicitAlgorithm,
             _t = utils.time()
 
         if start_vector is None:
-            start_vector = start_vectors.RandomStartVector(normalise=True)
+            start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
-        v0 = start_vector.get_vector(np.min(X.shape))
+        v0 = start_vector.get_weights(np.min(X.shape))
 
         arpack_failed = False
         try:
@@ -330,9 +330,9 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
             self.info_set(utils.Info.converged, False)
 
         if start_vector is None:
-            start_vector = start_vectors.RandomStartVector(normalise=True)
+            start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
-        v0 = start_vector.get_vector(np.min(X.shape))
+        v0 = start_vector.get_weights(np.min(X.shape))
 
         # determine when to use power method or scipy_sparse
         use_power = True if X.shape[1] >= 10 ** 3 else False
@@ -494,9 +494,9 @@ class RankOneSVDProduct(bases.ImplicitAlgorithm,
         M, N = X.shape
 
         if start_vector is None:
-            start_vector = start_vectors.RandomStartVector(normalise=True)
+            start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
-        v = start_vector.get_vector(Y.shape[1])
+        v = start_vector.get_weights(Y.shape[1])
 
         for it in range(1, self.max_iter + 1):
             v_ = v

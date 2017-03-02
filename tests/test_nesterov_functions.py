@@ -2,7 +2,7 @@
 """
 Created on Tue Apr 15 15:58:38 2014
 
-Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt
 @email:   lofstedt.tommy@gmail.com
@@ -29,7 +29,7 @@ class TestL1(TestCase):
         import parsimony.utils.start_vectors as start_vectors
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -45,7 +45,7 @@ class TestL1(TestCase):
         M = np.random.multivariate_normal(mean, Sigma, n)
         e = np.random.randn(n, 1)
 
-        beta = start_vector.get_vector(p)
+        beta = start_vector.get_weights(p)
         beta[np.abs(beta) < 0.1] = 0.0
 
         l = 0.618
@@ -103,7 +103,7 @@ class TestL1(TestCase):
         import parsimony.utils.start_vectors as start_vectors
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -117,7 +117,7 @@ class TestL1(TestCase):
         M = np.random.multivariate_normal(mean, Sigma, n)
         e = np.random.randn(n, 1)
 
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
         beta_start[np.abs(beta_start) < 0.1] = 0.0
 
         l = 0.618
@@ -192,8 +192,8 @@ class TestL1TV(TestCase):
         k = 0.01
         g = 1.1
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
-        beta = start_vector.get_vector(p)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        beta = start_vector.get_weights(p)
 
         alpha = 1.0
         Sigma = alpha * np.eye(p, p) \
@@ -233,7 +233,7 @@ class TestL1TV(TestCase):
 #                                               penalty_start=0))
 #        function.add_prox(penalties.L1(l=l))
 
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
         beta = alg.run(function, beta_start)
 
         berr = np.linalg.norm(beta - beta_star)

@@ -2,7 +2,7 @@
 """
 Created on Tue Mar  4 10:33:40 2014
 
-Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt
 @email:   lofstedt.tommy@gmail.com
@@ -38,7 +38,7 @@ class TestLogisticRegression(TestCase):
 
         np.random.seed(42)
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         px = 4
         py = 4
@@ -60,7 +60,7 @@ class TestLogisticRegression(TestCase):
 
         gd = gradient.GradientDescent(eps=eps, max_iter=max_iter)
         lr = losses.LogisticRegression(X, y, mean=True)
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta = gd.run(lr, beta_start)
 
@@ -168,7 +168,7 @@ class TestLogisticRegression(TestCase):
 
         np.random.seed(42)
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         px = 4
         py = 4
@@ -196,7 +196,7 @@ class TestLogisticRegression(TestCase):
         function = CombinedFunction()
         function.add_loss(losses.LogisticRegression(X, y, mean=True))
         function.add_prox(penalties.L1(l))
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta = algorithm.run(function, beta_start)
 
@@ -299,7 +299,7 @@ class TestLogisticRegression(TestCase):
 
         np.random.seed(42)
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         px = 4
         py = 4
@@ -330,7 +330,7 @@ class TestLogisticRegression(TestCase):
         function.add_loss(losses.LogisticRegression(X_parsimony, y,
                                                     mean=True))
         function.add_prox(penalties.L1(l, penalty_start=1))
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta = algorithm.run(function, beta_start)
 
@@ -432,7 +432,7 @@ class TestLogisticRegression(TestCase):
 
         np.random.seed(42)
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         px = 4
         py = 4
@@ -460,7 +460,7 @@ class TestLogisticRegression(TestCase):
         function = CombinedFunction()
         function.add_loss(losses.LogisticRegression(X, y, mean=True))
         function.add_penalty(penalties.L2Squared(k))
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta = gd.run(function, beta_start)
 
@@ -574,7 +574,7 @@ class TestLogisticRegression(TestCase):
         function_2.add_loss(losses.LogisticRegression(X, y, mean=True))
         function_2.add_penalty(penalties.L2Squared(l, penalty_start=0))
 
-        beta = start_vector.get_vector(p)
+        beta = start_vector.get_weights(p)
 
         assert abs(function_1.f(beta) - function_2.f(beta)) < consts.TOLERANCE
         assert maths.norm(function_1.grad(beta) - function_2.grad(beta)) \
@@ -595,7 +595,7 @@ class TestLogisticRegression(TestCase):
 
         np.random.seed(42)
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         px = 4
         py = 4
@@ -626,7 +626,7 @@ class TestLogisticRegression(TestCase):
         function.add_loss(losses.LogisticRegression(X_parsimony, y,
                                                     mean=True))
         function.add_penalty(penalties.L2Squared(k, penalty_start=1))
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta = gd.run(function, beta_start)
 
@@ -731,7 +731,7 @@ class TestLogisticRegression(TestCase):
 
         np.random.seed(42)
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         # Note that p must be even!
         n, p = 50, 100
@@ -761,7 +761,7 @@ class TestLogisticRegression(TestCase):
         function.add_loss(losses.LogisticRegression(X, y, mean=True))
         function.add_penalty(gl.GroupLassoOverlap(l=g, A=A, mu=mu,
                                                   penalty_start=0))
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta = algorithm.run(function, beta_start)
 
@@ -879,7 +879,7 @@ class TestLogisticRegression(TestCase):
 
         np.random.seed(42)
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         px = 4
         py = 4
@@ -908,7 +908,7 @@ class TestLogisticRegression(TestCase):
         function.add_loss(losses.LogisticRegression(X, y, mean=True))
         function.add_penalty(penalties.L2Squared(k))
         function.add_prox(penalties.L1(l))
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta = algorithm.run(function, beta_start)
 
@@ -1012,7 +1012,7 @@ class TestLogisticRegression(TestCase):
 
         np.random.seed(42)
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         px = 4
         py = 4
@@ -1044,7 +1044,7 @@ class TestLogisticRegression(TestCase):
         function.add_loss(logreg)
         function.add_penalty(penalties.L2Squared(k, penalty_start=1))
         function.add_prox(penalties.L1(l, penalty_start=1))
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta = algorithm.run(function, beta_start)
 
@@ -1147,7 +1147,7 @@ class TestLogisticRegression(TestCase):
 
         np.random.seed(42)
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         # Note that p must be even!
         n, p = 50, 100
@@ -1178,7 +1178,7 @@ class TestLogisticRegression(TestCase):
         function.add_penalty(gl.GroupLassoOverlap(l=g, A=A, mu=mu,
                                                   penalty_start=0))
         function.add_prox(penalties.L1(l))
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta = algorithm.run(function, beta_start)
 
@@ -1284,7 +1284,7 @@ class TestLogisticRegression(TestCase):
 #
 #        np.random.seed(42)
 #
-#        start_vector = start_vectors.RandomStartVector(normalise=True)
+#        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 #
 #        # Note that p must be even!
 #        n, p = 50, 100 + 1
@@ -1313,7 +1313,7 @@ class TestLogisticRegression(TestCase):
 #
 #        algorithm = explicit.ISTA(eps=eps, max_iter=max_iter)
 #
-#        beta_start = start_vector.get_vector(p)
+#        beta_start = start_vector.get_weights(p)
 #        beta = beta_start
 #        for mu in mus:
 #            function = CombinedFunction()

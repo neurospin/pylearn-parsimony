@@ -13,16 +13,16 @@ import numpy as np
 
 try:
     from . import consts  # When imported as a package.
-except ValueError:
+except (ValueError, SystemError):
     from utils import consts  # When run as a program.
 try:
     from . import deprecated  # When imported as a package.
-except ValueError:
+except (ValueError, SystemError):
     from utils import deprecated  # When run as a program.
 
 from parsimony.utils import check_arrays
 
-__all__ = ["multivariate_normal", "sensitivity", "precision", "specificity",
+__all__ = ["multivariate_normal", "sensitivity", "specificity", "ppv",
            "npv", "F_score", "fleiss_kappa", "r2_score",
            "compute_ranks", "nemenyi_test"]
 
@@ -345,7 +345,7 @@ def F_score(cond, test):
     >>> round(stats.F_score(cond, test), 2)
     0.17
     """
-    PR = precision(cond, test)
+    PR = ppv(cond, test)
     RE = sensitivity(cond, test)
 
     value = 2.0 * PR * RE / (PR + RE)

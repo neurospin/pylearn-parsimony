@@ -2,7 +2,7 @@
 """
 Created on Mon Dec 23 15:00:10 2013
 
-Copyright (c) 2013-2015, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Edouard Duchesnay
 @email:   edouard.duchesnay@cea.fr
@@ -151,7 +151,7 @@ Xtr = X[tr, :]
 ytr = y[tr]
 Xte = X[te, :]
 yte = y[te]
-beta_start = start_vectors.RandomStartVector().get_vector(Xtr.shape[1])
+beta_start = start_vectors.RandomUniformWeights().get_weights(Xtr.shape[1])
 
 # check that ytr is balanced
 #assert ytr.sum() / ytr.shape[0] == 0.5
@@ -160,7 +160,7 @@ beta_start = start_vectors.RandomStartVector().get_vector(Xtr.shape[1])
 # Dataset with intercept
 Xtr_i = np.c_[np.ones((Xtr.shape[0], 1)), Xtr]
 Xte_i = np.c_[np.ones((Xte.shape[0], 1)), Xte]
-beta_start_i = start_vectors.RandomStartVector().get_vector(Xtr_i.shape[1])
+beta_start_i = start_vectors.RandomUniformWeights().get_weights(Xtr_i.shape[1])
 
 # global penalty
 alpha = l1_max_logistic_loss(Xtr, ytr)

@@ -2,7 +2,7 @@
 """
 Created on Fri Nov 22 10:42:07 2013
 
-Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Jinpeng Li
 @email:   jinpeng.li@cea.fr

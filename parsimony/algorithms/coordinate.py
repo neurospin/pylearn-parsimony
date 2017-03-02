@@ -95,8 +95,8 @@ class LassoCoordinateDescent(bases.ImplicitAlgorithm,
                      Info.converged]
 
     def __init__(self, l, mean=True, penalty_start=0,
-                 start_vector=start_vectors.RandomStartVector(
-                                                          limits=(-1.0, 1.0)),
+                 start_vector=start_vectors.RandomUniformWeights(normalise=True,
+                                                                 limits=(-1.0, 1.0)),
                  eps=consts.TOLERANCE,
                  info=[], max_iter=10000, min_iter=1):
 
@@ -155,12 +155,12 @@ class LassoCoordinateDescent(bases.ImplicitAlgorithm,
         n, p = X.shape
 
         if beta is None:
-            beta = self.start_vector.get_vector(p)
+            beta = self.start_vector.get_weights(p)
         else:
             beta = beta.copy()
 
         function = functions.CombinedFunction()
-        function.add_function(functions.losses.LinearRegression(X, y,
+        function.add_loss(functions.losses.LinearRegression(X, y,
                                                                 mean=False))
         function.add_prox(penalties.L1(l=self.l))
 
@@ -285,8 +285,8 @@ class ShootingAlgorithm(bases.ImplicitAlgorithm,
                      Info.converged]
 
     def __init__(self, l, mean=True, penalty_start=0,
-                 start_vector=start_vectors.RandomStartVector(
-                                                          limits=(-1.0, 1.0)),
+                 start_vector=start_vectors.RandomUniformWeights(normalise=True,
+                                                                 limits=(-1.0, 1.0)),
                  eps=consts.TOLERANCE,
                  info=[], max_iter=10000, min_iter=1):
 
@@ -345,7 +345,7 @@ class ShootingAlgorithm(bases.ImplicitAlgorithm,
         n, p = X.shape
 
         if beta is None:
-            beta = self.start_vector.get_vector(p)
+            beta = self.start_vector.get_weights(p)
         else:
             beta = beta.copy()
 

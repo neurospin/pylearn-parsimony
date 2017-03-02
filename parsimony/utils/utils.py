@@ -17,9 +17,11 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 import warnings
 from functools import wraps
 from time import time, clock
+# import collections
+import functools
+import inspect
 
 import numpy as np
-import collections
 
 try:
     from . import consts
@@ -37,46 +39,167 @@ __all__ = ["time_cpu", "time_wall", "time", "deprecated", "corr", "project",
 # _DEBUG = True
 
 
-def deprecated(*replaced_by):
-    """This decorator can be used to mark functions as deprecated.
+class deprecated(object):
+    """A decorator for marking classes, functions and class functions as
+    deprecated.
 
-    Useful when phasing out old API functions.
+    Adapted from: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
 
     Parameters
     ----------
-    replaced_by : String. The name of the function that should be used instead.
+    replaced_by : str
+        The name of the new class or function that replaces this class or
+        function.
+
+    Examples
+    --------
+    >>> import warnings
+    >>> from parsimony.utils import deprecated
+    >>>
+    >>> @deprecated("other_function", filter_off=False)
+    ... def function1():
+    ...     return 3.14159
+    >>>
+    >>> @deprecated(filter_off=False)
+    ... def function2():
+    ...     return 3.14159
+    >>>
+    >>> class Class1(object):
+    ...     @deprecated("other_function", filter_off=False)
+    ...     def method(self):
+    ...         return 2.71828
+    >>>
+    >>> @deprecated("other_function", filter_off=False)
+    ... class Class2(object):
+    ...     pass
+    >>>
+    >>> with warnings.catch_warnings():
+    ...     warnings.filterwarnings("error")  # Make warnings raise exceptions
+    ...     try:
+    ...         v = function1()
+    ...     except DeprecationWarning as warning:
+    ...         print(warning)  # doctest: +ELLIPSIS
+    Function or method "..." is deprecated (use "..." instead).
+    >>> with warnings.catch_warnings():
+    ...     warnings.filterwarnings("error")  # Make warnings raise exceptions
+    ...     try:
+    ...         v = function2()
+    ...     except DeprecationWarning as warning:
+    ...         print(warning)  # doctest: +ELLIPSIS
+    Function or method "..." is deprecated.
+    >>> with warnings.catch_warnings():
+    ...     warnings.filterwarnings("error")  # Make warnings raise exceptions
+    ...     try:
+    ...         v = Class1().method()
+    ...     except DeprecationWarning as warning:
+    ...         print(warning)  # doctest: +ELLIPSIS
+    Function or method "..." is deprecated (use "..." instead).
+    >>> with warnings.catch_warnings():
+    ...     warnings.filterwarnings("error")  # Make warnings raise exceptions
+    ...     try:
+    ...         v = Class2()
+    ...     except DeprecationWarning as warning:
+    ...         print(warning)  # doctest: +ELLIPSIS
+    Class "..." is deprecated (use "..." instead).
     """
-    arg = True
-    if len(replaced_by) == 1 and isinstance(replaced_by[0], collections.Callable):
-        func = replaced_by[0]
-        replaced_by = None
-        arg = False
-    else:
-        replaced_by = replaced_by[0]
+    def __init__(self, replaced_by=None, filter_off=True):
 
-    def outer(func):
-        @wraps(func)
-        def with_warning(*args, **kwargs):
-            string = ""
-            if replaced_by is not None:
-                string = " Use %s instead." % replaced_by
+        if inspect.isclass(replaced_by) or inspect.isfunction(replaced_by):
+            raise TypeError("Reason for deprecation must be supplied")
 
-            warnings.warn("Function " + str(func.__name__) +
-                          " is deprecated." + string,
-                          category=DeprecationWarning,
-                          stacklevel=2)
-            return func(*args, **kwargs)
+        self.replaced_by = replaced_by
+        self.filter_off = bool(filter_off)
 
-        with_warning.__name__ = func.__name__
-        with_warning.__doc__ = func.__doc__
-        with_warning.__dict__.update(func.__dict__)
+    def __call__(self, cls_or_func):
 
-        return with_warning
+        if inspect.isfunction(cls_or_func):
 
-    if not arg:
-        return outer(func)
-    else:
-        return outer
+            if hasattr(cls_or_func, 'func_code'):
+                _code = cls_or_func.func_code
+            else:
+                _code = cls_or_func.__code__
+
+            if self.replaced_by is None:
+                fmt = 'Function or method "{name}" is deprecated.'
+            else:
+                fmt = 'Function or method "{name}" is deprecated ' + \
+                      '(use "{replaced_by}" instead).'
+            filename = _code.co_filename
+            lineno = _code.co_firstlineno + 1
+
+        elif inspect.isclass(cls_or_func):
+            if self.replaced_by is None:
+                fmt = 'Class "{name}" is deprecated.'
+            else:
+                fmt = 'Class "{name}" is deprecated (use "{replaced_by}" instead).'
+            filename = cls_or_func.__module__
+            lineno = 1
+
+        else:
+            raise TypeError(type(cls_or_func))
+
+        if self.replaced_by is None:
+            msg = fmt.format(name=cls_or_func.__name__)
+        else:
+            msg = fmt.format(name=cls_or_func.__name__,
+                             replaced_by=self.replaced_by)
+
+        @functools.wraps(cls_or_func)
+        def new_func(*args, **kwargs):
+            if self.filter_off:
+                warnings.simplefilter("always", DeprecationWarning)  # Turn off filter
+
+#            warnings.warn_explicit(msg, category=DeprecationWarning,
+#                                   filename=filename, lineno=lineno)
+            warnings.warn(msg, category=DeprecationWarning, stacklevel=2)  # Prints function call site instead of function definition site.
+
+            if self.filter_off:
+                warnings.simplefilter("default", DeprecationWarning)  # Reset filter
+
+            return cls_or_func(*args, **kwargs)
+
+        return new_func
+
+#def deprecated(*replaced_by):
+#    """This decorator can be used to mark functions as deprecated.
+#
+#    Useful when phasing out old API functions.
+#
+#    Parameters
+#    ----------
+#    replaced_by : String. The name of the function that should be used instead.
+#    """
+#    arg = True
+#    if len(replaced_by) == 1 and isinstance(replaced_by[0], collections.Callable):
+#        func = replaced_by[0]
+#        replaced_by = None
+#        arg = False
+#    else:
+#        replaced_by = replaced_by[0]
+#
+#    def outer(func):
+#        @wraps(func)
+#        def with_warning(*args, **kwargs):
+#            string = ""
+#            if replaced_by is not None:
+#                string = " Use %s instead." % replaced_by
+#
+#            warnings.warn("Function " + str(func.__name__) +
+#                          " is deprecated." + string,
+#                          category=DeprecationWarning,
+#                          stacklevel=2)
+#            return func(*args, **kwargs)
+#
+#        with_warning.__name__ = func.__name__
+#        with_warning.__doc__ = func.__doc__
+#        with_warning.__dict__.update(func.__dict__)
+#
+#        return with_warning
+#
+#    if not arg:
+#        return outer(func)
+#    else:
+#        return outer
 
 
 #@deprecated("functions.properties.Gradient.approx_grad")

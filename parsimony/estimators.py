@@ -4,7 +4,7 @@ function and penalties.
 
 Created on Sat Nov  2 15:19:17 2013
 
-Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt, Edouard Duchesnay
 @email:   lofstedt.tommy@gmail.com, edouard.duchesnay@cea.fr
@@ -159,7 +159,7 @@ class RegressionEstimator(with_metaclass(abc.ABCMeta, BaseEstimator)):
     """
 
     def __init__(self, algorithm,
-                 start_vector=start_vectors.RandomStartVector()):
+                 start_vector=start_vectors.RandomUniformWeights(normalise=True)):
 
         super(RegressionEstimator, self).__init__(algorithm=algorithm)
 
@@ -248,11 +248,11 @@ class LinearRegression(RegressionEstimator):
     ...                                  algorithm_params=dict(max_iter=1000),
     ...                                  mean=False)
     >>> error = lr.fit(X, y).score(X, y)
-    >>> print("error = %.10f" % (error,))
-    error = 0.0116466704
+    >>> print("error = %f" % (error,))  # doctest: +ELLIPSIS
+    error = 0.0135...
     """
     def __init__(self, algorithm=None, algorithm_params=dict(),
-                 start_vector=start_vectors.RandomStartVector(),
+                 start_vector=start_vectors.RandomUniformWeights(normalise=True),
                  mean=True):
 
         if algorithm is None:
@@ -282,7 +282,7 @@ class LinearRegression(RegressionEstimator):
 
         # TODO: Should we use a seed here so that we get deterministic results?
         if beta is None:
-            beta = self.start_vector.get_vector(X.shape[1])
+            beta = self.start_vector.get_weights(X.shape[1])
 
         self.beta = self.algorithm.run(function, beta)
 
@@ -353,11 +353,11 @@ class RidgeRegression(RegressionEstimator):
     ...                                 algorithm_params=dict(max_iter=1000),
     ...                                 mean=False)
     >>> error = rr.fit(X, y).score(X, y)
-    >>> print("error = %.10f" % (error,))
-    error = 0.3776794377
+    >>> print("error = %f" % (error,))  # doctest: +ELLIPSIS
+    error = 0.3776...
     """
     def __init__(self, l, algorithm=None, algorithm_params=dict(),
-                 start_vector=start_vectors.RandomStartVector(),
+                 start_vector=start_vectors.RandomUniformWeights(normalise=True),
                  penalty_start=0, mean=True):
 
         if algorithm is None:
@@ -385,7 +385,7 @@ class RidgeRegression(RegressionEstimator):
         X, y = check_arrays(X, y)
 
         function = functions.CombinedFunction()
-        function.add_function(losses.LinearRegression(X, y, mean=self.mean))
+        function.add_loss(losses.LinearRegression(X, y, mean=self.mean))
         function.add_penalty(penalties.L2Squared(l=self.l,
                                                  penalty_start=self.penalty_start))
 
@@ -395,7 +395,7 @@ class RidgeRegression(RegressionEstimator):
         # TODO: Should we use a seed somewhere so that we get deterministic
         # results?
         if beta is None:
-            beta = self.start_vector.get_vector(X.shape[1])
+            beta = self.start_vector.get_weights(X.shape[1])
 
         self.beta = self.algorithm.run(function, beta)
 
@@ -466,12 +466,12 @@ class Lasso(RegressionEstimator):
     ...                          algorithm_params=dict(max_iter=1000),
     ...                          mean=False)
     >>> error = lasso.fit(X, y).score(X, y)
-    >>> print("error = %.12f" % (error,))
-    error = 0.395494642796
+    >>> print("error = %f" % (error,))  # doctest: +ELLIPSIS
+    error = 0.3954...
     """
     def __init__(self, l,
                  algorithm=None, algorithm_params=dict(),
-                 start_vector=start_vectors.RandomStartVector(),
+                 start_vector=start_vectors.RandomUniformWeights(normalise=True),
                  penalty_start=0,
                  mean=True):
 
@@ -501,7 +501,7 @@ class Lasso(RegressionEstimator):
         X, y = check_arrays(X, y)
 
         function = functions.CombinedFunction()
-        function.add_function(losses.LinearRegression(X, y, mean=self.mean))
+        function.add_loss(losses.LinearRegression(X, y, mean=self.mean))
         function.add_prox(penalties.L1(l=self.l,
                                        penalty_start=self.penalty_start))
 
@@ -510,7 +510,7 @@ class Lasso(RegressionEstimator):
 
         # TODO: Should we use a seed here so that we get deterministic results?
         if beta is None:
-            beta = self.start_vector.get_vector(X.shape[1])
+            beta = self.start_vector.get_weights(X.shape[1])
 
         self.beta = self.algorithm.run(function, beta)
 
@@ -586,11 +586,11 @@ class ElasticNet(RegressionEstimator):
     ...                            algorithm_params=dict(max_iter=1000),
     ...                            mean=False)
     >>> error = en.fit(X, y).score(X, y)
-    >>> print("error = %.12f" % (round(error, 13),))
-    error = 0.492096328053
+    >>> print("error = %f" % (error,))  # doctest: +ELLIPSIS
+    error = 0.492096...
     """
     def __init__(self, l, alpha=1.0, algorithm=None, algorithm_params=dict(),
-                 start_vector=start_vectors.RandomStartVector(),
+                 start_vector=start_vectors.RandomUniformWeights(normalise=True),
                  penalty_start=0, mean=True):
 
         if algorithm is None:
@@ -619,7 +619,7 @@ class ElasticNet(RegressionEstimator):
         X, y = check_arrays(X, y)
 
         function = functions.CombinedFunction()
-        function.add_function(losses.LinearRegression(X, y, mean=self.mean))
+        function.add_loss(losses.LinearRegression(X, y, mean=self.mean))
         function.add_penalty(penalties.L2Squared(l=self.alpha * (1.0 - self.l),
                                                  penalty_start=self.penalty_start))
         function.add_prox(penalties.L1(l=self.alpha * self.l,
@@ -630,7 +630,7 @@ class ElasticNet(RegressionEstimator):
 
         # TODO: Should we use a seed here so that we get deterministic results?
         if beta is None:
-            beta = self.start_vector.get_vector(X.shape[1])
+            beta = self.start_vector.get_weights(X.shape[1])
 
         self.beta = self.algorithm.run(function, beta)
 
@@ -694,6 +694,9 @@ class LinearRegressionL1L2TV(RegressionEstimator):
     mean : Boolean. Whether to compute the squared loss or the mean squared
             loss. Default is True, the mean squared loss.
 
+    start_vector : BaseStartVector. Generates the start vector that will be
+            used.
+
     rho : Positive float. Regularisation constant only used in ADMM. Default
             is 1.0.
 
@@ -719,28 +722,28 @@ class LinearRegressionL1L2TV(RegressionEstimator):
     ...                      mean=False)
     >>> res = lr.fit(X, y)
     >>> lr.score(X, y)  # doctest: +ELLIPSIS
-    0.06838425...
+    0.0683...
     >>>
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                     algorithm=proximal.CONESTA(max_iter=1000),
     ...                     mean=False)
     >>> res = lr.fit(X, y)
     >>> lr.score(X, y)  # doctest: +ELLIPSIS
-    0.06835834...
+    0.0683...
     >>>
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                                algorithm=proximal.FISTA(max_iter=1000),
     ...                                mean=False)
     >>> lr = lr.fit(X, y)
     >>> lr.score(X, y)  # doctest: +ELLIPSIS
-    1.58175771...
+    0.1206...
     >>>
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                                 algorithm=proximal.ISTA(max_iter=1000),
     ...                                 mean=False)
     >>> lr = lr.fit(X, y)
     >>> lr.score(X, y)  # doctest: +ELLIPSIS
-    2.07583068...
+    0.6976...
     >>>
     >>> import parsimony.functions.nesterov.l1tv as l1tv
     >>> np.random.seed(1337)
@@ -757,6 +760,7 @@ class LinearRegressionL1L2TV(RegressionEstimator):
                  algorithm=None, algorithm_params=dict(),
                  penalty_start=0,
                  mean=True,
+                 start_vector=start_vectors.RandomUniformWeights(normalise=True),
                  rho=1.0):
 
         self.l1 = max(consts.TOLERANCE, float(l1))
@@ -815,8 +819,8 @@ class LinearRegressionL1L2TV(RegressionEstimator):
             # results?
             p = X.shape[1]
             if beta is None:
-                x = self.start_vector.get_vector(p)
-                r = self.start_vector.get_vector(2 * p)
+                x = self.start_vector.get_weights(p)
+                r = self.start_vector.get_weights(2 * p)
             else:
                 x = beta
 #                r = np.vstack((beta, np.zeros((p, 1))))
@@ -843,7 +847,7 @@ class LinearRegressionL1L2TV(RegressionEstimator):
             # TODO: Should we use a seed here so that we get deterministic
             # results?
             if beta is None:
-                beta = self.start_vector.get_vector(X.shape[1])
+                beta = self.start_vector.get_weights(X.shape[1])
 
         self.algorithm.check_compatibility(function,
                                            self.algorithm.INTERFACES)
@@ -912,6 +916,9 @@ class LinearRegressionL1L2GL(RegressionEstimator):
     mean : Boolean. Whether to compute the squared loss or the mean squared
             loss. Default is True, the mean squared loss.
 
+    start_vector : parsimony.utils.generate_weights.BaseWeights
+        Generates the start vector that will be used.
+
     Examples
     --------
     >>> import numpy as np
@@ -936,7 +943,7 @@ class LinearRegressionL1L2GL(RegressionEstimator):
     ...                                   mean=False)
     >>> res = lr.fit(X, y)
     >>> lr.score(X, y)  # doctest: +ELLIPSIS
-    0.61018382...
+    0.6101...
     >>>
     >>> lr = estimators.LinearRegressionL1L2GL(l1, l2, gl, A,
     ...                                  algorithm=proximal.CONESTA(),
@@ -944,7 +951,7 @@ class LinearRegressionL1L2GL(RegressionEstimator):
     ...                                  mean=False)
     >>> res = lr.fit(X, y)
     >>> lr.score(X, y)  # doctest: +ELLIPSIS
-    0.61139525...
+    0.611...
     >>>
     >>> lr = estimators.LinearRegressionL1L2GL(l1, l2, gl, A,
     ...                                   algorithm=proximal.FISTA(),
@@ -952,7 +959,7 @@ class LinearRegressionL1L2GL(RegressionEstimator):
     ...                                   mean=False)
     >>> lr = lr.fit(X, y)
     >>> lr.score(X, y)  # doctest: +ELLIPSIS
-    10.74652493...
+    1.0881...
     >>>
     >>> lr = estimators.LinearRegressionL1L2GL(l1, l2, gl, A,
     ...                                   algorithm=proximal.ISTA(),
@@ -960,13 +967,14 @@ class LinearRegressionL1L2GL(RegressionEstimator):
     ...                                   mean=False)
     >>> lr = lr.fit(X, y)
     >>> lr.score(X, y)  # doctest: +ELLIPSIS
-    11.02462114...
+    8.5872...
     """
     def __init__(self, l1, l2, gl,
                  A=None, mu=consts.TOLERANCE,
                  algorithm=None, algorithm_params=dict(),
                  penalty_start=0,
-                 mean=True):
+                 mean=True,
+                 start_vector=start_vectors.RandomUniformWeights(normalise=True)):
 
         self.l1 = max(consts.TOLERANCE, float(l1))
         self.l2 = max(consts.TOLERANCE, float(l2))
@@ -1018,7 +1026,7 @@ class LinearRegressionL1L2GL(RegressionEstimator):
 
         # TODO: Should we use a seed here so that we get deterministic results?
         if beta is None:
-            beta = self.start_vector.get_vector(X.shape[1])
+            beta = self.start_vector.get_weights(X.shape[1])
 
         if self.mu is None:
             self.mu = function.estimate_mu(beta)
@@ -1146,7 +1154,7 @@ class LinearRegressionL1L2GL(RegressionEstimator):
 #
 #        # TODO: Should we use a seed here so that we get deterministic results?
 #        if beta is None:
-#            beta = self.start_vector.get_vector(X.shape[1])
+#            beta = self.start_vector.get_weights(X.shape[1])
 #
 #        if self.mu is None:
 #            self.mu = self.function.estimate_mu(beta)
@@ -1186,7 +1194,7 @@ class LogisticRegressionEstimator(with_metaclass(abc.ABCMeta, BaseEstimator)):
         weights inversely proportional to class frequencies.
     """
     def __init__(self, algorithm,
-                 start_vector=start_vectors.RandomStartVector(),
+                 start_vector=start_vectors.RandomUniformWeights(normalise=True),
                  class_weight=None):
 
         super(LogisticRegressionEstimator, self).__init__(algorithm=algorithm)
@@ -1349,7 +1357,7 @@ class LogisticRegression(LogisticRegressionEstimator):
 
         # TODO: Should we use a seed here so that we get deterministic results?
         if beta is None:
-            beta = self.start_vector.get_vector(X.shape[1])
+            beta = self.start_vector.get_weights(X.shape[1])
 
         self.beta = self.algorithm.run(function, beta)
 
@@ -1398,11 +1406,9 @@ class RandomLogisticRegression(LogisticRegression):
     0.52...
     """
     def __init__(self, rng, class_weight=None, penalty_start=0,
-                 start_vector=start_vectors.RandomStartVector(),
-                 mean=True):
+                 start_vector=None, mean=True):
 
-        super(RandomLogisticRegression, self).__init__(algorithm=None)#,
-                                                       #start_vector=start_vector)
+        super(RandomLogisticRegression, self).__init__(algorithm=None)
 
         self.rng = rng
         self.mean = bool(mean)
@@ -1531,7 +1537,7 @@ class RidgeLogisticRegression(LogisticRegressionEstimator):
                                                   mean=self.mean)
 
 #        function = functions.CombinedFunction()
-#        function.add_function(losses.LogisticRegression(X, y, mean=self.mean))
+#        function.add_loss(losses.LogisticRegression(X, y, mean=self.mean))
 #        function.add_penalty(penalties.L2Squared(self.l,
 #                                             penalty_start=self.penalty_start))
 
@@ -1540,7 +1546,7 @@ class RidgeLogisticRegression(LogisticRegressionEstimator):
 
         # TODO: Should we use a seed here so that we get deterministic results?
         if beta is None:
-            beta = self.start_vector.get_vector(X.shape[1])
+            beta = self.start_vector.get_weights(X.shape[1])
 
         self.beta = self.algorithm.run(function, beta)
 
@@ -1649,9 +1655,9 @@ class LassoLogisticRegression(LogisticRegressionEstimator):
         y, sample_weight = check_arrays(y, sample_weight)
 
         function = functions.CombinedFunction()
-        function.add_function(losses.LogisticRegression(X, y,
-                                                        weights=sample_weight,
-                                                        mean=self.mean))
+        function.add_loss(losses.LogisticRegression(X, y,
+                                                    weights=sample_weight,
+                                                    mean=self.mean))
         function.add_prox(penalties.L1(l=self.l,
                                        penalty_start=self.penalty_start))
 
@@ -1660,7 +1666,7 @@ class LassoLogisticRegression(LogisticRegressionEstimator):
 
         # TODO: Should we use a seed here so that we get deterministic results?
         if beta is None:
-            beta = self.start_vector.get_vector(X.shape[1])
+            beta = self.start_vector.get_weights(X.shape[1])
 
         self.beta = self.algorithm.run(function, beta)
 
@@ -1785,7 +1791,7 @@ class ElasticNetLogisticRegression(LogisticRegressionEstimator):
 
         # TODO: Should we use a seed here so that we get deterministic results?
         if beta is None:
-            beta = self.start_vector.get_vector(X.shape[1])
+            beta = self.start_vector.get_weights(X.shape[1])
 
         self.beta = self.algorithm.run(function, beta)
 
@@ -1851,6 +1857,9 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
     mean : Boolean. Whether to compute the squared loss or the mean squared
             loss. Default is True, the mean squared loss.
 
+    start_vector : parsimony.utils.generate_weights.BaseWeights
+        Generates the start vector that will be used.
+
     Examples
     --------
     >>> import numpy as np
@@ -1881,21 +1890,22 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
     >>> lr = lr.fit(X, y)
     >>> error = lr.score(X, y)
     >>> print("error = %.1f" % (error,))
-    error = 0.7
+    error = 0.5
     >>> lr = estimators.LogisticRegressionL1L2TV(l1, l2, tv, A,
     ...                                 algorithm=proximal.ISTA(max_iter=1000),
     ...                                 mean=False)
     >>> lr = lr.fit(X, y)
     >>> error = lr.score(X, y)
     >>> print("error = %.1f" % (error,))
-    error = 0.7
+    error = 0.8
     """
     def __init__(self, l1, l2, tv,
                  A=None, mu=consts.TOLERANCE,
                  algorithm=None, algorithm_params=dict(),
                  class_weight=None,
                  penalty_start=0,
-                 mean=True):
+                 mean=True,
+                 start_vector=start_vectors.RandomUniformWeights(normalise=True)):
 
         self.l1 = max(consts.TOLERANCE, float(l1))
         # self.l2 = max(consts.TOLERANCE, float(l2))
@@ -1955,7 +1965,7 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
 
         # TODO: Should we use a seed here so that we get deterministic results?
         if beta is None:
-            beta = self.start_vector.get_vector(X.shape[1])
+            beta = self.start_vector.get_weights(X.shape[1])
 
         if self.mu is None:
             self.mu = function.estimate_mu(beta)
@@ -2036,7 +2046,7 @@ class LogisticRegressionL1L2TVInexactFISTA(LogisticRegressionL1L2TV):
                                            self.algorithm.INTERFACES)
         # TODO: Should we use a seed here so that we get deterministic results?
         if beta is None:
-            beta = self.start_vector.get_vector(X.shape[1])
+            beta = self.start_vector.get_weights(X.shape[1])
         self.beta = self.algorithm.run(function, beta)
 
         return self
@@ -2101,6 +2111,9 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
     mean : Boolean. Whether to compute the squared loss or the mean squared
             loss. Default is True, the mean squared loss.
 
+    start_vector : parsimony.utils.generate_weights.BaseWeights
+        Generates the start vector that will be used.
+
     Examples
     --------
     >>> import numpy as np
@@ -2134,14 +2147,14 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
     >>> lr = lr.fit(X, y)
     >>> error = lr.score(X, y)
     >>> print("error = %.1f" % (error,))
-    error = 0.7
+    error = 0.8
     >>> lr = estimators.LogisticRegressionL1L2GL(l1, l2, gl, A,
     ...                                 algorithm=proximal.ISTA(max_iter=1000),
     ...                                 mean=False)
     >>> lr = lr.fit(X, y)
     >>> error = lr.score(X, y)
     >>> print("error = %.1f" % (error,))
-    error = 0.7
+    error = 0.5
     """
     def __init__(self, l1, l2, gl,
                  A=None, mu=consts.TOLERANCE,
@@ -2149,7 +2162,8 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
                  algorithm=None, algorithm_params=dict(),
                  class_weight=None,
                  penalty_start=0,
-                 mean=True):
+                 mean=True,
+                 start_vector=start_vectors.RandomUniformWeights(normalise=True)):
 
         self.l1 = max(consts.TOLERANCE, float(l1))
         self.l2 = max(consts.TOLERANCE, float(l2))
@@ -2209,7 +2223,7 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
 
         # TODO: Should we use a seed here so that we get deterministic results?
         if beta is None:
-            beta = self.start_vector.get_vector(X.shape[1])
+            beta = self.start_vector.get_weights(X.shape[1])
 
         if self.mu is None:
             self.mu = function.estimate_mu(beta)
@@ -2529,7 +2543,7 @@ class SupportVectorMachine(SVMEstimator):
     """
     def __init__(self, C, kernel=None,
                  algorithm=None, algorithm_params=dict(),
-                 start_vector=start_vectors.RandomStartVector()):
+                 start_vector=start_vectors.RandomUniformWeights(normalise=True)):
 
         self.C = max(consts.FLOAT_EPSILON, float(C))
 
@@ -2613,7 +2627,7 @@ class SupportVectorMachine(SVMEstimator):
                                                self.algorithm.INTERFACES)
 
             # TODO: Add determinism through a random_state?
-            beta = self.start_vector.get_vector(X.shape[0])
+            beta = self.start_vector.get_weights(X.shape[0])
             beta = self.algorithm.run(function, beta)
 
             if isinstance(self.kernel, alg_utils.ExplicitKernel):
@@ -2688,7 +2702,7 @@ class PLSRegression(RegressionEstimator):
 #    >>> print("error = %f" % (error,))
 #    error = 0.0222345202333
     def __init__(self, K=2, algorithm=None, algorithm_params=dict(),
-                 start_vector=start_vectors.RandomStartVector(),
+                 start_vector=start_vectors.RandomUniformWeights(normalise=True),
                  unbiased=True, mean=True):
 
         self.K = max(1, int(K))
@@ -2736,8 +2750,8 @@ class PLSRegression(RegressionEstimator):
                 l22 = penalties.L2(c=1.0)
 
                 function = mb_losses.CombinedMultiblockFunction([X, Y])
-                function.add_function(cov1, 0, 1)
-                function.add_function(cov2, 1, 0)
+                function.add_loss(cov1, 0, 1)
+                function.add_loss(cov2, 1, 0)
 
                 function.add_constraint(l21, 0)
                 function.add_constraint(l22, 1)
@@ -2748,8 +2762,8 @@ class PLSRegression(RegressionEstimator):
                 # TODO: Should we use a seed here so that we get deterministic
                 # results?
 #                if w is None or k > 0:
-                w = [self.start_vector.get_vector(X.shape[1]),
-                     self.start_vector.get_vector(Y.shape[1])]
+                w = [self.start_vector.get_weights(X.shape[1]),
+                     self.start_vector.get_weights(Y.shape[1])]
 
                 print("max iter: %d" % (self.algorithm.max_iter,))
                 w = self.algorithm.run(function, w)
@@ -2894,7 +2908,7 @@ class SparsePLSRegression(RegressionEstimator):
 #    >>> print("error = %f" % (error,))
 #    error = 0.0547513070388
     def __init__(self, l, K=2, algorithm=None, algorithm_params=dict(),
-                 start_vector=start_vectors.RandomStartVector(),
+                 start_vector=start_vectors.RandomUniformWeights(normalise=True),
                  unbiased=True, mean=True):
 
         self.l = [max(0.0, float(l[0])),
@@ -2949,8 +2963,8 @@ class SparsePLSRegression(RegressionEstimator):
 #                l12 = penalties.L1(l=self.l[1])
 
                 function = mb_losses.CombinedMultiblockFunction([X, Y])
-                function.add_function(cov1, 0, 1)
-                function.add_function(cov2, 1, 0)
+                function.add_loss(cov1, 0, 1)
+                function.add_loss(cov2, 1, 0)
 
                 function.add_penalty(l1l2_1, 0)
                 function.add_penalty(l1l2_2, 1)
@@ -2966,8 +2980,8 @@ class SparsePLSRegression(RegressionEstimator):
                 # TODO: Should we use a seed here so that we get deterministic
                 # results?
 #                if w is None or k > 0:
-                w = [self.start_vector.get_vector(X.shape[1]),
-                     self.start_vector.get_vector(Y.shape[1])]
+                w = [self.start_vector.get_weights(X.shape[1]),
+                     self.start_vector.get_weights(Y.shape[1])]
 
                 print("max iter: %d" % (self.algorithm.max_iter,))
                 w = self.algorithm.run(function, w)

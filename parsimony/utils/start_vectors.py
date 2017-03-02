@@ -2,7 +2,7 @@
 """
 Created on Thu Mar 28 15:35:26 2013
 
-Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt, Edouard Duchesnay
 @email:   lofstedt.tommy@gmail.com, edouard.duchesnay@cea.fr
@@ -16,203 +16,287 @@ try:
     from . import maths  # Only works when imported as a package.
 except (ValueError, SystemError):
     import parsimony.utils.maths as maths  # Run as a script.
+try:
+    from . import consts  # Only works when imported as a package.
+except (ValueError, SystemError):
+    import parsimony.utils.consts as consts  # Run as a script.
+from parsimony.utils import deprecated
 
-__all__ = ['BaseStartVector', 'IdentityStartVector', 'RandomStartVector',
-           'OnesStartVector', 'ZerosStartVector']
+__all__ = ["BaseWeights", "IdentityWeights", "RandomUniformWeights",
+           "OnesWeights", "ZerosWeights",
+           "NeuralNetworkInitialisation", "TanhInitialisation",
+           "LogisticInitialisation", "OrthogonalRandomInitialisation"]
 
 
-class BaseStartVector(with_metaclass(abc.ABCMeta, object)):
-    """Base class for start vector generation.
+class BaseWeights(with_metaclass(abc.ABCMeta, object)):
+    """Base class for weight generation.
 
     Parameters
     ----------
-    normalise : Bool. Whether or not to normalise the vector that is returned.
+    normalise : bool
+        Whether or not to normalise the weight vectors that are returned.
 
-    seed : Integer or None. The seed to the pseudo-random number generator. If
-            none, no seed is used. The seed is set at initialisation, so if the
-            RNG is used in between initialisation and utilisation, then the
-            random numbers will change. Default is None. The seed is not used
-            by all implementing classes.
+    random_state : numpy.random.RandomState
+        A random state to use when sampling pseudo-random numbers. If not
+        provided, a random state is generated with a seed, if provided.
+
+    seed : int or None
+        The seed to the pseudo-random number generator. If None, no seed is
+        used. The seed is set at initialisation, so unless a random_state is
+        provided, if the RNG is used in between initialisation and utilisation,
+        the random numbers will change. The seed is not used by all
+        implementing classes. Default is None. Consider using random_state
+        instead of a seed!
     """
+    def __init__(self, normalise=False, random_state=None, seed=None):
 
-    def __init__(self, normalise=True, seed=None):
-        super(BaseStartVector, self).__init__()
+        super(BaseWeights, self).__init__()
 
-        self.normalise = normalise
+        self.normalise = bool(normalise)
+        self.random_state = random_state
+
+        if seed is None:
+            if random_state is None:
+                random_state = None  # np.random.RandomState()
+        else:
+            if random_state is None:
+                np.random.seed(seed)  # TODO: Adapt code to use RandomState instead!
+#                random_state = np.random.RandomState(seed)
+            else:
+                random_state.seed(seed)
+
+        self.random_state = random_state
         self.seed = seed
-        if seed is not None:
-            np.random.seed(seed)
 
     @abc.abstractmethod
-    def get_vector(self, size):
+    def get_weights(self, shape):
 
-        raise NotImplementedError('Abstract method "get_vector" must be '
+        raise NotImplementedError('Abstract method "get_weights" must be '
                                   'specialised!')
 
+    @deprecated("get_weights")
+    def get_vector(self, shape):
 
-class IdentityStartVector(BaseStartVector):
-    """A pre-determined start vector.
+        return self.get_weights(shape)
+
+
+@deprecated("BaseWeights")
+class BaseStartVector(BaseWeights):
+    """Deprecated class! Use BaseWeights instead!
+    """
+    pass
+
+
+class IdentityWeights(BaseWeights):
+    """A pre-determined weights.
 
     Parameters
     ----------
-    vector : Numpy array. The predetermined start vector
+    weights : numpy.ndarray
+        The predetermined weights.
 
     Examples
     --------
-    >>> from parsimony.utils.start_vectors import IdentityStartVector
-    >>> start_vector = IdentityStartVector(np.array([[0.5], [2.0], [0.3],
-    ...                                              [1.0]]))
-    >>> start_vector.get_vector()
+    >>> import numpy as np
+    >>> from parsimony.utils.start_vectors import IdentityWeights
+    >>>
+    >>> start_vector = IdentityWeights(np.array([[0.5], [2.0], [0.3], [1.0]]))
+    >>> start_vector.get_weights()
     array([[ 0.5],
            [ 2. ],
            [ 0.3],
            [ 1. ]])
+    >>> start_vector = IdentityWeights(np.eye(3, 4))
+    >>> start_vector.get_weights()
+    array([[ 1.,  0.,  0.,  0.],
+           [ 0.,  1.,  0.,  0.],
+           [ 0.,  0.,  1.,  0.]])
     """
-    def __init__(self, vector, **kwargs):
+    def __init__(self, weights, **kwargs):
 
-        super(IdentityStartVector, self).__init__(**kwargs)
+        super(IdentityWeights, self).__init__(**kwargs)
 
-        self.vector = vector
+        self.weights = weights
 
-    def get_vector(self, *args, **kwargs):
-        """Return the predetermined start vector
-
-        Examples
-        --------
-        >>> from parsimony.utils.start_vectors import IdentityStartVector
-        >>> start_vector = IdentityStartVector(np.array([[0.5], [2.0], [0.3],
-        ...                                              [1.0]]))
-        >>> start_vector.get_vector()
-        array([[ 0.5],
-               [ 2. ],
-               [ 0.3],
-               [ 1. ]])
+    def get_weights(self, *args, **kwargs):
+        """Returns the predetermined start vector
         """
-        return self.vector
+        return self.weights
 
 
-class RandomStartVector(BaseStartVector):
-    """A start vector of uniformly distributed random values.
+@deprecated("IdentityWeights")
+class IdentityStartVector(IdentityWeights):
+    """Deprecated class! Use IdentityWeights instead!
+    """
+    pass
+
+
+class RandomUniformWeights(BaseWeights):
+    """Weights of uniformly distributed random values.
 
     Parameters
     ----------
-    normalise : Bool. If True, normalise the randomly created vectors.
-            Default is True.
+    limits : list or tuple
+        A list or tuple with two elements, the lower and upper limits of the
+        uniform distribution. If normalise=True, then these limits may not be
+        honoured. Default is (-1.0, 1.0). Default is 1. If both limits and
+        variance is given, the limits will be used.
 
-    seed : Integer or None. The seed to the pseudo-random number generator. If
-            none, no seed is used. The seed is set at initialisation, so if the
-            RNG is used in between initialisation and utilisation, then the
-            random numbers will change. Default is None.
+    variance : int
+        The variance of the sampled symmetric uniform points. Default is 1. If
+        both limits and variance is given, the limits will be used. If
+        normalise is True, the variance is likely to deviate from the
+        requested.
 
-    limits : List or tuple. A list or tuple with two elements, the lower and
-            upper limits of the uniform distribution. If normalise=True, then
-            these limits may not be honoured. Default is (0.0, 1.0).
+    normalise : bool
+        Whether or not to normalise the weight vectors that is returned.
+
+    random_state : numpy.random.RandomState
+        A random state to use when sampling pseudo-random numbers. If not
+        provided, a random state is generated with a seed, if provided.
+
+    seed : int or None
+        The seed to the pseudo-random number generator. If None, no seed is
+        used. The seed is set at initialisation, so unless a random_state is
+        provided, if the RNG is used in between initialisation and utilisation,
+        the random numbers will change. The seed is not used by all
+        implementing classes. Default is None. Consider using random_state
+        instead of a seed!
 
     Examples
     --------
-    >>> from parsimony.utils.start_vectors import RandomStartVector
+    >>> import numpy as np
+    >>> import parsimony.utils.maths as maths
+    >>> from parsimony.utils.start_vectors import RandomUniformWeights
     >>>
     >>> # Without normalization
-    >>> start_vector = RandomStartVector(normalise=False, seed=42)
-    >>> random = start_vector.get_vector(3)
+    >>> start_vector = RandomUniformWeights(seed=42)
+    >>> random = start_vector.get_weights(3)
     >>> print(random)
-    [[ 0.37454012]
-     [ 0.95071431]
-     [ 0.73199394]]
-    >>> print(maths.norm(random))
-    1.25696186254
+    [[-0.25091976]
+     [ 0.90142861]
+     [ 0.46398788]]
+    >>> (np.round(maths.norm(random), 13) - 1.2569618625429) < 5e-16
+    True
     >>>
     >>> # With normalization
-    >>> start_vector_normalized = RandomStartVector(normalise=True, seed=2)
-    >>> random_normalized = start_vector_normalized.get_vector(3)
+    >>> start_vector_normalized = RandomUniformWeights(normalise=True, seed=2)
+    >>> random_normalized = start_vector_normalized.get_weights(3)
     >>> print(random_normalized)
-    [[ 0.62101956]
-     [ 0.03692864]
-     [ 0.78292463]]
-    >>> print(maths.norm(random_normalized))
-    1.0
+    [[-0.1330817 ]
+     [-0.98571123]
+     [ 0.10326001]]
+    >>> (np.round(maths.norm(random_normalized), 13) - 1.0) < 5e-16
+    True
     >>>
     >>> # With limits
-    >>> start_vector_normalized = RandomStartVector(normalise=True, seed=2,
-    ...                                             limits=(-1, 1))
-    >>> random_limits = start_vector_normalized.get_vector(3)
+    >>> start_vector_normalized = RandomUniformWeights(normalise=True,
+    ...                                                seed=2,
+    ...                                                limits=(-1.0, 1.0))
+    >>> random_limits = start_vector_normalized.get_weights(3)
     >>> print(random_limits)
     [[-0.1330817 ]
      [-0.98571123]
      [ 0.10326001]]
-    >>> print(maths.norm(random_limits))
-    1.0
-
+    >>> (np.round(maths.norm(random_limits), 13) - 1.0) < 5e-16
+    True
+    >>> start_vector = RandomUniformWeights(normalise=True,
+    ...                                     random_state=np.random.RandomState(3),
+    ...                                     limits=(-1.0, 1.0))
+    >>> random_1 = start_vector.get_weights((2, 3))
+    >>> print(random_1)
+    [[ 0.08019838  0.32861824 -0.33011403]
+     [ 0.01709433  0.62037419  0.62565698]]
+    >>> start_vector = RandomUniformWeights(normalise=True,
+    ...                                     random_state=np.random.RandomState(),
+    ...                                     seed=3,
+    ...                                     limits=(-1.0, 1.0))
+    >>> random_2 = start_vector.get_weights((2, 3))
+    >>> print(random_2)
+    [[ 0.08019838  0.32861824 -0.33011403]
+     [ 0.01709433  0.62037419  0.62565698]]
+    >>> start_vector = RandomUniformWeights(seed=3, variance=2.0)
+    >>> random = start_vector.get_weights((3, 2))
+    >>> print(random)
+    [[ 0.24885788  1.01971191]
+     [-1.02435339  0.05304422]
+     [ 1.92503907  1.94143171]]
     """
-    def __init__(self, limits=(0.0, 1.0), **kwargs):
+    def __init__(self, limits=None, variance=None, **kwargs):
 
-        super(RandomStartVector, self).__init__(**kwargs)
+        super(RandomUniformWeights, self).__init__(**kwargs)
+
+        if (limits is None) and (variance is None):
+            limits = (-1.0, 1.0)
 
         self.limits = limits
+        if variance is not None:
+            self.variance = max(consts.FLOAT_EPSILON, float(variance))
 
-    def get_vector(self, size):
-        """Return randomly generated vector of given shape.
+    def get_weights(self, shape):
+        """Return randomly generated weights of given shape.
 
         Parameters
         ----------
-        size : Positive integer. Size of the vector to generate. The shape of
-                the output is (size, 1).
-
-        Examples
-        --------
-        >>> from parsimony.utils.start_vectors import RandomStartVector
-        >>> start_vector = RandomStartVector(normalise=False, seed=42)
-        >>> random = start_vector.get_vector(3)
-        >>> print(random)
-        [[ 0.37454012]
-         [ 0.95071431]
-         [ 0.73199394]]
-        >>>
-        >>> start_vector = RandomStartVector(normalise=False, seed=1,
-        ...                                  limits=(-1, 2))
-        >>> random = start_vector.get_vector(3)
-        >>> print(random)
-        [[ 0.25106601]
-         [ 1.16097348]
-         [-0.99965688]]
+        shape : int or list of ints or tuple of ints
+            Shape of the weights to generate. The shape of the output is shape
+            or (shape, 1) in case shape is an integer.
         """
-        l = float(self.limits[0])
-        u = float(self.limits[1])
+        if not isinstance(shape, (list, tuple)):
+            shape = (int(shape), 1)
 
-        size = int(size)
-        vector = np.random.rand(size, 1) * (u - l) + l  # Random vector.
+        if self.limits is not None:
+            l = float(self.limits[0])
+            u = float(self.limits[1])
+        elif self.variance is not None:
+            u = np.sqrt(3.0 * self.variance)
+            l = -u
 
+        if self.random_state is None:
+            vector = np.random.rand(*shape) * (u - l) + l  # Random vector.
+        else:
+            vector = self.random_state.rand(*shape) * (u - l) + l  # Random vector.
+
+        # TODO: Normalise columns when a matrix?
         if self.normalise:
-            return vector * (1.0 / maths.norm(vector))
+            return vector / maths.norm(vector)
         else:
             return vector
 
 
-class OnesStartVector(BaseStartVector):
-    """A start vector of ones.
+@deprecated("RandomUniformWeights")
+class RandomStartVector(RandomUniformWeights):
+    """Deprecated class! Use RandomUniformWeights instead!
+    """
+    pass
+
+
+class OnesWeights(BaseWeights):
+    """All weights are one.
 
     Parameters
     ----------
-    normalise : Bool. If True, normalise the randomly created vectors
-            Default is False
+    normalise : bool
+        If True, normalise the randomly created weights. Default is False.
 
     Examples
     --------
-    >>> from parsimony.utils.start_vectors import OnesStartVector
-
-    # Without normalization
-    >>> start_vector = OnesStartVector(normalise=False)
-    >>> ones = start_vector.get_vector(3)
+    >>> import numpy as np
+    >>> import parsimony.utils.maths as maths
+    >>> from parsimony.utils.start_vectors import OnesWeights
+    >>>
+    >>> # Without normalization
+    >>> start_vector = OnesWeights()
+    >>> ones = start_vector.get_weights(3)
     >>> print(ones)
     [[ 1.]
      [ 1.]
      [ 1.]]
     >>> print(maths.norm(ones))
     1.73205080757
-
-    # With normalization
-    >>> start_vector_normalized = OnesStartVector(normalise=True)
-    >>> ones_normalized = start_vector_normalized.get_vector(3)
+    >>> # With normalization
+    >>> start_vector_normalized = OnesWeights(normalise=True)
+    >>> ones_normalized = start_vector_normalized.get_weights(3)
     >>> print(ones_normalized)
     [[ 0.57735027]
      [ 0.57735027]
@@ -222,46 +306,50 @@ class OnesStartVector(BaseStartVector):
     """
     def __init__(self, normalise=False, **kwargs):
 
-        super(OnesStartVector, self).__init__(normalise=normalise, **kwargs)
+        super(OnesWeights, self).__init__(normalise=normalise, **kwargs)
 
-    def get_vector(self, size):
-        """Return vector of ones of chosen shape
+    def get_weights(self, shape):
+        """Return weights that are all one.
 
         Parameters
         ----------
-        size : Positive integer. Size of the vector to generate. The shape of
-                the output is (size, 1).
-
-        Examples
-        --------
-        >>> from parsimony.utils.start_vectors import OnesStartVector
-        >>> start_vector = OnesStartVector()
-        >>> ones = start_vector.get_vector(3)
-        >>> print(ones)
-        [[ 1.]
-         [ 1.]
-         [ 1.]]
+        shape : int or list of ints or tuple of ints
+            Shape of the vector to generate. The shape of the output is shape
+            or (shape, 1) in case shape is an integer.
         """
-        size = int(size)
-        vector = np.ones((size, 1))  # Using a vector of ones.
+        if not isinstance(shape, (list, tuple)):
+            shape = (int(shape), 1)
+
+        vector = np.ones(shape)  # Using a vector of ones.
 
         if self.normalise:
-            return vector * (1.0 / maths.norm(vector))
+            return vector / maths.norm(vector)
         else:
             return vector
 
 
-class ZerosStartVector(BaseStartVector):
-    """A start vector of zeros.
+@deprecated("OnesWeights")
+class OnesStartVector(OnesWeights):
+    """Deprecated class! Use OnesWeights instead!
+    """
+    pass
+
+
+class ZerosWeights(BaseWeights):
+    """All weights are zero.
 
     Use with care! Be aware that using this in algorithms that are not aware
-    may result in division by zero since the norm of this start vector is 0.
+    may e.g. result in division by zero since the norm of this start vector is
+    0. Other problems may also appear.
 
     Examples
     --------
-    >>> from parsimony.utils.start_vectors import ZerosStartVector
-    >>> start_vector = ZerosStartVector()
-    >>> zeros = start_vector.get_vector(3)
+    >>> import numpy as np
+    >>> import parsimony.utils.maths as maths
+    >>> from parsimony.utils.start_vectors import ZerosWeights
+    >>>
+    >>> start_vector = ZerosWeights()
+    >>> zeros = start_vector.get_weights(3)
     >>> print(zeros)
     [[ 0.]
      [ 0.]
@@ -269,32 +357,310 @@ class ZerosStartVector(BaseStartVector):
     """
     def __init__(self, **kwargs):
 
-        kwargs.pop('normalise', False)  # We do not care about this argument.
+        kwargs.pop("normalise", False)  # We do not care about this argument.
 
-        super(ZerosStartVector, self).__init__(normalise=False, **kwargs)
+        super(ZerosWeights, self).__init__(normalise=False, **kwargs)
 
-    def get_vector(self, size):
+    def get_weights(self, shape):
         """Return vector of zeros of chosen shape.
 
         Parameters
         ----------
-        size : Positive integer. Size of the vector to generate. The shape of
-                the output is (size, 1).
-
-        Examples
-        --------
-        >>> from parsimony.utils.start_vectors import ZerosStartVector
-        >>> start_vector = ZerosStartVector()
-        >>> zeros = start_vector.get_vector(3)
-        >>> print(zeros)
-        [[ 0.]
-         [ 0.]
-         [ 0.]]
+        shape : int or list of ints or tuple of ints
+            Shape of the vector to generate. The shape of the output is shape
+            or (shape, 1) in case shape is an integer.
         """
-        size = int(size)
-        w = np.zeros((size, 1))  # Using a vector of zeros.
+        if not isinstance(shape, (list, tuple)):
+            shape = (int(shape), 1)
+
+        w = np.zeros(shape)  # Using a vector of zeros.
 
         return w
+
+
+@deprecated("ZerosWeights")
+class ZerosStartVector(ZerosWeights):
+    """Deprecated class! Use ZerosWeights instead!
+    """
+    pass
+
+
+class NeuralNetworkInitialisation(BaseWeights):
+    """Commonly used in neural networks with different activation functions.
+
+    Parameters
+    ----------
+    K : float
+        Positive float. A scaling constant used in determining the rage of
+        weight values. Default is 96 = 4 * sqrt(6), which was recommended by
+        Glorot and Bengio (2010) for logistic activation functions.
+
+    random_state : numpy.random.RandomState
+        A random state to use when sampling pseudo-random numbers. If not
+        provided, a random state is generated with a seed, if provided.
+
+    seed : int or None
+        The seed to the pseudo-random number generator. If None, no seed is
+        used. The seed is set at initialisation, so unless a random_state is
+        provided, if the RNG is used in between initialisation and utilisation,
+        the random numbers will change. The seed is not used by all
+        implementing classes. Default is None. Consider using random_state
+        instead of a seed!
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import parsimony.utils.maths as maths
+    >>> from parsimony.utils.start_vectors import NeuralNetworkInitialisation
+    >>>
+    >>> start_vector = NeuralNetworkInitialisation(seed=31337)
+    >>> W = start_vector.get_weights((2, 3))
+    >>> print(W)
+    [[ 1.94421446  4.08768236 -1.84868134]
+     [-2.88017736 -1.12508711  4.20919974]]
+    >>> start_vector = NeuralNetworkInitialisation(K=6, seed=31337)
+    >>> W = start_vector.get_weights((3, 2))
+    >>> print(W)
+    [[ 0.48605361  1.02192059]
+     [-0.46217033 -0.72004434]
+     [-0.28127178  1.05229994]]
+    """
+    def __init__(self, K=96, random_state=None, seed=None):
+
+        super(NeuralNetworkInitialisation, self).__init__(normalise=False,
+                                                          random_state=random_state,
+                                                          seed=seed)
+
+        self.K = max(consts.FLOAT_EPSILON, float(K))
+
+    def get_weights(self, shape):
+        """Returns a weight matrix of chosen shape. The elements are
+        distributed as
+
+            W ~ U(-r, r),
+
+        where
+
+            r = sqrt(K / (fanin + fanout)),
+
+        where fanin = shape[1] and fanout = shape[0].
+
+        Parameters
+        ----------
+        shape : list of int or tuple of int
+            Shape of the matrix to generate. The shape of the output is shape
+            or (shape, 1) in case shape is an integer.
+
+        fanin : int
+            The number of input connections to this node.
+
+        fanout : int
+            The number of nodes in a particular layer.
+        """
+        if not isinstance(shape, (list, tuple)) or len(shape) != 2:
+            raise ValueError("The shape must be a 2-list or a 2-tuple.")
+
+        fanout, fanin = shape
+        r = np.sqrt(self.K / float(fanin + fanout))
+        if self.random_state is None:
+            W = np.random.rand(*shape) * (2 * r) - r
+        else:
+            W = self.random_state.rand(*shape) * (2 * r) - r
+
+        return W
+
+
+class TanhInitialisation(NeuralNetworkInitialisation):
+    """Commonly used in neural networks with the hyperbolic tangent activation
+    function.
+
+    The elements are distributed as
+
+        W ~ U(-r, r),
+
+    where
+
+        r = sqrt(6 / (fanin + fanout)),
+
+    where fanin = shape[1] and fanout = shape[0].
+
+    The variance used in this initialisation was derived by Glorot and Bengio
+    (2010).
+
+    Parameters
+    ----------
+    random_state : numpy.random.RandomState
+        A random state to use when sampling pseudo-random numbers. If not
+        provided, a random state is generated with a seed, if provided.
+
+    seed : int or None
+        The seed to the pseudo-random number generator. If None, no seed is
+        used. The seed is set at initialisation, so unless a random_state is
+        provided, if the RNG is used in between initialisation and utilisation,
+        the random numbers will change. The seed is not used by all
+        implementing classes. Default is None. Consider using random_state
+        instead of a seed!
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import parsimony.utils.maths as maths
+    >>> from parsimony.utils.start_vectors import TanhInitialisation
+    >>>
+    >>> start_vector = TanhInitialisation(seed=31337)
+    >>> W = start_vector.get_weights((2, 3))
+    >>> print(W)
+    [[ 0.48605361  1.02192059 -0.46217033]
+     [-0.72004434 -0.28127178  1.05229994]]
+    >>> start_vector = TanhInitialisation(seed=31337)
+    >>> W = start_vector.get_weights((3, 2))
+    >>> print(W)
+    [[ 0.48605361  1.02192059]
+     [-0.46217033 -0.72004434]
+     [-0.28127178  1.05229994]]
+
+    References
+    ----------
+    .. Glorot, Xavier, and Yoshua Bengio. "Understanding the difficulty of
+       training deep feedforward neural networks". International conference on
+       artificial intelligence and statistics, 2010.
+    """
+    def __init__(self, random_state=None, seed=None):
+
+        super(TanhInitialisation, self).__init__(K=6.0,
+                                                 random_state=random_state,
+                                                 seed=seed)
+
+
+class LogisticInitialisation(NeuralNetworkInitialisation):
+    """Commonly used in neural networks with the logistic sigmoid activation
+    function (Bengio, 2012).
+
+    The elements are distributed as
+
+        W ~ U(-r, r),
+
+    where
+
+        r = 4 * sqrt(6 / (fanin + fanout)),
+
+    where fanin = shape[1] and fanout = shape[0].
+
+    Parameters
+    ----------
+    random_state : numpy.random.RandomState
+        A random state to use when sampling pseudo-random numbers. If not
+        provided, a random state is generated with a seed, if provided.
+
+    seed : int or None
+        The seed to the pseudo-random number generator. If None, no seed is
+        used. The seed is set at initialisation, so unless a random_state is
+        provided, if the RNG is used in between initialisation and utilisation,
+        the random numbers will change. The seed is not used by all
+        implementing classes. Default is None. Consider using random_state
+        instead of a seed!
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import parsimony.utils.maths as maths
+    >>> from parsimony.utils.start_vectors import LogisticInitialisation
+    >>>
+    >>> start_vector = LogisticInitialisation(seed=31337)
+    >>> W = start_vector.get_weights((2, 3))
+    >>> print(W)
+    [[ 0.62112121  1.30589823 -0.5906011 ]
+     [-0.92013473 -0.35943332  1.34471958]]
+    >>> start_vector = LogisticInitialisation(seed=31337)
+    >>> W = start_vector.get_weights((3, 2))
+    >>> print(W)
+    [[ 0.62112121  1.30589823]
+     [-0.5906011  -0.92013473]
+     [-0.35943332  1.34471958]]
+
+    References
+    ----------
+    .. Bengio, Yoshua. "Practical Recommendations for Gradient-Based Training
+       of Deep Architectures". arXiv:1206.5533v2, 2012.
+    """
+    def __init__(self, random_state=None, seed=None):
+
+        super(LogisticInitialisation, self).__init__(K=4.0 * np.sqrt(6.0),
+                                                     random_state=random_state,
+                                                     seed=seed)
+
+
+class OrthogonalRandomInitialisation(NeuralNetworkInitialisation):
+    """Orthogonal random matrix initialisation used in neural networks.
+
+    The right-singular vectors of a Gaussian random matrix is used as the
+    weight matrix.
+
+    Parameters
+    ----------
+    random_state : numpy.random.RandomState
+        A random state to use when sampling pseudo-random numbers. If not
+        provided, a random state is generated with a seed, if provided.
+
+    seed : int or None
+        The seed to the pseudo-random number generator. If None, no seed is
+        used. The seed is set at initialisation, so unless a random_state is
+        provided, if the RNG is used in between initialisation and utilisation,
+        the random numbers will change. The seed is not used by all
+        implementing classes. Default is None. Consider using random_state
+        instead of a seed!
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import parsimony.utils.maths as maths
+    >>> from parsimony.utils.start_vectors import OrthogonalRandomInitialisation
+    >>>
+    >>> start_vector = OrthogonalRandomInitialisation(seed=42)
+    >>> W = start_vector.get_weights((2, 3))
+    >>> print(W)
+    [[ -9.86455841e-01   1.63488317e-01   1.32832502e-02]
+     [  6.81405840e-04   8.50658731e-02  -9.96375096e-01]]
+    >>> np.allclose(np.dot(W, W.T), np.eye(W.shape[0]))
+    True
+    >>> W = start_vector.get_weights((3, 2))
+    >>> print(W)
+    [[-0.93824927  0.00478817]
+     [ 0.09818416 -0.9551057 ]
+     [ 0.33173511  0.29622656]]
+    >>> np.allclose(np.dot(W.T, W), np.eye(W.shape[1]))
+    True
+    """
+    def __init__(self, random_state=None, seed=None):
+
+        super(NeuralNetworkInitialisation, self).__init__(normalise=False,
+                                                          random_state=random_state,
+                                                          seed=seed)
+
+    def get_weights(self, shape):
+        """Returns a weight matrix of chosen shape.
+
+        Parameters
+        ----------
+        shape : list of int or tuple of int
+            Shape of the weight matrix to generate.
+        """
+        if not isinstance(shape, (list, tuple)) or len(shape) != 2:
+            raise ValueError("The shape must be a 2-list or a 2-tuple.")
+
+        if self.random_state is None:
+            A = np.random.randn(*shape)
+        else:
+            A = self.random_state.randn(*shape)
+        U, _, V = np.linalg.svd(A, full_matrices=False)
+
+        # TODO: Is this really correct??
+        if shape[0] > shape[1]:
+            W = U
+        else:
+            W = V
+
+        return W
 
 
 #class LargestStartVector(BaseStartVector):

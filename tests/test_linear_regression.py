@@ -2,7 +2,7 @@
 """
 Created on Thu Feb 27 09:21:23 2014
 
-Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt
 @email:   lofstedt.tommy@gmail.com
@@ -39,8 +39,8 @@ class TestLinearRegression(TestCase):
         mean = np.zeros(p)
         X = np.random.multivariate_normal(mean, Sigma, n)
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
-        beta_star = start_vector.get_vector(p)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        beta_star = start_vector.get_weights(p)
 
         y = np.dot(X, beta_star)
 
@@ -48,7 +48,7 @@ class TestLinearRegression(TestCase):
         max_iter = 150
         gd = gradient.GradientDescent(eps=eps, max_iter=max_iter)
         linear_regression = LinearRegression(X, y, mean=False)
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta_parsimony = gd.run(linear_regression, beta_start)
 
@@ -100,8 +100,8 @@ class TestLinearRegression(TestCase):
         mean = np.zeros(p)
         X = np.random.multivariate_normal(mean, Sigma, n)
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
-        beta_star = start_vector.get_vector(p)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        beta_star = start_vector.get_weights(p)
 
         y = np.dot(X, beta_star)
 
@@ -109,7 +109,7 @@ class TestLinearRegression(TestCase):
         max_iter = 300
         gd = gradient.GradientDescent(eps=eps, max_iter=max_iter)
         linear_regression = LinearRegression(X, y, mean=False)
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta_parsimony = gd.run(linear_regression, beta_start)
 
@@ -157,8 +157,8 @@ class TestLinearRegression(TestCase):
         mean = np.zeros(p)
         X = np.random.multivariate_normal(mean, Sigma, n)
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
-        beta_star = start_vector.get_vector(p)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        beta_star = start_vector.get_weights(p)
 
         y = np.dot(X, beta_star)
 
@@ -166,7 +166,7 @@ class TestLinearRegression(TestCase):
         max_iter = 7000
         gd = gradient.GradientDescent(eps=eps, max_iter=max_iter)
         linear_regression = LinearRegression(X, y, mean=False)
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta_parsimony = gd.run(linear_regression, beta_start)
 
@@ -206,7 +206,7 @@ class TestLinearRegression(TestCase):
 
         np.random.seed(42)
 
-        start_vector = start_vectors.RandomStartVector(normalise=False)
+        start_vector = start_vectors.RandomUniformWeights(normalise=False)
 
         n, p = 60, 90
 
@@ -218,7 +218,7 @@ class TestLinearRegression(TestCase):
         X_parsimony = np.hstack((np.ones((n, 1)), X0))
         X_spams = np.hstack((X0, np.ones((n, 1))))
 
-        beta_star = start_vector.get_vector(p)
+        beta_star = start_vector.get_weights(p)
 
         e = 0.01 * np.random.rand(n, 1)
         y = np.dot(X_parsimony, beta_star) + e
@@ -227,7 +227,7 @@ class TestLinearRegression(TestCase):
         max_iter = 1000
         gd = gradient.GradientDescent(eps=eps, max_iter=max_iter)
         linear_regression = LinearRegression(X_parsimony, y, mean=True)
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta_parsimony = gd.run(linear_regression, beta_start)
 
@@ -331,7 +331,7 @@ class TestLinearRegression(TestCase):
 #
 #        np.random.seed(42)
 #
-#        start_vector = start_vectors.RandomStartVector(normalise=False)
+#        start_vector = start_vectors.RandomUniformWeights(normalise=False)
 #
 #        n, p = 60, 90
 #
@@ -343,7 +343,7 @@ class TestLinearRegression(TestCase):
 #        X_parsimony = np.hstack((np.ones((n, 1)), X0))
 #        X_spams = np.hstack((X0, np.ones((n, 1))))
 #
-#        beta_star = start_vector.get_vector(p)
+#        beta_star = start_vector.get_weights(p)
 #
 #        e = 0.01 * np.random.rand(n, 1)
 #        y = np.dot(X_parsimony, beta_star) + e
@@ -357,7 +357,7 @@ class TestLinearRegression(TestCase):
 #        function.add_penalty(L2Squared(k, penalty_start=1))
 #
 #        gd = gradient.GradientDescent(eps=eps, max_iter=max_iter)
-#        beta_start = start_vector.get_vector(p)
+#        beta_start = start_vector.get_weights(p)
 #        beta_parsimony = gd.run(function, beta_start)
 #
 #        try:
@@ -417,7 +417,7 @@ class TestLinearRegression(TestCase):
         import parsimony.utils.start_vectors as start_vectors
         import parsimony.estimators as estimators
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -431,7 +431,7 @@ class TestLinearRegression(TestCase):
         M = np.random.multivariate_normal(mean, Sigma, n)
         e = np.random.randn(n, 1)
 
-        beta = start_vector.get_vector(p)
+        beta = start_vector.get_weights(p)
         beta[beta < 0.1] = 0.0
 
         l = 0.618
@@ -452,7 +452,7 @@ class TestLinearRegression(TestCase):
         function.add_loss(linear_regression)
         function.add_prox(l1)
 
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta_parsimony = fista.run(function, beta_start)
 
@@ -548,7 +548,7 @@ class TestLinearRegression(TestCase):
         import parsimony.utils.start_vectors as start_vectors
         import parsimony.estimators as estimators
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -563,7 +563,7 @@ class TestLinearRegression(TestCase):
         M = np.hstack((np.ones((n, 1)), M0))
         e = np.random.randn(n, 1)
 
-        beta = start_vector.get_vector(p)
+        beta = start_vector.get_weights(p)
         beta[beta < 0.1] = 0.0
 
         l = 0.618
@@ -583,7 +583,7 @@ class TestLinearRegression(TestCase):
         function.add_loss(LinearRegression(X, y, mean=False))
         function.add_prox(L1(l=l, penalty_start=1))
 
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta_parsimony = fista.run(function, beta_start)
 
@@ -682,7 +682,7 @@ class TestLinearRegression(TestCase):
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
         import parsimony.utils.start_vectors as start_vectors
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -696,7 +696,7 @@ class TestLinearRegression(TestCase):
         M = np.random.multivariate_normal(mean, Sigma, n)
         e = np.random.randn(n, 1)
 
-        beta = start_vector.get_vector(p)
+        beta = start_vector.get_weights(p)
 #        beta[beta < 0.1] = 0.0
 
         l = 0.0
@@ -712,7 +712,7 @@ class TestLinearRegression(TestCase):
         max_iter = 7500
 
         fista = proximal.FISTA(eps=eps, max_iter=max_iter)
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         function = CombinedFunction()
         function.add_loss(LinearRegression(X, y, mean=False))
@@ -774,7 +774,7 @@ class TestLinearRegression(TestCase):
         import parsimony.utils.start_vectors as start_vectors
         import parsimony.estimators as estimators
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -789,7 +789,7 @@ class TestLinearRegression(TestCase):
         M = np.hstack((np.ones((n, 1)), M0))
         e = np.random.randn(n, 1)
 
-        beta = start_vector.get_vector(p)
+        beta = start_vector.get_weights(p)
 #        beta[beta < 0.1] = 0.0
 
         l = 0.0
@@ -806,7 +806,7 @@ class TestLinearRegression(TestCase):
         max_iter = 1500
 
         fista = proximal.FISTA(eps=eps, max_iter=max_iter)
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         function = CombinedFunction()
         function.add_loss(LinearRegression(X, y, mean=False))
@@ -933,7 +933,7 @@ class TestLinearRegression(TestCase):
         import parsimony.datasets.simulate.l1_l2_tvmu as l1_l2_tvmu
         import parsimony.utils.start_vectors as start_vectors
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -950,7 +950,7 @@ class TestLinearRegression(TestCase):
         M = np.random.multivariate_normal(mean, Sigma, n)
         e = np.random.randn(n, 1)
 
-        beta = start_vector.get_vector(p)
+        beta = start_vector.get_weights(p)
         beta = np.sort(beta, axis=0)
 #        beta[beta < 0.1] = 0.0
 
@@ -968,7 +968,7 @@ class TestLinearRegression(TestCase):
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
         fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta_nonsmooth = beta_start
         for mu in mus:
@@ -1023,7 +1023,7 @@ class TestLinearRegression(TestCase):
         import parsimony.utils.start_vectors as start_vectors
         import parsimony.estimators as estimators
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1041,7 +1041,7 @@ class TestLinearRegression(TestCase):
         M = np.hstack((np.ones((n, 1)), M0))
         e = np.random.randn(n, 1)
 
-        beta = start_vector.get_vector(p)
+        beta = start_vector.get_weights(p)
         beta = np.sort(beta, axis=0)
 #        beta[beta < 0.1] = 0.0
 
@@ -1059,7 +1059,7 @@ class TestLinearRegression(TestCase):
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
         fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta_nonsmooth = beta_start
         for mu in mus:
@@ -1158,7 +1158,7 @@ class TestLinearRegression(TestCase):
         import parsimony.utils.start_vectors as start_vectors
         import parsimony.estimators as estimators
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1176,7 +1176,7 @@ class TestLinearRegression(TestCase):
         M = np.random.multivariate_normal(mean, Sigma, n)
         e = np.random.randn(n, 1)
 
-        beta = start_vector.get_vector(p)
+        beta = start_vector.get_weights(p)
         beta = np.sort(beta, axis=0)
 #        beta[beta < 0.1] = 0.0
 
@@ -1193,7 +1193,7 @@ class TestLinearRegression(TestCase):
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
         fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta_nonsmooth = beta_start
         for mu in mus:
@@ -1269,7 +1269,7 @@ class TestLinearRegression(TestCase):
         import parsimony.utils.start_vectors as start_vectors
         import parsimony.estimators as estimators
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1289,7 +1289,7 @@ class TestLinearRegression(TestCase):
         M = np.hstack((np.ones((n, 1)), M0))
         e = np.random.randn(n, 1)
 
-        beta = start_vector.get_vector(p)
+        beta = start_vector.get_weights(p)
         beta = np.sort(beta, axis=0)
 #        beta[beta < 0.1] = 0.0
 
@@ -1306,7 +1306,7 @@ class TestLinearRegression(TestCase):
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
         fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta_nonsmooth = beta_start
         for mu in mus:
@@ -1385,7 +1385,7 @@ class TestLinearRegression(TestCase):
         import parsimony.utils.start_vectors as start_vectors
         import parsimony.estimators as estimators
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1398,7 +1398,7 @@ class TestLinearRegression(TestCase):
         M = np.random.multivariate_normal(mean, Sigma, n)
         e = np.random.randn(n, 1)
 
-        beta = start_vector.get_vector(p)
+        beta = start_vector.get_weights(p)
         beta[beta < 0.1] = 0.0
 
         l = 0.618
@@ -1414,7 +1414,7 @@ class TestLinearRegression(TestCase):
         max_iter = 400
 
         fista = proximal.FISTA(eps=eps, max_iter=max_iter)
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         function = CombinedFunction()
         function.add_loss(LinearRegression(X, y, mean=False))
@@ -1477,7 +1477,7 @@ class TestLinearRegression(TestCase):
         import parsimony.datasets.simulate.l1_l2_tvmu as l1_l2_tvmu
         import parsimony.utils.start_vectors as start_vectors
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1494,7 +1494,7 @@ class TestLinearRegression(TestCase):
         M = np.random.multivariate_normal(mean, Sigma, n)
         e = np.random.randn(n, 1)
 
-        beta = start_vector.get_vector(p)
+        beta = start_vector.get_weights(p)
         beta = np.sort(beta, axis=0)
         beta[beta < 0.1] = 0.0
 
@@ -1512,7 +1512,7 @@ class TestLinearRegression(TestCase):
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
         fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta_nonsmooth_penalty = beta_start
         function = None
@@ -1577,7 +1577,7 @@ class TestLinearRegression(TestCase):
         import parsimony.utils.start_vectors as start_vectors
         import parsimony.estimators as estimators
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1595,7 +1595,7 @@ class TestLinearRegression(TestCase):
         M = np.random.multivariate_normal(mean, Sigma, n)
         e = np.random.randn(n, 1)
 
-        beta = start_vector.get_vector(p)
+        beta = start_vector.get_weights(p)
         beta = np.sort(beta, axis=0)
         beta[beta < 0.1] = 0.0
 
@@ -1612,7 +1612,7 @@ class TestLinearRegression(TestCase):
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
         fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta_nonsmooth = beta_start
         for mu in mus:
@@ -1692,7 +1692,7 @@ class TestLinearRegression(TestCase):
         import parsimony.datasets.simulate.l1_l2_tvmu as l1_l2_tvmu
         import parsimony.utils.start_vectors as start_vectors
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1709,7 +1709,7 @@ class TestLinearRegression(TestCase):
         M = np.random.multivariate_normal(mean, Sigma, n)
         e = np.random.randn(n, 1)
 
-        beta = start_vector.get_vector(p)
+        beta = start_vector.get_weights(p)
         beta = np.sort(beta, axis=0)
 #        beta[beta < 0.1] = 0.0
 
@@ -1727,7 +1727,7 @@ class TestLinearRegression(TestCase):
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
         fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta_nonsmooth_penalty = beta_start
         for mu in mus:
@@ -1871,7 +1871,7 @@ class TestLinearRegression(TestCase):
         import parsimony.utils.start_vectors as start_vectors
         import parsimony.estimators as estimators
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1889,7 +1889,7 @@ class TestLinearRegression(TestCase):
         M = np.random.multivariate_normal(mean, Sigma, n)
         e = np.random.randn(n, 1)
 
-        beta = start_vector.get_vector(p)
+        beta = start_vector.get_weights(p)
         beta = np.sort(beta, axis=0)
 #        beta[beta < 0.1] = 0.0
 
@@ -1906,7 +1906,7 @@ class TestLinearRegression(TestCase):
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
         fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta_nonsmooth_penalty = beta_start
         for mu in mus:
@@ -2070,7 +2070,7 @@ class TestLinearRegression(TestCase):
         import parsimony.datasets.simulate.l1_l2_tvmu as l1_l2_tvmu
         import parsimony.utils.start_vectors as start_vectors
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -2087,7 +2087,7 @@ class TestLinearRegression(TestCase):
         M = np.random.multivariate_normal(mean, Sigma, n)
         e = np.random.randn(n, 1)
 
-        beta = start_vector.get_vector(p)
+        beta = start_vector.get_weights(p)
         beta = np.sort(beta, axis=0)
         beta[beta < 0.1] = 0.0
 
@@ -2105,7 +2105,7 @@ class TestLinearRegression(TestCase):
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
         fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta_nonsmooth_penalty = beta_start
         function = None
@@ -2212,7 +2212,7 @@ class TestLinearRegression(TestCase):
         import parsimony.utils.start_vectors as start_vectors
         import parsimony.estimators as estimators
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -2230,7 +2230,7 @@ class TestLinearRegression(TestCase):
         M = np.random.multivariate_normal(mean, Sigma, n)
         e = np.random.randn(n, 1)
 
-        beta = start_vector.get_vector(p)
+        beta = start_vector.get_weights(p)
         beta = np.sort(beta, axis=0)
         beta[beta < 0.1] = 0.0
 
@@ -2247,7 +2247,7 @@ class TestLinearRegression(TestCase):
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
         fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         beta_nonsmooth_penalty = beta_start
         for mu in mus:
@@ -2375,7 +2375,7 @@ class TestLinearRegression(TestCase):
         from parsimony.functions.losses import LinearRegression
         from parsimony.functions.penalties import L1, L2Squared
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -2647,7 +2647,7 @@ class TestLinearRegression(TestCase):
 
         # Test group lasso
         # ----------------
-        start_vector = start_vectors.RandomStartVector(normalise=True)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -2665,7 +2665,7 @@ class TestLinearRegression(TestCase):
         M = np.random.multivariate_normal(mean, Sigma, n)
         e = np.random.randn(n, 1)
 
-        beta = start_vector.get_vector(p)
+        beta = start_vector.get_weights(p)
         beta = np.sort(beta, axis=0)
         beta[:10, :] = 0.0
 

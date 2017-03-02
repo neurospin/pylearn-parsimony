@@ -2,7 +2,7 @@
 """
 Created on Mon Feb 24 11:03:30 2014
 
-Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt
 @email:   lofstedt.tommy@gmail.com
@@ -10,7 +10,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 try:
     from .tests import TestCase  # When imported as a package.
-except ValueError:
+except (ValueError, SystemError):
     from tests import TestCase  # When run as a program.
 
 from parsimony.algorithms.proximal import FISTA
@@ -42,8 +42,8 @@ class TestGroupLasso(TestCase):
         k = 0.0
         g = 1.0
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
-        beta = start_vector.get_vector(p)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        beta = start_vector.get_weights(p)
 
         alpha = 1.0
         Sigma = alpha * np.eye(p, p) \
@@ -59,7 +59,7 @@ class TestGroupLasso(TestCase):
         eps = 1e-8
         max_iter = 8500
 
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
         fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
@@ -71,8 +71,8 @@ class TestGroupLasso(TestCase):
 #                                                        penalty_start=0)
 
             function = CombinedFunction()
-            function.add_function(functions.losses.LinearRegression(X, y,
-                                                               mean=False))
+            function.add_loss(functions.losses.LinearRegression(X, y,
+                                                                mean=False))
             function.add_penalty(gl.GroupLassoOverlap(l=g, A=A, mu=mu,
                                                       penalty_start=0))
 
@@ -121,7 +121,7 @@ class TestGroupLasso(TestCase):
                                      [10.89356615]])
 
         berr = np.linalg.norm(beta_parsimony - beta_spams)
-#        print berr
+        print(berr)
         assert berr < 5e-2
 
         f_parsimony = function.f(beta_parsimony)
@@ -154,8 +154,8 @@ class TestGroupLasso(TestCase):
         k = 0.0
         g = 0.9
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
-        beta = start_vector.get_vector(p)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        beta = start_vector.get_weights(p)
 
         alpha = 1.0
         Sigma = alpha * np.eye(p, p) \
@@ -173,7 +173,7 @@ class TestGroupLasso(TestCase):
         eps = 1e-8
         max_iter = 18000
 
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         mus = [5e-0, 5e-2, 5e-4, 5e-6, 5e-8]
         fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
@@ -185,8 +185,8 @@ class TestGroupLasso(TestCase):
 #                                                        penalty_start=0)
 
             function = CombinedFunction()
-            function.add_function(functions.losses.LinearRegression(X, y,
-                                                               mean=False))
+            function.add_loss(functions.losses.LinearRegression(X, y,
+                                                                mean=False))
             function.add_penalty(gl.GroupLassoOverlap(l=g, A=A, mu=mu,
                                                       penalty_start=0))
 
@@ -268,8 +268,8 @@ class TestGroupLasso(TestCase):
         k = 0.0
         g = 1.1
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
-        beta = start_vector.get_vector(p)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        beta = start_vector.get_weights(p)
 
         alpha = 1.0
         Sigma = alpha * np.eye(p, p) \
@@ -285,7 +285,7 @@ class TestGroupLasso(TestCase):
         eps = 1e-8
         max_iter = 8000
 
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
         fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
@@ -297,8 +297,8 @@ class TestGroupLasso(TestCase):
 #                                                        penalty_start=0)
 
             function = CombinedFunction()
-            function.add_function(functions.losses.LinearRegression(X, y,
-                                                               mean=False))
+            function.add_loss(functions.losses.LinearRegression(X, y,
+                                                                mean=False))
             function.add_penalty(gl.GroupLassoOverlap(l=g, A=A, mu=mu,
                                                       penalty_start=0))
 
@@ -335,8 +335,8 @@ class TestGroupLasso(TestCase):
         k = 0.0
         g = 0.9
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
-        beta = start_vector.get_vector(p)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        beta = start_vector.get_weights(p)
 
         alpha = 1.0
         Sigma = alpha * np.eye(p, p) \
@@ -354,7 +354,7 @@ class TestGroupLasso(TestCase):
         eps = 1e-8
         max_iter = 15000
 
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         mus = [5e-0, 5e-2, 5e-4, 5e-6, 5e-8]
         fista = FISTA(eps=eps, max_iter=max_iter / len(mus))
@@ -366,8 +366,8 @@ class TestGroupLasso(TestCase):
 #                                                        penalty_start=0)
 
             function = CombinedFunction()
-            function.add_function(functions.losses.LinearRegression(X, y,
-                                                               mean=False))
+            function.add_loss(functions.losses.LinearRegression(X, y,
+                                                                mean=False))
             function.add_penalty(gl.GroupLassoOverlap(l=g, A=A, mu=mu,
                                                       penalty_start=0))
 
@@ -405,8 +405,8 @@ class TestGroupLasso(TestCase):
         k = 1.0 - l
         g = 2.718
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
-        beta = start_vector.get_vector(p)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        beta = start_vector.get_weights(p)
 
         alpha = 1.0
         Sigma = alpha * np.eye(p, p) \
@@ -424,7 +424,7 @@ class TestGroupLasso(TestCase):
         eps = 1e-8
         max_iter = 5000
 
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         mus = [5e-0, 5e-2, 5e-4, 5e-6, 5e-8]
         fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
@@ -436,8 +436,8 @@ class TestGroupLasso(TestCase):
 #                                                        penalty_start=0)
 
             function = CombinedFunction()
-            function.add_function(functions.losses.LinearRegression(X, y,
-                                                               mean=False))
+            function.add_loss(functions.losses.LinearRegression(X, y,
+                                                                mean=False))
             function.add_penalty(functions.penalties.L2Squared(l=k))
             function.add_penalty(gl.GroupLassoOverlap(l=g, A=A, mu=mu,
                                                       penalty_start=0))
@@ -477,8 +477,8 @@ class TestGroupLasso(TestCase):
         k = 1.0 - l
         g = 2.718
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
-        beta = start_vector.get_vector(p)
+        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        beta = start_vector.get_weights(p)
 
         alpha = 1.0
         Sigma = alpha * np.eye(p, p) \
@@ -494,7 +494,7 @@ class TestGroupLasso(TestCase):
         eps = 1e-8
         max_iter = 10000
 
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         mus = [5e-0, 5e-2, 5e-4, 5e-6, 5e-8]
         fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
@@ -506,8 +506,8 @@ class TestGroupLasso(TestCase):
 #                                                        penalty_start=0)
 
             function = CombinedFunction()
-            function.add_function(functions.losses.LinearRegression(X, y,
-                                                               mean=False))
+            function.add_loss(functions.losses.LinearRegression(X, y,
+                                                                mean=False))
             function.add_penalty(functions.penalties.L2Squared(l=k))
             function.add_penalty(gl.GroupLassoOverlap(l=g, A=A, mu=mu,
                                                       penalty_start=0))
