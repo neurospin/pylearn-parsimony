@@ -11,7 +11,10 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 import numpy as np
 
 from parsimony.utils.consts import TOLERANCE
-from . import linalgs
+try:
+    from . import linalgs  # Only works when imported as a package.
+except (ValueError, SystemError):
+    import parsimony.utils.linalgs as linalgs  # Run as a script.
 
 __all__ = ["norm", "normFro", "norm1", "norm0", "normInf", "corr", "cov",
            "positive"]
@@ -25,11 +28,11 @@ def norm(x):
     >>> import numpy as np
     >>> from parsimony.utils.maths import norm
     >>> matrix = np.array([[0.2, 1.0, 0.4], [2.0, 1.5, 0.1]])
-    >>> round(norm(matrix), 15)
-    2.731300056749533
+    >>> norm(matrix)  # doctest: +ELLIPSIS
+    2.73130005...
     >>> vector = np.array([[0.2], [1.0], [0.4]])
-    >>> round(norm(vector), 15)
-    1.095445115010332
+    >>> norm(vector)  # doctest: +ELLIPSIS
+    1.09544511...
     """
     n, p = x.shape
     if p == 1:
@@ -56,11 +59,11 @@ def normFro(X):
     >>> import numpy as np
     >>> from parsimony.utils.maths import norm
     >>> matrix = np.array([[0.2, 1.0, 0.4], [2.0, 1.5, 0.1]])
-    >>> round(norm(matrix), 15)
-    2.731300056749533
+    >>> norm(matrix)  # doctest: +ELLIPSIS
+    2.73130005...
     >>> vector = np.array([[0.2], [1.0], [0.4]])
-    >>> round(norm(vector), 15)
-    1.095445115010332
+    >>> norm(vector)  # doctest: +ELLIPSIS
+    1.09544511...
     """
     return norm(X)
 
@@ -145,7 +148,7 @@ def corr(a, b):
     >>> from parsimony.utils.maths import corr
     >>> v1 = np.asarray([[1., 2., 3.], [1., 2., 3.]])
     >>> v2 = np.asarray([[1., 2., 3.], [1., 2., 3.]])
-    >>> print corr(v1, v2)
+    >>> print(corr(v1, v2))
     [[ 1.  0. -1.]
      [ 0.  0.  0.]
      [-1.  0.  1.]]
@@ -181,7 +184,7 @@ def cov(a, b):
     >>> from parsimony.utils.maths import cov
     >>> v1 = np.asarray([[1., 2., 3.], [1., 2., 3.]])
     >>> v2 = np.asarray([[1., 2., 3.], [1., 2., 3.]])
-    >>> print cov(v1, v2)
+    >>> print(cov(v1, v2))
     [[ 2.  0. -2.]
      [ 0.  0.  0.]
      [-2.  0.  2.]]

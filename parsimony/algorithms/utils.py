@@ -9,7 +9,7 @@ should not depend on any state.
 
 Created on Thu Mar 31 17:25:01 2014
 
-Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt
 @email:   lofstedt.tommy@gmail.com
@@ -21,7 +21,7 @@ import numpy as np
 
 try:
     from . import bases  # Only works when imported as a package.
-except ValueError:
+except (ValueError, SystemError):
     import parsimony.algorithms.bases as bases  # When run as a program.
 from parsimony.utils import check_arrays
 import parsimony.utils.consts as consts
@@ -98,7 +98,7 @@ class AlgorithmSnapshot:
     ...          algorithm=proximal.FISTA(max_iter=50, callback=snapshot))
     >>> en = en.fit(X, y)
     >>> import glob
-    >>> print "Nb snapshots =", len(glob.glob(prefix + "*"))
+    >>> print("Nb snapshots =", len(glob.glob(prefix + "*")))
     Nb snapshots = 5
     """
     def __init__(self, output_prefix, saving_period=100):
@@ -681,8 +681,8 @@ class Kernel(object):
     def __call__(self, x1, x2=None):
 
         if x2 is not None:
-            if (isinstance(x1, (int, np.int64)) and
-                    isinstance(x2, (int, np.int64))):
+            if (isinstance(x1, (int, np.int32, np.int64)) and
+                    isinstance(x2, (int, np.int32, np.int64))):
                 return self._index(x1, x2)
             else:
                 return self._vector(x1, x2)
@@ -692,10 +692,10 @@ class Kernel(object):
 
             K_ = np.zeros((self.shape[0], 1))
             if isinstance(x1, (int, np.int64)):
-                for i in xrange(self.shape[0]):
+                for i in range(self.shape[0]):
                     K_[i, 0] = self._index(i, x1)
             else:
-                for i in xrange(self.shape[0]):
+                for i in range(self.shape[0]):
                     K_[i, 0] = self._vector(self.X[i, :], x1)
 
             return K_
@@ -720,8 +720,8 @@ class Kernel(object):
             val = self._K.dot(other)
         else:
             val = np.zeros((self.shape[0], 1))
-            for i in xrange(self.shape[0]):
-                for j in xrange(self.shape[0]):
+            for i in range(self.shape[0]):
+                for j in range(self.shape[0]):
                     val[i, 0] += self._index(i, j) * other[j, 0]
 
         return val

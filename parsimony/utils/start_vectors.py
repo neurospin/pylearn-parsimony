@@ -12,7 +12,10 @@ from six import with_metaclass
 import abc
 import numpy as np
 
-from . import maths
+try:
+    from . import maths  # Only works when imported as a package.
+except (ValueError, SystemError):
+    import parsimony.utils.maths as maths  # Run as a script.
 
 __all__ = ['BaseStartVector', 'IdentityStartVector', 'RandomStartVector',
            'OnesStartVector', 'ZerosStartVector']
@@ -112,32 +115,32 @@ class RandomStartVector(BaseStartVector):
     >>> # Without normalization
     >>> start_vector = RandomStartVector(normalise=False, seed=42)
     >>> random = start_vector.get_vector(3)
-    >>> print random
+    >>> print(random)
     [[ 0.37454012]
      [ 0.95071431]
      [ 0.73199394]]
-    >>> print maths.norm(random)
+    >>> print(maths.norm(random))
     1.25696186254
     >>>
     >>> # With normalization
     >>> start_vector_normalized = RandomStartVector(normalise=True, seed=2)
     >>> random_normalized = start_vector_normalized.get_vector(3)
-    >>> print random_normalized
+    >>> print(random_normalized)
     [[ 0.62101956]
      [ 0.03692864]
      [ 0.78292463]]
-    >>> print maths.norm(random_normalized)
+    >>> print(maths.norm(random_normalized))
     1.0
     >>>
     >>> # With limits
     >>> start_vector_normalized = RandomStartVector(normalise=True, seed=2,
     ...                                             limits=(-1, 1))
     >>> random_limits = start_vector_normalized.get_vector(3)
-    >>> print random_limits
+    >>> print(random_limits)
     [[-0.1330817 ]
      [-0.98571123]
      [ 0.10326001]]
-    >>> print maths.norm(random_limits)
+    >>> print(maths.norm(random_limits))
     1.0
 
     """
@@ -160,7 +163,7 @@ class RandomStartVector(BaseStartVector):
         >>> from parsimony.utils.start_vectors import RandomStartVector
         >>> start_vector = RandomStartVector(normalise=False, seed=42)
         >>> random = start_vector.get_vector(3)
-        >>> print random
+        >>> print(random)
         [[ 0.37454012]
          [ 0.95071431]
          [ 0.73199394]]
@@ -168,7 +171,7 @@ class RandomStartVector(BaseStartVector):
         >>> start_vector = RandomStartVector(normalise=False, seed=1,
         ...                                  limits=(-1, 2))
         >>> random = start_vector.get_vector(3)
-        >>> print random
+        >>> print(random)
         [[ 0.25106601]
          [ 1.16097348]
          [-0.99965688]]
@@ -200,21 +203,21 @@ class OnesStartVector(BaseStartVector):
     # Without normalization
     >>> start_vector = OnesStartVector(normalise=False)
     >>> ones = start_vector.get_vector(3)
-    >>> print ones
+    >>> print(ones)
     [[ 1.]
      [ 1.]
      [ 1.]]
-    >>> print maths.norm(ones)
+    >>> print(maths.norm(ones))
     1.73205080757
 
     # With normalization
     >>> start_vector_normalized = OnesStartVector(normalise=True)
     >>> ones_normalized = start_vector_normalized.get_vector(3)
-    >>> print ones_normalized
+    >>> print(ones_normalized)
     [[ 0.57735027]
      [ 0.57735027]
      [ 0.57735027]]
-    >>> print maths.norm(ones_normalized)
+    >>> print(maths.norm(ones_normalized))
     1.0
     """
     def __init__(self, normalise=False, **kwargs):
@@ -234,7 +237,7 @@ class OnesStartVector(BaseStartVector):
         >>> from parsimony.utils.start_vectors import OnesStartVector
         >>> start_vector = OnesStartVector()
         >>> ones = start_vector.get_vector(3)
-        >>> print ones
+        >>> print(ones)
         [[ 1.]
          [ 1.]
          [ 1.]]
@@ -259,7 +262,7 @@ class ZerosStartVector(BaseStartVector):
     >>> from parsimony.utils.start_vectors import ZerosStartVector
     >>> start_vector = ZerosStartVector()
     >>> zeros = start_vector.get_vector(3)
-    >>> print zeros
+    >>> print(zeros)
     [[ 0.]
      [ 0.]
      [ 0.]]
@@ -283,7 +286,7 @@ class ZerosStartVector(BaseStartVector):
         >>> from parsimony.utils.start_vectors import ZerosStartVector
         >>> start_vector = ZerosStartVector()
         >>> zeros = start_vector.get_vector(3)
-        >>> print zeros
+        >>> print(zeros)
         [[ 0.]
          [ 0.]
          [ 0.]]

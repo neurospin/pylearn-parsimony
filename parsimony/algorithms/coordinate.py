@@ -22,7 +22,7 @@ import numpy as np
 
 try:
     from . import bases  # Only works when imported as a package.
-except ValueError:
+except (ValueError, SystemError):
     import parsimony.algorithms.bases as bases  # When run as a program.
 import parsimony.utils as utils
 import parsimony.utils.maths as maths
@@ -82,12 +82,11 @@ class LassoCoordinateDescent(bases.ImplicitAlgorithm,
     >>> l = 0.0618
     >>> alg = LassoCoordinateDescent(l)
     >>> function = functions.CombinedFunction()
-    >>> function.add_function(functions.losses.LinearRegression(X, y,
-    ...                                                         mean=False))
+    >>> function.add_loss(functions.losses.LinearRegression(X, y, mean=False))
     >>> function.add_prox(penalties.L1(l=l))
     >>> beta = alg.run(X, y)
-    >>> round(np.linalg.norm(beta_star - beta), 14)
-    0.34655181469595
+    >>> np.linalg.norm(beta_star - beta)  # doctest: +ELLIPSIS
+    0.34655181...
     """
     INFO_PROVIDED = [Info.ok,
                      Info.num_iter,
@@ -273,12 +272,11 @@ class ShootingAlgorithm(bases.ImplicitAlgorithm,
     >>> l = 0.0618
     >>> alg = ShootingAlgorithm(l)
     >>> function = functions.CombinedFunction()
-    >>> function.add_function(functions.losses.LinearRegression(X, y,
-    ...                                                         mean=False))
+    >>> function.add_loss(functions.losses.LinearRegression(X, y, mean=False))
     >>> function.add_prox(penalties.L1(l=l))
     >>> beta = alg.run(X, y)
-    >>> round(np.linalg.norm(beta_star - beta), 14)
-    0.34655181469595
+    >>> np.linalg.norm(beta_star - beta)  # doctest: +ELLIPSIS
+    0.34655181...
     """
     INFO_PROVIDED = [Info.ok,
                      Info.num_iter,

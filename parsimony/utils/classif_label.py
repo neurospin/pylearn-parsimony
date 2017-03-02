@@ -37,9 +37,9 @@ def class_weight_to_sample_weight(class_weight, y):
     -------
     >>> y = [1, 1, 1, 0, 0, 2]
     >>> w = class_weight_to_sample_weight("auto", y)
-    >>> print w.sum() == len(y)
+    >>> print(w.sum() == len(y))
     True
-    >>> print ["%i:%.2f" % (l, np.sum(w[y==l])) for l in np.unique(y)]
+    >>> print(["%i:%.2f" % (l, np.sum(w[y==l])) for l in np.unique(y)])
     ['0:2.00', '1:2.00', '2:2.00']
     >>> y = [1, 1, 1, 0, 0, 2]
     >>> w2 = class_weight_to_sample_weight({0:1./3, 1:1./3, 2:1./3}, y)

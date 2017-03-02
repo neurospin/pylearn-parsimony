@@ -11,7 +11,7 @@ called.
 
 Created on Mon Apr 22 10:54:29 2013
 
-Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt, Vincent Guillemot, Edouard Duchesnay and
           Fouad Hadj-Selem
@@ -24,7 +24,7 @@ import scipy.sparse as sparse
 
 try:
     from . import properties  # Only works when imported as a package.
-except ValueError:
+except (ValueError, SystemError):
     import parsimony.functions.properties as properties  # Run as a script.
 import parsimony.utils.maths as maths
 import parsimony.utils.consts as consts
@@ -761,8 +761,8 @@ class L2(properties.AtomicFunction,
         >>> np.random.seed(42)
         >>> l2 = L2(c=0.3183098861837907)
         >>> y1 = l2.proj(np.random.rand(100, 1) * 2.0 - 1.0)
-        >>> round(np.linalg.norm(y1), 15)
-        0.318309886183791
+        >>> np.linalg.norm(y1)  # doctest: +ELLIPSIS
+        0.31830988...
         >>> y2 = np.random.rand(100, 1) * 2.0 - 1.0
         >>> l2.feasible(y2)
         False
@@ -941,8 +941,8 @@ class L2Squared(properties.AtomicFunction,
         >>> np.random.seed(42)
         >>> l2 = L2Squared(c=0.3183098861837907)
         >>> y1 = l2.proj(np.random.rand(100, 1) * 2.0 - 1.0)
-        >>> round(0.5 * np.linalg.norm(y1) ** 2.0, 15)
-        0.318309886183791
+        >>> 0.5 * np.linalg.norm(y1) ** 2.0  # doctest: +ELLIPSIS
+        0.31830988...
         >>> y2 = np.random.rand(100, 1) * 2.0 - 1.0
         >>> l2.feasible(y2)
         False
@@ -2137,7 +2137,6 @@ class KernelL2Squared(properties.AtomicFunction,
         >>> import numpy as np
         >>> from parsimony.functions.penalties import KernelL2Squared
         >>> from parsimony.algorithms.utils import LinearKernel
-        >>>
         >>> np.random.seed(42)
         >>>
         >>> X = np.random.randn(5, 10)

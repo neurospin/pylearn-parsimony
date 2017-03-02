@@ -22,7 +22,7 @@ import numpy as np
 
 try:
     from . import properties  # Only works when imported as a package.
-except ValueError:
+except (ValueError, SystemError):
     import parsimony.functions.properties as properties  # Run as a script.
 import parsimony.utils as utils
 import parsimony.utils.consts as consts
@@ -140,8 +140,8 @@ class LinearRegression(properties.CompositeFunction,
         >>> L_ = lr.approx_L((15, 1), 10000)
         >>> L >= L_
         True
-        >>> round((L - L_) / L, 14)
-        0.14039091870818
+        >>> (L - L_) / L  # doctest: +ELLIPSIS
+        0.14039091...
         """
         if self._L is None:
 
@@ -473,15 +473,15 @@ class LogisticRegression(properties.AtomicFunction,
         >>> L_ = lr.approx_L((15, 1), 10000)
         >>> L >= L_
         True
-        >>> round((L - L_) / L, 15)
-        0.45110910457988
+        >>> (L - L_) / L  # doctest: +ELLIPSIS
+        0.45110910...
         >>> lr = LogisticRegression(X=X, y=y, mean=False)
         >>> L = lr.L()
         >>> L_ = lr.approx_L((15, 1), 10000)
         >>> L >= L_
         True
-        >>> round((L - L_) / L, 13)
-        0.430306683612
+        >>> (L - L_) / L  # doctest: +ELLIPSIS
+        0.43030668...
         """
         if self._L is None:
             # pi(x) * (1 - pi(x)) <= 0.25 = 0.5 * 0.5
@@ -763,11 +763,11 @@ class LatentVariableVariance(properties.Function,
         >>> X = np.random.rand(50, 150)
         >>> w = np.random.rand(150, 1)
         >>> var = LatentVariableVariance(X)
-        >>> round(var.L(), 10)
-        47025.0809786841
+        >>> var.L()  # doctest: +ELLIPSIS
+        47025.08097868...
         >>> _, S, _ = np.linalg.svd(np.dot(X.T, X))
-        >>> round(np.max(S) * 49 / 2.0, 10)
-        47025.0809786841
+        >>> np.max(S) * 49 / 2.0  # doctest: +ELLIPSIS
+        47025.08097868...
         """
         if self._lambda_max is None:
             from parsimony.algorithms.nipals import RankOneSVD

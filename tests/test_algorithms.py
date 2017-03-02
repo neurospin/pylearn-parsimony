@@ -17,7 +17,7 @@ import parsimony.functions.losses as losses
 #from tests import TestCase
 try:
     from .tests import TestCase  # When imported as a package.
-except ValueError:
+except (ValueError, SystemError):
     from tests import TestCase  # When run as a program.
 
 
@@ -68,11 +68,11 @@ class TestAlgorithms(TestCase):
         np.random.seed(42)
 
         n = 100
-        X = np.vstack([0.2 * np.random.randn(n / 2, 2) + 0.25,
-                       0.2 * np.random.randn(n / 2, 2) + 0.75])
+        X = np.vstack([0.2 * np.random.randn(int(n / 2), 2) + 0.25,
+                       0.2 * np.random.randn(int(n / 2), 2) + 0.75])
         X_1 = np.hstack((-np.ones((X.shape[0], 1)), X))
-        y = np.vstack([1 * np.ones((n / 2, 1)),
-                       3 * np.ones((n / 2, 1))]) - 2
+        y = np.vstack([1 * np.ones((int(n / 2), 1)),
+                       3 * np.ones((int(n / 2), 1))]) - 2
 
         import parsimony.algorithms.algorithms as alg
 

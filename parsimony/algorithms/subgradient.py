@@ -21,7 +21,7 @@ import numpy as np
 
 try:
     from . import bases  # Only works when imported as a package.
-except ValueError:
+except (ValueError, SystemError):
     import parsimony.algorithms.bases as bases  # When run as a program.
 import parsimony.utils as utils
 import parsimony.utils.maths as maths
@@ -144,7 +144,7 @@ class SubGradientDescent(bases.ExplicitAlgorithm,
         fbest = np.inf
         betabest = None
 
-        for i in xrange(1, self.max_iter + 1):
+        for i in range(1, self.max_iter + 1):
 
             if self.info_requested(Info.time):
                 tm = utils.time_cpu()

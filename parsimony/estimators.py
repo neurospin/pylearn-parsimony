@@ -718,29 +718,29 @@ class LinearRegressionL1L2TV(RegressionEstimator):
     ...                      algorithm=proximal.StaticCONESTA(max_iter=1000),
     ...                      mean=False)
     >>> res = lr.fit(X, y)
-    >>> round(lr.score(X, y), 13)
-    0.0683842576534
+    >>> lr.score(X, y)  # doctest: +ELLIPSIS
+    0.06838425...
     >>>
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                     algorithm=proximal.CONESTA(max_iter=1000),
     ...                     mean=False)
     >>> res = lr.fit(X, y)
-    >>> round(lr.score(X, y), 13)
-    0.0683583406798
+    >>> lr.score(X, y)  # doctest: +ELLIPSIS
+    0.06835834...
     >>>
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                                algorithm=proximal.FISTA(max_iter=1000),
     ...                                mean=False)
     >>> lr = lr.fit(X, y)
-    >>> round(lr.score(X, y), 13)
-    1.5817577127184
+    >>> lr.score(X, y)  # doctest: +ELLIPSIS
+    1.58175771...
     >>>
     >>> lr = estimators.LinearRegressionL1L2TV(l1, l2, tv, A,
     ...                                 algorithm=proximal.ISTA(max_iter=1000),
     ...                                 mean=False)
     >>> lr = lr.fit(X, y)
-    >>> round(lr.score(X, y), 14)
-    2.07583068899674
+    >>> lr.score(X, y)  # doctest: +ELLIPSIS
+    2.07583068...
     >>>
     >>> import parsimony.functions.nesterov.l1tv as l1tv
     >>> np.random.seed(1337)
@@ -749,8 +749,8 @@ class LinearRegressionL1L2TV(RegressionEstimator):
     ...                                 algorithm=proximal.ADMM(max_iter=1000),
     ...                                 mean=False)
     >>> lr = lr.fit(X, y)
-    >>> round(lr.score(X, y), 13)
-    0.0623552412543
+    >>> lr.score(X, y)  # doctest: +ELLIPSIS
+    0.06235524...
     """
     def __init__(self, l1, l2, tv,
                  A=None, mu=consts.TOLERANCE,
@@ -935,32 +935,32 @@ class LinearRegressionL1L2GL(RegressionEstimator):
     ...                                   algorithm_params=dict(max_iter=1000),
     ...                                   mean=False)
     >>> res = lr.fit(X, y)
-    >>> round(lr.score(X, y), 12)
-    0.610183822424
+    >>> lr.score(X, y)  # doctest: +ELLIPSIS
+    0.61018382...
     >>>
     >>> lr = estimators.LinearRegressionL1L2GL(l1, l2, gl, A,
     ...                                  algorithm=proximal.CONESTA(),
     ...                                  algorithm_params=dict(max_iter=1000),
     ...                                  mean=False)
     >>> res = lr.fit(X, y)
-    >>> round(lr.score(X, y), 11)
-    0.61139525439
+    >>> lr.score(X, y)  # doctest: +ELLIPSIS
+    0.61139525...
     >>>
     >>> lr = estimators.LinearRegressionL1L2GL(l1, l2, gl, A,
     ...                                   algorithm=proximal.FISTA(),
     ...                                   algorithm_params=dict(max_iter=1000),
     ...                                   mean=False)
     >>> lr = lr.fit(X, y)
-    >>> round(lr.score(X, y), 12)
-    10.7465249393
+    >>> lr.score(X, y)  # doctest: +ELLIPSIS
+    10.74652493...
     >>>
     >>> lr = estimators.LinearRegressionL1L2GL(l1, l2, gl, A,
     ...                                   algorithm=proximal.ISTA(),
     ...                                   algorithm_params=dict(max_iter=1000),
     ...                                   mean=False)
     >>> lr = lr.fit(X, y)
-    >>> round(lr.score(X, y), 14)
-    11.02462114246791
+    >>> lr.score(X, y)  # doctest: +ELLIPSIS
+    11.02462114...
     """
     def __init__(self, l1, l2, gl,
                  A=None, mu=consts.TOLERANCE,
@@ -1394,8 +1394,8 @@ class RandomLogisticRegression(LogisticRegression):
     >>> X = np.random.rand(n, p)
     >>> y = np.random.randint(0, 2, (n, 1))
     >>> rr = estimators.RandomLogisticRegression(lambda x: np.random.randn(*x))
-    >>> round(rr.fit(X, y).score(X, y), 2)
-    0.52
+    >>> rr.fit(X, y).score(X, y)  # doctest: +ELLIPSIS
+    0.52...
     """
     def __init__(self, rng, class_weight=None, penalty_start=0,
                  start_vector=start_vectors.RandomStartVector(),
@@ -2290,9 +2290,8 @@ class LinearRegressionL2SmoothedL1TV(RegressionEstimator):
     ...                 algorithm_params=dict(max_iter=1000),
     ...                 mean=False)
     >>> res = lr.fit(X, y)
-    >>> error = lr.score(X, y)
-    >>> round(error, 14)
-    0.06837304969156
+    >>> lr.score(X, y)  # doctest: +ELLIPSIS
+    0.06837304...
     """
     def __init__(self, l2, l1, tv,
                  A=None,
@@ -2417,10 +2416,10 @@ class SVMEstimator(RegressionEstimator):
         beta = np.multiply(self.alpha, self.y)
 
         y = np.zeros((X.shape[0], 1))
-        for j in xrange(X.shape[0]):
+        for j in range(X.shape[0]):
             x = X[j, :]
             val = 0.0
-            for i in xrange(self.X.shape[0]):
+            for i in range(self.X.shape[0]):
                 val += beta[i, 0] * self.kernel(self.X[i, :], x)
             val -= self.bias
 
@@ -2514,10 +2513,10 @@ class SupportVectorMachine(SVMEstimator):
     >>> np.random.seed(42)
     >>>
     >>> n = 30
-    >>> X = np.vstack([0.2 * np.random.randn(n / 2, 2) + 0.25,
-    ...                0.2 * np.random.randn(n / 2, 2) + 0.75])
-    >>> y = np.vstack([1 * np.ones((n / 2, 1)),
-    ...                3 * np.ones((n / 2, 1))]) - 2
+    >>> X = np.vstack([0.2 * np.random.randn(int(n / 2), 2) + 0.25,
+    ...                0.2 * np.random.randn(int(n / 2), 2) + 0.75])
+    >>> y = np.vstack([1 * np.ones((int(n / 2), 1)),
+    ...                3 * np.ones((int(n / 2), 1))]) - 2
     >>>
     >>> K = utils.LinearKernel(X=X)
     >>> svm = estimators.SupportVectorMachine(1.0,
@@ -3060,10 +3059,10 @@ class Clustering(BaseEstimator):
     >>>
     >>> K = 3
     >>> n, p = 150, 2
-    >>> X = np.vstack((2 * np.random.rand(n / 3, 2) - 2,
-    ...                0.5 * np.random.rand(n / 3, 2),
-    ...                np.hstack([0.5 * np.random.rand(n / 3, 1) - 1,
-    ...                           0.5 * np.random.rand(n / 3, 1)])))
+    >>> X = np.vstack((2 * np.random.rand(int(n / 3), 2) - 2,
+    ...                0.5 * np.random.rand(int(n / 3), 2),
+    ...                np.hstack([0.5 * np.random.rand(int(n / 3), 1) - 1,
+    ...                           0.5 * np.random.rand(int(n / 3), 1)])))
     >>> lloyds = cluster.KMeans(K, max_iter=100, repeat=10)
     >>> KMeans = estimators.Clustering(K, algorithm=lloyds)
     >>> error = KMeans.fit(X).score(X)

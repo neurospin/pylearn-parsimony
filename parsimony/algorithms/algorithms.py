@@ -84,8 +84,8 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
     >>> import numpy as np
     >>> import parsimony.algorithms.algorithms as alg
     >>> import parsimony.algorithms.utils as utils
-    >>>
     >>> np.random.seed(42)
+    >>>
     >>> n = 30
     >>> X = np.vstack([0.3 * np.random.randn(int(n / 2), 2) + 0.25,
     ...                0.3 * np.random.randn(int(n / 2), 2) + 0.75])
@@ -103,8 +103,8 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
     ...     val -= smo.bias
     ...     yhat[j, 0] = val
     >>> yhat = np.sign(yhat)
-    >>> round(np.mean(yhat == y), 13)
-    0.8666666666667
+    >>> np.mean(yhat == y)  # doctest: +ELLIPSIS
+    0.86666666...
     """
     INFO_PROVIDED = [utils.Info.ok,
                      utils.Info.time,
@@ -404,8 +404,8 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
     >>> import parsimony.algorithms.utils as utils
     >>> import parsimony.functions.losses as losses
     >>> import parsimony.functions.taylor as taylor
-    >>>
     >>> np.random.seed(42)
+    >>>
     >>> n = 30
     >>> X = np.vstack([0.3 * np.random.randn(int(n / 2), 2) + 0.25,
     ...                0.3 * np.random.randn(int(n / 2), 2) + 0.75])

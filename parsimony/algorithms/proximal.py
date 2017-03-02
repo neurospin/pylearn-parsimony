@@ -26,7 +26,7 @@ except ImportError:
 
 try:
     from . import bases  # Only works when imported as a package.
-except ValueError:
+except (ValueError, SystemError):
     import parsimony.algorithms.bases as bases  # When run as a program.
 import parsimony.utils as utils
 import parsimony.utils.maths as maths
@@ -83,8 +83,8 @@ class ISTA(bases.ExplicitAlgorithm,
     >>> ista = ISTA(max_iter=10000)
     >>> beta1 = ista.run(function, np.random.rand(50, 1))
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
-    >>> round(np.linalg.norm(beta1 - beta2), 13)
-    0.0003121557633
+    >>> np.linalg.norm(beta1 - beta2)  # doctest: +ELLIPSIS
+    0.00031215...
     >>>
     >>> np.random.seed(42)
     >>> X = np.random.rand(100, 50)
@@ -95,8 +95,8 @@ class ISTA(bases.ExplicitAlgorithm,
     >>> ista = ISTA(max_iter=10000)
     >>> beta1 = ista.run(function, np.random.rand(50, 1))
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
-    >>> round(np.linalg.norm(beta1 - beta2), 13)
-    0.8272330310458
+    >>> np.linalg.norm(beta1 - beta2)  # doctest: +ELLIPSIS
+    0.82723303...
     >>> int(np.linalg.norm(beta2.ravel(), 0))
     50
     >>> int(np.linalg.norm(beta1.ravel(), 0))
@@ -247,8 +247,8 @@ class FISTA(bases.ExplicitAlgorithm,
     >>> fista = FISTA(max_iter=10000)
     >>> beta1 = fista.run(function, np.random.rand(50, 1))
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
-    >>> round(np.linalg.norm(beta1 - beta2), 13)
-    4.6182817e-06
+    >>> np.linalg.norm(beta1 - beta2)  # doctest: +ELLIPSIS
+    4.618281...e-06
     >>>
     >>> np.random.seed(42)
     >>> X = np.random.rand(100, 50)
@@ -259,8 +259,8 @@ class FISTA(bases.ExplicitAlgorithm,
     >>> fista = FISTA(max_iter=10000)
     >>> beta1 = fista.run(function, np.random.rand(50, 1))
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
-    >>> round(np.linalg.norm(beta1 - beta2), 14)
-    0.82723292510703
+    >>> np.linalg.norm(beta1 - beta2)  # doctest: +ELLIPSIS
+    0.82723292...
     >>> int(np.linalg.norm(beta2.ravel(), 0))
     50
     >>> int(np.linalg.norm(beta1.ravel(), 0))
@@ -716,8 +716,8 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
     >>> static_conesta = StaticCONESTA(max_iter=10000)
     >>> beta1 = static_conesta.run(function, np.random.rand(50, 1))
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
-    >>> round(np.linalg.norm(beta1 - beta2), 13)
-    0.8272329573827
+    >>> np.linalg.norm(beta1 - beta2)  # doctest: +ELLIPSIS
+    0.82723295...
     >>> int(np.linalg.norm(beta2.ravel(), 0))
     50
     >>> int(np.linalg.norm(beta1.ravel(), 0))
@@ -732,8 +732,8 @@ class StaticCONESTA(bases.ExplicitAlgorithm,
     >>> static_conesta = StaticCONESTA(max_iter=10000)
     >>> beta1 = static_conesta.run(function, np.zeros((50, 1)))
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
-    >>> round(np.linalg.norm(beta1 - beta2), 11)
-    0.9662907061
+    >>> np.linalg.norm(beta1 - beta2)  # doctest: +ELLIPSIS
+    0.96629070...
     """
     INTERFACES = [properties.NesterovFunction,
                   properties.StepSize,

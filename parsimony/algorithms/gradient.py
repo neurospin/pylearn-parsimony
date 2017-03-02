@@ -21,7 +21,7 @@ import numpy as np
 
 try:
     from . import bases  # Only works when imported as a package.
-except ValueError:
+except (ValueError, SystemError):
     import parsimony.algorithms.bases as bases  # When run as a program.
 import parsimony.utils as utils
 import parsimony.utils.maths as maths
@@ -63,8 +63,8 @@ class GradientDescent(bases.ExplicitAlgorithm,
     >>> function = RidgeRegression(X, y, k=0.0, mean=False)
     >>> beta1 = gd.run(function, np.random.rand(50, 1))
     >>> beta2 = np.dot(np.linalg.pinv(X), y)
-    >>> round(np.linalg.norm(beta1 - beta2), 13)
-    0.0003121557633
+    >>> np.linalg.norm(beta1 - beta2)  # doctest: +ELLIPSIS
+    0.00031215...
     """
     INTERFACES = [properties.Function,
                   properties.Gradient,
