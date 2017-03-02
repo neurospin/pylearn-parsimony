@@ -98,7 +98,7 @@ class AlgorithmSnapshot:
     ...          algorithm=proximal.FISTA(max_iter=50, callback=snapshot))
     >>> en = en.fit(X, y)
     >>> import glob
-    >>> print("Nb snapshots =", len(glob.glob(prefix + "*")))
+    >>> print("Nb snapshots = %d" % (len(glob.glob(prefix + "*")),))
     Nb snapshots = 5
     """
     def __init__(self, output_prefix, saving_period=100):
