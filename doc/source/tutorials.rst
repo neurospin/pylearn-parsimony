@@ -187,13 +187,13 @@ constraint, :math:`\mathrm{GL}`, and instead minimise
     import parsimony.estimators as estimators
     import parsimony.algorithms as algorithms
     import parsimony.functions.nesterov.gl as gl
-    k = 0.0  # l2 ridge regression coefficient
     l = 0.1  # l1 lasso coefficient
+    k = 0.0  # l2 ridge regression coefficient
     g = 0.1  # group lasso coefficient
     groups = [range(0, 2 * num_ft / 3), range(num_ft/ 3, num_ft)]
     A = gl.linear_operator_from_groups(num_ft, groups)
     estimator = estimators.LinearRegressionL1L2GL(
-                                          k, l, g, A=A,
+                                          l, k, g, A=A,
                                           algorithm=algorithms.proximal.FISTA(),
                                           algorithm_params=dict(max_iter=1000))
     res = estimator.fit(X, y)
@@ -317,13 +317,13 @@ constraint and instead minimise
     import parsimony.estimators as estimators
     import parsimony.algorithms as algorithms
     import parsimony.functions.nesterov.gl as gl
-    k = 0.0  # l2 ridge regression coefficient
     l = 0.1  # l1 lasso coefficient
+    k = 0.0  # l2 ridge regression coefficient
     g = 0.1  # group lasso coefficient
     groups = [range(0, 2 * num_ft / 3), range(num_ft/ 3, num_ft)]
     A = gl.linear_operator_from_groups(num_ft, groups)
     estimator = estimators.LogisticRegressionL1L2GL(
-                                          k, l, g, A=A,
+                                          l, k, g, A=A,
                                           algorithm=algorithms.proximal.FISTA(),
                                           algorithm_params=dict(max_iter=1000))
     res = estimator.fit(X, y)
