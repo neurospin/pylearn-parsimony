@@ -139,11 +139,11 @@ penalty and minimize using FISTA.
 import parsimony.estimators as estimators
 import parsimony.algorithms as algorithms
 import parsimony.functions.nesterov.tv as tv
-k = 0.0  # l2 ridge regression coefficient
 l = 0.0  # l1 lasso coefficient
+k = 0.0  # l2 ridge regression coefficient
 g = 1.0  # tv coefficient
 A = tv.linear_operator_from_shape(shape)  # Memory allocation for TV
-olstv = estimators.LinearRegressionL1L2TV(k, l, g, A, mu=0.0001,
+olstv = estimators.LinearRegressionL1L2TV(l, k, g, A, mu=0.0001,
                                          algorithm=algorithms.proximal.FISTA(),
                                          algorithm_params=dict(max_iter=1000))
 ```
