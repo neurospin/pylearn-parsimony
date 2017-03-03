@@ -16,7 +16,7 @@ import parsimony.algorithms.utils as utils
 import parsimony.functions.losses as losses
 try:
     from .tests import TestCase  # When imported as a package.
-except ValueError:
+except (ValueError, SystemError):
     from tests import TestCase  # When run as a program.
 
 import parsimony.algorithms as algorithms
@@ -57,7 +57,7 @@ class TestMultiblock(TestCase):
         w[0] = np.ones((p0, 1))
         w[1] = np.ones((p1, 1))
         w[2] = np.ones((p2, 1))
-        for i in xrange(3):
+        for i in range(3):
             w[i] = function.proj(w, i)
 
         taylor_function = mb_losses.CombinedMultiblockFunction([X[0],

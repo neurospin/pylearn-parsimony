@@ -12,7 +12,7 @@ from nose.tools import assert_less
 
 try:
     from .tests import TestCase  # When imported as a package.
-except ValueError:
+except (ValueError, SystemError):
     from tests import TestCase  # When run as a program.
 
 
@@ -218,8 +218,9 @@ class TestL1TV(TestCase):
 
         X, y, beta_star = lr.load(beta)
 
+        np.random.seed(42)
         eps = 1e-8
-        max_iter = 810
+        max_iter = 1000
 
         alg = proximal.FISTA(eps=eps, max_iter=max_iter)
 
@@ -239,7 +240,7 @@ class TestL1TV(TestCase):
         berr = np.linalg.norm(beta - beta_star)
 #        print "berr:", berr
 #        assert berr < 5e-1
-        assert_less(berr, 5e-1, "The found regression vector is not correct.")
+        assert_less(berr, 0.5, "The found regression vector is not correct.")
 
         f_parsimony = function.f(beta)
         f_star = function.f(beta_star)
