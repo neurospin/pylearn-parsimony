@@ -483,7 +483,7 @@ class CombinedFunction(properties.CompositeFunction,
 
         return proj_x
 
-    def step(self, x):
+    def step(self, x, **kwargs):
         """The step size to use in descent methods.
 
         From the interface "StepSize".
@@ -626,7 +626,7 @@ class LinearRegressionL1(properties.CompositeFunction,
         """
         return self.l1.proj(beta, **kwargs)
 
-    def step(self, beta):
+    def step(self, beta, **kwargs):
         """The step size to use in descent methods.
 
         From the interface "StepSize".
@@ -1034,7 +1034,7 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
         """
         return self.rr.k
 
-    def step(self, x):
+    def step(self, x, **kwargs):
         """The step size to use in descent methods.
 
         From the interface "StepSize".
@@ -1481,7 +1481,7 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
         """
         return self.gl.project(a)
 
-    def step(self, x):
+    def step(self, x, **kwargs):
         """The step size to use in descent methods.
 
         From the interface "StepSize".
@@ -1601,6 +1601,7 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
         b = ((1. / (self.weights * scale)) * sigma) + self.y
         l_star = np.sum((b * np.log(b) + (1 - b)
                 * np.log(1 - b)) * (self.weights * scale))
+        # TODO: It appears we sometimes get log(x) for x <= 0 here. np.clip?
 
         lAta = self.tv.l * self.tv.Aa(alpha)
         if self.penalty_start > 0:
@@ -2413,7 +2414,7 @@ class PrincipalComponentAnalysisL1TV(properties.CompositeFunction,
         """
         return self.rr.k
 
-    def step(self, x):
+    def step(self, x, **kwargs):
         """The step size to use in descent methods.
 
         From the interface "StepSize".

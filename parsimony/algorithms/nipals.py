@@ -10,7 +10,7 @@ should not depend on any state.
 
 Created on Thu Feb 20 17:46:17 2014
 
-Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt
 @email:   lofstedt.tommy@gmail.com
@@ -22,13 +22,13 @@ import scipy.linalg
 
 try:
     from . import bases  # When imported as a package.
-except ValueError:
+except (ValueError, SystemError):
     import parsimony.algorithms.bases as bases  # When run as a program.
 import parsimony.utils.maths as maths
 import parsimony.utils.consts as consts
 try:
     from . import utils  # When imported as a package.
-except ValueError:
+except (ValueError, SystemError):
     import parsimony.algorithms.utils as utils  # When run as a program.
 import parsimony.utils.weights as weights
 import parsimony.functions.penalties as penalties

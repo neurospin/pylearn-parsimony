@@ -173,7 +173,7 @@ class LinearRegression(properties.CompositeFunction,
 
         return self._L
 
-    def step(self, beta, index=0):
+    def step(self, beta, index=0, **kwargs):
         """The step size to use in descent methods.
 
         Parameters
@@ -333,7 +333,7 @@ class RidgeRegression(properties.CompositeFunction,
 
         return self._lambda_min + self.k
 
-    def step(self, beta, index=0):
+    def step(self, beta, index=0, **kwargs):
         """The step size to use in descent methods.
 
         Parameters
@@ -495,7 +495,7 @@ class LogisticRegression(properties.AtomicFunction,
 
         return self._L
 
-    def step(self, beta, index=0):
+    def step(self, beta, index=0, **kwargs):
         """The step size to use in descent methods.
 
         Parameters
@@ -667,7 +667,7 @@ class RidgeLogisticRegression(properties.CompositeFunction,
 
         return self._L
 
-    def step(self, beta, index=0):
+    def step(self, beta, index=0, **kwargs):
         """The step size to use in descent methods.
 
         Parameters
@@ -778,7 +778,7 @@ class LatentVariableVariance(properties.Function,
 
         return self._n * self._lambda_max / 2.0
 
-    def step(self, w, index=0):
+    def step(self, w, index=0, **kwargs):
         """The step size to use in descent methods.
 
         Parameters
@@ -876,7 +876,7 @@ class LinearFunction(properties.CompositeFunction,
         """
         return 0.0
 
-    def step(self, beta=None, index=0):
+    def step(self, beta=None, index=0, **kwargs):
         """The step size to use in descent methods.
         """
         return 1.0

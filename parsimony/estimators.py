@@ -1604,9 +1604,9 @@ class LassoLogisticRegression(LogisticRegressionEstimator):
     >>> import numpy as np
     >>> import parsimony.estimators as estimators
     >>> import parsimony.algorithms.gradient as gradient
-    >>> n, p = 10, 16
-    >>>
     >>> np.random.seed(1337)
+    >>>
+    >>> n, p = 10, 16
     >>> X = np.random.rand(n, p)
     >>> y = np.random.randint(0, 2, (n, 1))
     >>> l = 1.0

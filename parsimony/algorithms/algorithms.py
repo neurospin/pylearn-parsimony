@@ -10,7 +10,7 @@ thus they should not depend on any state.
 
 Created on Sat Apr 23 22:16:48 2016
 
-Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt
 @email:   lofstedt.tommy@gmail.com
@@ -30,7 +30,7 @@ except (ValueError, SystemError):
 
 import parsimony.functions.properties as properties
 
-__all__ = ["SequentialMinimalOptimization"]
+__all__ = ["SequentialMinimalOptimization", "MajorizationMinimization"]
 
 
 class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
@@ -393,7 +393,7 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
 
     Returns
     -------
-    x : numpy array
+    x : numpy.ndarray
         The parameter vector that minimises f.
 
     Examples
