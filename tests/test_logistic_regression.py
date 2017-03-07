@@ -33,13 +33,13 @@ class TestLogisticRegression(TestCase):
         import parsimony.functions.nesterov.tv as tv
         import parsimony.algorithms.gradient as gradient
         import parsimony.algorithms.proximal as proximal
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.utils.maths as maths
         import parsimony.estimators as estimators
 
         np.random.seed(42)
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         px = 4
         py = 4
@@ -162,14 +162,14 @@ class TestLogisticRegression(TestCase):
         import parsimony.functions.losses as losses
         import parsimony.functions.penalties as penalties
         import parsimony.algorithms.proximal as proximal
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.utils.maths as maths
         import parsimony.estimators as estimators
         import parsimony.functions.nesterov.tv as tv
 
         np.random.seed(42)
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         px = 4
         py = 4
@@ -289,14 +289,14 @@ class TestLogisticRegression(TestCase):
         import parsimony.functions.losses as losses
         import parsimony.functions.penalties as penalties
         import parsimony.algorithms.proximal as proximal
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.utils.maths as maths
         import parsimony.estimators as estimators
         import parsimony.functions.nesterov.tv as tv
 
         np.random.seed(42)
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         px = 4
         py = 4
@@ -422,14 +422,14 @@ class TestLogisticRegression(TestCase):
         import parsimony.functions.penalties as penalties
         import parsimony.algorithms.proximal as proximal
         import parsimony.algorithms.gradient as gradient
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.utils.maths as maths
         import parsimony.estimators as estimators
         import parsimony.functions.nesterov.tv as tv
 
         np.random.seed(42)
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         px = 4
         py = 4
@@ -585,14 +585,14 @@ class TestLogisticRegression(TestCase):
         import parsimony.functions.penalties as penalties
         import parsimony.algorithms.gradient as gradient
         import parsimony.algorithms.proximal as proximal
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.utils.maths as maths
         import parsimony.estimators as estimators
         import parsimony.functions.nesterov.tv as tv
 
         np.random.seed(42)
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         px = 4
         py = 4
@@ -721,14 +721,14 @@ class TestLogisticRegression(TestCase):
         import parsimony.functions.losses as losses
         import parsimony.functions.penalties as penalties
         import parsimony.algorithms.proximal as proximal
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.utils.maths as maths
         import parsimony.functions.nesterov.gl as gl
         import parsimony.estimators as estimators
 
         np.random.seed(42)
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         # Note that p must be even!
         n, p = 50, 100
@@ -869,14 +869,14 @@ class TestLogisticRegression(TestCase):
         import parsimony.functions.losses as losses
         import parsimony.functions.penalties as penalties
         import parsimony.algorithms.proximal as proximal
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.utils.maths as maths
         import parsimony.estimators as estimators
         import parsimony.functions.nesterov.tv as tv
 
         np.random.seed(42)
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         px = 4
         py = 4
@@ -1002,14 +1002,14 @@ class TestLogisticRegression(TestCase):
         import parsimony.functions.losses as losses
         import parsimony.functions.penalties as penalties
         import parsimony.algorithms.proximal as proximal
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.utils.maths as maths
         import parsimony.estimators as estimators
         import parsimony.functions.nesterov.tv as tv
 
         np.random.seed(42)
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         px = 4
         py = 4
@@ -1137,14 +1137,14 @@ class TestLogisticRegression(TestCase):
         import parsimony.functions.losses as losses
         import parsimony.functions.penalties as penalties
         import parsimony.algorithms.proximal as proximal
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.utils.maths as maths
         import parsimony.functions.nesterov.gl as gl
         import parsimony.estimators as estimators
 
         np.random.seed(42)
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         # Note that p must be even!
         n, p = 50, 100
@@ -1274,14 +1274,14 @@ class TestLogisticRegression(TestCase):
 #        import parsimony.functions.losses as losses
 #        import parsimony.functions.penalties as penalties
 #        import parsimony.algorithms.explicit as explicit
-#        import parsimony.utils.start_vectors as start_vectors
+#        import parsimony.utils.weights as weights
 #        import parsimony.utils.maths as maths
 #        import parsimony.functions.nesterov.gl as gl
 #        import parsimony.estimators as estimators
 #
 #        np.random.seed(42)
 #
-#        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+#        start_vector = weights.RandomUniformWeights(normalise=True)
 #
 #        # Note that p must be even!
 #        n, p = 50, 100 + 1

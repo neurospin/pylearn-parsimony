@@ -25,7 +25,7 @@ class TestTotalVariation(TestCase):
         import parsimony.functions as functions
         import parsimony.functions.nesterov.tv as tv
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
 
         np.random.seed(42)
 
@@ -39,7 +39,7 @@ class TestTotalVariation(TestCase):
         k = 0.0
         g = 1.1
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
         beta = start_vector.get_weights(p)
 
         alpha = 1.0
@@ -114,7 +114,7 @@ class TestTotalVariation(TestCase):
         import parsimony.functions as functions
         import parsimony.functions.nesterov.tv as tv
         import parsimony.datasets.simulate.l1_l2_tvmu as l1_l2_tvmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
 
         np.random.seed(1337)
 
@@ -128,7 +128,7 @@ class TestTotalVariation(TestCase):
         k = 0.0
         g = 0.9
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
         beta = start_vector.get_weights(p)
 
         alpha = 1.0
@@ -184,7 +184,7 @@ class TestTotalVariation(TestCase):
         import parsimony.functions as functions
         import parsimony.functions.nesterov.tv as tv
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
 
         np.random.seed(42)
 
@@ -198,7 +198,7 @@ class TestTotalVariation(TestCase):
         k = 1.0 - l
         g = 1.1
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
         beta = start_vector.get_weights(p)
 
         alpha = 1.0
@@ -255,7 +255,7 @@ class TestTotalVariation(TestCase):
         import parsimony.functions as functions
         import parsimony.functions.nesterov.tv as tv
         import parsimony.datasets.simulate.l1_l2_tvmu as l1_l2_tvmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
 
         np.random.seed(42)
 
@@ -269,7 +269,7 @@ class TestTotalVariation(TestCase):
         k = 1.0 - l
         g = 1.1
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
         beta = start_vector.get_weights(p)
 
         alpha = 1.0

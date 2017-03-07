@@ -26,10 +26,10 @@ class TestL1(TestCase):
         import parsimony.algorithms.proximal as proximal
         import parsimony.functions.losses as losses
         import parsimony.functions.nesterov as nesterov
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -100,10 +100,10 @@ class TestL1(TestCase):
         import parsimony.algorithms.proximal as proximal
         import parsimony.functions.losses as losses
         import parsimony.functions.nesterov as nesterov
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -177,7 +177,7 @@ class TestL1TV(TestCase):
         import parsimony.functions.penalties as penalties
         import parsimony.functions.nesterov.tv as tv
         import parsimony.functions.nesterov.l1tv as l1tv
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.datasets.simulate as simulate
 
         np.random.seed(42)
@@ -192,7 +192,7 @@ class TestL1TV(TestCase):
         k = 0.01
         g = 1.1
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
         beta = start_vector.get_weights(p)
 
         alpha = 1.0

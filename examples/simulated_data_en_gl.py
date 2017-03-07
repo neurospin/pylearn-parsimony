@@ -24,8 +24,8 @@ import parsimony.functions as functions
 import parsimony.algorithms as algorithms
 import parsimony.utils.maths as maths
 import parsimony.funcs.helper.gl as gl
-import parsimony.funcs.helper.tv as tv
-import parsimony.utils.start_vectors as start_vectors
+# import parsimony.funcs.helper.tv as tv
+import parsimony.utils.weights as weights
 
 import parsimony.datasets.simulated as simulated
 
@@ -36,7 +36,7 @@ p = 20
 beta_star = np.vstack((np.zeros((int(p / 3.0), 1)),
                        np.ones((int(p / 3.0), 1)),
                        np.zeros((int(p / 3.0), 1))))
-print beta_star.T
+print(beta_star.T)
 p = beta_star.shape[0]
 n = 10
 l = 0.5
@@ -69,7 +69,7 @@ X, y, beta_star = simulated.l1_l2_gl.load(l, k, g, beta_star, M, e, Agl, snr)
 f = []
 fmu = []
 b = []
-start_vector = start_vectors.RandomStartVector()
+start_vector = weights.RandomStartVector()
 errs = [-0.1, -0.08, -0.06, -0.04, -0.02, 0.0, 0.02, 0.04, 0.06, 0.08, 0.1]
 for er in errs:
 
@@ -77,7 +77,7 @@ for er in errs:
     function = functions.RR_L1_GL(X, y, k, l, g + er, A=Agl, mu=mu)
 
     beta = start_vector.get_vector(X.shape[1])
-    start_vector = start_vectors.IdentityStartVector(beta)
+    start_vector = weights.IdentityStartVector(beta)
 
 #    conts = 10
 #    algorithm = algorithms.StaticCONESTA(mu_start=mu * 2.0 ** (conts + 6),
@@ -92,11 +92,11 @@ for er in errs:
     fmu.append(abs(function.fmu(beta, mu) - function.fmu(beta_star, mu)) \
               / function.fmu(beta_star, mu))
     b.append(maths.norm(beta - beta_star) / maths.norm(beta_star))
-    print "er :", er
-    print "f  :", f[-1]
-    print "fmu:", fmu[-1]
-    print "b  :", b[-1]
-    print
+    print("er :", er)
+    print("f  :", f[-1])
+    print("fmu:", fmu[-1])
+    print("b  :", b[-1])
+    print()
 
 plot.subplot(3, 1, 1)
 plot.plot(errs, f)

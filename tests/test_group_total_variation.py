@@ -25,7 +25,7 @@ class TestGroupTotalVariation(TestCase):
         import parsimony.functions as functions
         import parsimony.functions.nesterov.grouptv as grouptv
         import parsimony.datasets.simulate.l1_l2_grouptvmu as l1_l2_grouptvmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
 
         np.random.seed(1337)
 
@@ -36,7 +36,7 @@ class TestGroupTotalVariation(TestCase):
         k = 0.1  # Must have some regularisation for all variables.
         g = 0.9
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
         beta = start_vector.get_weights(p)
 
         rects = [[(0, 5)], [(4, 10)], [(13, 15)]]
@@ -108,7 +108,7 @@ class TestGroupTotalVariation(TestCase):
         import parsimony.functions as functions
         import parsimony.functions.nesterov.grouptv as grouptv
         import parsimony.datasets.simulate.l1_l2_grouptvmu as l1_l2_grouptvmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
 
         np.random.seed(1337)
 
@@ -119,7 +119,7 @@ class TestGroupTotalVariation(TestCase):
         k = 0.0
         g = 1.618
 
-        start_vector = start_vectors.ZerosWeights()
+        start_vector = weights.ZerosWeights()
         beta = start_vector.get_weights(p)
 
         rects = [[(0, 1), (0, 3)], [(1, 2), (3, 6)]]

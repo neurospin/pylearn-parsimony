@@ -24,7 +24,7 @@ import parsimony.functions.losses as losses
 import parsimony.functions.multiblock.losses as mb_losses
 import parsimony.functions.penalties as penalties
 import parsimony.functions.nesterov.l1tv as l1tv
-import parsimony.utils.start_vectors as start_vectors
+import parsimony.utils.weights as weights
 import parsimony.utils.linalgs as linalgs
 import parsimony.algorithms.bases as bases
 import parsimony.algorithms.algorithms as algorithms
@@ -159,7 +159,7 @@ class RegressionEstimator(with_metaclass(abc.ABCMeta, BaseEstimator)):
     """
 
     def __init__(self, algorithm,
-                 start_vector=start_vectors.RandomUniformWeights(normalise=True)):
+                 start_vector=weights.RandomUniformWeights(normalise=True)):
 
         super(RegressionEstimator, self).__init__(algorithm=algorithm)
 
@@ -252,7 +252,7 @@ class LinearRegression(RegressionEstimator):
     error = 0.0135...
     """
     def __init__(self, algorithm=None, algorithm_params=dict(),
-                 start_vector=start_vectors.RandomUniformWeights(normalise=True),
+                 start_vector=weights.RandomUniformWeights(normalise=True),
                  mean=True):
 
         if algorithm is None:
@@ -357,7 +357,7 @@ class RidgeRegression(RegressionEstimator):
     error = 0.3776...
     """
     def __init__(self, l, algorithm=None, algorithm_params=dict(),
-                 start_vector=start_vectors.RandomUniformWeights(normalise=True),
+                 start_vector=weights.RandomUniformWeights(normalise=True),
                  penalty_start=0, mean=True):
 
         if algorithm is None:
@@ -471,7 +471,7 @@ class Lasso(RegressionEstimator):
     """
     def __init__(self, l,
                  algorithm=None, algorithm_params=dict(),
-                 start_vector=start_vectors.RandomUniformWeights(normalise=True),
+                 start_vector=weights.RandomUniformWeights(normalise=True),
                  penalty_start=0,
                  mean=True):
 
@@ -590,7 +590,7 @@ class ElasticNet(RegressionEstimator):
     error = 0.492096...
     """
     def __init__(self, l, alpha=1.0, algorithm=None, algorithm_params=dict(),
-                 start_vector=start_vectors.RandomUniformWeights(normalise=True),
+                 start_vector=weights.RandomUniformWeights(normalise=True),
                  penalty_start=0, mean=True):
 
         if algorithm is None:
@@ -760,7 +760,7 @@ class LinearRegressionL1L2TV(RegressionEstimator):
                  algorithm=None, algorithm_params=dict(),
                  penalty_start=0,
                  mean=True,
-                 start_vector=start_vectors.RandomUniformWeights(normalise=True),
+                 start_vector=weights.RandomUniformWeights(normalise=True),
                  rho=1.0):
 
         self.l1 = max(consts.TOLERANCE, float(l1))
@@ -916,7 +916,7 @@ class LinearRegressionL1L2GL(RegressionEstimator):
     mean : Boolean. Whether to compute the squared loss or the mean squared
             loss. Default is True, the mean squared loss.
 
-    start_vector : parsimony.utils.generate_weights.BaseWeights
+    start_vector : parsimony.utils.weights.BaseWeights
         Generates the start vector that will be used.
 
     Examples
@@ -974,7 +974,7 @@ class LinearRegressionL1L2GL(RegressionEstimator):
                  algorithm=None, algorithm_params=dict(),
                  penalty_start=0,
                  mean=True,
-                 start_vector=start_vectors.RandomUniformWeights(normalise=True)):
+                 start_vector=weights.RandomUniformWeights(normalise=True)):
 
         self.l1 = max(consts.TOLERANCE, float(l1))
         self.l2 = max(consts.TOLERANCE, float(l2))
@@ -1194,7 +1194,7 @@ class LogisticRegressionEstimator(with_metaclass(abc.ABCMeta, BaseEstimator)):
         weights inversely proportional to class frequencies.
     """
     def __init__(self, algorithm,
-                 start_vector=start_vectors.RandomUniformWeights(normalise=True),
+                 start_vector=weights.RandomUniformWeights(normalise=True),
                  class_weight=None):
 
         super(LogisticRegressionEstimator, self).__init__(algorithm=algorithm)
@@ -1857,7 +1857,7 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
     mean : Boolean. Whether to compute the squared loss or the mean squared
             loss. Default is True, the mean squared loss.
 
-    start_vector : parsimony.utils.generate_weights.BaseWeights
+    start_vector : parsimony.utils.weights.BaseWeights
         Generates the start vector that will be used.
 
     Examples
@@ -1905,7 +1905,7 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
                  class_weight=None,
                  penalty_start=0,
                  mean=True,
-                 start_vector=start_vectors.RandomUniformWeights(normalise=True)):
+                 start_vector=weights.RandomUniformWeights(normalise=True)):
 
         self.l1 = max(consts.TOLERANCE, float(l1))
         # self.l2 = max(consts.TOLERANCE, float(l2))
@@ -2111,7 +2111,7 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
     mean : Boolean. Whether to compute the squared loss or the mean squared
             loss. Default is True, the mean squared loss.
 
-    start_vector : parsimony.utils.generate_weights.BaseWeights
+    start_vector : parsimony.utils.weights.BaseWeights
         Generates the start vector that will be used.
 
     Examples
@@ -2163,7 +2163,7 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
                  class_weight=None,
                  penalty_start=0,
                  mean=True,
-                 start_vector=start_vectors.RandomUniformWeights(normalise=True)):
+                 start_vector=weights.RandomUniformWeights(normalise=True)):
 
         self.l1 = max(consts.TOLERANCE, float(l1))
         self.l2 = max(consts.TOLERANCE, float(l2))
@@ -2543,7 +2543,7 @@ class SupportVectorMachine(SVMEstimator):
     """
     def __init__(self, C, kernel=None,
                  algorithm=None, algorithm_params=dict(),
-                 start_vector=start_vectors.RandomUniformWeights(normalise=True)):
+                 start_vector=weights.RandomUniformWeights(normalise=True)):
 
         self.C = max(consts.FLOAT_EPSILON, float(C))
 
@@ -2702,7 +2702,7 @@ class PLSRegression(RegressionEstimator):
 #    >>> print("error = %f" % (error,))
 #    error = 0.0222345202333
     def __init__(self, K=2, algorithm=None, algorithm_params=dict(),
-                 start_vector=start_vectors.RandomUniformWeights(normalise=True),
+                 start_vector=weights.RandomUniformWeights(normalise=True),
                  unbiased=True, mean=True):
 
         self.K = max(1, int(K))
@@ -2908,7 +2908,7 @@ class SparsePLSRegression(RegressionEstimator):
 #    >>> print("error = %f" % (error,))
 #    error = 0.0547513070388
     def __init__(self, l, K=2, algorithm=None, algorithm_params=dict(),
-                 start_vector=start_vectors.RandomUniformWeights(normalise=True),
+                 start_vector=weights.RandomUniformWeights(normalise=True),
                  unbiased=True, mean=True):
 
         self.l = [max(0.0, float(l[0])),
@@ -3378,16 +3378,15 @@ class GridSearchKFold(BaseEstimator):
             Function that works with the given algorithm. Also returns a list
             of start vectors for the algorithm. The signature is:
 
-                function, beta = generate_function(X, params,
-                                                   start_vectors=True),
+                function, beta = generate_function(X, params, weights=True),
             or
 
-                function = generate_function(X, params, start_vectors=False),
+                function = generate_function(X, params, weights=False),
 
             where X is a list if numpy arrays (e.g., the training data sets),
             and params is a dictionary with the current parameters. The beta
             may be None, if the algorithm doesn't need any start vectors, and
-            is not returned at all if start_vectors is False.
+            is not returned at all if weights is False.
 
     score_function : Python function. The score_function takes as argument two
             lists of data sets, the grid parameters and the fitted parameters
@@ -3548,12 +3547,12 @@ class GridSearchKFold(BaseEstimator):
         # Compute the best model
 #        if self._warm_restart is None:
         function, beta = self.generate_function(X, self._best_params,
-                                                start_vectors=True)
+                                                weights=True)
 #            self._warm_restart = beta
 #        else:
 #            beta = self._warm_restart
 #            function = self.generate_function(X, self._best_params,
-#                                              start_vectors=False)
+#                                              weights=False)
         self.algorithm.reset()
         self._best_beta = self.algorithm.run(function, beta)
 
@@ -3573,13 +3572,12 @@ class GridSearchKFold(BaseEstimator):
                 Xte[i] = X[i][test, :]
 
 #            if self._warm_restart is None:
-            function, beta = self.generate_function(Xtr, params,
-                                                    start_vectors=True)
+            function, beta = self.generate_function(Xtr, params, weights=True)
 #                self._warm_restart = beta
 #            else:
 #                beta = self._warm_restart
 #                function = self.generate_function(Xtr, params,
-#                                                  start_vectors=False)
+#                                                  weights=False)
 
             self.algorithm.reset()
             beta = self.algorithm.run(function, beta)
@@ -3744,11 +3742,11 @@ class KFoldCrossValidation(BaseEstimator):
             returns a list of start vectors for the algorithm. The signature
             is:
 
-                function, beta = generate_function(X, start_vectors=True),
+                function, beta = generate_function(X, weights=True),
 
             where X is a list if numpy arrays (e.g., the training data sets).
             The output beta may be None, if the algorithm doesn't need any
-            start vectors, and is not returned at all if start_vectors is
+            start vectors, and is not returned at all if weights is
             False.
 
     score_function : Python function. The score_function takes as argument two
@@ -3837,11 +3835,10 @@ class KFoldCrossValidation(BaseEstimator):
                 Xte[i] = X[i][test, :]
 
 #            if self._warm_restart is None:
-            function, beta = self.generate_function(Xtr,
-                                                    start_vectors=True)
+            function, beta = self.generate_function(Xtr, weights=True)
 #                self._warm_restart = beta
 #            else:
-#                function = self.generate_function(Xtr, start_vectors=False)
+#                function = self.generate_function(Xtr, weights=False)
 #
 #                beta = self._warm_restart
 

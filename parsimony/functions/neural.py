@@ -30,7 +30,7 @@ except (ValueError, SystemError):
     import parsimony.functions.step_sizes as step_sizes  # Run as a script.
 from parsimony.utils import check_arrays
 import parsimony.utils.consts as consts
-import parsimony.utils.start_vectors as start_vectors
+import parsimony.utils.weights as weights
 
 
 __all__ = ["BaseNetwork", "FeedForwardNetwork",
@@ -65,7 +65,7 @@ class BaseNetwork(with_metaclass(abc.ABCMeta,
     loss : parsimony.neural.BaseLoss
         The loss function of the network.
 
-    weight_init : parsimony.utils.start_vectors.BaseStartVector
+    weight_init : parsimony.utils.weights.BaseWeights
         The class to use to generate the initial weights.
     """
     def __init__(self, X, y, output_nodes, loss,
@@ -86,19 +86,14 @@ class BaseNetwork(with_metaclass(abc.ABCMeta,
                                                         nodes=output_nodes)
         else:
             self._output = OutputLayer(loss, num_nodes=y.shape[1],
-                                       nodes=output_nodes)
+                                       nodes=output_nodes,
+                                       weight_init=weight_init)
 
         loss.set_target(y.T)  # Note: The network outputs column vectors
 
         self._step_size = step_size
 
-        if (weight_init is not None) \
-                and (not isinstance(weight_init,
-                                    start_vectors.BaseStartVector)):
-            raise ValueError("weight_init must be of type "
-                             "NeuralNetworkInitialisation")
-        else:
-            self._weight_init = weight_init
+        self._weight_init = weight_init
 
         self.reset()
 
@@ -289,10 +284,12 @@ class FeedForwardNetwork(BaseNetwork):
 class BaseLayer(with_metaclass(abc.ABCMeta)):
     """This is the base class for all layers.
     """
-    def __init__(self, num_nodes=None, nodes=None, weights=None):
+    def __init__(self, num_nodes=None, nodes=None, weights=None,
+                 weight_init=None):
 
         self._set_nodes(nodes, num_nodes)
         self.set_weights(weights)
+        self._weight_init = weight_init
 
         self._all_same = True
         if isinstance(nodes, list):
@@ -349,9 +346,8 @@ class BaseLayer(with_metaclass(abc.ABCMeta)):
         if layer is None:
             self._weights = None
         elif self._weights is None:
-            self._weight_init.get_
-            self._weights = _init_weights(self.get_num_nodes(),
-                                          layer.get_num_nodes())
+            self._weights = self._weight_init.get_weights((self.get_num_nodes(),
+                                                           layer.get_num_nodes()))
 
     def get_weights(self):
 
@@ -461,11 +457,9 @@ class HiddenLayer(BaseLayer):
 class OutputLayer(BaseLayer):
     """Represents the output layer.
     """
-    def __init__(self, loss, num_nodes=None, nodes=None, weights=None):
+    def __init__(self, loss, **kwargs):
 
-        super(OutputLayer, self).__init__(num_nodes=num_nodes,
-                                          nodes=nodes,
-                                          weights=weights)
+        super(OutputLayer, self).__init__(**kwargs)
 
         self.set_loss(loss)
 
@@ -516,7 +510,7 @@ class OutputLayer(BaseLayer):
 class SoftmaxCategoricalCrossEntropyOutputLayer(OutputLayer):
     """Represents an output layer with softmax + categorical cross-entropy loss
     """
-    def __init__(self, loss, num_nodes=None, nodes=None, weights=None):
+    def __init__(self, loss, **kwargs):
 
         if loss is None:
             loss = self.set_loss(CategoricalCrossEntropyLoss())
@@ -525,7 +519,7 @@ class SoftmaxCategoricalCrossEntropyOutputLayer(OutputLayer):
             raise ValueError("Loss must be categorical cross-entropy!")
 
         super(SoftmaxCategoricalCrossEntropyOutputLayer, self) \
-            .__init__(loss, num_nodes=num_nodes, nodes=nodes, weights=weights)
+            .__init__(loss, **kwargs)
 
     def _backward(self, y):
 

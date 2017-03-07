@@ -59,7 +59,7 @@ We build a simple simulated dataset for the regression problem
 .. code-block:: python
 
     import numpy as np
-    import parsimony.utils.start_vectors as start_vectors
+    import parsimony.utils.weights as weights
     np.random.seed(42)
     # Three-dimensional matrix is defined as:
     shape = (4, 4, 4)
@@ -70,8 +70,7 @@ We build a simple simulated dataset for the regression problem
     # Define X randomly as simulated data
     X = np.random.rand(num_samples, num_ft)
     # Define beta randomly
-    start_vector = start_vectors.RandomStartVector(normalise=False,
-                                                   limits=(-1, 1))
+    start_vector = weights.RandomStartVector(normalise=False, limits=(-1, 1))
     beta = start_vector.get_vector(num_ft)
     beta = np.sort(beta, axis=0)
     beta[np.abs(beta) < 0.2] = 0.0

@@ -25,7 +25,7 @@ class TestLinearRegression(TestCase):
 
         from parsimony.functions.losses import LinearRegression
         import parsimony.algorithms.gradient as gradient
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
 
         np.random.seed(42)
@@ -38,7 +38,7 @@ class TestLinearRegression(TestCase):
         mean = np.zeros(p)
         X = np.random.multivariate_normal(mean, Sigma, n)
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
         beta_star = start_vector.get_weights(p)
 
         y = np.dot(X, beta_star)
@@ -86,7 +86,7 @@ class TestLinearRegression(TestCase):
 
         from parsimony.functions.losses import LinearRegression
         import parsimony.algorithms.gradient as gradient
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
 
         np.random.seed(42)
@@ -99,7 +99,7 @@ class TestLinearRegression(TestCase):
         mean = np.zeros(p)
         X = np.random.multivariate_normal(mean, Sigma, n)
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
         beta_star = start_vector.get_weights(p)
 
         y = np.dot(X, beta_star)
@@ -143,7 +143,7 @@ class TestLinearRegression(TestCase):
 
         from parsimony.functions.losses import LinearRegression
         import parsimony.algorithms.gradient as gradient
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
 
         np.random.seed(42)
@@ -156,7 +156,7 @@ class TestLinearRegression(TestCase):
         mean = np.zeros(p)
         X = np.random.multivariate_normal(mean, Sigma, n)
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
         beta_star = start_vector.get_weights(p)
 
         y = np.dot(X, beta_star)
@@ -201,13 +201,13 @@ class TestLinearRegression(TestCase):
         import numpy as np
         from parsimony.functions.losses import LinearRegression
         import parsimony.algorithms.gradient as gradient
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
         import parsimony.algorithms.proximal as proximal
 
         np.random.seed(42)
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=False)
+        start_vector = weights.RandomUniformWeights(normalise=False)
 
         n, p = 60, 90
 
@@ -372,11 +372,11 @@ class TestLinearRegression(TestCase):
 #        from parsimony.functions.losses import LinearRegression
 #        from parsimony.functions.penalties import L2
 #        import parsimony.algorithms.gradient as gradient
-#        import parsimony.utils.start_vectors as start_vectors
+#        import parsimony.utils.weights as weights
 #
 #        np.random.seed(42)
 #
-#        start_vector = start_vectors.RandomUniformWeights(normalise=False)
+#        start_vector = weights.RandomUniformWeights(normalise=False)
 #
 #        n, p = 60, 90
 #
@@ -460,11 +460,11 @@ class TestLinearRegression(TestCase):
         from parsimony.functions.penalties import L1
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
         import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -592,11 +592,11 @@ class TestLinearRegression(TestCase):
         from parsimony.functions.penalties import L1
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
         import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -728,10 +728,10 @@ class TestLinearRegression(TestCase):
         from parsimony.functions.penalties import L2Squared
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -820,11 +820,11 @@ class TestLinearRegression(TestCase):
         from parsimony.functions.penalties import L2Squared
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
         import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -981,10 +981,10 @@ class TestLinearRegression(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
         import parsimony.datasets.simulate.l1_l2_tvmu as l1_l2_tvmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1071,11 +1071,11 @@ class TestLinearRegression(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
         import parsimony.datasets.simulate.l1_l2_tvmu as l1_l2_tvmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
         import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1208,11 +1208,11 @@ class TestLinearRegression(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
         import parsimony.datasets.simulate.l1_l2_glmu as l1_l2_glmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
         import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1320,11 +1320,11 @@ class TestLinearRegression(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
         import parsimony.datasets.simulate.l1_l2_glmu as l1_l2_glmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
         import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1437,11 +1437,11 @@ class TestLinearRegression(TestCase):
         from parsimony.functions.penalties import L2Squared
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
         import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1531,10 +1531,10 @@ class TestLinearRegression(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
         import parsimony.datasets.simulate.l1_l2_tvmu as l1_l2_tvmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1631,11 +1631,11 @@ class TestLinearRegression(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
         import parsimony.datasets.simulate.l1_l2_glmu as l1_l2_glmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
         import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1748,10 +1748,10 @@ class TestLinearRegression(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
         import parsimony.datasets.simulate.l1_l2_tvmu as l1_l2_tvmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1927,11 +1927,11 @@ class TestLinearRegression(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
         import parsimony.datasets.simulate.l1_l2_glmu as l1_l2_glmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
         import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -2128,10 +2128,10 @@ class TestLinearRegression(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
         import parsimony.datasets.simulate.l1_l2_tvmu as l1_l2_tvmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -2270,11 +2270,11 @@ class TestLinearRegression(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
         import parsimony.datasets.simulate.l1_l2_glmu as l1_l2_glmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
         import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -2432,13 +2432,13 @@ class TestLinearRegression(TestCase):
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
 #        import parsimony.datasets.simulate.l1_l2_glmu as l1_l2_glmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         from parsimony.functions import CombinedFunction
         from parsimony.functions.losses import LinearRegression
         from parsimony.functions.penalties import L1, L2Squared
         import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -2710,7 +2710,7 @@ class TestLinearRegression(TestCase):
 
         # Test group lasso
         # ----------------
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
