@@ -5,7 +5,7 @@ Use in terminal: ./generate_todo.py
 
 Created on Thu Jul 11 14:27:20 2013
 
-Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt
 @email:   lofstedt.tommy@gmail.com
@@ -64,3 +64,4 @@ with open(OUTPUT, "w+") as out:
                             match_next_comment = False
 #            if not first_in_file:
 #                write(out, "")
+
