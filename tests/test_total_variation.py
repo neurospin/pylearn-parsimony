@@ -2,7 +2,7 @@
 """
 Created on Wed Feb 26 16:17:15 2014
 
-Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt, Edouard Duchesnay
 @email:   lofstedt.tommy@gmail.com, edouard.duchesnay@cea.fr
@@ -12,7 +12,7 @@ import numpy as np
 
 try:
     from .tests import TestCase  # When imported as a package.
-except ValueError:
+except (ValueError, SystemError):
     from tests import TestCase  # When run as a program.
 
 
@@ -25,7 +25,7 @@ class TestTotalVariation(TestCase):
         import parsimony.functions as functions
         import parsimony.functions.nesterov.tv as tv
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
 
         np.random.seed(42)
 
@@ -39,12 +39,12 @@ class TestTotalVariation(TestCase):
         k = 0.0
         g = 1.1
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
-        beta = start_vector.get_vector(p)
+        start_vector = weights.RandomUniformWeights(normalise=True)
+        beta = start_vector.get_weights(p)
 
         alpha = 1.0
         Sigma = alpha * np.eye(p, p) \
-              + (1.0 - alpha) * np.random.randn(p, p)
+            + (1.0 - alpha) * np.random.randn(p, p)
         mean = np.zeros(p)
         M = np.random.multivariate_normal(mean, Sigma, n)
         e = np.random.randn(n, 1)
@@ -58,20 +58,20 @@ class TestTotalVariation(TestCase):
         eps = 1e-8
         max_iter = 12500
 
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
         fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
 
         beta_parsimony = beta_start
         for mu in mus:
-#            function = functions.LinearRegressionL1L2GL(X, y, l, k, g,
-#                                                        A=A, mu=mu,
-#                                                        penalty_start=0)
+            # function = functions.LinearRegressionL1L2GL(X, y, l, k, g,
+            #                                             A=A, mu=mu,
+            #                                             penalty_start=0)
 
             function = CombinedFunction()
-            function.add_function(functions.losses.LinearRegression(X, y,
-                                                                   mean=False))
+            function.add_loss(functions.losses.LinearRegression(X, y,
+                                                                mean=False))
             function.add_penalty(tv.TotalVariation(l=g, A=A, mu=mu,
                                                    penalty_start=0))
 
@@ -91,8 +91,7 @@ class TestTotalVariation(TestCase):
         beta_parsimony = beta_start
 
         function = CombinedFunction()
-        function.add_function(functions.losses.LinearRegression(X, y,
-                                                                mean=False))
+        function.add_loss(functions.losses.LinearRegression(X, y, mean=False))
         function.add_prox(tv.TotalVariation(l=g, A=A, mu=mu, penalty_start=0))
 
         fista = proximal.FISTA(eps=eps, max_iter=830)
@@ -115,7 +114,7 @@ class TestTotalVariation(TestCase):
         import parsimony.functions as functions
         import parsimony.functions.nesterov.tv as tv
         import parsimony.datasets.simulate.l1_l2_tvmu as l1_l2_tvmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
 
         np.random.seed(1337)
 
@@ -129,12 +128,12 @@ class TestTotalVariation(TestCase):
         k = 0.0
         g = 0.9
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
-        beta = start_vector.get_vector(p)
+        start_vector = weights.RandomUniformWeights(normalise=True)
+        beta = start_vector.get_weights(p)
 
         alpha = 1.0
         Sigma = alpha * np.eye(p, p) \
-              + (1.0 - alpha) * np.random.randn(p, p)
+            + (1.0 - alpha) * np.random.randn(p, p)
         mean = np.zeros(p)
         M = np.random.multivariate_normal(mean, Sigma, n)
         e = np.random.randn(n, 1)
@@ -149,20 +148,20 @@ class TestTotalVariation(TestCase):
         eps = 1e-8
         max_iter = 17700
 
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
         fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
 
         beta_parsimony = beta_start
         for mu in mus:
-#            function = functions.LinearRegressionL1L2GL(X, y, l, k, g,
-#                                                        A=A, mu=mu,
-#                                                        penalty_start=0)
+            # function = functions.LinearRegressionL1L2GL(X, y, l, k, g,
+            #                                             A=A, mu=mu,
+            #                                             penalty_start=0)
 
             function = CombinedFunction()
-            function.add_function(functions.losses.LinearRegression(X, y,
-                                                               mean=False))
+            function.add_loss(functions.losses.LinearRegression(X, y,
+                                                                mean=False))
             function.add_penalty(tv.TotalVariation(l=g, A=A, mu=mu,
                                                    penalty_start=0))
 
@@ -185,7 +184,7 @@ class TestTotalVariation(TestCase):
         import parsimony.functions as functions
         import parsimony.functions.nesterov.tv as tv
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
 
         np.random.seed(42)
 
@@ -199,12 +198,12 @@ class TestTotalVariation(TestCase):
         k = 1.0 - l
         g = 1.1
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
-        beta = start_vector.get_vector(p)
+        start_vector = weights.RandomUniformWeights(normalise=True)
+        beta = start_vector.get_weights(p)
 
         alpha = 1.0
         Sigma = alpha * np.eye(p, p) \
-              + (1.0 - alpha) * np.random.randn(p, p)
+            + (1.0 - alpha) * np.random.randn(p, p)
         mean = np.zeros(p)
         M = np.random.multivariate_normal(mean, Sigma, n)
         e = np.random.randn(n, 1)
@@ -218,20 +217,20 @@ class TestTotalVariation(TestCase):
         eps = 1e-8
         max_iter = 5300
 
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
         fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
 
         beta_parsimony = beta_start
         for mu in mus:
-#            function = functions.LinearRegressionL1L2GL(X, y, l, k, g,
-#                                                        A=A, mu=mu,
-#                                                        penalty_start=0)
+            # function = functions.LinearRegressionL1L2GL(X, y, l, k, g,
+            #                                             A=A, mu=mu,
+            #                                             penalty_start=0)
 
             function = CombinedFunction()
-            function.add_function(functions.losses.LinearRegression(X, y,
-                                                                   mean=False))
+            function.add_loss(functions.losses.LinearRegression(X, y,
+                                                                mean=False))
             function.add_penalty(tv.TotalVariation(l=g, A=A, mu=mu,
                                                    penalty_start=0))
             function.add_penalty(functions.penalties.L2Squared(l=k))
@@ -256,7 +255,7 @@ class TestTotalVariation(TestCase):
         import parsimony.functions as functions
         import parsimony.functions.nesterov.tv as tv
         import parsimony.datasets.simulate.l1_l2_tvmu as l1_l2_tvmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
 
         np.random.seed(42)
 
@@ -270,12 +269,12 @@ class TestTotalVariation(TestCase):
         k = 1.0 - l
         g = 1.1
 
-        start_vector = start_vectors.RandomStartVector(normalise=True)
-        beta = start_vector.get_vector(p)
+        start_vector = weights.RandomUniformWeights(normalise=True)
+        beta = start_vector.get_weights(p)
 
         alpha = 1.0
         Sigma = alpha * np.eye(p, p) \
-              + (1.0 - alpha) * np.random.randn(p, p)
+            + (1.0 - alpha) * np.random.randn(p, p)
         mean = np.zeros(p)
         M = np.random.multivariate_normal(mean, Sigma, n)
         e = np.random.randn(n, 1)
@@ -290,20 +289,20 @@ class TestTotalVariation(TestCase):
         eps = 1e-8
         max_iter = 5300
 
-        beta_start = start_vector.get_vector(p)
+        beta_start = start_vector.get_weights(p)
 
         mus = [5e-2, 5e-4, 5e-6, 5e-8]
         fista = proximal.FISTA(eps=eps, max_iter=max_iter / len(mus))
 
         beta_parsimony = beta_start
         for mu in mus:
-#            function = functions.LinearRegressionL1L2GL(X, y, l, k, g,
-#                                                        A=A, mu=mu,
-#                                                        penalty_start=0)
+            # function = functions.LinearRegressionL1L2GL(X, y, l, k, g,
+            #                                             A=A, mu=mu,
+            #                                             penalty_start=0)
 
             function = CombinedFunction()
-            function.add_function(functions.losses.LinearRegression(X, y,
-                                                               mean=False))
+            function.add_loss(functions.losses.LinearRegression(X, y,
+                                                                mean=False))
             function.add_penalty(tv.TotalVariation(l=g, A=A, mu=mu,
                                                    penalty_start=0))
             function.add_penalty(functions.penalties.L2Squared(l=k))
@@ -345,34 +344,35 @@ class TestTotalVariation(TestCase):
 
     def test_tvhelper_linear_operator_from_mask(self):
 
+        import numpy as np
         import parsimony.functions.nesterov.tv as tv
 
-        ## Simple mask with offset
+        # Simple mask with offset
         shape = (5, 4)
         mask = np.zeros(shape)
         mask[1:(shape[0] - 1), 0:(shape[1] - 1)] = 1
         Ax_ = np.matrix(
-        [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, -1, 0, 0, 1, 0, 0, 0, 0, 0],
-         [0, 0, -1, 0, 0, 1, 0, 0, 0, 0],
-         [0, 0, 0, -1, 0, 0, 1, 0, 0, 0],
-         [0, 0, 0, 0, -1, 0, 0, 1, 0, 0],
-         [0, 0, 0, 0, 0, -1, 0, 0, 1, 0],
-         [0, 0, 0, 0, 0, 0, -1, 0, 0, 1],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
+            [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, -1, 0, 0, 1, 0, 0, 0, 0, 0],
+             [0, 0, -1, 0, 0, 1, 0, 0, 0, 0],
+             [0, 0, 0, -1, 0, 0, 1, 0, 0, 0],
+             [0, 0, 0, 0, -1, 0, 0, 1, 0, 0],
+             [0, 0, 0, 0, 0, -1, 0, 0, 1, 0],
+             [0, 0, 0, 0, 0, 0, -1, 0, 0, 1],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
         Ay_ = np.matrix(
-        [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, -1, 1, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, -1, 1, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, -1, 1, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, -1, 1, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, -1, 1, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, -1, 1],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
+            [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, -1, 1, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, -1, 1, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, -1, 1, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, -1, 1, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, -1, 1, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, -1, 1],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
         A = tv.linear_operator_from_mask(mask, offset=1)
         Ax, Ay, Az = A
 
@@ -381,49 +381,49 @@ class TestTotalVariation(TestCase):
         assert np.sum(Az.todense() == 0)
 
         #######################################################################
-        ## GROUP TV
+        # GROUP TV
         shape = (6, 4)
         mask = np.zeros(shape, dtype=int)
         mask[:3, :3] = 1
         mask[3:6, 1:4] = 2
         Ax_ = np.matrix(
-        [[-1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 1],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
+            [[-1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 1],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
         Ay_ = np.matrix(
-        [[-1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
+            [[-1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
         A = tv.linear_operator_from_mask(mask)
         Ax, Ay, Az = A
 
@@ -432,7 +432,7 @@ class TestTotalVariation(TestCase):
         assert np.sum(Az.todense() == 0)
 
         #######################################################################
-        ## test function tv on checkerboard
+        # test function tv on checkerboard
         #######################################################################
         dx = 5  # p should be odd
         shape = (dx, dx, dx)
@@ -443,7 +443,7 @@ class TestTotalVariation(TestCase):
         beta = np.zeros(p)
         beta[0:p:2] = 1  # checkerboard of 0 and 1
         A = tv.linear_operator_from_mask(mask)
-        tvfunc = tv.TotalVariation(l=1., A=A)
+        tvfunc = tv.TotalVariation(l=1.0, A=A)
 
         assert tvfunc.f(beta) == self._f_checkerboard_cube((dx - 2,
                                                             dx - 2,
@@ -452,28 +452,32 @@ class TestTotalVariation(TestCase):
         # linear_operator_from_masks with group
         mask = np.zeros(shape)
         # 4 groups
-        mask[0:(dx / 2), 0:(dx / 2), :] = 1
-        mask[0:(dx / 2), (dx / 2):dx, :] = 2
-        mask[(dx / 2):dx, 0:(dx / 2), :] = 3
-        mask[(dx / 2):dx, (dx / 2):dx, :] = 4
+        mask[0:int(dx / 2), 0:int(dx / 2), :] = 1
+        mask[0:int(dx / 2), int(dx / 2):dx, :] = 2
+        mask[int(dx / 2):dx, 0:int(dx / 2), :] = 3
+        mask[int(dx / 2):dx, int(dx / 2):dx, :] = 4
         p = np.prod((dx, dx, dx))
         beta = np.zeros(p)
         beta[0:p:2] = 1  # checkerboard of 0 and 1
         A = tv.linear_operator_from_mask(mask)
-        tvfunc = tv.TotalVariation(l=1., A=A)
+        tvfunc = tv.TotalVariation(l=1.0, A=A)
 
         assert np.allclose(tvfunc.f(beta),
-                       self._f_checkerboard_cube((dx / 2, dx / 2, dx)) +
-                       self._f_checkerboard_cube((dx / 2, dx / 2 + 1, dx)) +
-                       self._f_checkerboard_cube((dx / 2 + 1, dx / 2, dx)) +
-                       self._f_checkerboard_cube((dx / 2 + 1, dx / 2 + 1, dx)))
+                           self._f_checkerboard_cube((int(dx / 2),
+                                                      int(dx / 2), dx)) +
+                           self._f_checkerboard_cube((int(dx / 2),
+                                                      int(dx / 2) + 1, dx)) +
+                           self._f_checkerboard_cube((int(dx / 2) + 1,
+                                                      int(dx / 2), dx)) +
+                           self._f_checkerboard_cube((int(dx / 2) + 1,
+                                                      int(dx / 2) + 1, dx)))
 
         shape = (2, 3)
         mask = np.ones(shape)
         weights1D = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
-        #weights2D = np.reshape(weights1D, shape)
+        # weights2D = np.reshape(weights1D, shape)
         A_shape = tv.linear_operator_from_shape(shape, weights1D)
-        #A_mask = tv.linear_operator_from_subset_mask(mask, weights2D)
+        # A_mask = tv.linear_operator_from_subset_mask(mask, weights2D)
         A_true = (np.array([[-1., 1., 0., 0., 0., 0.],
                            [0., -2., 2., 0., 0., 0.],
                            [0., 0., 0., 0., 0., 0.],
@@ -503,13 +507,14 @@ class TestTotalVariation(TestCase):
     def test_tvhelper_linear_operator_from_mesh(self):
         import parsimony.functions.nesterov.tv as tv_helper
         mesh_coord = np.array([[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2]])
-        mesh_triangles = np.array([[0 ,1, 3], [0, 2 ,3], [2, 3, 5], [2, 4, 5]])
+        mesh_triangles = np.array([[0, 1, 3], [0, 2, 3], [2, 3, 5], [2, 4, 5]])
         A = tv_helper.linear_operator_from_mesh(mesh_coord, mesh_triangles)
-        a =[[np.where(l)[0].tolist() for l in a.toarray()] for a in A]
+        a = [[np.where(l)[0].tolist() for l in a.toarray()] for a in A]
         b = [[[], [0, 1], [0, 2], [0, 3], [2, 4], [2, 5]],
              [[], [],     [],     [1, 3], [],     [3, 5]],
              [[], [],     [],     [2, 3], [],     [4, 5]]]
         assert a == b
+
 
 if __name__ == "__main__":
     import unittest

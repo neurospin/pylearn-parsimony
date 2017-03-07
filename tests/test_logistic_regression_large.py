@@ -25,7 +25,7 @@ from parsimony.utils.penalties import l1_max_logistic_loss
 from parsimony.utils import mesh
 import parsimony.config as config
 import parsimony.functions.nesterov.l1tv as l1tv
-import parsimony.utils.start_vectors as start_vectors
+import parsimony.utils.weights as weights
 
 has_data = True
 if not config.get_boolean("tests", "allow_downloads", False):
@@ -151,7 +151,7 @@ Xtr = X[tr, :]
 ytr = y[tr]
 Xte = X[te, :]
 yte = y[te]
-beta_start = start_vectors.RandomUniformWeights().get_weights(Xtr.shape[1])
+beta_start = weights.RandomUniformWeights().get_weights(Xtr.shape[1])
 
 # check that ytr is balanced
 #assert ytr.sum() / ytr.shape[0] == 0.5
@@ -160,7 +160,7 @@ beta_start = start_vectors.RandomUniformWeights().get_weights(Xtr.shape[1])
 # Dataset with intercept
 Xtr_i = np.c_[np.ones((Xtr.shape[0], 1)), Xtr]
 Xte_i = np.c_[np.ones((Xte.shape[0], 1)), Xte]
-beta_start_i = start_vectors.RandomUniformWeights().get_weights(Xtr_i.shape[1])
+beta_start_i = weights.RandomUniformWeights().get_weights(Xtr_i.shape[1])
 
 # global penalty
 alpha = l1_max_logistic_loss(Xtr, ytr)

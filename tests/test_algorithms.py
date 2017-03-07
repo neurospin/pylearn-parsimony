@@ -166,13 +166,13 @@ class TestAlgorithms(TestCase):
 #
 #        import parsimony.estimators as estimators
 #        import parsimony.functions.nesterov.tv as tv
-#        import parsimony.utils.start_vectors as start_vectors
+#        import parsimony.utils.weights as weights
 #        import parsimony.algorithms.primaldual as primaldual
 #
 #        import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
 #
-#        start_vector = start_vectors.RandomStartVector(normalise=True,
-#                                                       limits=(-1, 1))
+#        start_vector = weights.RandomStartVector(normalise=True,
+#                                                 limits=(-1, 1))
 #
 #        px = 1
 #        py = 10
@@ -234,13 +234,13 @@ class TestAlgorithms(TestCase):
 #
 #        import parsimony.estimators as estimators
 #        import parsimony.functions.nesterov.gl as gl
-#        import parsimony.utils.start_vectors as start_vectors
+#        import parsimony.utils.weights as weights
 #        import parsimony.algorithms.primaldual as primaldual
 #
 #        import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
 #
-#        start_vector = start_vectors.RandomStartVector(normalise=True,
-#                                                       limits=(-1, 1))
+#        start_vector = weights.RandomStartVector(normalise=True,
+#                                                 limits=(-1, 1))
 #
 #        # Note that p should be divisible by 3!
 #        n, p = 75, 90

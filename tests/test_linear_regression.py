@@ -12,11 +12,10 @@ from nose.tools import assert_less, assert_almost_equal
 
 import numpy as np
 
-import parsimony.algorithms.proximal as proximal
 import parsimony.utils.consts as consts
 try:
     from .tests import TestCase  # When imported as a package.
-except ValueError:
+except (ValueError, SystemError):
     from tests import TestCase  # When run as a program.
 
 
@@ -26,7 +25,7 @@ class TestLinearRegression(TestCase):
 
         from parsimony.functions.losses import LinearRegression
         import parsimony.algorithms.gradient as gradient
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
 
         np.random.seed(42)
@@ -39,7 +38,7 @@ class TestLinearRegression(TestCase):
         mean = np.zeros(p)
         X = np.random.multivariate_normal(mean, Sigma, n)
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
         beta_star = start_vector.get_weights(p)
 
         y = np.dot(X, beta_star)
@@ -64,7 +63,7 @@ class TestLinearRegression(TestCase):
         else:
             err = abs(f_parsimony - f_star)
 #        print "err:", err
-        assert_less(err, 1e-6, "The found regression vector does not give "
+        assert_less(err, 5e-6, "The found regression vector does not give "
                                "the correct function value.")
 
         lr = estimators.LinearRegression(algorithm=gradient.GradientDescent(),
@@ -80,14 +79,14 @@ class TestLinearRegression(TestCase):
         f_star = linear_regression.f(beta_star)
         err = abs(f_est - f_star)
 #        print "err:", err
-        assert_less(err, 5e-7, "The found regression vector does not give "
+        assert_less(err, 5e-6, "The found regression vector does not give "
                                "the correct function value.")
 
     def test_underdetermined(self):
 
         from parsimony.functions.losses import LinearRegression
         import parsimony.algorithms.gradient as gradient
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
 
         np.random.seed(42)
@@ -100,7 +99,7 @@ class TestLinearRegression(TestCase):
         mean = np.zeros(p)
         X = np.random.multivariate_normal(mean, Sigma, n)
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
         beta_star = start_vector.get_weights(p)
 
         y = np.dot(X, beta_star)
@@ -115,13 +114,13 @@ class TestLinearRegression(TestCase):
 
         berr = np.linalg.norm(beta_parsimony - beta_star)
 #        print "berr:", berr
-        assert_less(berr, 5e-1, "The found regression vector is not correct.")
+        assert_less(berr, 0.85, "The found regression vector is not correct.")
 
         f_parsimony = linear_regression.f(beta_parsimony)
         f_star = linear_regression.f(beta_star)
         err = abs(f_parsimony - f_star)
 #        print "err:", err
-        assert_less(err, 1e-4, "The found regression vector does not give "
+        assert_less(err, 5e-4, "The found regression vector does not give "
                                "the correct function value.")
 
         lr = estimators.LinearRegression(algorithm=gradient.GradientDescent(),
@@ -131,7 +130,7 @@ class TestLinearRegression(TestCase):
 
         berr = np.linalg.norm(lr.beta - beta_star)
 #        print "berr:", berr
-        assert_less(berr, 5e-1, "The found regression vector is not correct.")
+        assert_less(berr, 0.85, "The found regression vector is not correct.")
 
         f_est = linear_regression.f(lr.beta)
         f_star = linear_regression.f(beta_star)
@@ -144,7 +143,7 @@ class TestLinearRegression(TestCase):
 
         from parsimony.functions.losses import LinearRegression
         import parsimony.algorithms.gradient as gradient
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
 
         np.random.seed(42)
@@ -157,13 +156,13 @@ class TestLinearRegression(TestCase):
         mean = np.zeros(p)
         X = np.random.multivariate_normal(mean, Sigma, n)
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
         beta_star = start_vector.get_weights(p)
 
         y = np.dot(X, beta_star)
 
         eps = 1e-8
-        max_iter = 7000
+        max_iter = 13000
         gd = gradient.GradientDescent(eps=eps, max_iter=max_iter)
         linear_regression = LinearRegression(X, y, mean=False)
         beta_start = start_vector.get_weights(p)
@@ -171,13 +170,13 @@ class TestLinearRegression(TestCase):
         beta_parsimony = gd.run(linear_regression, beta_start)
 
         berr = np.linalg.norm(beta_parsimony - beta_star)
-#        print "berr:", berr
+#        print("berr:", berr)
         assert_less(berr, 5e-2, "The found regression vector is not correct.")
 
         f_parsimony = linear_regression.f(beta_parsimony)
         f_star = linear_regression.f(beta_star)
         err = abs(f_parsimony - f_star)
-#        print "err:", err
+#        print("err:", err)
         assert_less(err, 5e-5, "The found regression vector does not give "
                                "the correct function value.")
 
@@ -199,14 +198,16 @@ class TestLinearRegression(TestCase):
 
     def test_intercept1(self):
 
+        import numpy as np
         from parsimony.functions.losses import LinearRegression
         import parsimony.algorithms.gradient as gradient
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
+        import parsimony.algorithms.proximal as proximal
 
         np.random.seed(42)
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=False)
+        start_vector = weights.RandomUniformWeights(normalise=False)
 
         n, p = 60, 90
 
@@ -253,39 +254,83 @@ class TestLinearRegression(TestCase):
 #            print beta_spams
 
         except ImportError:
-            beta_spams = np.asarray(
-                    [[0.09736768], [0.69854941], [0.48793715], [0.75698677],
-                     [0.44423199], [0.63262493], [0.30397824], [0.5815484],
-                     [0.02765551], [0.63991869], [1.09671465], [0.21529914],
-                     [0.39480577], [0.54851789], [-0.02412213], [0.69405293],
-                     [0.18821586], [0.89556287], [-0.14179676], [0.86230118],
-                     [0.46760193], [0.62187006], [0.21463264], [0.40930455],
-                     [1.00249679], [1.08387997], [0.1115664], [0.66241187],
-                     [0.42912028], [0.0020646], [1.087087], [0.84161254],
-                     [0.37992596], [0.45365878], [0.52357722], [0.0683171],
-                     [0.79540688], [0.65421616], [0.47634391], [0.24049712],
-                     [0.55384988], [0.33100698], [0.12267719], [0.62996432],
-                     [0.88073445], [0.70778668], [0.83411801], [0.83597934],
-                     [0.14499151], [0.82389504], [0.78075443], [0.99507837],
-                     [0.47733893], [0.56237854], [0.7443968], [0.30659158],
-                     [0.29745792], [0.74846412], [0.06055889], [-0.17837795],
-                     [0.50033042], [0.62078627], [0.58955146], [-0.04940678],
-                     [1.16326298], [0.33954734], [0.74985271], [0.05866496],
-                     [0.70692727], [0.29520974], [0.09383234], [0.39026236],
-                     [0.65104699], [0.83970364], [0.6179541], [0.60286729],
-                     [0.47713691], [0.975948], [0.78007776], [0.33100383],
-                     [0.41049941], [0.6689349], [0.64447833], [0.11711684],
-                     [0.44066274], [0.82042655], [0.48411089], [0.28608364],
-                     [0.13726529], [0.76605214]])
-
+#            beta_spams = np.asarray(
+#                    [[0.09736768], [0.69854941], [0.48793715], [0.75698677],
+#                     [0.44423199], [0.63262493], [0.30397824], [0.5815484],
+#                     [0.02765551], [0.63991869], [1.09671465], [0.21529914],
+#                     [0.39480577], [0.54851789], [-0.02412213], [0.69405293],
+#                     [0.18821586], [0.89556287], [-0.14179676], [0.86230118],
+#                     [0.46760193], [0.62187006], [0.21463264], [0.40930455],
+#                     [1.00249679], [1.08387997], [0.1115664], [0.66241187],
+#                     [0.42912028], [0.0020646], [1.087087], [0.84161254],
+#                     [0.37992596], [0.45365878], [0.52357722], [0.0683171],
+#                     [0.79540688], [0.65421616], [0.47634391], [0.24049712],
+#                     [0.55384988], [0.33100698], [0.12267719], [0.62996432],
+#                     [0.88073445], [0.70778668], [0.83411801], [0.83597934],
+#                     [0.14499151], [0.82389504], [0.78075443], [0.99507837],
+#                     [0.47733893], [0.56237854], [0.7443968], [0.30659158],
+#                     [0.29745792], [0.74846412], [0.06055889], [-0.17837795],
+#                     [0.50033042], [0.62078627], [0.58955146], [-0.04940678],
+#                     [1.16326298], [0.33954734], [0.74985271], [0.05866496],
+#                     [0.70692727], [0.29520974], [0.09383234], [0.39026236],
+#                     [0.65104699], [0.83970364], [0.6179541], [0.60286729],
+#                     [0.47713691], [0.975948], [0.78007776], [0.33100383],
+#                     [0.41049941], [0.6689349], [0.64447833], [0.11711684],
+#                     [0.44066274], [0.82042655], [0.48411089], [0.28608364],
+#                     [0.13726529], [0.76605214]])
+            beta_spams = np.asarray([[-8.06037694e-01], [4.14156982e-01],
+                                     [-1.80829496e-02], [5.34481301e-01],
+                                     [-8.46381193e-02], [2.56606896e-01],
+                                     [-4.26659295e-01], [1.82213499e-01],
+                                     [-9.41253654e-01], [2.63066890e-01],
+                                     [1.18255173e+00], [-5.71527320e-01],
+                                     [-2.06597712e-01], [6.74329128e-02],
+                                     [-1.04303862e+00], [3.79074845e-01],
+                                     [-6.57880693e-01], [8.39195685e-01],
+                                     [-1.28990607e+00], [7.52094722e-01],
+                                     [-7.46442435e-02], [2.18599639e-01],
+                                     [-5.79908831e-01], [-1.82726073e-01],
+                                     [1.02221912e+00], [1.16823785e+00],
+                                     [-7.94080968e-01], [3.11798740e-01],
+                                     [-1.43802482e-01], [-1.00745697e+00],
+                                     [1.15453591e+00], [6.88358705e-01],
+                                     [-2.23805221e-01], [-9.41220530e-02],
+                                     [2.11753396e-02], [-8.70117706e-01],
+                                     [5.95196712e-01], [2.95795298e-01],
+                                     [-2.56071086e-02], [-5.30198419e-01],
+                                     [1.01631032e-01], [-3.45813973e-01],
+                                     [-7.85969212e-01], [2.37584477e-01],
+                                     [7.31884771e-01], [4.11786425e-01],
+                                     [6.78644951e-01], [6.97758030e-01],
+                                     [-7.01861098e-01], [6.89303857e-01],
+                                     [5.59633996e-01], [9.62677153e-01],
+                                     [-6.47778588e-02], [1.11142255e-01],
+                                     [5.02295252e-01], [-3.84548649e-01],
+                                     [-3.99659654e-01], [5.17375634e-01],
+                                     [-8.94495268e-01], [-1.30375396e+00],
+                                     [-1.50643945e-04], [2.53026512e-01],
+                                     [1.99746951e-01], [-1.09332170e+00],
+                                     [1.33558526e+00], [-3.27159890e-01],
+                                     [5.14294273e-01], [-8.80836834e-01],
+                                     [4.04945120e-01], [-4.18478889e-01],
+                                     [-8.21612998e-01], [-2.14504030e-01],
+                                     [2.92026711e-01], [6.99326047e-01],
+                                     [2.64324616e-01], [1.99913618e-01],
+                                     [-4.70411769e-02], [9.62956473e-01],
+                                     [5.64395870e-01], [-3.43228133e-01],
+                                     [-1.95259912e-01], [3.74151026e-01],
+                                     [2.86425391e-01], [-7.45765812e-01],
+                                     [-1.22699069e-01], [6.54066438e-01],
+                                     [-3.86692628e-02], [-4.06830505e-01],
+                                     [-7.36631395e-01], [5.26869724e-01]])
 
         berr = np.linalg.norm(beta_parsimony - beta_star)
-#        print "berr:", berr
-        assert_less(berr, 2.02, "The found regression vector is not correct.")
+#        print("berr:", berr)
+        assert_less(berr, 4.03, "The found regression vector is not correct.")
 
         berr = np.linalg.norm(beta_spams - beta_star)
 #        print "berr:", berr
-        assert_less(berr, 4.3, "The found regression vector is not correct.")
+        assert_less(berr, 8.43, "The found regression vector is not correct.")
 
         f_star = linear_regression.f(beta_star)
 
@@ -310,7 +355,7 @@ class TestLinearRegression(TestCase):
 
         berr = np.linalg.norm(lr.beta - beta_star)
 #        print "berr:", berr
-        assert_almost_equal(berr, 2.010556,
+        assert_almost_equal(berr, 4.021099,
                             msg="The found regression vector is not correct.",
                             places=5)
 
@@ -327,11 +372,11 @@ class TestLinearRegression(TestCase):
 #        from parsimony.functions.losses import LinearRegression
 #        from parsimony.functions.penalties import L2
 #        import parsimony.algorithms.gradient as gradient
-#        import parsimony.utils.start_vectors as start_vectors
+#        import parsimony.utils.weights as weights
 #
 #        np.random.seed(42)
 #
-#        start_vector = start_vectors.RandomUniformWeights(normalise=False)
+#        start_vector = weights.RandomUniformWeights(normalise=False)
 #
 #        n, p = 60, 90
 #
@@ -410,14 +455,16 @@ class TestLinearRegression(TestCase):
 
     def test_l1(self):
 
+        import numpy as np
         from parsimony.functions.losses import LinearRegression
         from parsimony.functions.penalties import L1
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
+        import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -512,13 +559,13 @@ class TestLinearRegression(TestCase):
         f_parsimony = function.f(beta_parsimony)
         err = abs(f_parsimony - f_star) / f_star
 #        print "err:", err
-        assert_less(err, 5e-4, "The found regression vector does not give "
+        assert_less(err, 5e-3, "The found regression vector does not give "
                                "the correct function value.")
 
         f_est = function.f(reg_est.beta)
         err = abs(f_est - f_star) / f_star
 #        print "err:", err
-        assert_less(err, 5e-4, "The found regression vector does not give "
+        assert_less(err, 5e-3, "The found regression vector does not give "
                                "the correct function value.")
 
 #        f_rest = function.f(rreg_est.beta)
@@ -530,13 +577,13 @@ class TestLinearRegression(TestCase):
         f_rest_2 = function.f(rreg_est_2.beta)
         err = abs(f_rest_2 - f_star) / f_star
 #        print "err:", err
-        assert_less(err, 5e-4, "The found regression vector does not give "
+        assert_less(err, 5e-3, "The found regression vector does not give "
                                "the correct function value.")
 
         f_lasso = function.f(lasso.beta)
         err = abs(f_lasso - f_star) / f_star
 #        print "err:", err
-        assert_less(err, 5e-4, "The found regression vector does not give "
+        assert_less(err, 5e-3, "The found regression vector does not give "
                                "the correct function value.")
 
     def test_l1_intercept(self):
@@ -545,10 +592,11 @@ class TestLinearRegression(TestCase):
         from parsimony.functions.penalties import L1
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
+        import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -680,9 +728,10 @@ class TestLinearRegression(TestCase):
         from parsimony.functions.penalties import L2Squared
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
+        import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -771,10 +820,11 @@ class TestLinearRegression(TestCase):
         from parsimony.functions.penalties import L2Squared
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
+        import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -931,9 +981,10 @@ class TestLinearRegression(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
         import parsimony.datasets.simulate.l1_l2_tvmu as l1_l2_tvmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
+        import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1020,10 +1071,11 @@ class TestLinearRegression(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
         import parsimony.datasets.simulate.l1_l2_tvmu as l1_l2_tvmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
+        import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1150,15 +1202,17 @@ class TestLinearRegression(TestCase):
 
     def test_gl(self):
 
+        import numpy as np
         from parsimony.functions.losses import LinearRegression
         import parsimony.functions.nesterov.gl as gl
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
         import parsimony.datasets.simulate.l1_l2_glmu as l1_l2_glmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
+        import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1205,8 +1259,8 @@ class TestLinearRegression(TestCase):
 
         berr = np.linalg.norm(beta_nonsmooth - beta_star) \
             / np.linalg.norm(beta_star)
-#        print "berr:", berr
-        assert_less(berr, 5e-2, "The found regression vector is not correct.")
+#        print("berr:", berr)
+        assert_less(berr, 6e-2, "The found regression vector is not correct.")
 
         f_star = function.f(beta_star)
         f_parsimony = function.f(beta_nonsmooth)
@@ -1229,7 +1283,7 @@ class TestLinearRegression(TestCase):
         berr = np.linalg.norm(beta_smooth - beta_star) \
             / np.linalg.norm(beta_star)
 #        print "berr:", berr
-        assert_less(berr, 5e-2, "The found regression vector is not correct.")
+        assert_less(berr, 6e-2, "The found regression vector is not correct.")
 
         f_star = function.f(beta_star)
         f_rr = function.f(beta_smooth)
@@ -1266,10 +1320,11 @@ class TestLinearRegression(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
         import parsimony.datasets.simulate.l1_l2_glmu as l1_l2_glmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
+        import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1382,10 +1437,11 @@ class TestLinearRegression(TestCase):
         from parsimony.functions.penalties import L2Squared
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
+        import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1475,9 +1531,10 @@ class TestLinearRegression(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
         import parsimony.datasets.simulate.l1_l2_tvmu as l1_l2_tvmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
+        import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1528,7 +1585,7 @@ class TestLinearRegression(TestCase):
         mse = np.linalg.norm(beta_nonsmooth_penalty - beta_star) \
             / np.linalg.norm(beta_star)
 #        print "mse:", mse
-        assert_less(mse, 5e-3, "The found regression vector is not correct.")
+        assert_less(mse, 6e-2, "The found regression vector is not correct.")
 
         f_nonsmooth_star = function.f(beta_star)
         f_nonsmooth_penalty = function.f(beta_nonsmooth_penalty)
@@ -1555,7 +1612,7 @@ class TestLinearRegression(TestCase):
         mse = np.linalg.norm(beta_smooth_penalty - beta_star) \
             / np.linalg.norm(beta_star)
 #        print "mse:", mse
-        assert_less(mse, 5e-3, "The found regression vector is not correct.")
+        assert_less(mse, 5e-2, "The found regression vector is not correct.")
 
         f_smooth_star = function.f(beta_star)
         f_smooth_penalty = function.f(beta_smooth_penalty)
@@ -1574,10 +1631,11 @@ class TestLinearRegression(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
         import parsimony.datasets.simulate.l1_l2_glmu as l1_l2_glmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
+        import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1650,13 +1708,13 @@ class TestLinearRegression(TestCase):
         mse = np.linalg.norm(beta_smooth - beta_star) \
             / np.linalg.norm(beta_star)
 #        print "mse:", mse
-        assert_less(mse, 5e-2, "The found regression vector is not correct.")
+        assert_less(mse, 7e-2, "The found regression vector is not correct.")
 
         f_star = function.f(beta_star)
         f_rr = function.f(beta_smooth)
         err = abs(f_rr - f_star) / f_star
 #        print "err:", err
-        assert_less(err, 5e-4, "The found regression vector does not give "
+        assert_less(err, 5e-3, "The found regression vector does not give "
                                "the correct function value.")
 
         max_iter = 5200
@@ -1690,9 +1748,10 @@ class TestLinearRegression(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
         import parsimony.datasets.simulate.l1_l2_tvmu as l1_l2_tvmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
+        import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -1742,13 +1801,13 @@ class TestLinearRegression(TestCase):
         mse = np.linalg.norm(beta_nonsmooth_penalty - beta_star) \
             / np.linalg.norm(beta_star)
 #        print "mse:", mse
-        assert_less(mse, 5e-3, "The found regression vector is not correct.")
+        assert_less(mse, 5e-2, "The found regression vector is not correct.")
 
         f_star = function.f(beta_star)
         f_nonsmooth_penalty = function.f(beta_nonsmooth_penalty)
         err = abs(f_nonsmooth_penalty - f_star) / f_star
 #        print "err:", err
-        assert_less(err, 5e-5, "The found regression vector does not give "
+        assert_less(err, 6e-5, "The found regression vector does not give "
                                "the correct function value.")
 
         beta_nonsmooth_prox = beta_start
@@ -1763,13 +1822,13 @@ class TestLinearRegression(TestCase):
         mse = np.linalg.norm(beta_nonsmooth_prox - beta_star) \
             / np.linalg.norm(beta_star)
 #        print "mse:", mse
-        assert_less(mse, 5e-3, "The found regression vector is not correct.")
+        assert_less(mse, 5e-2, "The found regression vector is not correct.")
 
         f_star = function.f(beta_star)
         f_nonsmooth_prox = function.f(beta_nonsmooth_prox)
         err = abs(f_nonsmooth_prox - f_star) / f_star
 #        print "err:", err
-        assert_less(err, 5e-5, "The found regression vector does not give "
+        assert_less(err, 6e-5, "The found regression vector does not give "
                                "the correct function value.")
 
         beta_nonsmooth_rr = beta_start
@@ -1783,13 +1842,13 @@ class TestLinearRegression(TestCase):
         mse = np.linalg.norm(beta_nonsmooth_rr - beta_star) \
             / np.linalg.norm(beta_star)
 #        print "mse:", mse
-        assert_less(mse, 5e-3, "The found regression vector is not correct.")
+        assert_less(mse, 5e-2, "The found regression vector is not correct.")
 
         f_star = function.f(beta_star)
         f_nonsmooth_rr = function.f(beta_nonsmooth_rr)
         err = abs(f_nonsmooth_rr - f_star) / f_star
 #        print "err:", err
-        assert_less(err, 5e-5, "The found regression vector does not give "
+        assert_less(err, 6e-5, "The found regression vector does not give "
                                "the correct function value.")
 
         mu_min = mus[-1]
@@ -1808,13 +1867,13 @@ class TestLinearRegression(TestCase):
         mse = np.linalg.norm(beta_smooth_penalty - beta_star) \
             / np.linalg.norm(beta_star)
 #        print "mse:", mse
-        assert_less(mse, 5e-3, "The found regression vector is not correct.")
+        assert_less(mse, 5e-2, "The found regression vector is not correct.")
 
         f_star = function.f(beta_star)
         f_smooth_penalty = function.f(beta_smooth_penalty)
         err = abs(f_smooth_penalty - f_star) / f_star
 #        print "err:", err
-        assert_less(err, 5e-5, "The found regression vector does not give "
+        assert_less(err, 6e-5, "The found regression vector does not give "
                                "the correct function value.")
 
         beta_smooth_prox = beta_start
@@ -1829,13 +1888,13 @@ class TestLinearRegression(TestCase):
         mse = np.linalg.norm(beta_smooth_prox - beta_star) \
             / np.linalg.norm(beta_star)
 #        print "mse:", mse
-        assert_less(mse, 5e-3, "The found regression vector is not correct.")
+        assert_less(mse, 5e-2, "The found regression vector is not correct.")
 
         f_star = function.f(beta_star)
         f_smooth_prox = function.f(beta_smooth_prox)
         err = abs(f_smooth_prox - f_star) / f_star
 #        print "err:", err
-        assert_less(err, 5e-5, "The found regression vector does not give "
+        assert_less(err, 6e-5, "The found regression vector does not give "
                                "the correct function value.")
 
         beta_smooth_rr = beta_start
@@ -1849,13 +1908,13 @@ class TestLinearRegression(TestCase):
         mse = np.linalg.norm(beta_smooth_rr - beta_star) \
             / np.linalg.norm(beta_star)
 #        print "mse:", mse
-        assert_less(mse, 5e-3, "The found regression vector is not correct.")
+        assert_less(mse, 5e-2, "The found regression vector is not correct.")
 
         f_star = function.f(beta_star)
         f_smooth_rr = function.f(beta_smooth_rr)
         err = abs(f_smooth_rr - f_star) / f_star
 #        print "err:", err
-        assert_less(err, 5e-5, "The found regression vector does not give "
+        assert_less(err, 6e-5, "The found regression vector does not give "
                                "the correct function value.")
 
     def test_l2_gl(self):
@@ -1868,10 +1927,11 @@ class TestLinearRegression(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
         import parsimony.datasets.simulate.l1_l2_glmu as l1_l2_glmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
+        import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -2068,9 +2128,10 @@ class TestLinearRegression(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
         import parsimony.datasets.simulate.l1_l2_tvmu as l1_l2_tvmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
+        import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -2209,10 +2270,11 @@ class TestLinearRegression(TestCase):
         from parsimony.functions import CombinedFunction
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
         import parsimony.datasets.simulate.l1_l2_glmu as l1_l2_glmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         import parsimony.estimators as estimators
+        import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -2370,12 +2432,13 @@ class TestLinearRegression(TestCase):
         import parsimony.datasets.simulate.l1_l2_tv as l1_l2_tv
         import parsimony.datasets.simulate.l1_l2_gl as l1_l2_gl
 #        import parsimony.datasets.simulate.l1_l2_glmu as l1_l2_glmu
-        import parsimony.utils.start_vectors as start_vectors
+        import parsimony.utils.weights as weights
         from parsimony.functions import CombinedFunction
         from parsimony.functions.losses import LinearRegression
         from parsimony.functions.penalties import L1, L2Squared
+        import parsimony.algorithms.proximal as proximal
 
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -2406,8 +2469,8 @@ class TestLinearRegression(TestCase):
                                                mean=False)
         lr.fit(X, y)
         score = lr.score(X, y)
-#        print "score:", score
-        assert_almost_equal(score, 1.299125,
+#        print("score:", score)
+        assert_almost_equal(score, 1.297567,
                             msg="The found regression vector does not give "
                                 "a low enough score value.",
                             places=5)
@@ -2437,7 +2500,7 @@ class TestLinearRegression(TestCase):
         lr.fit(X, y)
         score = lr.score(X, y)
 #        print "score:", score
-        assert_almost_equal(score, 0.969570,
+        assert_almost_equal(score, 0.969725,
                             msg="The found regression vector does not give "
                                 "a low enough score value.",
                             places=5)
@@ -2467,7 +2530,7 @@ class TestLinearRegression(TestCase):
         lr.fit(X, y)
         score = lr.score(X, y)
 #        print "score:", score
-        assert_almost_equal(score, 1.154561,
+        assert_almost_equal(score, 1.154467,
                             msg="The found regression vector does not give "
                                 "a low enough score value.",
                             places=5)
@@ -2501,7 +2564,7 @@ class TestLinearRegression(TestCase):
         lr.fit(X, y)
         score = lr.score(X, y)
 #        print "score:", score
-        assert_almost_equal(score, 1.019992,
+        assert_almost_equal(score, 1.059350,
                             msg="The found regression vector does not give "
                                 "a low enough score value.",
                             places=5)
@@ -2512,7 +2575,7 @@ class TestLinearRegression(TestCase):
         lr.fit(X, y)
         score = lr.score(X, y)
 #        print "score:", score
-        assert_almost_equal(score, 2.963832,
+        assert_almost_equal(score, 3.392501,
                             msg="The found regression vector does not give "
                                 "the correct score value.",
                             places=5)
@@ -2528,7 +2591,7 @@ class TestLinearRegression(TestCase):
         lr.fit(X, y)
         score = lr.score(X, y)
 #        print "score:", score
-        assert_almost_equal(score, 1.070911,
+        assert_almost_equal(score, 1.110649,
                             msg="The found regression vector does not give "
                                 "a low enough score value.",
                             places=5)
@@ -2544,7 +2607,7 @@ class TestLinearRegression(TestCase):
         lr.fit(X, y)
         score = lr.score(X, y)
 #        print "score:", score
-        assert_almost_equal(score, 1.022994,
+        assert_almost_equal(score, 1.066520,
                             msg="The found regression vector does not give "
                                 "a low enough score value.",
                             places=5)
@@ -2560,7 +2623,7 @@ class TestLinearRegression(TestCase):
         lr.fit(X, y)
         score = lr.score(X, y)
 #        print "score:", score
-        assert_almost_equal(score, 13.029070,
+        assert_almost_equal(score, 15.619054,
                             msg="The found regression vector does not give "
                                 "a low enough score value.",
                             places=5)
@@ -2576,7 +2639,7 @@ class TestLinearRegression(TestCase):
         lr.fit(X, y)
         score = lr.score(X, y)
 #        print "score:", score
-        assert_almost_equal(score, 1.078159,
+        assert_almost_equal(score, 1.114322,
                             msg="The found regression vector does not give "
                                 "a low enough score value.",
                             places=5)
@@ -2592,7 +2655,7 @@ class TestLinearRegression(TestCase):
         lr.fit(X, y)
         score = lr.score(X, y)
 #        print "score:", score
-        assert_almost_equal(score, 13.032333,
+        assert_almost_equal(score, 15.619592,
                             msg="The found regression vector does not give "
                                 "a low enough score value.",
                             places=5)
@@ -2608,7 +2671,7 @@ class TestLinearRegression(TestCase):
         lr.fit(X, y)
         score = lr.score(X, y)
 #        print "score:", score
-        assert_almost_equal(score, 13.029266,
+        assert_almost_equal(score, 15.619039,
                             msg="The found regression vector does not give "
                                 "a low enough score value.",
                             places=5)
@@ -2624,7 +2687,7 @@ class TestLinearRegression(TestCase):
         lr.fit(X, y)
         score = lr.score(X, y)
 #        print "score:", score
-        assert_almost_equal(score, 904.132727,
+        assert_almost_equal(score, 1047.806503,
                             msg="The found regression vector does not give "
                                 "the correct score value.",
                             places=5)
@@ -2640,14 +2703,14 @@ class TestLinearRegression(TestCase):
         lr.fit(X, y)
         score = lr.score(X, y)
 #        print "score:", score
-        assert_almost_equal(score, 13.032530,
+        assert_almost_equal(score, 15.619577,
                             msg="The found regression vector does not give "
                                 "the correct score value.",
                             places=5)
 
         # Test group lasso
         # ----------------
-        start_vector = start_vectors.RandomUniformWeights(normalise=True)
+        start_vector = weights.RandomUniformWeights(normalise=True)
 
         np.random.seed(42)
 
@@ -2725,7 +2788,7 @@ class TestLinearRegression(TestCase):
         re = np.linalg.norm(est.beta - beta_star) \
             / np.linalg.norm(beta_star)
 #        print "re:", re
-        assert_less(re, 5e-2, "The found regression vector is not correct.")
+        assert_less(re, 7e-2, "The found regression vector is not correct.")
 
         function = CombinedFunction()
         function.add_loss(LinearRegression(X, y, mean=False))
@@ -2737,7 +2800,7 @@ class TestLinearRegression(TestCase):
         f_rr = function.f(est.beta)
         err = abs(f_rr - f_star) / f_star
 #        print "err:", err
-        assert_less(err, 1e-4, "The found regression vector does not give "
+        assert_less(err, 6e-4, "The found regression vector does not give "
                                "the correct function value.")
 
         np.random.seed(42)
@@ -2816,6 +2879,7 @@ class TestLinearRegression(TestCase):
         import parsimony.algorithms.gradient as gradient
         import parsimony.estimators as estimators
         import parsimony.functions.nesterov.tv as tv
+        import parsimony.algorithms.proximal as proximal
 
         np.random.seed(42)
 
@@ -2907,6 +2971,7 @@ class TestLinearRegression(TestCase):
 #        print err
         assert_less(err, 5e-10,
                     msg="The found regression vector is not correct.")
+
 
 if __name__ == "__main__":
     import unittest

@@ -59,7 +59,7 @@ We build a simple simulated dataset for the regression problem
 .. code-block:: python
 
     import numpy as np
-    import parsimony.utils.start_vectors as start_vectors
+    import parsimony.utils.weights as weights
     np.random.seed(42)
     # Three-dimensional matrix is defined as:
     shape = (4, 4, 4)
@@ -70,8 +70,7 @@ We build a simple simulated dataset for the regression problem
     # Define X randomly as simulated data
     X = np.random.rand(num_samples, num_ft)
     # Define beta randomly
-    start_vector = start_vectors.RandomStartVector(normalise=False,
-                                                   limits=(-1, 1))
+    start_vector = weights.RandomStartVector(normalise=False, limits=(-1, 1))
     beta = start_vector.get_vector(num_ft)
     beta = np.sort(beta, axis=0)
     beta[np.abs(beta) < 0.2] = 0.0
@@ -187,13 +186,13 @@ constraint, :math:`\mathrm{GL}`, and instead minimise
     import parsimony.estimators as estimators
     import parsimony.algorithms as algorithms
     import parsimony.functions.nesterov.gl as gl
-    k = 0.0  # l2 ridge regression coefficient
     l = 0.1  # l1 lasso coefficient
+    k = 0.0  # l2 ridge regression coefficient
     g = 0.1  # group lasso coefficient
     groups = [range(0, 2 * num_ft / 3), range(num_ft/ 3, num_ft)]
     A = gl.linear_operator_from_groups(num_ft, groups)
     estimator = estimators.LinearRegressionL1L2GL(
-                                          k, l, g, A=A,
+                                          l, k, g, A=A,
                                           algorithm=algorithms.proximal.FISTA(),
                                           algorithm_params=dict(max_iter=1000))
     res = estimator.fit(X, y)
@@ -317,13 +316,13 @@ constraint and instead minimise
     import parsimony.estimators as estimators
     import parsimony.algorithms as algorithms
     import parsimony.functions.nesterov.gl as gl
-    k = 0.0  # l2 ridge regression coefficient
     l = 0.1  # l1 lasso coefficient
+    k = 0.0  # l2 ridge regression coefficient
     g = 0.1  # group lasso coefficient
     groups = [range(0, 2 * num_ft / 3), range(num_ft/ 3, num_ft)]
     A = gl.linear_operator_from_groups(num_ft, groups)
     estimator = estimators.LogisticRegressionL1L2GL(
-                                          k, l, g, A=A,
+                                          l, k, g, A=A,
                                           algorithm=algorithms.proximal.FISTA(),
                                           algorithm_params=dict(max_iter=1000))
     res = estimator.fit(X, y)

@@ -30,7 +30,7 @@ try:
     from . import utils  # When imported as a package.
 except ValueError:
     import parsimony.algorithms.utils as utils  # When run as a program.
-import parsimony.utils.start_vectors as start_vectors
+import parsimony.utils.weights as weights
 import parsimony.functions.penalties as penalties
 
 try:
@@ -147,7 +147,7 @@ class RankOneSVD(bases.ImplicitAlgorithm,
             _t = utils.time()
 
         if start_vector is None:
-            start_vector = start_vectors.RandomUniformWeights(normalise=True)
+            start_vector = weights.RandomUniformWeights(normalise=True)
 
         v0 = start_vector.get_weights(np.min(X.shape))
 
@@ -330,7 +330,7 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
             self.info_set(utils.Info.converged, False)
 
         if start_vector is None:
-            start_vector = start_vectors.RandomUniformWeights(normalise=True)
+            start_vector = weights.RandomUniformWeights(normalise=True)
 
         v0 = start_vector.get_weights(np.min(X.shape))
 
@@ -359,6 +359,7 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
 
         if use_power:  # Use the power method if scipy failed or if determined.
 
+            # TODO: Use estimators for this!
             M, N = X.shape
             if M < N:
 
@@ -494,7 +495,7 @@ class RankOneSVDProduct(bases.ImplicitAlgorithm,
         M, N = X.shape
 
         if start_vector is None:
-            start_vector = start_vectors.RandomUniformWeights(normalise=True)
+            start_vector = weights.RandomUniformWeights(normalise=True)
 
         v = start_vector.get_weights(Y.shape[1])
 

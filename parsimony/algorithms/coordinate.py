@@ -27,7 +27,7 @@ except (ValueError, SystemError):
 import parsimony.utils as utils
 import parsimony.utils.maths as maths
 import parsimony.utils.consts as consts
-import parsimony.utils.start_vectors as start_vectors
+import parsimony.utils.weights as weights
 import parsimony.functions as functions
 import parsimony.functions.penalties as penalties
 from parsimony.algorithms.utils import Info
@@ -75,6 +75,7 @@ class LassoCoordinateDescent(bases.ImplicitAlgorithm,
     >>> import parsimony.functions.penalties as penalties
     >>> import numpy as np
     >>> np.random.seed(42)
+    >>>
     >>> X = np.random.rand(100, 50)
     >>> beta_star = np.random.rand(50, 1)
     >>> beta_star[beta_star < 0.5] = 0.0
@@ -95,8 +96,8 @@ class LassoCoordinateDescent(bases.ImplicitAlgorithm,
                      Info.converged]
 
     def __init__(self, l, mean=True, penalty_start=0,
-                 start_vector=start_vectors.RandomUniformWeights(normalise=True,
-                                                                 limits=(-1.0, 1.0)),
+                 start_vector=weights.RandomUniformWeights(normalise=True,
+                                                           limits=(-1.0, 1.0)),
                  eps=consts.TOLERANCE,
                  info=[], max_iter=10000, min_iter=1):
 
@@ -160,8 +161,7 @@ class LassoCoordinateDescent(bases.ImplicitAlgorithm,
             beta = beta.copy()
 
         function = functions.CombinedFunction()
-        function.add_loss(functions.losses.LinearRegression(X, y,
-                                                                mean=False))
+        function.add_loss(functions.losses.LinearRegression(X, y, mean=False))
         function.add_prox(penalties.L1(l=self.l))
 
         xTx = np.sum(X ** 2.0, axis=0)
@@ -285,8 +285,8 @@ class ShootingAlgorithm(bases.ImplicitAlgorithm,
                      Info.converged]
 
     def __init__(self, l, mean=True, penalty_start=0,
-                 start_vector=start_vectors.RandomUniformWeights(normalise=True,
-                                                                 limits=(-1.0, 1.0)),
+                 start_vector=weights.RandomUniformWeights(normalise=True,
+                                                           limits=(-1.0, 1.0)),
                  eps=consts.TOLERANCE,
                  info=[], max_iter=10000, min_iter=1):
 

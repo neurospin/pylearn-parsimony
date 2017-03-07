@@ -12,7 +12,7 @@ import parsimony.datasets
 import parsimony.functions.nesterov.tv as tv
 from parsimony.functions import PCA_L1_TV
 from parsimony.algorithms.multiblock import MultiblockProjectedGradientMethod
-import parsimony.utils.start_vectors as start_vectors
+import parsimony.utils.weights as weights
 
 n_samples = 500
 shape = (30, 30, 1)
@@ -20,7 +20,7 @@ X3d, y, beta3d = parsimony.datasets.make_regression_struct(n_samples=n_samples,
     shape=shape, r2=.75, random_seed=1)
 X = X3d.reshape((n_samples, np.prod(shape)))
 A = tv.linear_operator_from_shape(shape)
-start_vector = start_vectors.RandomStartVector()
+start_vector = weights.RandomStartVector()
 w = start_vector.get_vector(X.shape[1])
 
 alpha = 10.
