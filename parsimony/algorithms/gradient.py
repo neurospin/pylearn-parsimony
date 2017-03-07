@@ -11,7 +11,7 @@ thus they should not depend on any state.
 
 Created on Wed Jun  4 15:22:50 2014
 
-Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt
 @email:   lofstedt.tommy@gmail.com
@@ -57,6 +57,7 @@ class GradientDescent(bases.ExplicitAlgorithm,
     >>> from parsimony.functions.losses import RidgeRegression
     >>> import numpy as np
     >>> np.random.seed(42)
+    >>>
     >>> X = np.random.rand(100, 50)
     >>> y = np.random.rand(100, 1)
     >>> gd = GradientDescent(max_iter=10000)
@@ -79,6 +80,7 @@ class GradientDescent(bases.ExplicitAlgorithm,
 
     def __init__(self, eps=consts.TOLERANCE,
                  info=[], max_iter=20000, min_iter=1):
+
         super(GradientDescent, self).__init__(info=info,
                                               max_iter=max_iter,
                                               min_iter=min_iter)
@@ -92,14 +94,20 @@ class GradientDescent(bases.ExplicitAlgorithm,
 
         Parameters
         ----------
-        function : Function. The function to minimise.
+        function : Function
+            The function to minimise.
 
-        beta : Numpy array. The start vector.
+        beta : numpy.ndarray or list of numpy.ndarray
+            The start point.
         """
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, False)
 
-        step = function.step(beta)
+        is_list = False
+        if isinstance(beta, list):
+            is_list = True
+
+#        step = function.step(beta, iteration=0)
 
         betanew = betaold = beta
 
@@ -116,10 +124,15 @@ class GradientDescent(bases.ExplicitAlgorithm,
             if self.info_requested(Info.time):
                 tm = utils.time_cpu()
 
-            step = function.step(betanew)
+            step = function.step(betanew, iteration=i)
 
             betaold = betanew
-            betanew = betaold - step * function.grad(betaold)
+            grad = function.grad(betaold)
+            if not is_list:
+                betanew = betaold - step * grad
+            else:
+                betanew = [betaold[i] - step * grad[i]
+                           for i in range(len(betaold))]
 
             if self.info_requested(Info.time):
                 t.append(utils.time_cpu() - tm)
@@ -127,8 +140,12 @@ class GradientDescent(bases.ExplicitAlgorithm,
                     or self.info_requested(Info.func_val):
                 f.append(function.f(betanew))
 
-            if maths.norm(betanew - betaold) < self.eps \
-                    and i >= self.min_iter:
+            if not is_list:
+                err = maths.norm(betanew - betaold)
+            else:
+                err = np.sqrt(np.sum([np.sum((betanew[i] - betaold[i])**2.0)
+                                      for i in range(len(betanew))]))
+            if err < self.eps and i >= self.min_iter:
 
                 if self.info_requested(Info.converged):
                     self.info_set(Info.converged, True)
@@ -209,12 +226,18 @@ class AcceleratedGradientDescent(bases.ExplicitAlgorithm,
 
         Parameters
         ----------
-        function : Function. The function to minimise.
+        function : Function
+            The function to minimise.
 
-        beta : Numpy array, p-by-1. The start vector.
+        beta : numpy.ndarray or list of numpy.ndarray
+            The starting point.
         """
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, False)
+
+        is_list = False
+        if isinstance(beta, list):
+            is_list = True
 
         if self.info_requested(Info.time):
             t = []
@@ -231,23 +254,37 @@ class AcceleratedGradientDescent(bases.ExplicitAlgorithm,
             if self.info_requested(Info.time):
                 tm = utils.time_cpu()
 
-            step = function.step(betanew)
+            step = function.step(betanew, iteration=i)
 
             betaold = betanew
             thetaold = thetanew
             aold = anew
 
-            thetanew = betaold - step * function.grad(betaold)
+#            thetanew = betaold - step * function.grad(betaold)
             anew = (1.0 + np.sqrt(4.0 * aold * aold + 1.0)) / 2.0
-            betanew = thetanew + (aold - 1.0) * (thetanew - thetaold) / anew
+#            betanew = thetanew + (aold - 1.0) * (thetanew - thetaold) / anew
+            grad = function.grad(betaold)
+            acc_step = ((aold - 1.0) / anew)
+            if not is_list:
+                thetanew = betaold - step * grad
+                betanew = thetanew + acc_step * (thetanew - thetaold)
+            else:
+                thetanew = [betaold[i] - step * grad[i]
+                            for i in range(len(betaold))]
+                betanew = [thetanew[i] + acc_step * (thetanew[i] - thetaold[i])
+                           for i in range(len(thetanew))]
 
             if self.info_requested(Info.time):
                 t.append(utils.time_cpu() - tm)
             if self.info_requested(Info.func_val):
                 f.append(function.f(betanew))
 
-            if maths.norm(betanew - betaold) < self.eps \
-                    and i >= self.min_iter:
+            if not is_list:
+                err = maths.norm(betanew - betaold)
+            else:
+                err = np.sqrt(np.sum([np.sum((betanew[i] - betaold[i])**2.0)
+                                      for i in range(len(betanew))]))
+            if err < self.eps and i >= self.min_iter:
 
                 if self.info_requested(Info.converged):
                     self.info_set(Info.converged, True)

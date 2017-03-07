@@ -30,7 +30,7 @@ except (ValueError, SystemError):
     import parsimony.functions.step_sizes as step_sizes  # Run as a script.
 from parsimony.utils import check_arrays
 import parsimony.utils.consts as consts
-import parsimony.utils.weights as weights
+import parsimony.utils as utils
 
 
 __all__ = ["BaseNetwork", "FeedForwardNetwork",
@@ -65,12 +65,13 @@ class BaseNetwork(with_metaclass(abc.ABCMeta,
     loss : parsimony.neural.BaseLoss
         The loss function of the network.
 
-    weight_init : parsimony.utils.weights.BaseWeights
-        The class to use to generate the initial weights.
+    weights : parsimony.utils.weights.BaseWeights
+        A class to use to generate the initial weights for the output layer and
+        for any other layer that does not have its own specified weight
+        generator. Default is 
     """
     def __init__(self, X, y, output_nodes, loss,
-                 step_size=step_sizes.ConstantStepSize(0.01),
-                 weight_init=None):
+                 step_size=step_sizes.ConstantStepSize(0.01), weights=None):
 
         X, y = check_arrays(X, y)
 
@@ -78,22 +79,23 @@ class BaseNetwork(with_metaclass(abc.ABCMeta,
         self.y = y
         self._input = InputLayer(num_nodes=X.shape[1])
         self._layers = []
+
         if self._all_nodes_equal(output_nodes, SoftmaxNode) \
                 and isinstance(loss, CategoricalCrossEntropyLoss):
 
             self._output = SoftmaxCategoricalCrossEntropyOutputLayer(loss,
                                                         num_nodes=y.shape[1],
-                                                        nodes=output_nodes)
+                                                        nodes=output_nodes,
+                                                        weights=weights)
         else:
-            self._output = OutputLayer(loss, num_nodes=y.shape[1],
+            self._output = OutputLayer(loss,
+                                       num_nodes=y.shape[1],
                                        nodes=output_nodes,
-                                       weight_init=weight_init)
+                                       weights=weights)
 
         loss.set_target(y.T)  # Note: The network outputs column vectors
 
         self._step_size = step_size
-
-        self._weight_init = weight_init
 
         self.reset()
 
@@ -283,13 +285,36 @@ class FeedForwardNetwork(BaseNetwork):
 
 class BaseLayer(with_metaclass(abc.ABCMeta)):
     """This is the base class for all layers.
+
+    Parameters
+    ----------
+    num_nodes : int
+        The number of nodes in this layer. Used in conjunction with nodes.
+        The nodes may be a single node object, in which case num_nodes
+        determines the number of nodes of copies of nodes in this layer.
+        Otherwise, the length of nodes determines the number of nodes in the
+        layer.
+
+    nodes : neural.BaseNode or list of neural.BaseNode
+        If nodes is a list, then these determine the nodes in this layer.
+        Otherwise, the layer will constitute num_nodes copies of the nodes node
+        type.
+
+    weights : numpy.ndarray or utils.weights.BaseWeights
+        If a numpy.ndarray, these are the actual initial weights of this layer.
+        If a utils.weights.BaseWeights, this is an object to use to generate
+        the initial weights.
     """
-    def __init__(self, num_nodes=None, nodes=None, weights=None,
-                 weight_init=None):
+    def __init__(self, num_nodes=None, nodes=None, weights=None):
 
         self._set_nodes(nodes, num_nodes)
-        self.set_weights(weights)
-        self._weight_init = weight_init
+
+        if isinstance(weights, utils.weights.BaseWeights):
+            self.set_weights(None)
+            self._weight_init = weights
+        else:
+            self.set_weights(weights)
+            self._weight_init = None
 
         self._all_same = True
         if isinstance(nodes, list):
@@ -311,7 +336,7 @@ class BaseLayer(with_metaclass(abc.ABCMeta)):
         if isinstance(nodes, list):
 
             if (num_nodes is not None) and (len(nodes) != num_nodes):
-                raise ValueError("num_nodes and len(nodes) does not agree!")
+                raise ValueError("num_nodes and len(nodes) do not agree!")
 
             has_softmax = False
             for node in nodes:

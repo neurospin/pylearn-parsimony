@@ -470,9 +470,93 @@ class NeuralNetworkInitialisation(BaseWeights):
         return W
 
 
-class TanhInitialisation(NeuralNetworkInitialisation):
+class GlorotUniform(NeuralNetworkInitialisation):
+    """Commonly used in neural networks with the symmetric activation functions
+    with unit derivative at zero (i.e. f'(0) = 1).
+
+    Using this weight initialisation makes the layers approximately conform to
+
+        n_1 * Var(W_1) = 1
+
+    and
+
+        n_2 * Var(W_2) = 1,
+
+    where n_1 = shape[1] and n_1 = shape[0] and W_1 is the weight matrix of
+    layer 1 and W_2 is the weight matrix of layer 2.
+
+    The elements are distributed as
+
+        W ~ U(-r, r),
+
+    where
+
+        r = sqrt(6 / (fanin + fanout)),
+
+    where fanin = shape[1] and fanout = shape[0].
+
+    The variance used in this initialisation was derived by Glorot and Bengio
+    (2010).
+
+    Parameters
+    ----------
+    random_state : numpy.random.RandomState
+        A random state to use when sampling pseudo-random numbers. If not
+        provided, a random state is generated with a seed, if provided.
+
+    seed : int or None
+        The seed to the pseudo-random number generator. If None, no seed is
+        used. The seed is set at initialisation, so unless a random_state is
+        provided, if the RNG is used in between initialisation and utilisation,
+        the random numbers will change. The seed is not used by all
+        implementing classes. Default is None. Consider using random_state
+        instead of a seed!
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import parsimony.utils.maths as maths
+    >>> from parsimony.utils.weights import GlorotUniform
+    >>>
+    >>> wts = GlorotUniform(seed=1337)
+    >>> W = wts.get_weights((2, 3))
+    >>> print(W)
+    [[-0.52137781 -0.74778595 -0.48610044]
+     [-0.08913223 -0.39216817  0.04029665]]
+    >>> wts = GlorotUniform(seed=1337)
+    >>> W = wts.get_weights((3, 2))
+    >>> print(W)
+    [[-0.52137781 -0.74778595]
+     [-0.48610044 -0.08913223]
+     [-0.39216817  0.04029665]]
+
+    References
+    ----------
+    .. Glorot, Xavier, and Yoshua Bengio. "Understanding the difficulty of
+       training deep feedforward neural networks". International conference on
+       artificial intelligence and statistics, 2010.
+    """
+    def __init__(self, random_state=None, seed=None):
+
+        super(GlorotUniform, self).__init__(K=6.0,
+                                            random_state=random_state,
+                                            seed=seed)
+
+
+class TanhInitialisation(GlorotUniform):
     """Commonly used in neural networks with the hyperbolic tangent activation
     function.
+
+    Using this weight initialisation makes the layers approximately conform to
+
+        n_1 * Var(W_1) = 1
+
+    and
+
+        n_2 * Var(W_2) = 1,
+
+    where n_1 = shape[1] and n_1 = shape[0] and W_1 is the weight matrix of
+    layer 1 and W_2 is the weight matrix of layer 2.
 
     The elements are distributed as
 
@@ -510,14 +594,14 @@ class TanhInitialisation(NeuralNetworkInitialisation):
     >>> start_vector = TanhInitialisation(seed=31337)
     >>> W = start_vector.get_weights((2, 3))
     >>> print(W)
-    [[ 0.48605361  1.02192059 -0.46217033]
-     [-0.72004434 -0.28127178  1.05229994]]
+    [[ 1.94421446  4.08768236 -1.84868134]
+     [-2.88017736 -1.12508711  4.20919974]]
     >>> start_vector = TanhInitialisation(seed=31337)
     >>> W = start_vector.get_weights((3, 2))
     >>> print(W)
-    [[ 0.48605361  1.02192059]
-     [-0.46217033 -0.72004434]
-     [-0.28127178  1.05229994]]
+    [[ 1.94421446  4.08768236]
+     [-1.84868134 -2.88017736]
+     [-1.12508711  4.20919974]]
 
     References
     ----------
@@ -527,9 +611,8 @@ class TanhInitialisation(NeuralNetworkInitialisation):
     """
     def __init__(self, random_state=None, seed=None):
 
-        super(TanhInitialisation, self).__init__(K=6.0,
-                                                 random_state=random_state,
-                                                 seed=seed)
+        super(GlorotUniform, self).__init__(random_state=random_state,
+                                            seed=seed)
 
 
 class LogisticInitialisation(NeuralNetworkInitialisation):

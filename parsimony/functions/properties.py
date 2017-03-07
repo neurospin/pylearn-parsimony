@@ -7,7 +7,7 @@ Try to keep the inheritance tree loop-free unless absolutely impossible.
 
 Created on Mon Apr 22 10:54:29 2013
 
-Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt, Vincent Guillemot, Edouard Duchesnay and
           Fouad Hadj-Selem
@@ -529,15 +529,20 @@ class LipschitzContinuousGradient(with_metaclass(abc.ABCMeta, object)):
 class StepSize(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
-    def step(self, beta, index=0):
+    def step(self, beta, index=0, iteration=None):
         """The step size to use in descent methods.
 
         Parameters
         ----------
-        beta : Numpy array. The point at which to determine the step size.
+        beta : numpy.ndarray
+            The point at which to determine the step size.
 
-        index : Non-negative integer. For multiblock functions, to know which
-                variable the step is for.
+        index : int
+            Non-negative integer. For multiblock functions, to know which
+            variable the step is for.
+
+        iteration : int
+            The current iteration number.
         """
         raise NotImplementedError('Abstract method "step" must be '
                                   'specialised!')
