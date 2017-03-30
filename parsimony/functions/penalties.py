@@ -1253,7 +1253,6 @@ class GraphNet(QuadraticConstraint,
             from parsimony.algorithms.nipals import RankOneSparseSVD
 
             A = self.A
-            print(A.shape)
             # TODO: Add max_iter here!
             v = RankOneSparseSVD().run(A)  # , max_iter=max_iter)
             us = A.dot(v)

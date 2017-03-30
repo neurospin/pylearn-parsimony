@@ -46,6 +46,7 @@ __all__ = ["BaseEstimator",
 
            "LinearRegressionL1L2TV",
            "LinearRegressionL1L2GL",
+           "LinearRegressionL1L2GraphNet",
 
            "LogisticRegression",
            "RandomLogisticRegression",
@@ -872,6 +873,127 @@ class LinearRegressionL1L2TV(RegressionEstimator):
         y_hat = np.dot(X, self.beta)
 
         return np.sum((y_hat - y) ** 2.0) / float(n)
+
+
+class LinearRegressionL1L2GraphNet(LinearRegression):
+    """Linear regression with L1, L2 and GraphNet, a.k.a S-Lasso, penalties:
+
+        f(beta, X, y) = (1 / (2 * n)) * ||Xbeta - y||²_2
+                        + l1 * ||beta||_1
+                        + (l2 / 2) * ||beta||²_2
+                        + gn * GraphNet(beta)
+
+    Where
+        GraphNet(beta) = sum_{(i, j) \in G}(beta_i - beta_j)^2,
+
+    Where nodes (i, j) are connected in the Graph G and A is a (sparse) matrix
+    of P columns where each line contains a pair of (-1, +1) for 2 connected
+    nodes, and zero elsewhere.
+
+        GraphNet(beta) = beta'A'Abeta.
+                       = sum((Abeta)^2)
+
+    Parameters
+    ----------
+    l1 : Non-negative float. The L1 regularization parameter.
+
+    l2 : Non-negative float. The L2 regularization parameter.
+
+    gn : Non-negative float. The graph net regularization parameter.
+
+    A : Numpy or (usually) scipy.sparse array of P columns where each
+    line contains a pair of (-1, +1) for 2 connected nodes, and zero elsewhere.
+
+
+    algorithm : ExplicitAlgorithm. The algorithm that should be applied.
+            Should be one of:
+                1. FISTA(...)
+                2. ISTA(...)
+
+            Default is FISTA(...).
+
+    algorithm_params : A dict. The dictionary algorithm_params contains
+            parameters that should be set in the algorithm. Passing
+            algorithm=FISTA(**params) is equivalent to passing
+            algorithm=FISTA() and algorithm_params=params. Default is an
+            empty dictionary.
+
+    penalty_start : Non-negative integer. The number of columns, variables
+            etc., to be exempt from penalisation. Equivalently, the first
+            index to be penalised. Default is 0, all columns are included.
+
+    mean : Boolean. Whether to compute the squared loss or the mean squared
+            loss. Default is True, the mean squared loss.
+
+    start_vector : BaseStartVector. Generates the start vector that will be
+            used.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import parsimony.estimators as estimators
+    >>> import parsimony.algorithms.proximal as proximal
+    >>> n = 10
+    >>> p = 16
+    >>>
+    >>> np.random.seed(42)
+    >>> X = np.random.rand(n, p)
+    >>> y = np.random.rand(n, 1)
+    TO DO: Complete example for GraphNet
+
+    """
+    def __init__(self, l1, l2, gn, A, algorithm=None, algorithm_params=dict(),
+                 start_vector=weights.RandomUniformWeights(normalise=True),
+                 penalty_start=0, mean=True):
+
+        if algorithm is None:
+            algorithm = proximal.FISTA(**algorithm_params)
+        else:
+            algorithm.set_params(**algorithm_params)
+
+        super(LinearRegressionL1L2GraphNet, self).__init__(algorithm=algorithm,
+                                              start_vector=start_vector)
+
+        self.l1 = l1
+        self.l2 = l2
+        self.gn = gn
+
+        self.A = A
+        self.penalty_start = int(penalty_start)
+        self.mean = bool(mean)
+
+    def get_params(self):
+        """Return a dictionary containing the estimator's parameters.
+        """
+        return {"l1": self.l, "l2": self.l2, "gn": self.gn,
+                "penalty_start": self.penalty_start, "mean": self.mean}
+
+    def fit(self, X, y, beta=None):
+        """Fit the estimator to the data.
+        """
+        X, y = check_arrays(X, y)
+
+        function = functions.CombinedFunction()
+        function.add_loss(functions.losses.LinearRegression(X, y,
+                          mean=self.mean))
+        function.add_penalty(functions.penalties.L2Squared(l=self.l2,
+                             penalty_start=self.penalty_start))
+        function.add_penalty(functions.penalties.GraphNet(l=self.gn,
+                             A=self.A, penalty_start=self.penalty_start))
+        function.add_prox(functions.penalties.L1(l=self.l1,
+                          penalty_start=self.penalty_start))
+
+        self.algorithm.check_compatibility(function,
+                                           self.algorithm.INTERFACES)
+
+        # TODO: Should we use a seed somewhere so that we get deterministic
+        # results?
+        if beta is None:
+            beta = self.start_vector.get_weights(X.shape[1])
+
+        self.beta = self.algorithm.run(function, beta)
+
+        return self
 
 
 class LinearRegressionL1L2GL(RegressionEstimator):
