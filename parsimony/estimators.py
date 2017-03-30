@@ -933,14 +933,24 @@ class LinearRegressionL1L2GraphNet(LinearRegression):
     >>> import numpy as np
     >>> import parsimony.estimators as estimators
     >>> import parsimony.algorithms.proximal as proximal
+    >>> import parsimony.functions.nesterov.tv as total_variation
+    >>> import scipy.sparse as sparse
+    >>> shape = (1, 4, 4)
     >>> n = 10
-    >>> p = 16
+    >>> p = np.prod(shape)
     >>>
     >>> np.random.seed(42)
     >>> X = np.random.rand(n, p)
     >>> y = np.random.rand(n, 1)
-    TO DO: Complete example for GraphNet
-
+    >>> l1 = 0.1  # L1 coefficient
+    >>> l2 = 0.9  # Ridge coefficient
+    >>> gn = 1.0  # GraphNet coefficient
+    >>> Atv = total_variation.linear_operator_from_shape(shape)
+    >>> Agn = sparse.vstack(Atv)
+    >>> gn = estimators.LinearRegressionL1L2GraphNet(l1, l2, gn, Agn)
+    >>> res = gn.fit(X, y)
+    >>> lr.score(X, y)  # doctest: +ELLIPSIS
+    0.0683...
     """
     def __init__(self, l1, l2, gn, A, algorithm=None, algorithm_params=dict(),
                  start_vector=weights.RandomUniformWeights(normalise=True),
