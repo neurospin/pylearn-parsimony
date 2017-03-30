@@ -31,7 +31,7 @@ import parsimony.utils.consts as consts
 import parsimony.utils.linalgs as linalgs
 
 __all__ = ["ZeroFunction", "L1", "L0", "LInf", "L2", "L2Squared",
-           "L1L2Squared",
+           "L1L2Squared", "GraphNet",
            "QuadraticConstraint", "RGCCAConstraint", "RidgeSquaredError",
            "LinearConstraint",
            "LinearVariableConstraint",
@@ -1182,6 +1182,84 @@ class QuadraticConstraint(properties.AtomicFunction,
             bMb = np.dot(beta_.T, self.M.T.dot(self.N.dot(beta_)))
 
         return bMb <= self.c
+
+
+class GraphNet(QuadraticConstraint,
+               properties.LipschitzContinuousGradient):
+    """The proximal operator of the GraphNet function.
+
+        f(x) = l * sum_{(i, j) \in G}(b_i - b_j)^2,
+
+    Where nodes (i, j) are connected in the Graph G and A is a (sparse) matrix
+    of P columns where each line contains a pair of (-1, +1) for 2 connected
+    nodes, and zero elsewhere.
+
+        f(x) = l * x'A'Ax.
+             = l * sum((Ax)^2)
+
+    Parameters
+    ----------
+    l : Non-negative float. The Lagrange multiplier, or regularisation
+            constant, of the function.
+
+    A : Numpy or (usually) scipy.sparse array. The a matrix, made of (-1, +1),
+    that computes all the differences between connected nodes of the graph.
+
+
+    penalty_start : Non-negative integer. The number of columns, variables
+            etc., to be exempt from penalisation. Equivalently, the first index
+            to be penalised. Default is 0, all columns are included.
+    """
+    def __init__(self, l=1.0, A=None, penalty_start=0):
+
+        self.l = float(l)
+        self.c = 0
+        self.M = A  # for QuadraticConstraint
+        self.N = A  # for QuadraticConstraint
+        self.A = A
+        self.penalty_start = penalty_start
+        self._lambda_max = None
+
+    # TODO: Redefine grad and f, without inheritance from QuadraticConstraint
+    # to speed up computing of f matrix-vector multiplication only needs to be
+    # performed once,
+
+    def L(self):
+        """ Lipschitz constant of the gradient.
+
+        From the interface "LipschitzContinuousGradient".
+        """
+        if self.l < consts.TOLERANCE:
+            return 0.0
+
+        lmaxA = self.lambda_max()
+        # The (largest) Lipschitz constant of the gradient would be the operator
+        # norm of 2A'A, which thus is the square of the largest singular value
+        # of 2A'A.
+
+        return self.l * (2 * lmaxA) ** 2
+
+    def lambda_max(self):
+        """ Largest eigenvalue of the corresponding covariance matrix.
+
+        From the interface "Eigenvalues".
+        """
+        # From functions.nesterov.tv.TotalVariation.L
+        # Note that we can save the state here since lmax(A) does not change.
+        # TODO: This only work if the elements of self._A are scipy.sparse. We
+        # should allow dense matrices as well.
+        if self._lambda_max is None:
+
+            from parsimony.algorithms.nipals import RankOneSparseSVD
+
+            A = self.A
+            print(A.shape)
+            # TODO: Add max_iter here!
+            v = RankOneSparseSVD().run(A)  # , max_iter=max_iter)
+            us = A.dot(v)
+            self._lambda_max = np.sum(us ** 2.0)
+
+        return self._lambda_max
 
 
 class RGCCAConstraint(QuadraticConstraint,
