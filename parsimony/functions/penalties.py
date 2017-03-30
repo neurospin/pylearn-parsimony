@@ -1131,11 +1131,14 @@ class QuadraticConstraint(properties.AtomicFunction,
             beta_ = beta
 
         if self.N is None:
-            val = self.l * (np.dot(beta_.T, np.dot(self.M, beta_)) - self.c)
+            #val = self.l * (np.dot(beta_.T, np.dot(self.M, beta_)) - self.c)
+            val = self.l * (np.dot(beta_.T, self.M.dot(beta_)) - self.c)
         else:
-            val = self.l * (np.dot(beta_.T, np.dot(self.M.T,
-                                                   np.dot(self.N, beta_))) \
+            val = self.l * (np.dot(beta_.T, self.M.T.dot(self.N.dot(beta_))) \
                     - self.c)
+            #val = self.l * (np.dot(beta_.T, np.dot(self.M.T,
+            #                                       np.dot(self.N, beta_))) \
+            #        - self.c)
 
         return val
 
@@ -1150,9 +1153,11 @@ class QuadraticConstraint(properties.AtomicFunction,
             beta_ = beta
 
         if self.N is None:
-            grad = (2.0 * self.l) * np.dot(self.M, beta_)
+            grad = (2.0 * self.l) * self.M.dot(beta_)
+            #grad = (2.0 * self.l) * np.dot(self.M, beta_)
         else:
-            grad = (2.0 * self.l) * np.dot(self.M.T, np.dot(self.N, beta_))
+            grad = (2.0 * self.l) * self.M.T.dot(self.N.dot(beta_))
+            #grad = (2.0 * self.l) * np.dot(self.M.T, np.dot(self.N, beta_))
 
         if self.penalty_start > 0:
             grad = np.vstack(np.zeros((self.penalty_start, 1)), grad)
@@ -1170,9 +1175,11 @@ class QuadraticConstraint(properties.AtomicFunction,
             beta_ = beta
 
         if self.N is None:
-            bMb = np.dot(beta_.T, np.dot(self.M, beta_))
+            #bMb = np.dot(beta_.T, np.dot(self.M, beta_))
+            bMb = np.dot(beta_.T, self.M.dot(beta_))
         else:
-            bMb = np.dot(beta_.T, np.dot(self.M.T, np.dot(self.N, beta_)))
+            #bMb = np.dot(beta_.T, np.dot(self.M.T, np.dot(self.N, beta_)))
+            bMb = np.dot(beta_.T, self.M.T.dot(self.N.dot(beta_)))
 
         return bMb <= self.c
 
