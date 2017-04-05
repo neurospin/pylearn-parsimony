@@ -2168,9 +2168,9 @@ class LogisticRegressionL1L2TVInexactFISTA(LogisticRegressionL1L2TV):
         y, sample_weight = check_arrays(y, sample_weight)
         function = functions.CombinedFunction()
         function.add_loss(functions.losses.LogisticRegression(X, y,
-                                                              mean=self.mean))
+                          weights=sample_weight, mean=self.mean))
         function.add_penalty(functions.penalties.L2Squared(l=self.l2,
-                                                           penalty_start=self.penalty_start))
+                             penalty_start=self.penalty_start))
         function.add_prox(l1tv.L1TV(l1=self.l1, tv=self.tv, A=self.A,
                                     penalty_start=self.penalty_start))
 
@@ -2179,6 +2179,158 @@ class LogisticRegressionL1L2TVInexactFISTA(LogisticRegressionL1L2TV):
         # TODO: Should we use a seed here so that we get deterministic results?
         if beta is None:
             beta = self.start_vector.get_weights(X.shape[1])
+        self.beta = self.algorithm.run(function, beta)
+
+        return self
+
+
+class LogisticRegressionL1L2GraphNet(LogisticRegressionEstimator):
+    """Logistic regression (re-weighted log-likelihood aka. cross-entropy)
+    with L1, L2 and TV penalties:
+
+        f(beta) = -loglik / n_samples
+                  + l1 * ||beta||_1
+                  + (l2 / 2) * ||beta||²_2
+                        + gn * GraphNet(beta)
+
+    Where
+        GraphNet(beta) = sum_{(i, j) \in G}(beta_i - beta_j)^2,
+
+    Where nodes (i, j) are connected in the Graph G and A is a (sparse) matrix
+    of P columns where each line contains a pair of (-1, +1) for 2 connected
+    nodes, and zero elsewhere.
+
+        GraphNet(beta) = beta'A'Abeta.
+                       = sum((Abeta)^2),
+
+    and
+        loglik = Sum wi * (yi * log(pi) + (1 − yi) * log(1 − pi)),
+
+        pi = p(y=1|xi, beta) = 1 / (1 + exp(-xi'*beta)),
+
+        wi = weight of sample i.
+
+    Parameters
+    ----------
+    l1 : Non-negative float. The Lagrange multiplier, or regularisation
+            constant, for the L1 penalty.
+
+    l2 : Non-negative float. The Lagrange multiplier, or regularisation
+            constant, for the ridge (L2) penalty.
+
+    gn : Non-negative float. The graph net regularization parameter.
+
+    A : Numpy or (usually) scipy.sparse array of P columns where each
+    line contains a pair of (-1, +1) for 2 connected nodes, and zero elsewhere.
+
+
+    algorithm : ExplicitAlgorithm. The algorithm that should be applied.
+            Should be one of:
+                1. FISTA(...)
+                2. ISTA(...)
+
+            Default is FISTA(...).
+
+    algorithm_params : A dict. The dictionary algorithm_params contains
+            parameters that should be set in the algorithm. Passing
+            algorithm=CONESTA(**params) is equivalent to passing
+            algorithm=CONESTA() and algorithm_params=params. Default is an
+            empty dictionary.
+
+    class_weight : Dict, 'auto' or None. If 'auto', class weights will be
+            given inverse proportional to the frequency of the class in
+            the data. If a dictionary is given, keys are classes and values
+            are corresponding class weights. If None is given, the class
+            weights will be uniform.
+
+    penalty_start : Non-negative integer. The number of columns, variables
+            etc., to be exempt from penalisation. Equivalently, the first
+            index to be penalised. Default is 0, all columns are included.
+
+    mean : Boolean. Whether to compute the squared loss or the mean squared
+            loss. Default is True, the mean squared loss.
+
+    start_vector : parsimony.utils.weights.BaseWeights
+        Generates the start vector that will be used.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import parsimony.estimators as estimators
+    >>> import parsimony.algorithms.proximal as proximal
+    >>> import parsimony.functions.nesterov.tv as total_variation
+    >>> shape = (1, 4, 4)
+    >>> n = 10
+    >>> p = shape[0] * shape[1] * shape[2]
+    >>>
+    >>> np.random.seed(42)
+    >>> X = np.random.rand(n, p)
+    >>> y = np.random.randint(0, 2, (n, 1))
+    >>> l1 = 0.1  # L1 coefficient
+    >>> l2 = 0.9  # Ridge coefficient
+    TODO
+    """
+    def __init__(self, l1, l2, gn,
+                 A=None, mu=consts.TOLERANCE,
+                 algorithm=None, algorithm_params=dict(),
+                 class_weight=None,
+                 penalty_start=0,
+                 mean=True,
+                 start_vector=weights.RandomUniformWeights(normalise=True)):
+
+        self.l1 = max(consts.TOLERANCE, float(l1))
+        self.l2 = max(0.0, float(l2))
+        self.gn = float(gn)
+
+        if algorithm is None:
+            algorithm = proximal.FISTA(**algorithm_params)
+        else:
+            algorithm.set_params(**algorithm_params)
+
+        super(LogisticRegressionL1L2GraphNet, self).__init__(algorithm=algorithm,
+                                              start_vector=start_vector,
+                                              class_weight=class_weight)
+
+        if A is None:
+            raise TypeError("A may not be None.")
+        self.A = A
+
+        self.penalty_start = int(penalty_start)
+        self.mean = bool(mean)
+
+    def get_params(self):
+        """Return a dictionary containing all the estimator's parameters.
+        """
+        return {"l1": self.l1, "l2": self.l2, "gn": self.gn,
+                "A": self.A, "mu": self.mu, "class_weight": self.class_weight,
+                "penalty_start": self.penalty_start, "mean": self.mean}
+
+    def fit(self, X, y, beta=None, sample_weight=None):
+        """Fit the estimator to the data.
+        """
+        X, y = check_arrays(X, check_labels(y))
+        if sample_weight is None:
+            sample_weight = class_weight_to_sample_weight(self.class_weight, y)
+        y, sample_weight = check_arrays(y, sample_weight)
+        # sample_weight = sample_weight.ravel()
+
+        function = functions.CombinedFunction()
+        function.add_loss(functions.losses.LogisticRegression(X, y,
+                          weights=sample_weight, mean=self.mean))
+        function.add_penalty(functions.penalties.L2Squared(l=self.l2,
+                             penalty_start=self.penalty_start))
+        function.add_penalty(functions.penalties.GraphNet(l=self.gn,
+                             A=self.A, penalty_start=self.penalty_start))
+        function.add_prox(functions.penalties.L1(l=self.l1,
+                          penalty_start=self.penalty_start))
+
+        self.algorithm.check_compatibility(function,
+                                           self.algorithm.INTERFACES)
+
+        # TODO: Should we use a seed here so that we get deterministic results?
+        if beta is None:
+            beta = self.start_vector.get_weights(X.shape[1])
+
         self.beta = self.algorithm.run(function, beta)
 
         return self
