@@ -19,7 +19,7 @@ try:
 except:
     from parsimony.utils import consts
 
-__all__ = ["MultipartArray", "LinearOperator"]
+__all__ = ["MultipartArray", "LinearOperatorNesterov"]
 
 
 class MultipartArray(object):
@@ -561,8 +561,8 @@ class TridiagonalSolver(Solver):
 
         return x.reshape((n, 1))
 
-
-class LinearOperator(list):
+  
+class LinearOperatorNesterov(list):
     """Linear operator for the Nesterov function. It inherits from a list, with
    some serialization capabilities and the possibility to store some values:
    the maximum eigen value "lambda_max" and the number of compact "n_compacts".
@@ -573,42 +573,43 @@ class LinearOperator(list):
                build the current object.
 
     argv: The linear operator as a list of sparse csr matrix. The constructed
-          LinearOperator will have the same properties as the original one plus
-          some serialization capabilities and the possibility to store some
-          values.
+          LinearOperatorNesterov will have the same properties as the original
+          one plus some serialization capabilities and the possibility to store
+          some values.
 
     Examples
     --------
-#    >>> from parsimony.utils.linalgs import LinearOperator
-#    >>> import os.path
-#    >>> import tempfile
-#    >>> import parsimony.functions.nesterov.tv as nesterov_tv
-#    >>>
-#    >>> A = nesterov_tv.linear_operator_from_shape((3, 3, 3))
-#    >>> A.lambda_max = nesterov_tv.TotalVariation(l=0., A=A).lambda_max()
-#    >>> filename = os.path.join(tempfile.gettempdir(), "A.npz")
-#    >>> A.save(filename)
-#    >>> A_ = LinearOperator(filename=filename)
-#    >>> print(np.all([np.all(A_[i].todense() == A[i].todense())
-#    ...     for i in range(len(A))]))
-#    True
-#    >>> print(np.all([np.all(A.n_compacts == A_.n_compacts),
-#    ...               np.all(A.lambda_max == A_.lambda_max)]))
-#    True
+    >>> import numpy as np
+    >>> from parsimony.utils.linalgs import LinearOperatorNesterov
+    >>> import os.path
+    >>> import tempfile
+    >>> import parsimony.functions.nesterov.tv as nesterov_tv
+    >>>
+    >>> A = nesterov_tv.linear_operator_from_shape((3, 3, 3), calc_lambda_max=True)
+    >>> filename = os.path.join(tempfile.gettempdir(), "A.npz")
+    >>> A.save(filename)
+    >>> A_ = LinearOperatorNesterov(filename=filename)
+    >>> print(np.all([np.all(A_[i].todense() == A[i].todense())
+    ...     for i in range(len(A))]))
+    True
+    >>> print(np.all([np.all(A.n_compacts == A_.n_compacts),
+    ...               np.all(A.singular_values == A_.singular_values)]))
+    True
     """
     def __init__(self, *argv, **kwargs):
-        self.lambda_max = None
+        self.singular_values = []
         self.n_compacts = None
         filename = kwargs["filename"] if "filename" in kwargs else None
         if filename is not None:
             d = np.load(filename)
             arr_k = [k for k in list(d.keys()) if k.count("csr")]
+            arr_k.sort(reverse=False)
             argv = [sparse.csr_matrix((d[k][0], d[k][1], d[k][2]),
                                       shape=d[k][3])
                     for k in arr_k]
             for k in set(d.keys()) - set(arr_k):
                 try:
-                    setattr(self, k, float(d[k]))
+                    setattr(self, k, d[k])
                 except:
                     pass
         for l in argv:
@@ -625,11 +626,16 @@ class LinearOperator(list):
             arr_dict[k] = getattr(self, k)
         np.savez_compressed(filename, **arr_dict)
 
-    def lambda_max(self):
-        return self.lambda_max
+
+    def get_singular_values(self, nb=None):
+        if nb is not None:
+            return self.singular_values[nb]
+        else:
+            self.singular_values
 
     def n_compacts(self):
         return self.n_compacts
+
 
 if __name__ == "__main__":
     import doctest

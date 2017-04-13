@@ -24,7 +24,7 @@ import parsimony.utils.maths as maths
 import parsimony.utils as utils
 from . import tv
 from . import l1
-from parsimony.utils.linalgs import LinearOperator
+from parsimony.utils.linalgs import LinearOperatorNesterov
 
 __all__ = ["L1TV",
            "linear_operator_from_mask", "A_from_mask",
@@ -287,7 +287,7 @@ def linear_operator_from_mask(mask, num_variables, penalty_start=0):
     Atv = tv.linear_operator_from_mask(mask)
     Al1 = l1.A_from_variables(num_variables, penalty_start=penalty_start)
 
-    A = LinearOperator(Al1[0], *Atv)
+    A = LinearOperatorNesterov(Al1[0], *Atv)
     return A
 
 
@@ -320,7 +320,7 @@ def linear_operator_from_shape(shape, num_variables, penalty_start=0):
     Atv = tv.linear_operator_from_shape(shape)
     Al1 = l1.linear_operator_from_variables(num_variables, penalty_start=penalty_start)
 
-    A = LinearOperator(Al1[0], *Atv)
+    A = LinearOperatorNesterov(Al1[0], *Atv)
     return A
 
 def linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0,
@@ -377,5 +377,5 @@ def linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0,
     Al1 = l1.linear_operator_from_variables(num_variables,
                                             penalty_start=offset)
 
-    A = LinearOperator(Al1[0], *Atv)
+    A = LinearOperatorNesterov(Al1[0], *Atv)
     return A

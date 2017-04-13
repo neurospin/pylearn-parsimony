@@ -21,7 +21,7 @@ from .. import properties
 import parsimony.utils.consts as consts
 import parsimony.utils.maths as maths
 import parsimony.utils as utils
-from parsimony.utils.linalgs import LinearOperator
+from parsimony.utils.linalgs import LinearOperatorNesterov
 
 
 __all__ = ["TotalVariation",
@@ -158,26 +158,33 @@ class TotalVariation(properties.NesterovFunction,
 
         From the interface "Eigenvalues".
         """
-        # Note that we can save the state here since lmax(A) does not change.
-        # TODO: This only work if the elements of self._A are scipy.sparse. We
-        # should allow dense matrices as well.
-        if len(self._A) == 3 \
-                and self._A[1].nnz == 0 and self._A[2].nnz == 0:
-            # TODO: Instead of p, this should really be the number of non-zero
-            # rows of A.
-            self._lambda_max = 2.0 * (1.0 - math.cos(float(self._p - 1)
-                                                     * math.pi
-                                                     / float(self._p)))
-
-        elif self._lambda_max is None:
-
-            from parsimony.algorithms.nipals import RankOneSparseSVD
-
-            A = sparse.vstack(self.A())
-            # TODO: Add max_iter here!
-            v = RankOneSparseSVD().run(A)  # , max_iter=max_iter)
-            us = A.dot(v)
-            self._lambda_max = np.sum(us ** 2.0)
+        if self._lambda_max is None:        
+            try:
+                self.lambda_max = self.A().get_singular_values(0)
+            except:
+                pass
+ 
+        if self._lambda_max is None:
+            # Note that we can save the state here since lmax(A) does not change.
+            # TODO: This only work if the elements of self._A are scipy.sparse. We
+            # should allow dense matrices as well.
+            if len(self._A) == 3 \
+                    and self._A[1].nnz == 0 and self._A[2].nnz == 0:
+                # TODO: Instead of p, this should really be the number of non-zero
+                # rows of A.
+                self._lambda_max = 2.0 * (1.0 - math.cos(float(self._p - 1)
+                                                         * math.pi
+                                                         / float(self._p)))
+    
+            else:
+    
+                from parsimony.algorithms.nipals import RankOneSparseSVD
+    
+                A = sparse.vstack(self.A())
+                # TODO: Add max_iter here!
+                v = RankOneSparseSVD().run(A)  # , max_iter=max_iter)
+                us = A.dot(v)
+                self._lambda_max = np.sum(us ** 2.0)
 
         return self._lambda_max
 
@@ -292,7 +299,7 @@ def A_from_mask(*args, **kwargs):
     return linear_operator_from_mask(*args, **kwargs)
 
 
-def linear_operator_from_mask(mask, offset=0, weights=None):
+def linear_operator_from_mask(mask, offset=0, weights=None, calc_lambda_max=False):
     """Generates the linear operator for the total variation Nesterov function
     from a mask for a 3D image.
 
@@ -316,6 +323,9 @@ def linear_operator_from_mask(mask, offset=0, weights=None):
     weights : Numpy array. The weight put on the gradient of every point.
             Default is weight 1 for each point, or equivalently, no weight. The
             weights is a numpy array of the same shape as mask.
+
+    calc_lambda_max: boolean. Should the largest singular value being
+            precomputed ?
     """
     while len(mask.shape) < 3:
         mask = mask[..., np.newaxis]
@@ -378,12 +388,14 @@ def linear_operator_from_mask(mask, offset=0, weights=None):
     Ax = sparse.csr_matrix((Ax_v, (Ax_i, Ax_j)), shape=(p, p))
     Ay = sparse.csr_matrix((Ay_v, (Ay_i, Ay_j)), shape=(p, p))
     Az = sparse.csr_matrix((Az_v, (Az_i, Az_j)), shape=(p, p))
-    A = LinearOperator(Ax, Ay, Az)
+    A = LinearOperatorNesterov(Ax, Ay, Az)
     A.n_compacts = n_compacts
+    if calc_lambda_max:
+        A.singular_values = [TotalVariation(l=0., A=A).lambda_max()]
     return A
 
 
-def linear_operator_from_subset_mask(mask, weights=None):
+def linear_operator_from_subset_mask(mask, weights=None, calc_lambda_max=False):
     """Generates the linear operator for the total variation Nesterov function
     from a mask for a 3D image.
 
@@ -398,6 +410,9 @@ def linear_operator_from_subset_mask(mask, weights=None):
     weights : Numpy array. The weight put on the gradient of every point.
             Default is weight 1 for each point, or equivalently, no weight. The
             weights is a numpy array of the same shape as mask.
+
+    calc_lambda_max: boolean. Should the largest singular value being
+            precomputed ?
     """
     while len(mask.shape) < 3:
         mask = mask[np.newaxis, :]
@@ -465,8 +480,10 @@ def linear_operator_from_subset_mask(mask, weights=None):
     Az = sparse.csr_matrix((Az_v, (Az_i, Az_j)), shape=(p, p))
     Ay = sparse.csr_matrix((Ay_v, (Ay_i, Ay_j)), shape=(p, p))
     Ax = sparse.csr_matrix((Ax_v, (Ax_i, Ax_j)), shape=(p, p))
-    A = LinearOperator(Ax, Ay, Az)
+    A = LinearOperatorNesterov(Ax, Ay, Az)
     A.n_compacts = num_compacts
+    if calc_lambda_max:
+        A.singular_values = [TotalVariation(l=0., A=A).lambda_max()]
     return A
 
 
@@ -476,7 +493,7 @@ def A_from_shape(*args, **kwargs):
     return linear_operator_from_shape(*args, **kwargs)
 
 
-def linear_operator_from_shape(shape, weights=None):
+def linear_operator_from_shape(shape, weights=None, calc_lambda_max=False):
     """Generates the linear operator for the total variation Nesterov function
     from the shape of a 1D, 2D or 3D image.
 
@@ -490,6 +507,9 @@ def linear_operator_from_shape(shape, weights=None):
 
     weights : Sequence, e.g. list or numpy (p-by-1) array. Weights put on the
             groups. Default is weight 1 for each group, i.e. no weight.
+
+    calc_lambda_max: boolean. Should the largest singular value being
+            precomputed ?
     """
     if not isinstance(shape, (list, tuple)):
         shape = [shape]
@@ -556,12 +576,15 @@ def linear_operator_from_shape(shape, weights=None):
         Az.eliminate_zeros()
     else:
         Az = sparse.csr_matrix((p, p), dtype=float)
-    A = LinearOperator(Ax, Ay, Az)
+    A = LinearOperatorNesterov(Ax, Ay, Az)
     A.n_compacts = (nz * ny * nx - 1)
+
+    if calc_lambda_max:
+        A.singular_values = [TotalVariation(l=0., A=A).lambda_max()]
     return A
 
 def linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0,
-                              weights=None):
+                              weights=None, calc_lambda_max=False):
     """Generates the linear operator for the total variation Nesterov function
     from a mesh.
 
@@ -590,6 +613,9 @@ def linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0,
     weights : Numpy array. The weight put on the gradient of every point.
             Default is weight 1 for each point, or equivalently, no weight. The
             weights is a numpy array of the same shape as mask.
+
+    calc_lambda_max: boolean. Should the largest singular value being
+            precomputed ?
 
     Returns
     -------
@@ -662,6 +688,9 @@ def linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0,
     p = mask.sum()
     A = [sparse.csr_matrix((A[i][2], (A[i][0], A[i][1])),
                            shape=(p, p)) for i in range(len(A))]
-    A = LinearOperator(*A)
+    A = LinearOperatorNesterov(*A)
     A.n_compacts = n_compacts
+
+    if calc_lambda_max:
+        A.singular_values = [TotalVariation(l=0., A=A).lambda_max()]
     return A
