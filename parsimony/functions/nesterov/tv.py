@@ -160,7 +160,7 @@ class TotalVariation(properties.NesterovFunction,
         """
         if self._lambda_max is None:        
             try:
-                self.lambda_max = self.A().get_singular_values(0)
+                self._lambda_max = self.A().get_singular_values(0)
             except:
                 pass
  
