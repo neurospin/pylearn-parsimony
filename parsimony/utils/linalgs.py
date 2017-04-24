@@ -561,7 +561,7 @@ class TridiagonalSolver(Solver):
 
         return x.reshape((n, 1))
 
-  
+
 class LinearOperatorNesterov(list):
     """Linear operator for the Nesterov function. It inherits from a list, with
    some serialization capabilities and the possibility to store some values:
@@ -631,7 +631,7 @@ class LinearOperatorNesterov(list):
         if nb is not None:
             return self.singular_values[nb]
         else:
-            self.singular_values
+            return self.singular_values
 
     def n_compacts(self):
         return self.n_compacts
