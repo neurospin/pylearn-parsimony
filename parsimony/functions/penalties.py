@@ -1160,7 +1160,7 @@ class QuadraticConstraint(properties.AtomicFunction,
             #grad = (2.0 * self.l) * np.dot(self.M.T, np.dot(self.N, beta_))
 
         if self.penalty_start > 0:
-            grad = np.vstack(np.zeros((self.penalty_start, 1)), grad)
+            grad = np.vstack((np.zeros((self.penalty_start, 1)), grad))
 
         return grad
 
