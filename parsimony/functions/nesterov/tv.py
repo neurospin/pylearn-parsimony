@@ -81,6 +81,10 @@ class TotalVariation(properties.NesterovFunction,
         if self.l < consts.TOLERANCE:
             return 0.0
 
+        if (len(beta.shape) == 2) \
+                and (beta.shape[0] == 1) and (beta.shape[1] > 1):
+            beta = beta.T
+
         if self.penalty_start > 0:
             beta_ = beta[self.penalty_start:, :]
         else:

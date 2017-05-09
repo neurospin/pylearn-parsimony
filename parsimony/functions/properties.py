@@ -649,12 +649,12 @@ class NesterovFunction(with_metaclass(abc.ABCMeta, Gradient,
                 etc., to except from penalisation. Equivalently, the first
                 index to be penalised. Default is 0, all columns are included.
         """
-        self.l = float(l)
+        self.l = max(0.0, float(l))
         if A is None:
             raise ValueError("The linear operator A must not be None.")
         self._A = A
-        self.mu = float(mu)
-        self.penalty_start = int(penalty_start)
+        self.mu = max(0.0, float(mu))
+        self.penalty_start = max(0, int(penalty_start))
 
         self._alpha = None
 
@@ -699,7 +699,7 @@ class NesterovFunction(with_metaclass(abc.ABCMeta, Gradient,
         beta : Numpy array. The point at which to evaluate the gradient.
         """
         if self.l < consts.TOLERANCE:
-            return 0.0
+            return np.zeros(beta.shape)
 
         # beta need not be sliced here.
         alpha = self.alpha(beta)
@@ -754,6 +754,8 @@ class NesterovFunction(with_metaclass(abc.ABCMeta, Gradient,
 
         A = self.A()
         mu = self.get_mu()
+        if mu < consts.TOLERANCE:
+            mu = consts.TOLERANCE
         alpha = [0] * len(A)
         for i in range(len(A)):
             alpha[i] = A[i].dot(beta_) * (1.0 / mu)

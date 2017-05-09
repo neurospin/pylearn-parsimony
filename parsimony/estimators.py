@@ -949,8 +949,8 @@ class LinearRegressionL1L2GraphNet(LinearRegression):
     >>> Agn = sparse.vstack(Atv)
     >>> gn = estimators.LinearRegressionL1L2GraphNet(l1, l2, gn, Agn)
     >>> res = gn.fit(X, y)
-    >>> lr.score(X, y)  # doctest: +ELLIPSIS
-    0.0683...
+    >>> gn.score(X, y)  # doctest: +ELLIPSIS
+    0.1280...
     """
     def __init__(self, l1, l2, gn, A, algorithm=None, algorithm_params=dict(),
                  start_vector=weights.RandomUniformWeights(normalise=True),
@@ -2268,7 +2268,7 @@ class LogisticRegressionL1L2GraphNet(LogisticRegressionEstimator):
     >>> y = np.random.randint(0, 2, (n, 1))
     >>> l1 = 0.1  # L1 coefficient
     >>> l2 = 0.9  # Ridge coefficient
-    TODO
+    >>> # TODO
     """
     def __init__(self, l1, l2, gn,
                  A=None, mu=consts.TOLERANCE,

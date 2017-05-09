@@ -85,7 +85,7 @@ class GradientDescent(bases.ExplicitAlgorithm,
                                               max_iter=max_iter,
                                               min_iter=min_iter)
 
-        self.eps = eps
+        self.eps = max(0.0, float(eps))
 
     @bases.force_reset
     @bases.check_compatibility
@@ -217,7 +217,7 @@ class AcceleratedGradientDescent(bases.ExplicitAlgorithm,
                                                          max_iter=max_iter,
                                                          min_iter=min_iter)
 
-        self.eps = eps
+        self.eps = max(0.0, float(eps))
 
     @bases.force_reset
     @bases.check_compatibility

@@ -64,7 +64,7 @@ class ZeroFunction(properties.AtomicFunction,
             be exempt from penalisation. Equivalently, the first index to be
             penalised. Default is 0, all columns are included.
         """
-        self.l = float(l)
+        self.l = max(0.0, float(l))
         self.c = float(c)
         if self.c < 0.0:
             raise ValueError("A negative constraint parameter does not make "
@@ -333,9 +333,9 @@ class L0(properties.AtomicFunction,
     """
     def __init__(self, l=1.0, c=0.0, penalty_start=0):
 
-        self.l = float(l)
+        self.l = max(0.0, float(l))
         self.c = float(c)
-        self.penalty_start = int(penalty_start)
+        self.penalty_start = max(0, int(penalty_start))
 
     def f(self, x):
         """Function value.
@@ -709,9 +709,9 @@ class L2(properties.AtomicFunction,
     """
     def __init__(self, l=1.0, c=0.0, penalty_start=0):
 
-        self.l = float(l)
+        self.l = max(0.0, float(l))
         self.c = float(c)
-        self.penalty_start = int(penalty_start)
+        self.penalty_start = max(0, int(penalty_start))
 
     def f(self, beta):
         """Function value.
@@ -854,9 +854,9 @@ class L2Squared(properties.AtomicFunction,
     """
     def __init__(self, l=1.0, c=0.0, penalty_start=0):
 
-        self.l = float(l)
+        self.l = max(0.0, float(l))
         self.c = float(c)
-        self.penalty_start = int(penalty_start)
+        self.penalty_start = max(0, int(penalty_start))
 
     def f(self, beta):
         """Function value.
@@ -1112,7 +1112,7 @@ class QuadraticConstraint(properties.AtomicFunction,
     """
     def __init__(self, l=1.0, c=0.0, M=None, N=None, penalty_start=0):
 
-        self.l = float(l)
+        self.l = max(0.0, float(l))
         self.c = float(c)
         if self.penalty_start > 0:
             self.M = M[:, self.penalty_start:]  # NOTE! We slice M here!
@@ -1120,7 +1120,7 @@ class QuadraticConstraint(properties.AtomicFunction,
         else:
             self.M = M
             self.N = N
-        self.penalty_start = penalty_start
+        self.penalty_start = max(0, int(penalty_start))
 
     def f(self, beta):
         """Function value.
@@ -2054,13 +2054,16 @@ class SufficientDescentCondition(properties.Function,
 
         Parameters
         ----------
-        p : Numpy array. The descent direction.
+        p : numpy.ndarray
+            The descent direction.
 
-        c : Float, 0 < c < 1. A constant for the condition. Should be small.
+        c : float
+            A float satisfying 0 < c < 1. A constant for the condition. Should
+            be "small".
         """
         self.function = function
         self.p = p
-        self.c = c
+        self.c = max(0.0, max(float(c), 1.0))
 
     def f(self, x, a):
 
