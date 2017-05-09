@@ -176,6 +176,7 @@ def direct_vector(v):
     return v
 
 
+# TODO: Remove or replace! Use functionality from scipy.optimize instead!
 class Bisection(bases.ExplicitAlgorithm,
                 bases.IterativeAlgorithm,
                 bases.InformationAlgorithm):

@@ -8,7 +8,7 @@ such that settings for parsimony.algorithms are found in the section
 
 Created on Wed Apr  8 21:21:20 2015
 
-Copyright (c) 2013-2015, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt
 @email:   lofstedt.tommy@gmail.com
@@ -25,6 +25,10 @@ except ImportError:
 
 __all__ = ["get_option", "get_boolean", "get_float", "get_int", "set_option",
            "flush"]
+
+# TODO: Python 3 destroys the ini file sometimes on delete. Make the config
+#       read the file on every call? Slower, but much safer; especially when
+#       running multiple instances of pylearn-parsimony.
 
 #__config__ = None
 #__ini_file__ = "config.ini"

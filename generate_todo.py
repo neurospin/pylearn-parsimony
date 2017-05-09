@@ -13,7 +13,6 @@ Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 import os
 import re
-import string
 
 PATH = "./parsimony/"
 OUTPUT = "./TODO"
@@ -54,10 +53,10 @@ with open(OUTPUT, "w+") as out:
                                 write(out, "%s:" % fullpath)
                                 write(out, "-" * len(fullpath))
                                 first_in_file = False
-                            write(out, "%d: %s" % (i + 1, string.strip(line)))
+                            write(out, "%d: %s" % (i + 1, line.strip()))
                             match_next_comment = True
                         elif match_next_comment and RE_COMMENT.match(line):
-                            write(out, "%d: %s" % (i + 1, string.strip(line)))
+                            write(out, "%d: %s" % (i + 1, line.strip()))
                         else:
                             if match_next_comment:
                                 write(out, "")
