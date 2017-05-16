@@ -10,7 +10,7 @@ should not depend on any state.
 
 Created on Thu Feb 20 17:42:16 2014
 
-Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 @author:  Tommy Löfstedt, Edouard Duchesnay
 @email:   lofstedt.tommy@gmail.com, edouard.duchesnay@cea.fr
@@ -110,7 +110,8 @@ class ImplicitAlgorithm(with_metaclass(abc.ABCMeta, BaseAlgorithm)):
 
     Parameters
     ----------
-    X : One or more data matrices.
+    X : numpy.ndarray or list of numpy.ndarray
+        One or more data matrices.
     """
     @abc.abstractmethod
     def run(X, **kwargs):
@@ -134,9 +135,11 @@ class ExplicitAlgorithm(with_metaclass(abc.ABCMeta, BaseAlgorithm)):
 
         Parameters
         ----------
-        function : The function to minimise.
+        function : parsimony.functions.properties.Function
+            The function to minimise.
 
-        x : A starting point.
+        x : numpy.ndarray or list of numpy.ndarray
+            A starting point.
         """
         raise NotImplementedError('Abstract method "run" must be '
                                   'specialised!')
@@ -145,30 +148,34 @@ class ExplicitAlgorithm(with_metaclass(abc.ABCMeta, BaseAlgorithm)):
 class IterativeAlgorithm(object):
     """Algorithms that require iterative steps to achieve the goal.
 
-    Fields
-    ------
-    max_iter : Non-negative integer. The maximum number of allowed iterations.
-
-    min_iter : Non-negative integer less than or equal to max_iter. The minimum
-            number of iterations that must be performed. Default is 1.
-
-    num_iter : Non-negative integer greater than or equal to min_iter. The
-            number of iterations performed by the iterative algorithm. All
-            algorithms that inherit from IterativeAlgortihm MUST call
-            iter_reset before every run.
-
     Parameters
     ----------
-    max_iter : int
+    max_iter : int, optional
         A non-negative integer. The maximum number of allowed iterations.
+        Default is consts.MAX_ITER.
 
-    min_iter : int
+    min_iter : int, optional
         A non-negative integer. The minimum number of required iterations.
+        Default is 1.
 
-    callback : Callable
+    callback : Callable, optional
         A callable that accepts a dictionary with parameters and their values.
         Usually callback will be called with the output of locals() at each
         iteration of the algorithm.
+
+    Fields
+    ------
+    max_iter : int
+        Non-negative integer. The maximum number of allowed iterations.
+
+    min_iter : int
+        Non-negative integer less than or equal to max_iter. The minimum number
+        of iterations that must be performed. Default is 1.
+
+    num_iter : int
+        Non-negative integer greater than or equal to min_iter. The number of
+        iterations performed by the iterative algorithm. All algorithms that
+        inherit from IterativeAlgortihm MUST call iter_reset before every run.
     """
     def __init__(self, max_iter=consts.MAX_ITER, min_iter=1, callback=None,
                  **kwargs):
@@ -196,18 +203,24 @@ class InformationAlgorithm(object):
     ALL algorithms that inherit from InformationAlgorithm MUST add force_reset
     as a decorator to the run method.
 
+    Parameters
+    ----------
+    info : list or tuple of utils.Info, optional
+        The identifiers for the run information to return. Default is an empty
+        list.
+
     Fields
     ------
-    info_ret : Dictionary. The algorithm outputs are collected in this
-            dictionary.
+    info_ret : dict
+        The algorithm outputs are collected in this dictionary.
 
-    info : List of utils.Info. The identifiers for the requested information
-            outputs. The algorithms will store the requested outputs in
-            self.info.
+    info : list of utils.Info
+        The identifiers for the requested information outputs. The algorithms
+        will store the requested outputs in self.info.
 
-    INFO_PROVIDED : List of utils.Info. The allowed output identifiers. The
-            implementing class should update this list with the
-            provided/allowed outputs.
+    INFO_PROVIDED : list of utils.Info
+        The allowed output identifiers. The implementing class should update
+        this list with the provided/allowed outputs.
 
     Examples
     --------
@@ -231,12 +244,6 @@ class InformationAlgorithm(object):
     INFO_PROVIDED = []
 
     def __init__(self, info=[], **kwargs):
-        """
-        Parameters
-        ----------
-        info : List or tuple of utils.Info. The identifiers for the run
-                information to return.
-        """
         super(InformationAlgorithm, self).__init__(**kwargs)
 
         if not isinstance(info, (list, tuple)):
@@ -252,8 +259,9 @@ class InformationAlgorithm(object):
 
         Parameters
         ----------
-        nfo : utils.Info. The identifier to return information about. If nfo is
-                None, all information is returned in a dictionary.
+        nfo : utils.Info
+            The identifier to return information about. If nfo is None, all
+            information is returned in a dictionary.
         """
         if nfo is None:
             return self.info_ret
@@ -266,9 +274,11 @@ class InformationAlgorithm(object):
 
         Parameters
         ----------
-        nfo : utils.Info. The identifier to for the computed information about.
+        nfo : utils.Info
+            The identifier to for the computed information about.
 
-        value : object. The value to associate with nfo.
+        value : object
+            The value to associate with nfo.
         """
         self.info_ret[nfo] = value
 
@@ -305,8 +315,8 @@ class InformationAlgorithm(object):
 
         Parameters
         ----------
-        info : A list of utils.Info. The identifiers for information that
-                should be computed.
+        info : list of utils.Info
+            The identifiers for information that should be computed.
         """
         for i in info:
             if not self.info_provided(i):

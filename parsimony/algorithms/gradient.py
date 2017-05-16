@@ -39,17 +39,22 @@ class GradientDescent(bases.ExplicitAlgorithm,
 
     Parameters
     ----------
-    eps : Positive float. Tolerance for the stopping criterion.
+    eps : float, optional
+        Positive float. Tolerance for the stopping criterion. Default is
+        consts.TOLERANCE.
 
-    info : List or tuple of utils.consts.Info. What, if any, extra run
-            information should be stored. Default is an empty list, which means
-            that no run information is computed nor returned.
+    info : list or tuple of utils.consts.Info, optional
+        What, if any, extra run information should be stored. Default is an
+        empty list, which means that no run information is computed nor
+        returned.
 
-    max_iter : Non-negative integer. Maximum allowed number of iterations.
-            Default is 20000.
+    max_iter : int, optional
+        Non-negative integer. Maximum allowed number of iterations. Default is
+        20000.
 
-    min_iter : Non-negative integer less than or equal to max_iter. Minimum
-            number of iterations that must be performed. Default is 1.
+    min_iter : int, optional
+        Non-negative integer less than or equal to max_iter. Minimum number of
+        iterations that must be performed. Default is 1.
 
     Examples
     --------
@@ -94,7 +99,7 @@ class GradientDescent(bases.ExplicitAlgorithm,
 
         Parameters
         ----------
-        function : Function
+        function : parsimony.functions.properties.Function
             The function to minimise.
 
         beta : numpy.ndarray or list of numpy.ndarray
@@ -173,17 +178,22 @@ class AcceleratedGradientDescent(bases.ExplicitAlgorithm,
 
     Parameters
     ----------
-    eps : Positive float. Tolerance for the stopping criterion.
+    eps : float, optional
+        Positive float. Tolerance for the stopping criterion. Default is
+        consts.TOLERANCE.
 
-    info : List or tuple of utils.consts.Info. What, if any, extra run
-            information should be stored. Default is an empty list, which means
-            that no run information is computed nor returned.
+    info : list or tuple of utils.consts.Info, optional
+        What, if any, extra run information should be stored. Default is an
+        empty list, which means that no run information is computed nor
+        returned.
 
-    max_iter : Non-negative integer. Maximum allowed number of iterations.
-            Default is 20000.
+    max_iter : int, optional
+        Non-negative integer. Maximum allowed number of iterations. Default is
+        20000.
 
-    min_iter : Non-negative integer less than or equal to max_iter. Minimum
-            number of iterations that must be performed. Default is 1.
+    min_iter : int, optional
+        Non-negative integer less than or equal to max_iter. Minimum number of
+        iterations that must be performed. Default is 1.
 
     Examples
     --------
@@ -226,7 +236,7 @@ class AcceleratedGradientDescent(bases.ExplicitAlgorithm,
 
         Parameters
         ----------
-        function : Function
+        function : parsimony.functions.properties.Function
             The function to minimise.
 
         beta : numpy.ndarray or list of numpy.ndarray
