@@ -84,7 +84,6 @@ class IndicatorFunction(with_metaclass(abc.ABCMeta, Function)):
 
     I.e. f(x) = 0 if x is in the associated set and infinity otherwise.
     """
-
     @abc.abstractmethod
     def f(self, *args, **kwargs):
         """Function value.
@@ -105,15 +104,13 @@ class SplittableFunction(with_metaclass(abc.ABCMeta, Function)):
     The first function, g(x), is accessed as self.g(...) and the second
     function, h(x), is accessed as self.h(...).
     """
-
     def f(self, x):
         """Function value.
         """
-        return self.g.f(x) \
-            + self.h.f(x)
+        return self.g.f(x) + self.h.f(x)
 
 
-class KernelFunction(Function):
+class KernelFunction(with_metaclass(abc.ABCMeta, Function)):
     """This is a function that uses Mercer kernels in the inner products.
 
     Parameters
@@ -121,8 +118,6 @@ class KernelFunction(Function):
     kernel : algorithms.utils.Kernel, optional
         A Mercer kernel. Default (when None) is a linear kernel.
     """
-    __metaclass__ = abc.ABCMeta
-
     def __init__(self, kernel=None, **kwargs):
 
         super(KernelFunction, self).__init__(**kwargs)
@@ -134,6 +129,29 @@ class KernelFunction(Function):
             self.kernel = kernel
 
 
+class DataFunction(with_metaclass(abc.ABCMeta, Function)):
+    """A function of the data, as well as of the parameters.
+    """
+    @abc.abstractmethod
+    def set_data(self, X, y=None):
+        """Updates the data in the function.
+
+        The functions must properly invalidate e.g. cached values that depend
+        on the data.
+
+        Parameters
+        ----------
+        X : numpy.ndarray or list of numpy.ndarray
+            The data to update the function with.
+
+        y : numpy.ndarray, optional
+            For e.g. regression methods, update the optional examples. Default
+            is None, there is no y vector to update.
+        """
+        raise NotImplementedError('Abstract method "set_data" must be '
+                                  'specialised!')
+
+
 class Penalty(with_metaclass(abc.ABCMeta, object)):
     """Represents the penalisation of a function.
 
@@ -143,9 +161,10 @@ class Penalty(with_metaclass(abc.ABCMeta, object)):
 
     Parameters
     ----------
-    penalty_start : Non-negative integer. The number of columns, variables
-            etc., to except from penalisation. Equivalently, the first index
-            to be penalised. Default is 0, all columns are included.
+    penalty_start : int
+        Non-negative integer. The number of columns, variables etc., to except
+        from penalisation. Equivalently, the first index to be penalised.
+        Default is 0, all columns are included.
     """
     pass
 
@@ -160,11 +179,11 @@ class Constraint(with_metaclass(abc.ABCMeta, object)):
 
     Parameters
     ----------
-    penalty_start : The number of columns, variables etc., to except from
-            penalisation. Equivalently, the first index to be penalised.
-            Default is 0, all columns are included.
+    penalty_start : int
+        The number of columns, variables etc., to except from penalisation.
+        Equivalently, the first index to be penalised. Default is 0, all
+        columns are included.
     """
-
     @abc.abstractmethod
     def feasible(self, x):
         """Feasibility of the constraint at point x.
@@ -174,7 +193,8 @@ class Constraint(with_metaclass(abc.ABCMeta, object)):
 
 
 class ProximalOperator(with_metaclass(abc.ABCMeta, object)):
-
+    """Represents a penalty function that has a known proximal operator.
+    """
     @abc.abstractmethod
     def prox(self, x, factor=1.0, eps=consts.TOLERANCE, max_iter=100,
              index=0):
@@ -182,23 +202,31 @@ class ProximalOperator(with_metaclass(abc.ABCMeta, object)):
 
         Parameters
         ----------
-        x : Numpy array (p-by-1). The point at which to apply the proximal
-                operator.
+        x : numpy.ndarray, shape (p, 1)
+            The point at which to apply the proximal operator.
 
-        factor : Positive float. A factor by which the Lagrange multiplier is
-                scaled. This is usually the step size.
+        factor : float, optional
+            Positive float. A factor by which the Lagrange multiplier is
+            scaled. This is usually the step size. Default is 1.0.
 
-        eps : Positive float. This is the stopping criterion for inexact
-                proximal methods, where the proximal operator is approximated
-                numerically.
+        eps : float, optional
+            Positive float. This is the stopping criterion for inexact proximal
+            methods, where the proximal operator is approximated numerically.
+            Default is consts.TOLERANCE.
 
         max_iter : Positive integer. This is the maximum number of iterations
                 for inexact proximal methods, where the proximal operator is
                 approximated numerically.
 
-        index : Non-negative integer. For multivariate functions, this
-                identifies the variable for which the proximal operator is
-                associated.
+        max_iter : int, optional
+            Positive integer. This is the maximum number of iterations for
+            inexact proximal methods, where the proximal operator is
+            approximated numerically. Default is 100.
+
+        index : int, optional
+            Non-negative integer. For multivariate functions, this identifies
+            the variable for which the proximal operator is associated. Default
+            is 0.
         """
         raise NotImplementedError('Abstract method "prox" must be '
                                   'specialised!')
@@ -228,7 +256,6 @@ class AugmentedProximalOperator(with_metaclass(abc.ABCMeta, ProximalOperator)):
     rho : Non-negative float. The regularisation constant for the augmented
             Lagrangian.
     """
-
     def __init__(self, rho=1.0):
 
         self.rho = max(0.0, float(rho))
@@ -241,10 +268,26 @@ class AugmentedProximalOperator(with_metaclass(abc.ABCMeta, ProximalOperator)):
 
 
 class ProjectionOperator(with_metaclass(abc.ABCMeta, object)):
-
+    """Represents a constraint function that has a known projection operator.
+    """
     @abc.abstractmethod
     def proj(self, beta, eps=consts.TOLERANCE, max_iter=100):
         """The projection operator corresponding to the function.
+
+        Parameters
+        ----------
+        beta : numpy.ndarray, shape (p, 1)
+            The point at which to apply the projection operator.
+
+        eps : float, optional
+            Positive float. This is the stopping criterion for inexact
+            projection methods, where the proximal operator is approximated
+            numerically. Default is consts.TOLERANCE.
+    
+        max_iter : int, optional
+            Positive integer. This is the maximum number of iterations for
+            inexact projection methods, where the projection operator is
+            approximated numerically. Default is 100.
         """
         raise NotImplementedError('Abstract method "proj" must be '
                                   'specialised!')
@@ -349,15 +392,41 @@ class Continuation(with_metaclass(abc.ABCMeta, object)):
 class Gradient(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
-    def grad(self, beta):
+    def grad(self, x):
         """Gradient of the function.
 
         Parameters
         ----------
-        beta : numpy array (p-by-1)
+        x : numpy.ndarray, shape (p, 1)
             The point at which to evaluate the gradient.
         """
         raise NotImplementedError('Abstract method "grad" must be '
+                                  'specialised!')
+
+    # TODO: Put in separate property?
+    def f_grad(self, x):
+        """Function value and gradient of the function.
+
+        Oftentimes, the function value and gradient have overlapping
+        computations, and computing them simultaneously may reduce the total
+        amount of computations.
+
+        This method is optional to implement.
+
+        Parameters
+        ----------
+        x : numpy array, shape (p, 1)
+            The point at which to evaluate the gradient.
+
+        Returns
+        -------
+        f : float
+            The function value.
+
+        grad : numpy.ndarray
+            The gradient of the function at the given point.
+        """
+        raise NotImplementedError('Abstract method "f_grad" has not been '
                                   'specialised!')
 
     def approx_grad(self, x, eps=1e-4):
@@ -365,12 +434,13 @@ class Gradient(with_metaclass(abc.ABCMeta, object)):
 
         Parameters
         ----------
-        beta : Numpy array (p-by-1). The point at which to evaluate the
-                gradient.
+        x : numpy.ndarray, shape (p, 1)
+            The point at which to evaluate the gradient.
 
-        eps : Positive integer. The precision of the numerical solution.
-                Smaller is better, but too small may result in floating point
-                precision errors.
+        eps : float, optional
+            Positive float. The precision of the numerical solution. Smaller is
+            better, but too small may result in floating point precision
+            errors. Default is 1e-4.
         """
         p = x.shape[0]
         grad = np.zeros(x.shape)
@@ -428,19 +498,20 @@ class Derivative(with_metaclass(abc.ABCMeta, object)):
 
 
 class SubGradient(with_metaclass(abc.ABCMeta, object)):
-
+    """A function with a known subgradient.
+    """
     @abc.abstractmethod
     def subgrad(self, beta, clever=True, random_state=None, **kwargs):
         """Subgradient of the function.
 
         Parameters
         ----------
-        beta : numpy array (p-by-1)
+        beta : numpy.ndarray, shape (p, 1)
             The point at which to evaluate the subgradient.
 
-        clever : bool
+        clever : bool, optional
             Whether or not to try to be "clever" when computing the
-            subgradient. If True, be "clever" in the sence that values of the
+            subgradient. If True, be "clever" in the sense that values of the
             subgradient are chosen that are assumed to improve the estimations;
             if False, use random uniform values. Default is True.
 
@@ -451,7 +522,6 @@ class SubGradient(with_metaclass(abc.ABCMeta, object)):
         """
         raise NotImplementedError('Abstract method "subgrad" must be '
                                   'specialised!')
-
 
 class Hessian(with_metaclass(abc.ABCMeta, object)):
 
@@ -615,10 +685,12 @@ class StronglyConvex(with_metaclass(abc.ABCMeta, object)):
                                   'implemented!')
 
 
-class NesterovFunction(with_metaclass(abc.ABCMeta, Gradient,
-                       LipschitzContinuousGradient,
-                       Eigenvalues,
-                       ProximalOperator)):
+class NesterovFunction(with_metaclass(abc.ABCMeta,
+                                      AtomicFunction,
+                                      Gradient,
+                                      LipschitzContinuousGradient,
+                                      Eigenvalues,
+                                      ProximalOperator)):
     """Abstract superclass of Nesterov functions.
 
     Attributes:
