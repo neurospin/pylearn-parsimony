@@ -64,6 +64,9 @@ class Info(object):
     beta_start = "beta_start"  # The start vector used.
     continuations = "continuations"  # In continuation: Number of continuations
     verbose = "verbose"  # Tell algo to be verbose
+    param_start = "param_start"  # The start parameters used.
+    param_end = "param_end"  # The final parameters found by the algorithm.
+    # TODO: Replace beta, betak and beta_start with param_start and param_end
 
 
 class AlgorithmSnapshot:

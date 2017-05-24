@@ -151,6 +151,13 @@ class DataFunction(with_metaclass(abc.ABCMeta, Function)):
         raise NotImplementedError('Abstract method "set_data" must be '
                                   'specialised!')
 
+    @abc.abstractmethod
+    def has_data(self):
+        """Returns True if the method set_data has been previously called.
+        """
+        raise NotImplementedError('Abstract method "has_data" must be '
+                                  'specialised!')
+
 
 class Penalty(with_metaclass(abc.ABCMeta, object)):
     """Represents the penalisation of a function.
