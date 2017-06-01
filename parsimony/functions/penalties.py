@@ -64,9 +64,9 @@ class ZeroFunction(properties.AtomicFunction,
             be exempt from penalisation. Equivalently, the first index to be
             penalised. Default is 0, all columns are included.
         """
-        self.l = max(0.0, float(l))
-        self.c = float(c)
-        if self.c < 0.0:
+        self.l = np.maximum(0.0, np.asarray(l, dtype=float))
+        self.c = np.asarray(c, dtype=float)
+        if np.any(self.c < 0.0):
             raise ValueError("A negative constraint parameter does not make "
                              "sense, since the function is always zero.")
         self.penalty_start = max(0, int(penalty_start))
@@ -144,8 +144,8 @@ class L1(properties.AtomicFunction,
     """
     def __init__(self, l=1.0, c=0.0, penalty_start=0):
 
-        self.l = float(l)
-        self.c = float(c)
+        self.l = np.asarray(l, dtype=float)
+        self.c = np.asarray(c, dtype=float)
         self.penalty_start = max(0, int(penalty_start))
 
     def f(self, beta):
@@ -156,7 +156,7 @@ class L1(properties.AtomicFunction,
         else:
             beta_ = beta
 
-        return self.l * (maths.norm1(beta_) - self.c)
+        return self.l * (maths.norm1(beta_, axis=0) - self.c)
 
     def subgrad(self, beta, clever=True, random_state=None, **kwargs):
 
@@ -201,6 +201,9 @@ class L1(properties.AtomicFunction,
 
         From the interface "ProjectionOperator".
         """
+        if beta.shape[1] != 1:
+            raise ValueError("Not vectorized yet: vector's shape should be [p, 1]")
+
         if self.penalty_start > 0:
             beta_ = beta[self.penalty_start:, :]
         else:
@@ -293,7 +296,7 @@ class L1(properties.AtomicFunction,
         else:
             beta_ = beta
 
-        return maths.norm1(beta_) <= self.c
+        return maths.norm1(beta_, axis=0) <= self.c
 
 
 class L0(properties.AtomicFunction,
@@ -333,8 +336,8 @@ class L0(properties.AtomicFunction,
     """
     def __init__(self, l=1.0, c=0.0, penalty_start=0):
 
-        self.l = max(0.0, float(l))
-        self.c = float(c)
+        self.l = np.maximum(0.0, np.asarray(l, dtype=float))
+        self.c = np.asarray(c, dtype=float)
         self.penalty_start = max(0, int(penalty_start))
 
     def f(self, x):
@@ -516,8 +519,8 @@ class LInf(properties.AtomicFunction,
     """
     def __init__(self, l=1.0, c=0.0, penalty_start=0):
 
-        self.l = float(l)
-        self.c = float(c)
+        self.l = np.asarray(l, dtype=float)
+        self.c = np.asarray(c, dtype=float)
         self.penalty_start = int(penalty_start)
 
     def f(self, x):
@@ -709,8 +712,8 @@ class L2(properties.AtomicFunction,
     """
     def __init__(self, l=1.0, c=0.0, penalty_start=0):
 
-        self.l = max(0.0, float(l))
-        self.c = float(c)
+        self.l = np.maximum(0.0, np.asarray(l, dtype=float))
+        self.c = np.asarray(c, dtype=float)
         self.penalty_start = max(0, int(penalty_start))
 
     def f(self, beta):
@@ -854,8 +857,8 @@ class L2Squared(properties.AtomicFunction,
     """
     def __init__(self, l=1.0, c=0.0, penalty_start=0):
 
-        self.l = max(0.0, float(l))
-        self.c = float(c)
+        self.l = np.maximum(0.0, np.asarray(l, dtype=float))
+        self.c = np.asarray(c, dtype=float)
         self.penalty_start = max(0, int(penalty_start))
 
     def f(self, beta):
@@ -1030,8 +1033,8 @@ class L1L2Squared(properties.AtomicFunction,
     """
     def __init__(self, l1=1.0, l2=1.0, penalty_start=0):
 
-        self.l1 = max(0.0, float(l1))
-        self.l2 = max(0.0, float(l2))
+        self.l1 = np.maximum(0.0, np.asarray(l1, dtype=float))
+        self.l2 = np.maximum(0.0, np.asarray(l2, dtype=float))
         self.penalty_start = max(0, int(penalty_start))
 
     def f(self, beta):
@@ -1111,6 +1114,9 @@ class QuadraticConstraint(properties.AtomicFunction,
             to be penalised. Default is 0, all columns are included.
     """
     def __init__(self, l=1.0, c=0.0, M=None, N=None, penalty_start=0):
+
+        if np.size(l) != 1 or np.size(c) != 1:
+            raise ValueError("Not vectorized yet: parameters should be scalars")
 
         self.l = max(0.0, float(l))
         self.c = float(c)
@@ -1212,6 +1218,9 @@ class GraphNet(QuadraticConstraint,
     """
     def __init__(self, l=1.0, A=None, penalty_start=0):
 
+        if np.size(l) != 1:
+            raise ValueError("Not vectorized yet: parameters should be scalars")
+
         self.l = float(l)
         self.c = 0
         self.M = A  # for QuadraticConstraint
@@ -1295,6 +1304,9 @@ class RGCCAConstraint(QuadraticConstraint,
     """
     def __init__(self, l=1.0, c=0.0, tau=1.0, X=None, unbiased=True,
                  penalty_start=0):
+
+        if np.size(l) != 1 or np.size(c) != 1:
+            raise ValueError("Not vectorized yet: parameters should be scalars")
 
         self.l = max(0.0, float(l))
         self.c = float(c)
@@ -1568,10 +1580,10 @@ class RidgeSquaredError(properties.CompositeFunction,
             squared loss. Default is True, the mean squared loss.
     """
     def __init__(self, X, y, k, l=1.0, penalty_start=0, mean=True):
-        self.l = max(0.0, float(l))
+        self.l = np.maximum(0.0, np.asarray(l, dtype=float))
         self.X = X
         self.y = y
-        self.k = max(0.0, float(k))
+        self.k = np.maximum(0.0, np.asarray(k, dtype=float))
 
         self.penalty_start = max(0, int(penalty_start))
         self.mean = bool(mean)
@@ -1614,8 +1626,8 @@ class RidgeSquaredError(properties.CompositeFunction,
         else:
             d = 2.0
 
-        f = (1.0 / d) * np.sum((Xx_ - self.y) ** 2.0) \
-                + (self.k / 2.0) * np.sum(x_ ** 2.0)
+        f = (1.0 / d) * np.sum((Xx_ - self.y) ** 2.0, axis=0) \
+                + (self.k / 2.0) * np.sum(x_ ** 2.0, axis=0)
 
         return self.l * f
 
@@ -1794,6 +1806,9 @@ class LinearConstraint(properties.IndicatorFunction,
         The offset.
     """
     def __init__(self, a, b, c, penalty_start=0):
+
+        if np.size(b) != 1 or np.size(c) != 1:
+            raise ValueError("Not vectorized yet: parameters should be scalars")
 
         self.a = a
         self.b = float(b)
@@ -2061,6 +2076,9 @@ class SufficientDescentCondition(properties.Function,
             A float satisfying 0 < c < 1. A constant for the condition. Should
             be "small".
         """
+        if np.size(c) != 1:
+            raise ValueError("Not vectorized yet: parameters should be scalars")
+
         self.function = function
         self.p = p
         self.c = max(0.0, max(float(c), 1.0))
@@ -2192,6 +2210,9 @@ class KernelL2Squared(properties.AtomicFunction,
         penalised. Default is 0, all columns are included.
     """
     def __init__(self, l=1.0, kernel=None, penalty_start=0):
+
+        if np.size(l) != 1:
+            raise ValueError("Not vectorized yet: parameters should be scalars")
 
         self.l = max(0.0, float(l))
         if kernel is None:

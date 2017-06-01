@@ -20,7 +20,7 @@ __all__ = ["norm", "normFro", "norm1", "norm0", "normInf", "corr", "cov",
            "positive"]
 
 
-def norm(x):
+def norm(x, axis=None):
     """Returns the L2-norm for matrices (i.e. the Frobenius norm) or vectors.
 
     Examples
@@ -33,6 +33,9 @@ def norm(x):
     >>> vector = np.array([[0.2], [1.0], [0.4]])
     >>> norm(vector)  # doctest: +ELLIPSIS
     1.09544511...
+    >>> vectors = np.array([[0.2, -0.1], [1.0, 2], [0.4, -0.3]])
+    >>> norm(vectors,  axis=0) == np.sqrt(np.sum(vectors**2, axis=0))
+    array([ True,  True], dtype=bool)
     """
     n, p = x.shape
     if p == 1:
@@ -46,7 +49,7 @@ def norm(x):
         else:
             return np.sqrt(np.dot(x, x.T))[0, 0]
     else:
-        return np.linalg.norm(x)
+        return np.linalg.norm(x, axis=axis)
 
 
 def normFro(X):
@@ -68,11 +71,17 @@ def normFro(X):
     return norm(X)
 
 
-def norm1(x):
+def norm1(x, axis=None):
     """Returns the L1-norm or a matrix or vector.
 
     For vectors: sum(abs(x)**2)**(1./2)
     For matrices: max(sum(abs(x), axis=0))
+
+    Parameters
+    ----------
+    axis: None or int. If provided, x contains several vectors
+    (not a matrix) whose norms should calculated. axis along which a
+    norm are calculated.
 
     Examples
     --------
@@ -83,10 +92,18 @@ def norm1(x):
     >>> vector = np.array([[0.2], [1.0], [0.4]])
     >>> norm1(vector)
     1.6000000000000001
+    >>> vectors = np.array([[0.2, -0.1], [1.0, 2], [0.4, -0.3]])
+    >>> norm1(vectors,  axis=0)
+    array([ 1.6,  2.4])
+    >>> norm1(vectors[:, 0, np.newaxis])
+    1.6000000000000001
+    >>> norm1(vectors[:, 1, np.newaxis])
+    2.3999999999999999
+    >>>
     """
     n, p = x.shape
-    if p == 1 or n == 1:
-        return np.sum(np.abs(x))
+    if (p == 1 or n == 1) or (axis is not None):
+        return np.sum(np.abs(x), axis=axis)
     else:
         return np.max(np.sum(np.abs(x), axis=0))
 #    return np.linalg.norm(x, ord=1)

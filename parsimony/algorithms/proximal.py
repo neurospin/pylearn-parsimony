@@ -379,11 +379,12 @@ class FISTA(bases.ExplicitAlgorithm,
                         break
             else:
                 if not self.simulation:
-                    eps_cur = maths.norm(betanew - z)
+                    eps_cur = maths.norm(betanew - z, axis=0)
                     if self.info_requested(Info.verbose):
                         print("FISTA ite: %i, eps_cur:%g" % (i, eps_cur))
-                    if step > 0.0:
-                        if (1.0 / step) * eps_cur < self.eps \
+                    if np.all(step > 0.0):
+                        converged = (1.0 / step) * eps_cur < self.eps
+                        if np.all(converged) \
                                 and i >= self.min_iter:
 
                             if self.info_requested(Info.converged):
@@ -392,7 +393,8 @@ class FISTA(bases.ExplicitAlgorithm,
                             break
 
                     else:  # TODO: Fix this!
-                        if maths.norm(betanew - z) < self.eps \
+                        converged = maths.norm(betanew - z, axis=0) < self.eps
+                        if np.all(converged) \
                                 and i >= self.min_iter:
 
                             if self.info_requested(Info.converged):

@@ -519,9 +519,11 @@ class CombinedFunction(properties.CompositeFunction,
             for N in self._N:
                 L += N.L()
 
-        if all_lipschitz and L > consts.TOLERANCE:
+        if all_lipschitz and np.all(L > consts.TOLERANCE):
             step = 1.0 / L
         else:
+            if x.shape[1] != 1:
+                raise ValueError("Not vectorized yet: vector's shape should be [p, 1]")
             # If not all functions have Lipschitz continuous gradients, try
             # to find the step size through backtracking line search.
             from parsimony.algorithms.utils import BacktrackingLineSearch
@@ -1003,8 +1005,8 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
 #        print "Fenchel duality gap:", gap
 
         return gap
-        
-        
+
+
 
     def A(self):
         """Linear operator of the Nesterov function.
@@ -1563,7 +1565,7 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
         Bach in spam see:
         http://spams-devel.gforge.inria.fr/doc/html/doc_spams009.html
 
-        The artificial penalty is lambda_0 = 2 * eps / len(beta_with_null_l2). 
+        The artificial penalty is lambda_0 = 2 * eps / len(beta_with_null_l2).
 
         If l2 == 0.
         - f_tilde = f + lambda_0 ||beta||^2_2
@@ -1571,7 +1573,7 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
         - psi_star:  psi_star + Eq 33 paper OLS avec kappa = gamma = 0
 
         If penalty_start > 0 some variable are unpenalized.
-        Define beta = [beta_0, beta_1] with beta_0 
+        Define beta = [beta_0, beta_1] with beta_0
         coeficients of unpenalized variables.
         - f_tilde = f + lambda_0 ||beta_0||^2_2
         - l_star remain the same
@@ -1580,7 +1582,7 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
         n = float(self.X.shape[0])
         alpha = self.tv.alpha(beta)
         # gap = f + l_star + psi_star Eq 29 of OLS paper
- 
+
         # f
         f = self.fmu(beta)
         if self.rr.k == 0:
@@ -1613,7 +1615,7 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
             alpha_sqsum += np.sum(a_ ** 2.0)
 
         # psi_star
-        v = -np.dot(self.X.T, sigma)  
+        v = -np.dot(self.X.T, sigma)
         # Eq. 29 of OLS paper
         if self.rr.k == 0:
             l2_penalty = (2 * eps / len(beta))

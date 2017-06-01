@@ -87,7 +87,7 @@ class LinearRegression(properties.CompositeFunction,
         else:
             d = 2.0
 
-        f = (1.0 / d) * np.sum((np.dot(self.X, beta) - self.y) ** 2.0)
+        f = (1.0 / d) * np.sum((np.dot(self.X, beta) - self.y) ** 2.0, axis=0)
 
         return f
 
@@ -161,7 +161,7 @@ class LinearRegression(properties.CompositeFunction,
 
                 v = RankOneSVD(max_iter=1000).run(self.X)
                 us = np.dot(self.X, v)
-                self._L = np.sum(us ** 2.0)
+                self._L = np.sum(us ** 2.0, axis=0)
 
             else:
                 s = np.linalg.svd(self.X,
@@ -215,7 +215,7 @@ class RidgeRegression(properties.CompositeFunction,
         """
         self.X = X
         self.y = y
-        self.k = max(0.0, float(k))
+        self.k = np.maximum(0.0, np.asarray(k, dtype=float))
 
         self.penalty_start = max(0, int(penalty_start))
         self.mean = bool(mean)
@@ -250,8 +250,8 @@ class RidgeRegression(properties.CompositeFunction,
         else:
             d = 2.0
 
-        f = (1.0 / d) * np.sum((np.dot(self.X, beta) - self.y) ** 2.0) \
-            + (self.k / 2.0) * np.sum(beta_ ** 2.0)
+        f = (1.0 / d) * np.sum((np.dot(self.X, beta) - self.y) ** 2.0, axis=0)\
+            + (self.k / 2.0) * np.sum(beta_ ** 2.0, axis=0)
 
         return f
 
@@ -403,7 +403,8 @@ class LogisticRegression(properties.AtomicFunction,
         """
         Xbeta = np.dot(self.X, beta)
         negloglike = -np.sum(self.weights *
-                             ((self.y * Xbeta) - np.log(1 + np.exp(Xbeta))))
+                             ((self.y * Xbeta) - np.log(1 + np.exp(Xbeta))),
+                             axis=0)
 
         if self.mean:
             negloglike /= float(self.X.shape[0])
@@ -546,7 +547,7 @@ class RidgeLogisticRegression(properties.CompositeFunction,
         """
         self.X = X
         self.y = y
-        self.k = max(0.0, float(k))
+        self.k = np.maximum(0.0, np.asarray(k, dtype=float))
         if weights is None:
             weights = np.ones(y.shape)  # .reshape(y.shape)
         self.weights = weights
@@ -573,7 +574,8 @@ class RidgeLogisticRegression(properties.CompositeFunction,
         # TODO check the correctness of the re-weighted loglike
         Xbeta = np.dot(self.X, beta)
         negloglike = -np.sum(self.weights *
-                             ((self.y * Xbeta) - np.log(1 + np.exp(Xbeta))))
+                             ((self.y * Xbeta) - np.log(1 + np.exp(Xbeta))),
+                             axis=0)
 
         if self.mean:
             negloglike *= 1.0 / float(self.X.shape[0])
@@ -583,7 +585,7 @@ class RidgeLogisticRegression(properties.CompositeFunction,
         else:
             beta_ = beta
 
-        return negloglike + (self.k / 2.0) * np.sum(beta_ ** 2.0)
+        return negloglike + (self.k / 2.0) * np.sum(beta_ ** 2.0, axis=0)
 
     def grad(self, beta):
         """Gradient of the function at beta.
@@ -717,7 +719,7 @@ class LatentVariableVariance(properties.Function,
         -1295.854475188615
         """
         Xw = np.dot(self.X, w)
-        wXXw = np.dot(Xw.T, Xw)[0, 0]
+        wXXw = np.dot(Xw.T, Xw) #[0, 0]
         return -wXXw / self._n
 
     def grad(self, w):
@@ -921,6 +923,9 @@ class LinearSVM(properties.Function,
         self.X = X
         self.y = y
 
+        if np.size(l) != 1:
+            raise ValueError("Not vectorized yet: parameters should be scalars")
+
         self.l = max(0.0, float(l))
 
         if kernel is None:
@@ -972,7 +977,7 @@ class LinearSVM(properties.Function,
             w_ = w[self.penalty_start:, :]
         else:
             w_ = w
-        f += (self.l / 2.0) * np.sum(w_ ** 2.0)
+        f += (self.l / 2.0) * np.sum(w_ ** 2.0, axis=0)
 
         return f
 
@@ -1069,6 +1074,9 @@ class NonlinearSVM(properties.KernelFunction,
         """
         self.X = X
         self.y = y
+
+        if np.size(l) != 1:
+            raise ValueError("Not vectorized yet: parameters should be scalars")
 
         self.l = max(0.0, float(l))
 
