@@ -365,14 +365,14 @@ class FISTA(bases.ExplicitAlgorithm,
                                    max_iter=self.max_iter)
 
                 # TODO: Warn if G_new < -consts.TOLERANCE.
-                gap = abs(gap)  # May happen close to machine epsilon.
+                gap = np.abs(gap)  # May happen close to machine epsilon.
                 if self.info_requested(Info.gap):
                     gap_.append(gap)
 
                 if not self.simulation:
                     if self.info_requested(Info.verbose):
                         print("FISTA ite:%i, gap:%g" % (i, gap))
-                    if gap < self.eps:
+                    if np.all(gap < self.eps):
                         if self.info_requested(Info.converged):
                             self.info_set(Info.converged, True)
 
@@ -524,30 +524,32 @@ class CONESTA(bases.ExplicitAlgorithm,
         # Compute current gap, precision eps (gap decreased by tau) and mu.
         function.set_mu(consts.TOLERANCE)
         gap = function.gap(beta, eps=self.eps, max_iter=self.max_iter)
-        eps = self.tau * abs(gap)
+        eps = self.tau * np.abs(gap)
         # Warning below if gap < -consts.TOLERANCE: See Special case 1
         gM = function.eps_max(1.0)
         loop = True
 
         # Special case 1: gap is very small: stopping criterion satisfied
-        if gap < self.eps:  # "- mu * gM" has been removed since mu == 0
+        if np.any(gap < self.eps):  # "- mu * gM" has been removed since mu == 0
             warnings.warn(
                 "Stopping criterion satisfied before the first iteration."
                 " Either beta_start a the solution (given eps)."
                 " If beta_start is null the problem might be over-penalized. "
                 " Then try smaller penalization.")
+
+        if np.all(gap < self.eps):
             loop = False
 
         # Special case 2: gap infinite or NaN => eps is not finite or NaN
         # => mu is NaN etc. Force eps to a large value, to force some FISTA
-        # iteration to getbetter starting point
-        if not np.isfinite(eps):
-            eps = self.eps_max
+        # iteration to get better starting point
+        eps[~np.isfinite(eps)] = self.eps_max
+        # if not np.isfinite(eps):
+        #    eps = self.eps_max
 
         if loop:  # mu is useless if loop is False
             mu = function.mu_opt(eps)
             function.set_mu(mu)
-        #gM = function.eps_max(1.0)
 
         # Initialise info variables. Info variables have the suffix "_".
         if self.info_requested(Info.time):
@@ -565,10 +567,9 @@ class CONESTA(bases.ExplicitAlgorithm,
 
         i = 0  # Iteration counter.
         while loop:
-            converged = False
 
             # Current precision.
-            eps_mu = max(eps, self.eps) - mu * gM
+            eps_mu = np.maximum(eps, self.eps) - mu * gM
 
             # Set current parameters to algorithm.
             algorithm.set_params(eps=eps_mu,
@@ -598,16 +599,15 @@ class CONESTA(bases.ExplicitAlgorithm,
 
             # Obtain the gap from the last FISTA run. May be small and negative
             # close to machine epsilon.
-            gap_mu = abs(algorithm.info_get(Info.gap)[-1])
+            gap_mu = np.abs(algorithm.info_get(Info.gap)[-1])
             # TODO: Warn if gap_mu < -consts.TOLERANCE.
 
             if not self.simulation:
-                if gap_mu + mu * gM < self.eps:
+                converged = gap_mu + mu * gM < self.eps
+                if np.all(converged):
 
                     if self.info_requested(Info.converged):
-                        self.info_set(Info.converged, True)
-
-                    converged = True
+                        self.info_set(Info.converged, converged)
 
             if self.callback is not None:
                 self.callback(locals())
@@ -616,16 +616,16 @@ class CONESTA(bases.ExplicitAlgorithm,
                       "eps_mu: %g" % (i, gap_mu, eps, mu, eps_mu))
 
             # Stopping criteria.
-            if (converged or self.num_iter >= self.max_iter) \
+            if (np.all(converged) or self.num_iter >= self.max_iter) \
                     and self.num_iter >= self.min_iter:
                 break
 
             # Update the precision eps.
 #            eps = self.tau * (gap_mu + mu * gM)
-            eps = max(self.eps, self.tau * (gap_mu + mu * gM))
+            eps = np.maximum(self.eps, self.tau * (gap_mu + mu * gM))
             # Compute and update mu.
 #            mu = max(self.mu_min, min(function.mu_opt(eps), mu))
-            mu = min(function.mu_opt(eps), mu)
+            mu = np.minimum(function.mu_opt(eps), mu)
             function.set_mu(mu)
 
             i = i + 1

@@ -290,7 +290,7 @@ class ProjectionOperator(with_metaclass(abc.ABCMeta, object)):
             Positive float. This is the stopping criterion for inexact
             projection methods, where the proximal operator is approximated
             numerically. Default is consts.TOLERANCE.
-    
+
         max_iter : int, optional
             Positive integer. This is the maximum number of iterations for
             inexact projection methods, where the projection operator is
@@ -728,11 +728,11 @@ class NesterovFunction(with_metaclass(abc.ABCMeta,
                 etc., to except from penalisation. Equivalently, the first
                 index to be penalised. Default is 0, all columns are included.
         """
-        self.l = max(0.0, float(l))
+        self.l = np.maximum(0.0, np.asarray(l, dtype=float))
         if A is None:
             raise ValueError("The linear operator A must not be None.")
         self._A = A
-        self.mu = max(0.0, float(mu))
+        self.mu = np.maximum(0.0, np.asarray(mu, dtype=float))
         self.penalty_start = max(0, int(penalty_start))
 
         self._alpha = None
@@ -752,7 +752,7 @@ class NesterovFunction(with_metaclass(abc.ABCMeta,
         alpha = self.alpha(beta)
         alpha_sqsum = 0.0
         for a in alpha:
-            alpha_sqsum += np.sum(a ** 2.0)
+            alpha_sqsum += np.sum(a ** 2.0, axis=0)
 
         Aa = self.Aa(alpha)
 
@@ -761,7 +761,8 @@ class NesterovFunction(with_metaclass(abc.ABCMeta,
         else:
             beta_ = beta
 
-        return self.l * (np.dot(beta_.T, Aa)[0, 0] - (mu / 2.0) * alpha_sqsum)
+        return self.l * (np.sum(beta_ * Aa, axis=0) - (mu / 2.0) * alpha_sqsum)
+        # return self.l * (np.dot(beta_.T, Aa) - (mu / 2.0) * alpha_sqsum)
 
     @abc.abstractmethod
     def phi(self, alpha, beta):
@@ -777,9 +778,6 @@ class NesterovFunction(with_metaclass(abc.ABCMeta,
         ----------
         beta : Numpy array. The point at which to evaluate the gradient.
         """
-        if self.l < consts.TOLERANCE:
-            return np.zeros(beta.shape)
-
         # beta need not be sliced here.
         alpha = self.alpha(beta)
 
@@ -788,6 +786,11 @@ class NesterovFunction(with_metaclass(abc.ABCMeta,
                                        self.Aa(alpha)))
         else:
             grad = self.l * self.Aa(alpha)
+
+        grad[self.l < consts.TOLERANCE] = 0
+
+        # if self.l < consts.TOLERANCE:
+        #    return np.zeros(beta.shape)
 
 #        approx_grad = utils.approx_grad(self.f, beta, eps=1e-6)
 #        print "NesterovFunction:", maths.norm(grad - approx_grad)
@@ -814,6 +817,9 @@ class NesterovFunction(with_metaclass(abc.ABCMeta,
         """
         old_mu = self.get_mu()
 
+        if np.isscalar(mu):
+            mu = np.repeat(mu, np.size(self.l))
+
         self.mu = mu
 
         return old_mu
@@ -833,8 +839,9 @@ class NesterovFunction(with_metaclass(abc.ABCMeta,
 
         A = self.A()
         mu = self.get_mu()
-        if mu < consts.TOLERANCE:
-            mu = consts.TOLERANCE
+        # if mu < consts.TOLERANCE:
+        #     mu = consts.TOLERANCE
+        mu[mu < consts.TOLERANCE] = consts.TOLERANCE
         alpha = [0] * len(A)
         for i in range(len(A)):
             alpha[i] = A[i].dot(beta_) * (1.0 / mu)
@@ -915,7 +922,7 @@ class NesterovFunction(with_metaclass(abc.ABCMeta,
         SS = 0.0
         A = self.A()
         for i in range(len(A)):
-            SS = max(SS, maths.norm(A[i].dot(beta_)))
+            SS = np.max(SS, maths.norm(A[i].dot(beta_), axis=0))
 
         return SS
 
@@ -944,12 +951,18 @@ class NesterovFunction(with_metaclass(abc.ABCMeta,
 
         From the interface "LipschitzContinuousGradient".
         """
-        if self.l < consts.TOLERANCE:
-            return 0.0
-
         lmaxA = self.lambda_max()
+        L = self.l * lmaxA / self.mu
+        L[self.l < consts.TOLERANCE] = 0
 
-        return self.l * lmaxA / self.mu
+        return L
+
+#        if self.l < consts.TOLERANCE:
+#            return 0.0
+#
+#        lmaxA = self.lambda_max()
+#
+#        return self.l * lmaxA / self.mu
 
     def prox(self, beta, factor=1.0, eps=consts.TOLERANCE, max_iter=1000):
         """The proximal operator corresponding to this function.
@@ -975,6 +988,9 @@ class NesterovFunction(with_metaclass(abc.ABCMeta,
                 for inexact proximal methods, where the proximal operator is
                 approximated numerically.
         """
+        if beta.shape[1] != 1:
+            raise ValueError("Not vectorized yet: vector's shape should be [p, 1]")
+
         eps = max(eps, consts.FLOAT_EPSILON)
 
         # Define the function to minimise

@@ -1585,11 +1585,27 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
 
         # f
         f = self.fmu(beta)
-        if self.rr.k == 0:
-            f += (2 * eps / len(beta)) * np.sum(beta ** 2)
-        elif self.penalty_start > 0: # f -> f_tilde = f + lambda_0 |beta_0|^2_2
-            f += (2 * eps / self.penalty_start) * \
-                np.sum(beta[:self.penalty_start, :] ** 2)
+
+        l2_is_null = self.rr.k == 0
+        # Eq. 29 of OLS paper: l2_penalty => 2 * eps / len(beta_with_null_l2)
+        if  np.any(l2_is_null):
+            l2_penalty = np.copy(self.rr.k)
+            l2_penalty[l2_is_null] = (2 * eps[l2_is_null] / beta.shape[0])
+        # if self.rr.k == 0:
+        #    l2_penalty = (2 * eps / beta.shape[0])
+
+            # f -> f_tilde = f + lambda_0 |beta_0|^2_2
+            f[l2_is_null] +=  l2_penalty[l2_is_null] \
+             * np.sum(beta[:, l2_is_null] ** 2, axis=0)
+        # if self.rr.k == 0:
+        #     f += (2 * eps / beta.shape[0]) * np.sum(beta ** 2)
+        else:
+            l2_penalty = self.rr.k
+
+        if self.penalty_start > 0: # f -> f_tilde = f + lambda_0 |beta_0|^2_2
+            f[~l2_is_null] += (2 * eps[~l2_is_null] / self.penalty_start) * \
+                np.sum(beta[:self.penalty_start, ~l2_is_null] ** 2, axis=0)
+
         Xbeta = np.dot(self.X, beta)
         pi = np.reciprocal(1.0 + np.exp(-Xbeta))
         #if weights is None:
@@ -1602,7 +1618,7 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
         sigma = (pi - self.y) * (self.weights * scale)
         b = ((1. / (self.weights * scale)) * sigma) + self.y
         l_star = np.sum((b * np.log(b) + (1 - b)
-                * np.log(1 - b)) * (self.weights * scale))
+                * np.log(1 - b)) * (self.weights * scale), axis=0)
         # TODO: It appears we sometimes get log(x) for x <= 0 here. np.clip?
 
         lAta = self.tv.l * self.tv.Aa(alpha)
@@ -1612,21 +1628,22 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
 
         alpha_sqsum = 0.0
         for a_ in alpha:
-            alpha_sqsum += np.sum(a_ ** 2.0)
+            alpha_sqsum += np.sum(a_ ** 2.0, axis=0)
 
         # psi_star
         v = -np.dot(self.X.T, sigma)
-        # Eq. 29 of OLS paper
-        if self.rr.k == 0:
-            l2_penalty = (2 * eps / len(beta))
-        else:
-            l2_penalty = self.rr.k
         psi_star = (1.0 / (2 * l2_penalty)) \
-           * np.sum(maths.positive(np.abs(v - lAta) - self.l1.l) ** 2.0) \
+           * np.sum(maths.positive(np.abs(v - lAta) - self.l1.l) ** 2.0,
+                    axis=0)\
            + (0.5 * self.tv.l * self.tv.get_mu() * alpha_sqsum)
-        if self.penalty_start > 0 and self.rr.k > 0:
-            psi_star += (0.5 / (2 * eps / self.penalty_start)) * \
-                np.sum(v[:self.penalty_start, :] ** 2)
+
+
+        if self.penalty_start > 0:
+            psi_star[~l2_is_null] += (0.5 / (2 * eps[~l2_is_null] / self.penalty_start)) * \
+                np.sum(v[:self.penalty_start, ~l2_is_null] ** 2, axis=0)
+#        if self.penalty_start > 0 and self.rr.k > 0:
+#            psi_star += (0.5 / (2 * eps / self.penalty_start)) * \
+#                np.sum(v[:self.penalty_start, :] ** 2, axis=0)
 
         gap = f + l_star + psi_star
 

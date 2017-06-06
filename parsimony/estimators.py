@@ -2050,7 +2050,7 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
             algorithm.set_params(**algorithm_params)
 
         if isinstance(algorithm, proximal.CONESTA) \
-                and self.tv < consts.TOLERANCE:
+                and np.all(self.tv < consts.TOLERANCE):
             algorithm = proximal.FISTA(**algorithm_params)
 
         super(LogisticRegressionL1L2TV, self).__init__(algorithm=algorithm,
@@ -2061,7 +2061,7 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
         self.A = A
 
         try:
-            self.mu = float([mu] * len(self.l1), dtype=float)
+            self.mu = np.array([mu] * len(self.l1), dtype=float)
         except (ValueError, TypeError):
             self.mu = None
 
@@ -2097,8 +2097,7 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
 
         # TODO: Should we use a seed here so that we get deterministic results?
         if beta is None:
-            beta = self.start_vector.get_weights(X.shape[1])
-
+            beta = self.start_vector.get_weights((X.shape[1], np.size(self.l1)))
         if self.mu is None:
             self.mu = function.estimate_mu(beta)
         else:
