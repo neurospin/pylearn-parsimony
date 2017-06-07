@@ -787,7 +787,7 @@ class NesterovFunction(with_metaclass(abc.ABCMeta,
         else:
             grad = self.l * self.Aa(alpha)
 
-        grad[self.l < consts.TOLERANCE] = 0
+        grad[:, self.l < consts.TOLERANCE] = 0
 
         # if self.l < consts.TOLERANCE:
         #    return np.zeros(beta.shape)
