@@ -182,8 +182,8 @@ class IterativeAlgorithm(object):
 
         super(IterativeAlgorithm, self).__init__(**kwargs)
 
-        self.max_iter = max_iter
-        self.min_iter = min_iter
+        self.min_iter = max(0, int(min_iter))
+        self.max_iter = max(self.min_iter, int(max_iter))
         self.callback = callback
         self.num_iter = 0
 

@@ -33,10 +33,76 @@ time_cpu = clock  # UNIX-based system measures CPU time used.
 time_wall = time  # UNIX-based system measures time in seconds since the epoch.
 time = time_cpu  # TODO: Make it so that this can be changed by settings.
 
-__all__ = ["time_cpu", "time_wall", "time", "deprecated", "corr", "project",
-           "optimal_shrinkage", "AnonymousClass"]
+__all__ = ["time_cpu", "time_wall", "time", "numpy_datatype", "deprecated",
+           "corr", "project", "optimal_shrinkage", "AnonymousClass"]
 
 # _DEBUG = True
+
+
+def numpy_datatype(dtype):  # TODO: Keep up-to-date!
+    """Convert input type representation to a numpy data type.
+
+    Parameters
+    ----------
+    dtype : data-type or str
+        The data type representation. Likely a numpy representation, or a
+        string representation.
+    """
+    # For built-in types, let numpy handle it!
+    if isinstance(dtype, (bool, int, float, complex)):
+        _ = np.zeros((1,), dtype=dtype)
+        dtype = _.dtype
+
+    # For special numpy types, let numpy handle it!
+    if isinstance(dtype, (np.bool_, np.int_, np.intc, np.intp, np.float_,
+                          np.complex_)):
+        _ = np.zeros((1,), dtype=dtype)
+        dtype = _.dtype
+
+    # If no type given, use default type (float64)
+    if (dtype is None):
+        dtype = consts.DATA_TYPE
+
+    if hasattr(dtype, "base_dtype"):  # For tensorflow inputs.
+        dtype = dtype.base_dtype
+
+    # Check for possible known types:
+    if (dtype == "float16") or (dtype == np.float16):
+        dtype = np.float16
+    elif (dtype == "float32") or (dtype == np.float32):
+        dtype = np.float32
+    elif (dtype == "float64") or (dtype == np.float64):
+        dtype = np.float64
+    elif (dtype == "int8") or (dtype == np.int8):
+        dtype = np.int8
+    elif (dtype == "int16") or (dtype == np.int16):
+        dtype = np.int16
+    elif (dtype == "int32") or (dtype == np.int32):
+        dtype = np.int32
+    elif (dtype == "int64") or (dtype == np.int64):
+        dtype = np.int64
+    elif (dtype == "uint8") or (dtype == np.uint8):
+        dtype = np.uint8
+    elif (dtype == "uint16") or (dtype == np.uint16):
+        dtype = np.uint16
+    elif (dtype == "string"):
+        dtype = np.string
+    elif (dtype == "bool") or (dtype == np.bool):
+        dtype = np.bool
+    elif (dtype == "complex64") or (dtype == np.complex64):
+        dtype = np.complex64
+    elif (dtype == "complex128") or (dtype == np.complex128):
+        dtype = np.complex128
+    elif (dtype == "qint8"):
+        dtype = np.qint8
+    elif (dtype == "qint32"):
+        dtype = np.qint32
+    elif (dtype == "quint8"):
+        dtype = np.quint8
+    else:
+        raise ValueError("Data-type not supported (%s)!" % (dtype,))
+
+    return dtype
 
 
 class deprecated(object):

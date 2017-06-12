@@ -16,16 +16,22 @@ try:
     from . import maths  # Only works when imported as a package.
 except (ValueError, SystemError):
     import parsimony.utils.maths as maths  # Run as a script.
+
 try:
     from . import consts  # Only works when imported as a package.
 except (ValueError, SystemError):
     import parsimony.utils.consts as consts  # Run as a script.
 from parsimony.utils import deprecated
 
+try:
+    from . import utils
+except (ValueError, SystemError):
+    from parsimony.utils import utils
+
 __all__ = ["BaseWeights", "IdentityWeights", "RandomUniformWeights",
            "OnesWeights", "ZerosWeights",
-           "NeuralNetworkInitialisation", "TanhInitialisation",
-           "LogisticInitialisation", "OrthogonalRandomInitialisation"]
+           "NeuralNetworkInitialiser", "TanhInitialiser",
+           "LogisticInitialiser", "OrthogonalRandomInitialiser"]
 
 
 class BaseWeights(with_metaclass(abc.ABCMeta, object)):
@@ -47,8 +53,16 @@ class BaseWeights(with_metaclass(abc.ABCMeta, object)):
         the random numbers will change. The seed is not used by all
         implementing classes. Default is None. Consider using random_state
         instead of a seed!
+
+    dtype : str or data-type, optional
+        The data type of the generated weights. Note that this may be an unsafe
+        operation, depending on the target type; consider using the default and
+        cast the output yourself, if this is a possible problem. Default is
+        None, which means to use the built-in numpy default (usually
+        np.float64).
     """
-    def __init__(self, normalise=False, random_state=None, seed=None):
+    def __init__(self, normalise=False, random_state=None, seed=None,
+                 dtype=None):  # TODO: Put in config file!
 
         super(BaseWeights, self).__init__()
 
@@ -67,6 +81,10 @@ class BaseWeights(with_metaclass(abc.ABCMeta, object)):
 
         self.random_state = random_state
         self.seed = seed
+        if dtype is not None:
+            self.dtype = utils.numpy_datatype(dtype)
+        else:
+            self.dtype = dtype
 
     @abc.abstractmethod
     def get_weights(self, shape):
@@ -95,6 +113,16 @@ class IdentityWeights(BaseWeights):
     weights : numpy.ndarray
         The predetermined weights.
 
+    normalise : bool
+        Whether or not to normalise the weight vectors that are returned.
+
+    dtype : str or data-type, optional
+        The data type of the generated weights. Note that this may be an unsafe
+        operation, depending on the target type; consider using the default and
+        cast the output yourself, if this is a possible problem. Default is
+        None, which means to use the built-in numpy default (usually
+        np.float64).
+
     Examples
     --------
     >>> import numpy as np
@@ -121,7 +149,16 @@ class IdentityWeights(BaseWeights):
     def get_weights(self, *args, **kwargs):
         """Returns the predetermined start vector
         """
-        return self.weights
+        weights = self.weights
+
+        # TODO: Normalise columns when a matrix?
+        if self.normalise:
+            weights = weights / maths.norm(weights)
+
+        if self.dtype is not None:
+            weights = weights.astype(self.dtype)
+
+        return weights
 
 
 @deprecated("IdentityWeights")
@@ -162,6 +199,13 @@ class RandomUniformWeights(BaseWeights):
         the random numbers will change. The seed is not used by all
         implementing classes. Default is None. Consider using random_state
         instead of a seed!
+
+    dtype : str or data-type, optional
+        The data type of the generated weights. Note that this may be an unsafe
+        operation, depending on the target type; consider using the default and
+        cast the output yourself, if this is a possible problem. Default is
+        None, which means to use the built-in numpy default (usually
+        np.float64).
 
     Examples
     --------
@@ -259,9 +303,188 @@ class RandomUniformWeights(BaseWeights):
 
         # TODO: Normalise columns when a matrix?
         if self.normalise:
-            return vector / maths.norm(vector)
+            vector /= maths.norm(vector)
+
+        if self.dtype is not None:
+            vector = vector.astype(self.dtype)
+
+        return vector
+
+
+class RandomNormalWeights(BaseWeights):
+    """Weights of normally distributed random values.
+
+    Parameters
+    ----------
+    limits : list or tuple
+        A list or tuple with two elements, the lower and upper ends of 95 % of
+        the density. If normalise=True, then these limits may not be
+        honoured. Default is (-2.0, 2.0). If both limits and variance is given,
+        the limits will be used.
+
+    mean : float
+        The mean of the normal distribution. If both limits, and mean and
+        variance are given, the limits will be used. If normalise is True, the
+        mean is likely to deviate from the requested. Default is 0.0.
+
+    variance : float
+        The variance of the normal distribution. If both limits, and mean and
+        variance are given, the limits will be used. If normalise is True, the
+        variance is likely to deviate from the requested. Default is 1.0.
+
+    normalise : bool, optional
+        Whether or not to normalise the weights that are returned. Kept for
+        consistency. Default is False, do not normalise the weights.
+
+    random_state : numpy.random.RandomState
+        A random state to use when sampling pseudo-random numbers. If not
+        provided, a random state is generated with a seed, if provided,
+        otherwise a random seed will be generated from the global random number
+        generator.
+
+    seed : int or None
+        The seed to the pseudo-random number generator. If None, no seed is
+        used. The seed is set at construction, so unless a random_state is
+        provided, if the RNG is used in between initialisation and utilisation,
+        the random numbers will change. The seed is not used by all
+        implementing classes. Default is None. Consider using random_state
+        instead of a seed!
+
+    dtype : str or data-type, optional
+        The data type of the generated weights. Note that this may be an unsafe
+        operation, depending on the target type; consider using the default and
+        cast the output yourself, if this is a possible problem. Default is
+        None, which means to use the built-in numpy default (usually
+        np.float64).
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import parsimony.utils.maths as maths
+    >>> from parsimony.utils.weights import RandomNormalWeights
+    >>>
+    >>> # Without normalization
+    >>> start_vector = RandomNormalWeights(seed=42)
+    >>> random = start_vector.get_weights(3)
+    >>> print(random)
+    [[ 0.49671415]
+     [-0.1382643 ]
+     [ 0.64768854]]
+    >>> (np.round(maths.norm(random), 13) - 2.0438869812767) < 5e-16
+    True
+    >>>
+    >>> # With normalization
+    >>> start_vector_normalized = RandomNormalWeights(normalise=True, seed=2)
+    >>> random_normalized = start_vector_normalized.get_weights(3)
+    >>> print(random_normalized)
+    [[-0.19141945]
+     [-0.0258437 ]
+     [-0.98116803]]
+    >>> np.round(maths.norm(random_normalized) - 1.0, 12) < 5e-16
+    True
+    >>>
+    >>> # With limits
+    >>> start_vector_normalized = RandomNormalWeights(normalise=True,
+    ...                                               seed=2,
+    ...                                               limits=(-1.0, 1.0))
+    >>> random_limits = start_vector_normalized.get_weights(3)
+    >>> print(random_limits)
+    [[-0.19141945]
+     [-0.0258437 ]
+     [-0.98116803]]
+    >>> np.round(maths.norm(random_limits) - 1.0, 13) < 5e-16
+    True
+    >>> start_vector = RandomNormalWeights(normalise=True,
+    ...                                    random_state=np.random.RandomState(3),
+    ...                                    limits=(-1.0, 1.0))
+    >>> random_1 = start_vector.get_weights((2, 3))
+    >>> print(random_1)
+    [[ 0.67247148  0.16411481  0.0362802 ]
+     [-0.70061822 -0.10428977 -0.1333789 ]]
+    >>> start_vector = RandomNormalWeights(normalise=True,
+    ...                                    random_state=np.random.RandomState(),
+    ...                                    seed=3,
+    ...                                    limits=(-1.0, 1.0))
+    >>> random_2 = start_vector.get_weights((2, 3))
+    >>> print(random_2)
+    [[ 0.67247148  0.16411481  0.0362802 ]
+     [-0.70061822 -0.10428977 -0.1333789 ]]
+    >>> start_vector = RandomNormalWeights(seed=3, variance=2.0)
+    >>> random = start_vector.get_weights((3, 2))
+    >>> print(random)
+    [[ 2.52950265  0.61731815]
+     [ 0.13646803 -2.63537665]
+     [-0.39228616 -0.50170496]]
+    >>> start_vector = RandomNormalWeights(seed=42, mean=1.0, variance=2.0)
+    >>> random = start_vector.get_weights((10000, 1))
+    >>> np.mean(random) - 1.0 < 5e-2
+    True
+    >>> np.var(random) - 2.0 < 5e-2
+    True
+    >>> start_vector = RandomNormalWeights(seed=42, limits=(-1.828427, 3.828427))
+    >>> random = start_vector.get_weights((10000, 1))
+    >>> np.mean(random) - 1.0 < 5e-2
+    True
+    >>> np.var(random) - 2.0 < 5e-2
+    True
+    """
+    def __init__(self, limits=None, mean=None, variance=None, **kwargs):
+
+        super(RandomNormalWeights, self).__init__(**kwargs)
+
+        if (limits is None) and (mean is None) and (variance is None):
+            limits = (-2.0, 2.0)
+
+        if limits is not None:
+            if len(limits) != 2:
+                raise ValueError("limits must be a list or tuple with two "
+                                 "elements.")
+
+            limits = (float(limits[0]), float(limits[1]))
+
+        if mean is None:
+            mean = 0.0
+        if variance is None:
+            variance = 1.0
+
+        self.limits = limits
+        if mean is not None:
+            self.mean = float(mean)
+        if variance is not None:
+            self.variance = max(consts.FLOAT_EPSILON, float(variance))
+
+    def get_weights(self, shape):
+        """Return randomly generated weights of given shape.
+
+        Parameters
+        ----------
+        shape : int or list of int or tuple of int
+            Shape of the weights to generate. The shape of the output is shape
+            or (shape, 1) in case shape is an integer.
+        """
+        if not isinstance(shape, (list, tuple)):
+            shape = (int(shape), 1)
+
+        if self.limits is not None:
+            m = np.min(self.limits) + (abs(self.limits[1] - self.limits[0]) / 2.0)
+            s = abs(self.limits[1] - self.limits[0]) / 4.0
         else:
-            return vector
+            m = self.mean
+            s = np.sqrt(self.variance)
+
+        if self.random_state is None:
+            vector = np.random.randn(*shape) * s + m
+        else:
+            vector = self.random_state.randn(*shape) * s + m  # Random vector.
+
+        # TODO: Normalise columns when a matrix?
+        if self.normalise:
+            vector /= maths.norm(vector)
+
+        if self.dtype is not None:
+            vector = vector.astype(self.dtype)
+
+        return vector
 
 
 @deprecated("RandomUniformWeights")
@@ -276,8 +499,15 @@ class OnesWeights(BaseWeights):
 
     Parameters
     ----------
-    normalise : bool
+    normalise : bool, optional
         If True, normalise the randomly created weights. Default is False.
+
+    dtype : str or data-type, optional
+        The data type of the generated weights. Note that this may be an unsafe
+        operation, depending on the target type; consider using the default and
+        cast the output yourself, if this is a possible problem. Default is
+        None, which means to use the built-in numpy default (usually
+        np.float64).
 
     Examples
     --------
@@ -304,9 +534,10 @@ class OnesWeights(BaseWeights):
     >>> print(maths.norm(ones_normalized))
     1.0
     """
-    def __init__(self, normalise=False, **kwargs):
+    def __init__(self, normalise=False, dtype=None, **kwargs):
 
-        super(OnesWeights, self).__init__(normalise=normalise, **kwargs)
+        super(OnesWeights, self).__init__(normalise=normalise, dtype=dtype,
+                                          **kwargs)
 
     def get_weights(self, shape):
         """Return weights that are all one.
@@ -322,10 +553,14 @@ class OnesWeights(BaseWeights):
 
         vector = np.ones(shape)  # Using a vector of ones.
 
+        # TODO: Normalise columns when a matrix?
         if self.normalise:
-            return vector / maths.norm(vector)
-        else:
-            return vector
+            vector /= maths.norm(vector)
+
+        if self.dtype is not None:
+            vector = vector.astype(self.dtype)
+
+        return vector
 
 
 @deprecated("OnesWeights")
@@ -342,6 +577,15 @@ class ZerosWeights(BaseWeights):
     may e.g. result in division by zero since the norm of this start vector is
     0. Other problems may also appear.
 
+    Parameters
+    ----------
+    dtype : str or data-type, optional
+        The data type of the generated weights. Note that this may be an unsafe
+        operation, depending on the target type; consider using the default and
+        cast the output yourself, if this is a possible problem. Default is
+        None, which means to use the built-in numpy default (usually
+        np.float64).
+
     Examples
     --------
     >>> import numpy as np
@@ -355,11 +599,12 @@ class ZerosWeights(BaseWeights):
      [ 0.]
      [ 0.]]
     """
-    def __init__(self, **kwargs):
+    def __init__(self, dtype=None, **kwargs):
 
         kwargs.pop("normalise", False)  # We do not care about this argument.
 
-        super(ZerosWeights, self).__init__(normalise=False, **kwargs)
+        super(ZerosWeights, self).__init__(normalise=False, dtype=dtype,
+                                           **kwargs)
 
     def get_weights(self, shape):
         """Return vector of zeros of chosen shape.
@@ -375,6 +620,9 @@ class ZerosWeights(BaseWeights):
 
         w = np.zeros(shape)  # Using a vector of zeros.
 
+        if self.dtype is not None:
+            w = w.astype(self.dtype)
+
         return w
 
 
@@ -385,7 +633,7 @@ class ZerosStartVector(ZerosWeights):
     pass
 
 
-class NeuralNetworkInitialisation(BaseWeights):
+class NeuralNetworkInitialiser(BaseWeights):
     """Commonly used in neural networks with different activation functions.
 
     Parameters
@@ -407,29 +655,39 @@ class NeuralNetworkInitialisation(BaseWeights):
         implementing classes. Default is None. Consider using random_state
         instead of a seed!
 
+    dtype : str or data-type, optional
+        The data type of the generated weights. Note that this may be an unsafe
+        operation, depending on the target type; consider using the default and
+        cast the output yourself, if this is a possible problem. Default is
+        None, which means to use the built-in numpy default (usually
+        np.float64).
+
     Examples
     --------
     >>> import numpy as np
     >>> import parsimony.utils.maths as maths
-    >>> from parsimony.utils.weights import NeuralNetworkInitialisation
+    >>> from parsimony.utils.weights import NeuralNetworkInitialiser
     >>>
-    >>> start_vector = NeuralNetworkInitialisation(seed=31337)
+    >>> start_vector = NeuralNetworkInitialiser(seed=31337)
     >>> W = start_vector.get_weights((2, 3))
     >>> print(W)
     [[ 1.94421446  4.08768236 -1.84868134]
      [-2.88017736 -1.12508711  4.20919974]]
-    >>> start_vector = NeuralNetworkInitialisation(K=6, seed=31337)
+    >>> start_vector = NeuralNetworkInitialiser(K=6, seed=31337)
     >>> W = start_vector.get_weights((3, 2))
     >>> print(W)
     [[ 0.48605361  1.02192059]
      [-0.46217033 -0.72004434]
      [-0.28127178  1.05229994]]
     """
-    def __init__(self, K=96, random_state=None, seed=None):
+    def __init__(self, K=96, random_state=None, seed=None, dtype=None,
+                 **kwargs):
 
-        super(NeuralNetworkInitialisation, self).__init__(normalise=False,
-                                                          random_state=random_state,
-                                                          seed=seed)
+        super(NeuralNetworkInitialiser, self).__init__(normalise=False,
+                                                       random_state=random_state,
+                                                       seed=seed,
+                                                       dtype=dtype,
+                                                       **kwargs)
 
         self.K = max(consts.FLOAT_EPSILON, float(K))
 
@@ -467,10 +725,13 @@ class NeuralNetworkInitialisation(BaseWeights):
         else:
             W = self.random_state.rand(*shape) * (2 * r) - r
 
+        if self.dtype is not None:
+            W = W.astype(self.dtype)
+
         return W
 
 
-class GlorotUniform(NeuralNetworkInitialisation):
+class GlorotUniform(NeuralNetworkInitialiser):
     """Commonly used in neural networks with the symmetric activation functions
     with unit derivative at zero (i.e. f'(0) = 1).
 
@@ -512,6 +773,13 @@ class GlorotUniform(NeuralNetworkInitialisation):
         implementing classes. Default is None. Consider using random_state
         instead of a seed!
 
+    dtype : str or data-type, optional
+        The data type of the generated weights. Note that this may be an unsafe
+        operation, depending on the target type; consider using the default and
+        cast the output yourself, if this is a possible problem. Default is
+        None, which means to use the built-in numpy default (usually
+        np.float64).
+
     Examples
     --------
     >>> import numpy as np
@@ -536,14 +804,16 @@ class GlorotUniform(NeuralNetworkInitialisation):
        training deep feedforward neural networks". International conference on
        artificial intelligence and statistics, 2010.
     """
-    def __init__(self, random_state=None, seed=None):
+    def __init__(self, random_state=None, seed=None, dtype=None, **kwargs):
 
         super(GlorotUniform, self).__init__(K=6.0,
                                             random_state=random_state,
-                                            seed=seed)
+                                            seed=seed,
+                                            dtype=dtype,
+                                            **kwargs)
 
 
-class TanhInitialisation(GlorotUniform):
+class TanhInitialiser(GlorotUniform):
     """Commonly used in neural networks with the hyperbolic tangent activation
     function.
 
@@ -585,18 +855,25 @@ class TanhInitialisation(GlorotUniform):
         implementing classes. Default is None. Consider using random_state
         instead of a seed!
 
+    dtype : str or data-type, optional
+        The data type of the generated weights. Note that this may be an unsafe
+        operation, depending on the target type; consider using the default and
+        cast the output yourself, if this is a possible problem. Default is
+        None, which means to use the built-in numpy default (usually
+        np.float64).
+
     Examples
     --------
     >>> import numpy as np
     >>> import parsimony.utils.maths as maths
-    >>> from parsimony.utils.weights import TanhInitialisation
+    >>> from parsimony.utils.weights import TanhInitialiser
     >>>
-    >>> start_vector = TanhInitialisation(seed=31337)
+    >>> start_vector = TanhInitialiser(seed=31337)
     >>> W = start_vector.get_weights((2, 3))
     >>> print(W)
     [[ 1.94421446  4.08768236 -1.84868134]
      [-2.88017736 -1.12508711  4.20919974]]
-    >>> start_vector = TanhInitialisation(seed=31337)
+    >>> start_vector = TanhInitialiser(seed=31337)
     >>> W = start_vector.get_weights((3, 2))
     >>> print(W)
     [[ 1.94421446  4.08768236]
@@ -609,13 +886,15 @@ class TanhInitialisation(GlorotUniform):
        training deep feedforward neural networks". International conference on
        artificial intelligence and statistics, 2010.
     """
-    def __init__(self, random_state=None, seed=None):
+    def __init__(self, random_state=None, seed=None, dtype=None, **kwargs):
 
         super(GlorotUniform, self).__init__(random_state=random_state,
-                                            seed=seed)
+                                            seed=seed,
+                                            dtype=dtype,
+                                            **kwargs)
 
 
-class LogisticInitialisation(NeuralNetworkInitialisation):
+class LogisticInitialiser(NeuralNetworkInitialiser):
     """Commonly used in neural networks with the logistic sigmoid activation
     function (Bengio, 2012).
 
@@ -643,18 +922,25 @@ class LogisticInitialisation(NeuralNetworkInitialisation):
         implementing classes. Default is None. Consider using random_state
         instead of a seed!
 
+    dtype : str or data-type, optional
+        The data type of the generated weights. Note that this may be an unsafe
+        operation, depending on the target type; consider using the default and
+        cast the output yourself, if this is a possible problem. Default is
+        None, which means to use the built-in numpy default (usually
+        np.float64).
+
     Examples
     --------
     >>> import numpy as np
     >>> import parsimony.utils.maths as maths
-    >>> from parsimony.utils.weights import LogisticInitialisation
+    >>> from parsimony.utils.weights import LogisticInitialiser
     >>>
-    >>> start_vector = LogisticInitialisation(seed=31337)
+    >>> start_vector = LogisticInitialiser(seed=31337)
     >>> W = start_vector.get_weights((2, 3))
     >>> print(W)
     [[ 0.62112121  1.30589823 -0.5906011 ]
      [-0.92013473 -0.35943332  1.34471958]]
-    >>> start_vector = LogisticInitialisation(seed=31337)
+    >>> start_vector = LogisticInitialiser(seed=31337)
     >>> W = start_vector.get_weights((3, 2))
     >>> print(W)
     [[ 0.62112121  1.30589823]
@@ -666,14 +952,16 @@ class LogisticInitialisation(NeuralNetworkInitialisation):
     .. Bengio, Yoshua. "Practical Recommendations for Gradient-Based Training
        of Deep Architectures". arXiv:1206.5533v2, 2012.
     """
-    def __init__(self, random_state=None, seed=None):
+    def __init__(self, random_state=None, seed=None, dtype=None, **kwargs):
 
-        super(LogisticInitialisation, self).__init__(K=4.0 * np.sqrt(6.0),
-                                                     random_state=random_state,
-                                                     seed=seed)
+        super(LogisticInitialiser, self).__init__(K=4.0 * np.sqrt(6.0),
+                                                  random_state=random_state,
+                                                  seed=seed,
+                                                  dtype=dtype,
+                                                  **kwargs)
 
 
-class OrthogonalRandomInitialisation(NeuralNetworkInitialisation):
+class OrthogonalRandomInitialiser(NeuralNetworkInitialiser):
     """Orthogonal random matrix initialisation used in neural networks.
 
     The right-singular vectors of a Gaussian random matrix is used as the
@@ -693,13 +981,20 @@ class OrthogonalRandomInitialisation(NeuralNetworkInitialisation):
         implementing classes. Default is None. Consider using random_state
         instead of a seed!
 
+    dtype : str or data-type, optional
+        The data type of the generated weights. Note that this may be an unsafe
+        operation, depending on the target type; consider using the default and
+        cast the output yourself, if this is a possible problem. Default is
+        None, which means to use the built-in numpy default (usually
+        np.float64).
+
     Examples
     --------
     >>> import numpy as np
     >>> import parsimony.utils.maths as maths
-    >>> from parsimony.utils.weights import OrthogonalRandomInitialisation
+    >>> from parsimony.utils.weights import OrthogonalRandomInitialiser
     >>>
-    >>> start_vector = OrthogonalRandomInitialisation(seed=42)
+    >>> start_vector = OrthogonalRandomInitialiser(seed=42)
     >>> W = start_vector.get_weights((2, 3))
     >>> print(W)
     [[ -9.86455841e-01   1.63488317e-01   1.32832502e-02]
@@ -714,11 +1009,13 @@ class OrthogonalRandomInitialisation(NeuralNetworkInitialisation):
     >>> np.allclose(np.dot(W.T, W), np.eye(W.shape[1]))
     True
     """
-    def __init__(self, random_state=None, seed=None):
+    def __init__(self, random_state=None, seed=None, dtype=None, **kwargs):
 
-        super(NeuralNetworkInitialisation, self).__init__(normalise=False,
-                                                          random_state=random_state,
-                                                          seed=seed)
+        super(NeuralNetworkInitialiser, self).__init__(normalise=False,
+                                                       random_state=random_state,
+                                                       seed=seed,
+                                                       dtype=dtype,
+                                                       **kwargs)
 
     def get_weights(self, shape):
         """Returns a weight matrix of chosen shape.
@@ -742,6 +1039,9 @@ class OrthogonalRandomInitialisation(NeuralNetworkInitialisation):
             W = U
         else:
             W = V
+
+        if self.dtype is not None:
+            W = W.astype(self.dtype)
 
         return W
 
