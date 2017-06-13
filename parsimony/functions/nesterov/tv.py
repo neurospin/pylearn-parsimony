@@ -98,6 +98,7 @@ class TotalVariation(properties.NesterovFunction,
             abeta2 += A[k].dot(beta_) ** 2
 
         f = self.l * (np.sum(np.sqrt(abeta2), axis=0) - self.c)
+        f = np.asarray(f)
         f[self.l < consts.TOLERANCE] = 0
 
         return f
@@ -130,6 +131,7 @@ class TotalVariation(properties.NesterovFunction,
 
         phi = self.l * ((np.dot(beta_.T, Aa)
                           - (mu / 2.0) * alpha_sqsum) - self.c)
+        phi = np.asarray(phi)
         phi[self.l < consts.TOLERANCE] = 0
 
         return phi
@@ -152,7 +154,7 @@ class TotalVariation(properties.NesterovFunction,
             abeta2 += A[k].dot(beta_) ** 2
         val = np.sum(np.sqrt(abeta2), axis=0)
 
-        return val <= self.c
+        return val <= self.c  # TODO: FIX This for vectrorization
 
     def L(self):
         """ Lipschitz constant of the gradient.

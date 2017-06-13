@@ -22,6 +22,7 @@ import scipy.sparse as sparse
 
 import parsimony.utils.maths as maths
 import parsimony.utils.consts as consts
+from parsimony.utils import check_arrays
 
 __all__ = ["Function", "AtomicFunction", "CompositeFunction",
            "Penalty", "Constraint",
@@ -728,11 +729,11 @@ class NesterovFunction(with_metaclass(abc.ABCMeta,
                 etc., to except from penalisation. Equivalently, the first
                 index to be penalised. Default is 0, all columns are included.
         """
-        self.l = np.maximum(0.0, np.asarray(l, dtype=float))
+        self.l = np.maximum(0.0, check_arrays(l, flatten=True))
         if A is None:
             raise ValueError("The linear operator A must not be None.")
         self._A = A
-        self.mu = np.maximum(0.0, np.asarray(mu, dtype=float))
+        self.mu = np.asarray(np.maximum(0.0, np.asarray(mu, dtype=float)))
         self.penalty_start = max(0, int(penalty_start))
 
         self._alpha = None
@@ -866,7 +867,7 @@ class NesterovFunction(with_metaclass(abc.ABCMeta,
         A = self.A()
         lA = [0] * len(A)
         for i in range(len(A)):
-            lA[i] = self.l * A[i]
+            lA[i] =  A[i].multiply(self.l)
 
         return lA
 
@@ -992,7 +993,6 @@ class NesterovFunction(with_metaclass(abc.ABCMeta,
             raise ValueError("Not vectorized yet: vector's shape should be [p, 1]")
 
         eps = max(eps, consts.FLOAT_EPSILON)
-
         # Define the function to minimise
         class F(Function, Gradient, ProximalOperator, StepSize):
             def __init__(self, v, A, t, proj, lambda_max):
