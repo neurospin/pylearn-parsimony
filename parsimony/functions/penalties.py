@@ -21,6 +21,7 @@ Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 import numpy as np
 import scipy.optimize as optimize
 import scipy.sparse as sparse
+from parsimony.utils import check_arrays
 
 try:
     from . import properties  # Only works when imported as a package.
@@ -144,8 +145,9 @@ class L1(properties.AtomicFunction,
     """
     def __init__(self, l=1.0, c=0.0, penalty_start=0):
 
-        self.l = np.asarray(l, dtype=float)
-        self.c = np.asarray(c, dtype=float)
+        c = np.repeat(c, np.size(l)) if (np.size(c) == 1) and (np.size(l) > 1)\
+                 else c
+        self.l, self.c = check_arrays(l, c, flatten=True)
         self.penalty_start = max(0, int(penalty_start))
 
     def f(self, beta):
@@ -336,8 +338,11 @@ class L0(properties.AtomicFunction,
     """
     def __init__(self, l=1.0, c=0.0, penalty_start=0):
 
-        self.l = np.maximum(0.0, np.asarray(l, dtype=float))
-        self.c = np.asarray(c, dtype=float)
+        c = np.repeat(c, np.size(l)) if (np.size(c) == 1) and (np.size(l) > 1)\
+                 else c
+        l, c = check_arrays(l, c, flatten=True)
+        self.l = np.maximum(0.0, l)
+        self.c = np.maximum(0.0, c)
         self.penalty_start = max(0, int(penalty_start))
 
     def f(self, x):
@@ -519,8 +524,11 @@ class LInf(properties.AtomicFunction,
     """
     def __init__(self, l=1.0, c=0.0, penalty_start=0):
 
-        self.l = np.asarray(l, dtype=float)
-        self.c = np.asarray(c, dtype=float)
+        c = np.repeat(c, np.size(l)) if (np.size(c) == 1) and (np.size(l) > 1)\
+                 else c
+        l, c = check_arrays(l, c, flatten=True)
+        self.l = np.maximum(0.0, l)
+        self.c = np.maximum(0.0, c)
         self.penalty_start = int(penalty_start)
 
     def f(self, x):
@@ -712,8 +720,11 @@ class L2(properties.AtomicFunction,
     """
     def __init__(self, l=1.0, c=0.0, penalty_start=0):
 
-        self.l = np.maximum(0.0, np.asarray(l, dtype=float))
-        self.c = np.asarray(c, dtype=float)
+        c = np.repeat(c, np.size(l)) if (np.size(c) == 1) and (np.size(l) > 1)\
+                 else c
+        l, c = check_arrays(l, c, flatten=True)
+        self.l = np.maximum(0.0, l)
+        self.c = np.maximum(0.0, c)
         self.penalty_start = max(0, int(penalty_start))
 
     def f(self, beta):
@@ -857,8 +868,11 @@ class L2Squared(properties.AtomicFunction,
     """
     def __init__(self, l=1.0, c=0.0, penalty_start=0):
 
-        self.l = np.maximum(0.0, np.asarray(l, dtype=float))
-        self.c = np.asarray(c, dtype=float)
+        c = np.repeat(c, np.size(l)) if (np.size(c) == 1) and (np.size(l) > 1)\
+                 else c
+        l, c = check_arrays(l, c, flatten=True)
+        self.l = np.maximum(0.0, l)
+        self.c = np.maximum(0.0, c)
         self.penalty_start = max(0, int(penalty_start))
 
     def f(self, beta):
@@ -1033,8 +1047,10 @@ class L1L2Squared(properties.AtomicFunction,
     """
     def __init__(self, l1=1.0, l2=1.0, penalty_start=0):
 
-        self.l1 = np.maximum(0.0, np.asarray(l1, dtype=float))
-        self.l2 = np.maximum(0.0, np.asarray(l2, dtype=float))
+
+        l1, l2 = check_arrays(l1, l2, flatten=True)
+        self.l = np.maximum(0.0, l1)
+        self.c = np.maximum(0.0, l2)
         self.penalty_start = max(0, int(penalty_start))
 
     def f(self, beta):
@@ -1221,8 +1237,8 @@ class GraphNet(QuadraticConstraint,
         if np.size(l) != 1:
             raise ValueError("Not vectorized yet: parameters should be scalars")
 
-        self.l = float(l)
-        self.c = 0
+        self.l = np.maximum(0.0, check_arrays(l, flatten=True))
+        self.c = np.repeat(0, np.size(self.l))
         self.M = A  # for QuadraticConstraint
         self.N = A  # for QuadraticConstraint
         self.A = A
@@ -1580,10 +1596,11 @@ class RidgeSquaredError(properties.CompositeFunction,
             squared loss. Default is True, the mean squared loss.
     """
     def __init__(self, X, y, k, l=1.0, penalty_start=0, mean=True):
-        self.l = np.maximum(0.0, np.asarray(l, dtype=float))
+        l, k = check_arrays(l, k, flatten=True)
+        self.l = np.maximum(0, l)
+        self.k = np.maximum(0, k)
         self.X = X
         self.y = y
-        self.k = np.maximum(0.0, np.asarray(k, dtype=float))
 
         self.penalty_start = max(0, int(penalty_start))
         self.mean = bool(mean)

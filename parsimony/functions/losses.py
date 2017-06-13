@@ -26,7 +26,7 @@ except (ValueError, SystemError):
     import parsimony.functions.properties as properties  # Run as a script.
 import parsimony.utils as utils
 import parsimony.utils.consts as consts
-
+from parsimony.utils import check_arrays
 
 __all__ = ["LinearRegression", "RidgeRegression",
            "LogisticRegression", "RidgeLogisticRegression",
@@ -215,7 +215,7 @@ class RidgeRegression(properties.CompositeFunction,
         """
         self.X = X
         self.y = y
-        self.k = np.maximum(0.0, np.asarray(k, dtype=float))
+        self.k = np.maximum(0.0, check_arrays(k, flatten=True))
 
         self.penalty_start = max(0, int(penalty_start))
         self.mean = bool(mean)
@@ -547,7 +547,7 @@ class RidgeLogisticRegression(properties.CompositeFunction,
         """
         self.X = X
         self.y = y
-        self.k = np.maximum(0.0, np.asarray(k, dtype=float))
+        self.k = np.maximum(0.0, check_arrays(k, flatten=True))
         if weights is None:
             weights = np.ones(y.shape)  # .reshape(y.shape)
         self.weights = weights

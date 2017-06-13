@@ -37,6 +37,7 @@ import parsimony.algorithms.deflation as deflation
 import parsimony.algorithms.utils as alg_utils
 from parsimony.utils import check_arrays, check_array_in
 from parsimony.utils import class_weight_to_sample_weight, check_labels
+from parsimony.utils import check_arrays
 
 __all__ = ["BaseEstimator",
            "RegressionEstimator", "LogisticRegressionEstimator",
@@ -369,7 +370,8 @@ class RidgeRegression(RegressionEstimator):
         super(RidgeRegression, self).__init__(algorithm=algorithm,
                                               start_vector=start_vector)
 
-        self.l = np.asarray(l, dtype=float)
+        self.l = check_arrays(l, flatten=True)
+        #self.l = np.asarray(l, dtype=float)
 
         self.penalty_start = int(penalty_start)
         self.mean = bool(mean)
@@ -484,7 +486,8 @@ class Lasso(RegressionEstimator):
         super(Lasso, self).__init__(algorithm=algorithm,
                                     start_vector=start_vector)
 
-        self.l = np.asarray(l, dtype=float)
+        self.l = check_arrays(l, flatten=True)
+        #self.l = np.asarray(l, dtype=float)
 
         self.penalty_start = int(penalty_start)
         self.mean = bool(mean)
@@ -602,8 +605,9 @@ class ElasticNet(RegressionEstimator):
         super(ElasticNet, self).__init__(algorithm=algorithm,
                                          start_vector=start_vector)
 
-        self.l = np.asarray(l, dtype=float)
-        self.alpha = np.asarray(alpha, dtype=float)
+        l, alpha = check_arrays(l, alpha, flatten=True)
+        self.l = np.maximum(0,  np.minimum(1, l))
+        self.alpha = np.maximum(0, alpha)
 
         self.penalty_start = int(penalty_start)
         self.mean = bool(mean)
@@ -764,9 +768,10 @@ class LinearRegressionL1L2TV(RegressionEstimator):
                  start_vector=weights.RandomUniformWeights(normalise=True),
                  rho=1.0):
 
-        self.l1 = np.maximum(consts.TOLERANCE, np.asarray(l1, dtype=float))
-        self.l2 = np.maximum(consts.TOLERANCE, np.asarray(l2, dtype=float))
-        self.tv = np.maximum(consts.FLOAT_EPSILON, np.asarray(tv, dtype=float))
+        l1, l2, tv = check_arrays(l1, l2, tv, flatten=True)
+        self.l1 = np.maximum(consts.TOLERANCE, l1)
+        self.l2 = np.maximum(consts.TOLERANCE, l2)
+        self.tv = np.maximum(consts.FLOAT_EPSILON, tv)
 
         if algorithm is None:
             algorithm = proximal.CONESTA(**algorithm_params)
@@ -964,9 +969,10 @@ class LinearRegressionL1L2GraphNet(LinearRegression):
         super(LinearRegressionL1L2GraphNet, self).__init__(algorithm=algorithm,
                                               start_vector=start_vector)
 
-        self.l1 = l1
-        self.l2 = l2
-        self.gn = gn
+        l1, l2, gn = check_arrays(l1, l2, gn, flatten=True)
+        self.l1 = np.maximum(consts.TOLERANCE, l1)
+        self.l2 = np.maximum(0, l2)
+        self.gn = np.maximum(0, gn)
 
         self.A = A
         self.penalty_start = int(penalty_start)
@@ -1108,9 +1114,10 @@ class LinearRegressionL1L2GL(RegressionEstimator):
                  mean=True,
                  start_vector=weights.RandomUniformWeights(normalise=True)):
 
-        self.l1 = np.maximum(consts.TOLERANCE, np.asarray(l1, dtype=float))
-        self.l2 = np.maximum(consts.TOLERANCE, np.asarray(l2, dtype=float))
-        self.gl = np.maximum(consts.FLOAT_EPSILON, np.asarray(gl, dtype=float))
+        l1, l2, gl = check_arrays(l1, l2, gl, flatten=True)
+        self.l1 = np.maximum(consts.TOLERANCE, l1)
+        self.l2 = np.maximum(consts.TOLERANCE, l2)
+        self.gl = np.maximum(consts.FLOAT_EPSILON, gl)
 
         if algorithm is None:
             algorithm = proximal.FISTA(**algorithm_params)
@@ -1632,7 +1639,7 @@ class RidgeLogisticRegression(LogisticRegressionEstimator):
                  penalty_start=0,
                  mean=True):
 
-        self.l = np.maximum(0.0, np.asarray(l, dtype=float))
+        self.l = np.maximum(0.0, check_arrays(l, flatten=True))
 
         if algorithm is None:
             algorithm = gradient.AcceleratedGradientDescent(**algorithm_params)
@@ -1756,7 +1763,7 @@ class LassoLogisticRegression(LogisticRegressionEstimator):
                  penalty_start=0,
                  mean=True):
 
-        self.l = np.maximum(0.0, np.asarray(l, dtype=float))
+        self.l = np.maximum(0.0, check_arrays(l, flatten=True))
 
         if algorithm is None:
             algorithm = proximal.FISTA(**algorithm_params)
@@ -1877,8 +1884,9 @@ class ElasticNetLogisticRegression(LogisticRegressionEstimator):
                  penalty_start=0,
                  mean=True):
 
-        self.l = np.maximum(0.0, np.minimum(np.asarray(l, dtype=float), 1.0))
-        self.alpha = np.maximum(0.0, np.asarray(alpha, dtype=float))
+        l, alpha = check_arrays(l, alpha, flatten=True)
+        self.l = np.maximum(0,  np.minimum(1, l))
+        self.alpha = np.maximum(0, alpha)
 
         if algorithm is None:
             algorithm = proximal.FISTA(**algorithm_params)
@@ -2039,10 +2047,10 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
                  mean=True,
                  start_vector=weights.RandomUniformWeights(normalise=True)):
 
-        self.l1 = np.maximum(consts.TOLERANCE, np.asarray(l1, dtype=float))
-        # self.l2 = np.maximum(consts.TOLERANCE, np.asarray(l2, dtype=float))
-        self.l2 = np.maximum(0.0, np.asarray(l2, dtype=float))
-        self.tv = np.maximum(consts.FLOAT_EPSILON, np.asarray(tv, dtype=float))
+        l1, l2, tv = check_arrays(l1, l2, tv, flatten=True)
+        self.l1 = np.maximum(consts.TOLERANCE, l1)
+        self.l2 = np.maximum(consts.TOLERANCE, l2)
+        self.tv = np.maximum(consts.FLOAT_EPSILON, tv)
 
         if algorithm is None:
             algorithm = proximal.CONESTA(**algorithm_params)
@@ -2277,9 +2285,10 @@ class LogisticRegressionL1L2GraphNet(LogisticRegressionEstimator):
                  mean=True,
                  start_vector=weights.RandomUniformWeights(normalise=True)):
 
-        self.l1 = np.maximum(consts.TOLERANCE, np.asarray(l1, dtype=float))
-        self.l2 = np.maximum(0.0, np.asarray(l2, dtype=float))
-        self.gn = np.asarray(gn, dtype=float)
+        l1, l2, gn = check_arrays(l1, l2, gn, flatten=True)
+        self.l1 = np.maximum(consts.TOLERANCE, l1)
+        self.l2 = np.maximum(0, l2)
+        self.gn = np.maximum(0, gn)
 
         if algorithm is None:
             algorithm = proximal.FISTA(**algorithm_params)
@@ -2448,9 +2457,10 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
                  mean=True,
                  start_vector=weights.RandomUniformWeights(normalise=True)):
 
-        self.l1 = np.maximum(consts.TOLERANCE, np.asarray(l1, dtype=float))
-        self.l2 = np.maximum(consts.TOLERANCE, np.asarray(l2, dtype=float))
-        self.gl = np.maximum(consts.FLOAT_EPSILON, np.asarray(gl, dtype=float))
+        l1, l2, gl = check_arrays(l1, l2, gl, flatten=True)
+        self.l1 = np.maximum(consts.TOLERANCE, l1)
+        self.l2 = np.maximum(consts.TOLERANCE, l2)
+        self.gl = np.maximum(consts.FLOAT_EPSILON, gl)
 
         if algorithm is None:
             algorithm = proximal.FISTA(**algorithm_params)
@@ -2604,12 +2614,13 @@ class LinearRegressionL2SmoothedL1TV(RegressionEstimator):
         super(LinearRegressionL2SmoothedL1TV, self).__init__(
                                                      algorithm=algorithm)
 
-        self.l2 = np.maximum(0.0, np.asarray(l2, dtype=float))
-        self.l1 = np.maximum(0.0, np.asarray(l1, dtype=float))
-        self.tv = np.maximum(0.0, np.asarray(tv, dtype=float))
+        l1, l2, tv = check_arrays(l1, l2, tv, flatten=True)
+        self.l1 = np.maximum(0.0, l1)
+        self.l2 = np.maximum(consts.TOLERANCE, l2)
+        self.tv = np.maximum(0.0, tv)
 
-        if self.l2 < consts.TOLERANCE:
-            warnings.warn("The ridge parameter should be non-zero.")
+        # if self.l2 < consts.TOLERANCE:
+        #     warnings.warn("The ridge parameter should be non-zero.")
 
         if A is None:
             raise TypeError("The A matrix may not be None.")
