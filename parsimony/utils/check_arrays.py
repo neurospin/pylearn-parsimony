@@ -132,6 +132,55 @@ def check_array_in(array1, array2):
 
     return array1
 
+
+def prepend_array(arr, size, val=0, axis=0):
+    """Prepend constant value along a given axis. Simplier but faster
+    alternative to np.pad(...).
+
+    Parameters
+    ----------
+
+    arr:  : 2d ndarray
+        The array to be extended.
+
+    size: int
+        The size of the extension.
+
+    val: float
+        The value repeated in the extension. Default is zero.
+
+    axis: int 0 or 1
+        0: the array is extended on his top; 1 on the left.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> arr = np.arange(6).reshape(3, 2)
+    >>> prepend_array(arr, size=2)
+    array([[ 0.,  0.],
+           [ 0.,  0.],
+           [ 0.,  1.],
+           [ 2.,  3.],
+           [ 4.,  5.]])
+    >>> prepend_array(arr, size=1, val=0, axis=1)
+    array([[ 0.,  0.,  1.],
+           [ 0.,  2.,  3.],
+           [ 0.,  4.,  5.]])
+    """
+    if size <= 0:
+        return arr
+    if axis == 0:
+        pad = np.empty((size, arr.shape[1]))
+        pad.fill(val)
+        return np.vstack((pad, arr))
+    if axis == 1:
+        pad = np.empty((arr.shape[0], size))
+        pad.fill(val)
+        return np.hstack((pad, arr))
+    else:
+        raise ValueError("axis must be 0 or 1. Consider using np.pad()")
+
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
