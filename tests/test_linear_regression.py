@@ -2513,7 +2513,7 @@ class TestLinearRegression(TestCase):
         assert_almost_equal(score, 0.969725,
                             msg="The found regression vector does not give "
                                 "a low enough score value.",
-                            places=5)
+                            places=4)
 
         n, p = 100, np.prod(shape)
 
