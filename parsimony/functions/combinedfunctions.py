@@ -880,7 +880,7 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
 
         Ata_tv = self.tv.l * self.tv.Aa(alphak)
         if self.penalty_start > 0:
-            Ata_tv = np.vstack((np.zeros((self.penalty_start, 1)),
+            Ata_tv = np.vstack((np.zeros((self.penalty_start, Ata_tv.shape[1])),
                                 Ata_tv))
 
 #        Ata_l1 = self.l1.l * SmoothedL1.project([betak / mu_min])[0]
@@ -972,35 +972,35 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
 #            alpha[j][i] = 0.0
 
         alpha = self.tv.alpha(beta)
-        g = self.fmu(beta)
+        fmu = self.fmu(beta)
 
         n = float(self.X.shape[0])
 
         if self.mean:
-            a = (np.dot(self.X, beta) - self.y) * (1.0 / n)
-            f_ = (n / 2.0) * maths.norm(a) ** 2.0 + np.dot(self.y.T, a)[0, 0]
+            sigma = (np.dot(self.X, beta) - self.y) * (1.0 / n)
+            l_star = (n / 2.0) * maths.norm(sigma, axis=0) ** 2.0 + np.dot(self.y.T, sigma)
         else:
-            a = np.dot(self.X, beta) - self.y
-            f_ = (1.0 / 2.0) * maths.norm(a) ** 2.0 + np.dot(self.y.T, a)[0, 0]
+            sigma = np.dot(self.X, beta) - self.y
+            l_star = (1.0 / 2.0) * maths.norm(sigma, axis=0) ** 2.0 + np.dot(self.y.T, sigma)
 
         lAta = self.tv.l * self.tv.Aa(alpha)
         if self.penalty_start > 0:
-            lAta = np.vstack((np.zeros((self.penalty_start, 1)),
+            lAta = np.vstack((np.zeros((self.penalty_start, beta.shape[1])),
                               lAta))
 
         alpha_sqsum = 0.0
         for a_ in alpha:
-            alpha_sqsum += np.sum(a_ ** 2.0)
+            alpha_sqsum += np.sum(a_ ** 2.0, axis=0)
 
-        z = -np.dot(self.X.T, a)
-        h_ = (1.0 / (2 * self.rr.k)) \
-           * np.sum(maths.positive(np.abs(z - lAta) - self.l1.l) ** 2.0) \
+        z = -np.dot(self.X.T, sigma)
+        psi_star = (1.0 / (2 * self.rr.k)) \
+           * np.sum(maths.positive(np.abs(z - lAta) - self.l1.l) ** 2.0, axis=0) \
            + (0.5 * self.tv.l * self.tv.get_mu() * alpha_sqsum)
 
 #        print "g :", g
 #        print "f_:", f_
 #        print "h_:", h_
-        gap = g + f_ + h_
+        gap = fmu + l_star + psi_star
 
 #        print "Fenchel duality gap:", gap
 
@@ -1290,7 +1290,7 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
 
         Ata_gl = self.gl.l * self.gl.Aa(alphak)
         if self.penalty_start > 0:
-            Ata_gl = np.vstack((np.zeros((self.penalty_start, 1)),
+            Ata_gl = np.vstack((np.zeros((self.penalty_start, Ata_gl.shape[1])),
                                 Ata_gl))
 
 ##        Al1 = nesterov.l1.linear_operator_from_variables(self.X.shape[1],
@@ -1403,7 +1403,7 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
 
         lAta = self.gl.l * self.gl.Aa(alpha)
         if self.penalty_start > 0:
-            lAta = np.vstack((np.zeros((self.penalty_start, 1)),
+            lAta = np.vstack((np.zeros((self.penalty_start, lAta.shape[1])),
                               lAta))
 
         alpha_sqsum = 0.0
@@ -1623,7 +1623,7 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
 
         lAta = self.tv.l * self.tv.Aa(alpha)
         if self.penalty_start > 0:
-            lAta = np.vstack((np.zeros((self.penalty_start, 1)),
+            lAta = np.vstack((np.zeros((self.penalty_start, lAta.shape[1])),
                               lAta))
 
         alpha_sqsum = 0.0
@@ -1879,7 +1879,7 @@ class LinearRegressionL2SmoothedL1TV(properties.CompositeFunction,
         lAta += A[3].T.dot(alpha[3])  # TV Z
 
         if self.penalty_start > 0:
-            lAta = np.vstack((np.zeros((self.penalty_start, 1)),
+            lAta = np.vstack((np.zeros((self.penalty_start, lAta.shape[1])),
                               lAta))
 
 #        XXkI = np.dot(X.T, X) + self.g.k * np.eye(X.shape[1])

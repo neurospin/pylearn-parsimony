@@ -911,7 +911,7 @@ class L2Squared(properties.AtomicFunction,
         """
         if self.penalty_start > 0:
             beta_ = beta[self.penalty_start:, :]
-            grad = np.vstack((np.zeros((self.penalty_start, 1)),
+            grad = np.vstack((np.zeros((self.penalty_start, beta.shape[1])),
                               self.l * beta_))
         else:
             beta_ = beta
@@ -1182,7 +1182,7 @@ class QuadraticConstraint(properties.AtomicFunction,
             #grad = (2.0 * self.l) * np.dot(self.M.T, np.dot(self.N, beta_))
 
         if self.penalty_start > 0:
-            grad = np.vstack((np.zeros((self.penalty_start, 1)), grad))
+            grad = np.vstack((np.zeros((self.penalty_start, beta.shape[1])), grad))
 
         return grad
 
@@ -1377,7 +1377,7 @@ class RGCCAConstraint(QuadraticConstraint,
             grad = (self.tau * 2.0) * beta_
 
         if self.penalty_start > 0:
-            grad = np.vstack(np.zeros((self.penalty_start, 1)),
+            grad = np.vstack(np.zeros((self.penalty_start, beta.shape[1])),
                              grad)
 
 #        approx_grad = utils.approx_grad(self.f, beta, eps=1e-4)
@@ -1686,7 +1686,7 @@ class RidgeSquaredError(properties.CompositeFunction,
         grad += self.k * x_
 
         if self.penalty_start > 0:
-            grad = np.vstack((np.zeros((self.penalty_start, 1)),
+            grad = np.vstack((np.zeros((self.penalty_start, grad.shape[1])),
                               self.l * grad))
         else:
             grad += self.l

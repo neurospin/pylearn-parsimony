@@ -783,7 +783,7 @@ class NesterovFunction(with_metaclass(abc.ABCMeta,
         alpha = self.alpha(beta)
 
         if self.penalty_start > 0:
-            grad = self.l * np.vstack((np.zeros((self.penalty_start, 1)),
+            grad = self.l * np.vstack((np.zeros((self.penalty_start, beta.shape[1])),
                                        self.Aa(alpha)))
         else:
             grad = self.l * self.Aa(alpha)

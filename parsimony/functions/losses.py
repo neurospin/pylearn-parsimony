@@ -284,7 +284,7 @@ class RidgeRegression(properties.CompositeFunction,
             gradOLS *= 1.0 / float(self.X.shape[0])
 
         if self.penalty_start > 0:
-            gradL2 = np.vstack((np.zeros((self.penalty_start, 1)),
+            gradL2 = np.vstack((np.zeros((self.penalty_start, beta.shape[1])),
                                 self.k * beta[self.penalty_start:, :]))
         else:
             gradL2 = self.k * beta
@@ -632,7 +632,7 @@ class RidgeLogisticRegression(properties.CompositeFunction,
             grad *= 1.0 / float(self.X.shape[0])
 
         if self.penalty_start > 0:
-            gradL2 = np.vstack((np.zeros((self.penalty_start, 1)),
+            gradL2 = np.vstack((np.zeros((self.penalty_start, beta.shape[1])),
                                 self.k * beta[self.penalty_start:, :]))
         else:
             gradL2 = self.k * beta
