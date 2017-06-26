@@ -750,11 +750,14 @@ class L2(properties.AtomicFunction,
         else:
             beta_ = beta
 
-        norm = maths.norm(beta_)
-        if norm >= l:
-            beta_ *= (1.0 - l / norm) * beta_
-        else:
-            beta_ *= 0.0
+        norm = maths.norm(beta_, axis=0)
+        beta_[norm >= l] *= (1.0 - l / norm) * beta_[norm >= l]
+        beta_[norm < l] *= 0
+
+        # if norm >= l:
+        #    beta_ *= (1.0 - l / norm) * beta_
+        # else:
+        #     beta_ *= 0.0
 
         if self.penalty_start > 0:
             prox = np.vstack((beta[:self.penalty_start, :], beta_))
