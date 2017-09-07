@@ -1590,10 +1590,7 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
         # Eq. 29 of OLS paper: l2_penalty => 2 * eps / len(beta_with_null_l2)
         if  np.any(l2_is_null):
             l2_penalty = np.copy(self.rr.k)
-            l2_penalty[l2_is_null] = (2 * eps[l2_is_null] / beta.shape[0])
-        # if self.rr.k == 0:
-        #    l2_penalty = (2 * eps / beta.shape[0])
-
+            l2_penalty[l2_is_null] = (2 * eps / beta.shape[0])
             # f -> f_tilde = f + lambda_0 |beta_0|^2_2
             f[l2_is_null] +=  l2_penalty[l2_is_null] \
              * np.sum(beta[:, l2_is_null] ** 2, axis=0)
@@ -1602,8 +1599,9 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
         else:
             l2_penalty = self.rr.k
 
+        # print(f, f[~l2_is_null], eps)
         if self.penalty_start > 0: # f -> f_tilde = f + lambda_0 |beta_0|^2_2
-            f[~l2_is_null] += (2 * eps[~l2_is_null] / self.penalty_start) * \
+            f[~l2_is_null] += (2 * eps / self.penalty_start) * \
                 np.sum(beta[:self.penalty_start, ~l2_is_null] ** 2, axis=0)
 
         Xbeta = np.dot(self.X, beta)
@@ -1639,7 +1637,7 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
 
 
         if self.penalty_start > 0:
-            psi_star[~l2_is_null] += (0.5 / (2 * eps[~l2_is_null] / self.penalty_start)) * \
+            psi_star[~l2_is_null] += (0.5 / (2 * eps / self.penalty_start)) * \
                 np.sum(v[:self.penalty_start, ~l2_is_null] ** 2, axis=0)
 #        if self.penalty_start > 0 and self.rr.k > 0:
 #            psi_star += (0.5 / (2 * eps / self.penalty_start)) * \
