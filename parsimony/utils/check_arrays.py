@@ -13,18 +13,21 @@ import numpy as np
 __all__ = ["check_arrays", "check_array_in"]
 
 
-def check_arrays(*arrays):
+def check_arrays(*arrays, flatten=False):
     """Checks that:
         - Lists are converted to numpy arrays.
         - All arrays are cast to float.
         - All arrays have consistent first dimensions.
-        - Arrays are at least 2D arrays, if not they are reshaped.
+        - If flatten is False (default), arrays are at least 2D arrays,
+        if not they are reshaped.
 
     Parameters
     ----------
     *arrays: Sequence of arrays or scipy.sparse matrices with same shape[0]
             Python lists or tuples occurring in arrays are converted to 2D
             numpy arrays.
+
+    flatten: boolean (default False), if true, array are flattened.
 
     Examples
     --------
@@ -34,6 +37,10 @@ def check_arrays(*arrays):
            [ 2.]]), array([[ 3.],
            [ 4.]]), array([[ 1.,  2.],
            [ 3.,  4.]])]
+    >>> check_arrays([1, 2], np.array([3, 4]), flatten=True)
+    [array([ 1.,  2.]), array([ 3.,  4.])]
+    >>> check_arrays(1, np.array([4]), flatten=True)
+    [array([ 1.]), array([ 4.])]
     """
     if len(arrays) == 0:
         return None
@@ -44,12 +51,20 @@ def check_arrays(*arrays):
         # Recast input as float array
         array = np.asarray(array, dtype=np.float)
 
+        if array.shape == ():  # a scalar has been given
+            array = array.reshape(1, 1)
+
         if n_samples is None:
             n_samples = array.shape[0]
+
         if array.shape[0] != n_samples:
             raise ValueError("Found array with dim %d. Expected %d"
                              % (array.shape[0], n_samples))
-        if len(array.shape) == 1:
+
+        if flatten is True:  # 1d array
+            array = array.ravel()
+
+        elif len(array.shape) == 1:  # 2d array
             array = array[:, np.newaxis]
 
         checked_arrays.append(array)
@@ -116,6 +131,55 @@ def check_array_in(array1, array2):
                          "found in array2.")
 
     return array1
+
+
+def prepend_array(arr, size, val=0, axis=0):
+    """Prepend constant value along a given axis. Simplier but faster
+    alternative to np.pad(...).
+
+    Parameters
+    ----------
+
+    arr:  : 2d ndarray
+        The array to be extended.
+
+    size: int
+        The size of the extension.
+
+    val: float
+        The value repeated in the extension. Default is zero.
+
+    axis: int 0 or 1
+        0: the array is extended on his top; 1 on the left.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> arr = np.arange(6).reshape(3, 2)
+    >>> prepend_array(arr, size=2)
+    array([[ 0.,  0.],
+           [ 0.,  0.],
+           [ 0.,  1.],
+           [ 2.,  3.],
+           [ 4.,  5.]])
+    >>> prepend_array(arr, size=1, val=0, axis=1)
+    array([[ 0.,  0.,  1.],
+           [ 0.,  2.,  3.],
+           [ 0.,  4.,  5.]])
+    """
+    if size <= 0:
+        return arr
+    if axis == 0:
+        pad = np.empty((size, arr.shape[1]))
+        pad.fill(val)
+        return np.vstack((pad, arr))
+    if axis == 1:
+        pad = np.empty((arr.shape[0], size))
+        pad.fill(val)
+        return np.hstack((pad, arr))
+    else:
+        raise ValueError("axis must be 0 or 1. Consider using np.pad()")
+
 
 if __name__ == "__main__":
     import doctest

@@ -67,7 +67,8 @@ class L1TV(properties.NesterovFunction,
         # WARNING: Number of non-zero rows may differ from p.
         self._p = A[0].shape[1]
         # Put lambda and gamma in A matrices.
-        A = [l1 * A[0]] + [tv * A[i] for i in range(1, len(A))]
+        A = [A[0].multiply(l1)] + [A[i].multiply(tv) for i in range(1, len(A))]
+        #A = [l1 * A[0]] + [tv * A[i] for i in range(1, len(A))]
 
         super(L1TV, self).__init__(l1, A=A, mu=mu, penalty_start=penalty_start)
 

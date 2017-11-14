@@ -532,19 +532,19 @@ class TestLogisticRegression(TestCase):
                             msg="The found regression vector is not correct.",
                             places=5)
 
-        f_spams = function.f(beta_spams)
-        f_parsimony = function.f(beta)
+        f_spams = float(function.f(beta_spams))
+        f_parsimony = float(function.f(beta))  # force conversion to scalar
         if abs(f_spams) > consts.TOLERANCE:
             err = abs(f_parsimony - f_spams) / f_spams
         else:
             err = abs(f_parsimony - f_spams)
-#        print "err:", err
+        # print("err:", err)
         assert_almost_equal(err, 2.046041e-16,
                             msg="The found regression vector does not give " \
                                 "the correct function value.",
                             places=5)
 
-        f_logreg = function.f(logreg_est.beta)
+        f_logreg = float(function.f(logreg_est.beta))
         if abs(f_spams) > consts.TOLERANCE:
             err = abs(f_logreg - f_spams) / f_spams
         else:
@@ -843,8 +843,8 @@ class TestLogisticRegression(TestCase):
 #        print "re:", res
         assert_less(re, 0.27, "The found regression vector is not correct.")
 
-        f_parsimony = function.f(beta)
-        f_spams = function.f(beta_spams)
+        f_parsimony = float(function.f(beta))
+        f_spams = float(function.f(beta_spams))
         if abs(f_spams) > consts.TOLERANCE:
             err = abs(f_parsimony - f_spams) / f_spams
         else:
@@ -853,7 +853,7 @@ class TestLogisticRegression(TestCase):
         assert_less(re, 0.27, "The found regression vector does not give "
                               "the correct function value.")
 
-        f_logreg = function.f(logreg_est.beta)
+        f_logreg = float(function.f(logreg_est.beta))  # force scalar
         if abs(f_spams) > consts.TOLERANCE:
             err = abs(f_logreg - f_spams) / f_spams
         else:
@@ -972,8 +972,8 @@ class TestLogisticRegression(TestCase):
                             msg="The found regression vector is not correct.",
                             places=5)
 
-        f_spams = function.f(beta_spams)
-        f_parsimony = function.f(beta)
+        f_spams = float(function.f(beta_spams))
+        f_parsimony = float(function.f(beta))
         if abs(f_spams) > consts.TOLERANCE:
             err = abs(f_parsimony - f_spams) / f_spams
         else:
@@ -984,7 +984,7 @@ class TestLogisticRegression(TestCase):
                                 "the correct function value.",
                             places=5)
 
-        f_logreg = function.f(logreg_est.beta)
+        f_logreg = float(function.f(logreg_est.beta))
         if abs(f_spams) > consts.TOLERANCE:
             err = abs(f_logreg - f_spams) / f_spams
         else:

@@ -21,6 +21,7 @@ class TestL1(TestCase):
     def test_smoothed(self):
 
         import numpy as np
+        import scipy.sparse
 
         from parsimony.functions import CombinedFunction
         import parsimony.algorithms.proximal as proximal
@@ -54,7 +55,8 @@ class TestL1(TestCase):
 
         mu_min = 0.001  # consts.TOLERANCE
 
-        A = np.eye(p)
+        A = scipy.sparse.eye(p)
+        # A = np.eye(p)
         A = [A, A, A]
         snr = 100.0
         X, y, beta_star = l1_l2_tv.load(l, k, g, beta, M, e, A, snr=snr)
@@ -94,6 +96,7 @@ class TestL1(TestCase):
     def test_nonsmooth(self):
 
         import numpy as np
+        import scipy.sparse
 
         import parsimony.utils.consts as consts
         from parsimony.functions import CombinedFunction
@@ -124,7 +127,8 @@ class TestL1(TestCase):
         k = 0.0
         g = 0.0
 
-        A = np.eye(p)
+        A = scipy.sparse.eye(p)
+        # A = np.eye(p)
         A = [A, A, A]
         snr = 100.0
         X, y, beta_star = l1_l2_tv.load(l, k, g, beta_start, M, e, A, snr=snr)

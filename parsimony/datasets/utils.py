@@ -13,6 +13,39 @@ import numpy as np
 from scipy import ndimage
 #import matplotlib.pyplot as plt
 
+def download_dataset(dataset):
+    """Download dataset.
+
+    Parameters
+    ----------
+    dataset: string
+
+    Return
+    ------
+    dataset_filename, dataset: path_to_archive, numpy_archive
+
+    Examples
+    --------
+
+    >>> dataset = "%s_%s_%ix%ix%i_%i_dataset_v%s.npz" % \
+    ...         tuple(["dice5", "classif", 50, 50, 1, 500, '0.3.1'])
+    >>> archiv, filename = download_dataset(dataset)
+    """
+    import os
+    import urllib
+    import tempfile
+    # base_ftp_url = "ftp://ftp.cea.fr/pub/dsv/anatomist/parsimony/%s"
+    base_ftp_url = "ftp://ftp.cea.fr/pub/unati/share/parsimony/datasets/%s"
+    tmp_dir = tempfile.gettempdir()
+    # dataset
+    dataset_url = base_ftp_url % dataset
+    dataset_filename = os.path.join(tmp_dir, os.path.basename(dataset_url))
+    if not os.path.exists(dataset_filename):
+        print("Download dataset from: %s => %s" % (dataset_url, dataset_filename))
+        urllib.request.urlretrieve(dataset_url, dataset_filename)
+    data = np.load(dataset_filename)
+    return(dataset_filename, data)
+
 
 def corr_to_coef(v_x, v_e, cov_xe, cor):
     """In a linear model y = bx + e. Calculate b such cor(bx + e, x) = cor.
