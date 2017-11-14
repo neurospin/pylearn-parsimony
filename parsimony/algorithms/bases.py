@@ -184,7 +184,10 @@ class IterativeAlgorithm(object):
 
         self.min_iter = max(0, int(min_iter))
         self.max_iter = max(self.min_iter, int(max_iter))
-        self.callback = callback
+        if (callback is None) or hasattr(callback, "__call__"):
+            self.callback = callback
+        else:
+            raise ValueError("The callback must be callable, or None.")
         self.num_iter = 0
 
         self.iter_reset()
@@ -244,6 +247,7 @@ class InformationAlgorithm(object):
     INFO_PROVIDED = []
 
     def __init__(self, info=[], **kwargs):
+
         super(InformationAlgorithm, self).__init__(**kwargs)
 
         if not isinstance(info, (list, tuple)):

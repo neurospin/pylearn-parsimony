@@ -28,7 +28,8 @@ try:
 except (ValueError, SystemError):
     from parsimony.utils import utils
 
-__all__ = ["BaseWeights", "IdentityWeights", "RandomUniformWeights",
+__all__ = ["BaseWeights", "IdentityWeights",
+           "RandomUniformWeights", "RandomNormalWeights",
            "OnesWeights", "ZerosWeights",
            "NeuralNetworkInitialiser", "TanhInitialiser",
            "LogisticInitialiser", "OrthogonalRandomInitialiser"]

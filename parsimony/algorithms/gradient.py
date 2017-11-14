@@ -157,6 +157,8 @@ class GradientDescent(bases.ExplicitAlgorithm,
 
                 break
 
+        self.num_iter = i
+
         if self.info_requested(Info.num_iter):
             self.info_set(Info.num_iter, i)
         if self.info_requested(Info.time):
@@ -300,6 +302,8 @@ class AcceleratedGradientDescent(bases.ExplicitAlgorithm,
                     self.info_set(Info.converged, True)
 
                 break
+
+        self.num_iter = i
 
         if self.info_requested(Info.num_iter):
             self.info_set(Info.num_iter, i)
