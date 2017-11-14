@@ -34,7 +34,8 @@ time_wall = time  # UNIX-based system measures time in seconds since the epoch.
 time = time_cpu  # TODO: Make it so that this can be changed by settings.
 
 __all__ = ["time_cpu", "time_wall", "time", "numpy_datatype", "deprecated",
-           "corr", "project", "optimal_shrinkage", "AnonymousClass"]
+           "corr", "project", "optimal_shrinkage", "AnonymousClass",
+           "is_windows", "version"]
 
 # _DEBUG = True
 
@@ -525,6 +526,108 @@ class AnonymousClass(object):
     def __neq__(self, other):
         return self.__dict__ != other.__dict__
 
+
+def is_windows():
+    """Tries to determine whether the current OS is Windows or not.
+
+    Returns
+    -------
+    windows_os : bool
+        If the OS is determined to be Windows.
+    """
+    import platform
+    system = platform.system().lower()
+    if system.startswith("win"):
+        return True
+    if hasattr(platform, "win32_ver"):
+        if any(platform.win32_ver()):
+            return True
+
+    import sys
+    sys_platform = sys.platform.lower()
+    if sys_platform.startswith("win"):
+        return True
+    if hasattr(sys, "getwindowsversion"):
+        return True
+
+    import os
+    if os.name == "nt":
+        return True
+    os_environ = os.environ.get("OS", "").lower()
+    if os_environ.startswith("win"):
+        return True
+
+    try:
+        import win32api
+        return True
+    except:
+        pass
+
+    return False
+
+
+def version(ver1, ver2):
+    """Compares version strings and returns true if ``ver1 <= ver2``.
+
+    Tries to use standard packages for comparing version numbers. If that does
+    not work (because the packages are not available), it will split the
+    strings on '.' and compare the parts. Don't expect this fallback version to
+    be anything resembling perfect. For comparisons that follow usual
+    conventions, install ``distutils``.
+    """
+    try:
+        from distutils.version import LooseVersion
+
+        return LooseVersion(ver1) <= LooseVersion(ver2)
+    except:
+        pass
+
+    try:
+        from packaging import version
+
+        return version.parse(ver1) <= version.parse(ver2)
+    except:
+        pass
+
+    try:
+        from packaging.version import Version
+
+        return Version(ver1) <= Version(ver2)
+    except:
+        pass
+
+    try:
+        from pkg_resources import parse_version
+
+        return parse_version(ver1) <= parse_version(ver2)
+    except:
+        pass
+
+    try:
+        ver1 = ver1.split(".")
+        ver2 = ver2.split(".")
+
+        if len(ver1) < len(ver2):
+            ver1.extend(["0"] * (len(ver2) - len(ver1)))
+        elif len(ver2) < len(ver1):
+            ver2.extend(["0"] * (len(ver1) - len(ver2)))
+
+        for i in range(min(len(ver1), len(ver2))):
+            try:
+                n1 = int(ver1[i])
+                n2 = int(ver2[i])
+            except ValueError:
+                n1 = ver1[i]
+                n2 = ver2[i]
+
+            if n1 > n2:
+                return False
+
+        return True
+    except:
+        pass
+
+    return ver1 <= ver2
 
 #class EnumItem(object):
 #    def __init__(self, cls_name, name, value):
