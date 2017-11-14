@@ -35,7 +35,8 @@ time = time_cpu  # TODO: Make it so that this can be changed by settings.
 
 __all__ = ["time_cpu", "time_wall", "time", "numpy_datatype", "deprecated",
            "corr", "project", "optimal_shrinkage", "AnonymousClass",
-           "is_windows", "version"]
+           "is_windows", "version",
+           "list_op"]
 
 # _DEBUG = True
 
@@ -629,279 +630,45 @@ def version(ver1, ver2):
 
     return ver1 <= ver2
 
-#class EnumItem(object):
-#    def __init__(self, cls_name, name, value):
-#        self.cls_name = cls_name
-#        self.name = name
-#        self.value = value
-#
-#    def __eq__(self, other):
-#        if not isinstance(other, self.__class__):
-#            return False
-#
-#        return self.cls_name == other.cls_name \
-#                and self.name == other.name \
-#                and self.value == other.value
-#
-#    def __hash__(self):
-#        return hash(self.cls_name) | hash(self.name) | hash(self.value)
-#
-#    def __str__(self):
-#        return "<%s.%s: %d>" % (self.cls_name, self.name, self.value)
-#
-#    def __repr__(self):
-#        return "EnumItem('%s', '%s', %d)" % (self.cls_name, self.name,
-#                                             self.value)
-#
-#
-#class Enum(object):
-#    """Used to declare enumerated constants.
-#
-#    Supposed to be similar to and used as the Enum class introduced in
-#    Python 3.4.
-#    """
-#    def __init__(self, name, *sequential, **named):
-##        self.__dict__["_Enum__name"] = name
-#        seq_pairs = zip(sequential, range(len(sequential)))
-#        values = {k: EnumItem(name, k, v) for k, v in seq_pairs}
-#        for k, v in named:
-#            values[k] = EnumItem(name, k, v)
-#        enums = dict(values)  # , **named)
-#        for k, v in enums.items():
-#            self.__dict__[k] = v
-#
-#    def __setattr__(self, name, value):  # Read-only.
-#        raise TypeError("Enum attributes are read-only.")
-#
-#    def __str__(self):
-#        return "Enum: " + str(self.__dict__.keys())
-#
-#
-#Info = Enum("Info", "ok", "num_iter", "t", "f", "gap", "mu", "bound", "beta",
-#                    "converged")
-#
-#
-#class LimitedDict(collections.MutableMapping):
-#    """A dictionary with a constraint on the set of keys that are allowed.
-#
-#    This class is essentially a dict, but it only allows a set of keys defined
-#    at initialisation.
-#
-#    Parameters
-#    ----------
-#    keys : A sequence of allowed keys. The set of keys that are allowed.
-#    """
-#    def __init__(self, *keys):
-#        if (len(keys) == 1 and isinstance(keys[0], collections.Sequence) \
-#                and len(keys[0]) == 0) or len(keys) == 0:
-#            self.__keys = set()
-#
-#        elif (len(keys) == 1 and isinstance(keys[0], collections.Sequence) \
-#                and len(keys[0]) == 1):
-#            self.__keys = set(list(keys[0]))
-#
-#        elif len(keys) == 1 and isinstance(keys[0], collections.Iterable):
-#
-#            self.__keys = set(keys[0])
-#
-#        else:
-#            self.__keys = set(keys)
-#
-#        self.__dict = dict()
-#
-#    def add_key(self, key):
-#        if key not in self.__keys:
-#            self.__keys.add(key)
-#
-#    def remove_key(self, key):
-#        if key in self.__keys:
-#            self.__keys.remove(key)
-#
-#            # Key no longer valid. Remove from dictionary if present.
-#            if key in self.__dict:
-#                del self.__dict[key]
-#
-#    def allows(self, key):
-#        return key in self.__keys
-#
-#    def allowed_keys(self):
-#        return list(self.__keys)
-#
-#    def __len__(self):
-#        return len(self.__dict)
-#
-#    def __getitem__(self, key):
-#        if key not in self.__keys:
-#            raise KeyError("'%s' is not an allowed key." % (key,))
-#
-#        return self.__dict[key]
-#
-#    def __setitem__(self, key, value):
-#        if key not in self.__keys:
-#            raise KeyError("'%s' is not an allowed key." % (key,))
-#
-#        self.__dict[key] = value
-#
-#    def __delitem__(self, key):
-#        if key not in self.__keys:
-#            raise KeyError("'%s' is not an allowed key." % (key,))
-#
-#        del self.__dict[key]
-#
-#    def __contains__(self, key):
-#        if key not in self.__keys:
-#            raise KeyError("'%s' is not an allowed key." % (key,))
-#
-#        return key in self.__dict
-#
-#    def __iter__(self):
-#        return iter(self.__dict)
-#
-#    def clear(self):
-#        self.__dict.clear()
-#
-#    def copy(self):
-#        info = self.__class__(list(self.__keys))
-#        info.__dict = self.__dict.copy()
-#
-#        return info
-#
-#    @classmethod
-#    def fromkeys(cls, keys, value=None):
-#        info = cls(keys)
-#        info.__dict = dict.fromkeys(keys, value)
-#
-#        return info
-#
-#    def get(self, key, default=None):
-#        if key not in self.__keys:
-#            raise KeyError("'%s' is not an allowed key." % (key,))
-#
-#        return self.__dict.get(key, default)
-##        if key in self.__dict:
-##            return self.__dict[key]
-##        else:
-##            return default
-#
-#    def items(self):
-#        return self.__dict.items()
-#
-#    def iteritems(self):
-#        return self.__dict.iteritems()
-#
-#    def iterkeys(self):
-#        return self.__dict.iterkeys()
-#
-#    def itervalues(self):
-#        return self.__dict.itervalues()
-#
-#    def keys(self):
-#        return self.__dict.keys()
-#
-#    def pop(self, *args):
-#        if len(args) == 0:
-#            raise TypeError("pop expected at least 1 arguments, got 0")
-#        if len(args) > 2:
-#            raise TypeError("pop expected at most 2 arguments, got %d" \
-#                    % (len(args),))
-#
-#        if len(args) >= 1:
-#            key = args[0]
-#            default_given = False
-#        if len(args) >= 2:
-#            default = args[1]
-#            default_given = True
-#
-#        if key not in self.__keys:
-#            raise KeyError("'%s' is not an allowed key." % (key,))
-#
-#        if key not in self.__dict:
-#            if default_given:
-#                return default
-#            else:
-#                raise KeyError(str(key))
-#        else:
-#            return self.__dict[key]
-#
-#    def popitem(self):
-#        return self.__dict.popitem()
-#
-#    def setdefault(self, key, default=None):
-#        if key not in self.__keys:
-#            raise KeyError("'%s' is not an allowed key." % (key,))
-#
-#        if key in self.__dict:
-#            return self.__dict[key]
-#        else:
-#            self.__dict[key] = default
-#            return default
-#
-#    def update(self, *args, **kwargs):
-#        info = dict()
-#        info.update(*args, **kwargs)
-#        for key in info.keys():
-#            if key not in self.__keys:
-#                raise KeyError("'%s' is not an allowed key." % (key,))
-#
-#        self.__dict.update(info)
-#
-#    def values(self):
-#        return self.__dict.values()
-#
-#    def viewitems(self):
-#        return self.__dict.viewitems()
-#
-#    def viewkeys(self):
-#        return self.__dict.viewkeys()
-#
-#    def viewvalues(self):
-#        return self.__dict.viewvalues()
-#
-#    def __format__(self, *args, **kwargs):
-#        return self.__dict.__format__(*args, **kwargs)
-#
-#    def __eq__(self, other):
-#        if not isinstance(other, self.__class__):
-#            return False
-#        return self.__keys == other.__keys and self.__dict == other.__dict
-#
-#    def __ge__(self, other):
-#        return self.__keys == other.__keys and self.__dict >= other.__dict
-#
-#    def __gt__(self, other):
-#        return self.__keys == other.__keys and self.__dict > other.__dict
-#
-#    def __hash__(self):
-#        return hash(self.__keys) | hash(self.__dict)
-#
-#    def __le__(self, other):
-#        return self.__keys == other.__keys and self.__dict <= other.__dict
-#
-#    def __lt__(self, other):
-#        return self.__keys == other.__keys and self.__dict < other.__dict
-#
-#    def __ne__(self, other):
-#        keys_eq = self.__keys == other.__keys
-#        if not keys_eq:
-#            return False
-#        else:
-#            return self.__dict != other.__dict
-#
-#    def __cmp__(self, other):
-#        keys_cmp = cmp(self.__keys, other.__keys)
-#        if keys_cmp != 0:
-#            return keys_cmp
-#        else:
-#            return cmp(self.__dict, other.__dict)
-#
-#    def __repr__(self):
-#        return "%s(%s).update(%s)" \
-#                % (self.__class__.__name__,
-#                   self.__keys.__repr__(),
-#                   self.__dict.__repr__())
-#
-#    def __str__(self):
-#        return "Keys: %s. Dict: %s." % (str(self.__keys), str(self.__dict))
+
+def list_op(lists, op, aggregator=None):
+    """Perform an operation on the elements of multiple lists.
+
+    Parameters
+    ----------
+    lists : list or tuple of lists
+        A list or tuple with the lists to apply operation on.
+
+    op : Callable
+        A callable, that takes as inputs
+
+    aggregator : Callable, optional
+        A final aggregator for the output list. Must accept a single list as
+        input. If given, this value will be returned instead of the list of
+        results. Default is None, which means to not apply an aggregator.
+
+    Returns
+    -------
+    result : list
+        A list of the results or the aggregated value(s) if ``aggregator`` is
+        not None.
+    """
+    for i in range(len(lists)):
+        if i == 0:
+            length = len(lists[i])
+        else:
+            if len(lists[i]) != length:
+                raise ValueError("The given lists must have the same length.")
+
+    res = []
+    for val in zip(*lists):
+        res.append(op(*val))
+
+    if aggregator is not None:
+        res = aggregator(res)
+
+    return res
+
 
 if __name__ == "__main__":
     import doctest
