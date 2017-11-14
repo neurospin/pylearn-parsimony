@@ -9,7 +9,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @license: BSD 3-clause.
 """
 from .utils import time_cpu, time_wall, time, deprecated, corr, project
-from .utils import optimal_shrinkage, AnonymousClass
+from .utils import optimal_shrinkage, AnonymousClass, list_op
 from .check_arrays import check_arrays, check_array_in
 from .plots import map2d
 from .classif_label import class_weight_to_sample_weight, check_labels
@@ -27,7 +27,7 @@ from . import mesh
 
 __all__ = ["time_cpu", "time_wall", "time", "deprecated", "corr", "project",
            "check_arrays", "check_array_in",
-           "optimal_shrinkage", "AnonymousClass",
+           "optimal_shrinkage", "AnonymousClass", "list_op",
            "map2d",
            "class_weight_to_sample_weight", "check_labels",
            "consts", "maths", "plots", "linalgs", "resampling",

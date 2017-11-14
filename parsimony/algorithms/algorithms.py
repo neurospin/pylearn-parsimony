@@ -22,7 +22,7 @@ try:
     from . import bases  # When imported as a package.
 except (ValueError, SystemError):
     import parsimony.algorithms.bases as bases  # When run as a program.
-from parsimony.utils import time, consts, check_arrays, check_array_in
+from parsimony.utils import time, consts, check_arrays, check_array_in, list_op
 try:
     from . import utils as utils
 except (ValueError, SystemError):
@@ -464,7 +464,8 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
 
     @bases.force_reset
     def run(self, g, x):
-        """Find the best separating margin for the samples in X.
+        """Run the optimiser using the majoriser function starting at the given
+        point.
 
         Parameters
         ----------
@@ -474,7 +475,7 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
         x : array_like
             The point at which to start the minimisation process.
         """
-        x = check_arrays(x)
+        # x = check_arrays(x)
 
         if self.info_requested(utils.Info.ok):
             self.info_set(utils.Info.ok, False)
@@ -507,7 +508,14 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
             if self.callback is not None:
                 self.callback(locals())
 
-            if i >= self.min_iter and np.linalg.norm(xnew - xold) < self.eps:
+            if isinstance(xnew, list):
+                val = list_op((xnew, xold),
+                              lambda new, old: np.linalg.norm(new - old),
+                              aggregator=np.max)
+            else:
+                val = np.linalg.norm(xnew - xold)
+
+            if i >= self.min_iter and val < self.eps:
 
                 if self.info_requested(utils.Info.converged):
                     self.info_set(utils.Info.converged, True)
