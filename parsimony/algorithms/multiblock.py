@@ -28,7 +28,7 @@ import parsimony.functions.properties as properties
 import parsimony.functions.multiblock.properties as multiblock_properties
 import parsimony.functions.multiblock.losses as mb_losses
 
-__all__ = ["BlockRelaxationWrapper", "MultiblockFISTA"]
+__all__ = ["BlockRelaxationWrapper", "MultiblockISTA", "MultiblockFISTA"]
 
 
 class BlockRelaxationWrapper(bases.ExplicitAlgorithm,
@@ -174,6 +174,175 @@ class BlockRelaxationWrapper(bases.ExplicitAlgorithm,
             self.info_set(Info.time, _t)
         if self.info_requested(Info.func_val):
             self.info_set(Info.func_val, _f)
+        if self.info_requested(Info.ok):
+            self.info_set(Info.ok, True)
+
+        return w
+
+
+class MultiblockISTA(bases.ExplicitAlgorithm,
+                     bases.IterativeAlgorithm,
+                     bases.InformationAlgorithm):
+    """The iterative soft-thresholding algorithm algorithm with alternating
+    minimisations in a multiblock setting.
+
+    Parameters
+    ----------
+    info : list or tuple of utils.Info
+        What, if any, extra run information should be stored. Default is an
+        empty list, which means that no run information is computed nor
+        returned.
+
+    eps : float
+        Positive float. Tolerance for the stopping criterion.
+
+    max_iter : int
+        Non-negative integer. Maximum total allowed number of iterations.
+
+    min_iter : int
+        Non-negative integer less than or equal to max_iter. Minimum number of
+        iterations that must be performed. Default is 1.
+    """
+    INTERFACES = [multiblock_properties.MultiblockFunction,
+                  multiblock_properties.MultiblockGradient,
+                  multiblock_properties.MultiblockStepSize,
+                  properties.OR(
+                      multiblock_properties.MultiblockProjectionOperator,
+                      multiblock_properties.MultiblockProximalOperator)]
+
+    INFO_PROVIDED = [Info.ok,
+                     Info.num_iter,
+                     Info.time,
+                     Info.func_val,
+                     Info.smooth_func_val,
+                     Info.converged]
+
+    def __init__(self,
+                 info=[],
+                 eps=consts.TOLERANCE,
+                 max_iter=consts.MAX_ITER, min_iter=1):
+
+        super(MultiblockISTA, self).__init__(info=info,
+                                             max_iter=max_iter,
+                                             min_iter=min_iter)
+
+        self.eps = max(consts.FLOAT_EPSILON, float(eps))
+
+    def reset(self):
+
+        self.info_reset()
+        self.iter_reset()
+
+    @bases.force_reset
+    @bases.check_compatibility
+    def run(self, function, w):
+
+        # Not ok until the end.
+        if self.info_requested(Info.ok):
+            self.info_set(Info.ok, False)
+
+        # Initialise info variables. Info variables have the prefix "_".
+        if self.info_requested(Info.time):
+            _t = []
+        if self.info_requested(Info.func_val):
+            _f = []
+        if self.info_requested(Info.smooth_func_val):
+            _fmu = []
+        if self.info_requested(Info.converged):
+            self.info_set(Info.converged, False)
+
+        exp = 2.0 + consts.FLOAT_EPSILON
+        block_iter = [1] * len(w)
+
+        it = 0
+        while True:
+
+            for i in range(len(w)):  # Loop over the blocks
+
+                 # Wrap a function around the ith block.
+                func = mb_losses.MultiblockFunctionWrapper(function, w, i)
+
+                # Run ISTA.
+                w_old = w[i]
+                for k in range(1, max(self.min_iter + 1,
+                                      self.max_iter - self.num_iter + 1)):
+
+                    if self.info_requested(Info.time):
+                        time = utils.time_wall()
+
+                    # Compute the step.
+                    step = func.step(w[i])
+                    # Compute inexact precision.
+                    eps = max(consts.FLOAT_EPSILON,
+                              1.0 / (block_iter[i] ** exp))
+
+                    w_old = w[i]
+                    # Take an ISTA step.
+                    w[i] = func.prox(w[i] - step * func.grad(w[i]),
+                                     factor=step, eps=eps)
+
+                    # Store info variables.
+                    if self.info_requested(Info.time):
+                        _t.append(utils.time_wall() - time)
+                    if self.info_requested(Info.func_val):
+                        _f.append(function.f(w))
+                    if self.info_requested(Info.smooth_func_val):
+                        _fmu.append(function.fmu(w))
+
+                    # Update iteration counts.
+                    self.num_iter += 1
+                    block_iter[i] += 1
+
+                    # Test stopping criterion.
+                    if maths.norm(w[i] - w_old) < step * self.eps \
+                            and k >= self.min_iter:
+                        break
+
+            # Test global stopping criterion.
+            all_converged = True
+            for i in range(len(w)):
+
+                # Wrap a function around the ith block.
+                func = mb_losses.MultiblockFunctionWrapper(function, w, i)
+
+                # Compute the step.
+                step = func.step(w[i])
+                # Compute inexact precision.
+                eps = max(consts.FLOAT_EPSILON,
+                          1.0 / (block_iter[i] ** exp))
+
+                # Take one ISTA step for use in the stopping criterion.
+                w_tilde = func.prox(w[i] - step * func.grad(w[i]),
+                                    factor=step, eps=eps)
+                # TODO: Use this step?
+
+                # Test if converged for block i.
+                if maths.norm(w[i] - w_tilde) > step * self.eps:
+                    all_converged = False
+                    break
+
+            # Converged in all blocks!
+            if all_converged:
+                if self.info_requested(Info.converged):
+                    self.info_set(Info.converged, True)
+
+                break
+
+            # Stop after maximum number of iterations.
+            if self.num_iter >= self.max_iter:
+                break
+
+            it += 1
+
+        # Store information.
+        if self.info_requested(Info.num_iter):
+            self.info_set(Info.num_iter, self.num_iter)
+        if self.info_requested(Info.time):
+            self.info_set(Info.time, _t)
+        if self.info_requested(Info.func_val):
+            self.info_set(Info.func_val, _f)
+        if self.info_requested(Info.smooth_func_val):
+            self.info_set(Info.smooth_func_val, _fmu)
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, True)
 
