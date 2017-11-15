@@ -95,9 +95,14 @@ class GroupLassoOverlap(properties.NesterovFunction,
             beta_ = beta
 
         A = self.A()
-        normsum = 0.0
-        for Ag in A:
-            normsum += maths.norm(Ag.dot(beta_))
+
+        normsum = maths.norm(A[0].dot(beta_), axis=0)
+        for k in range(1, len(A)):
+            normsum += maths.norm(A[k].dot(beta_), axis=0)
+
+        # normsum = 0.0
+        # for Ag in A:
+        #     normsum += maths.norm(Ag.dot(beta_))
 
         return self.l * (normsum - self.c)
 
@@ -118,11 +123,11 @@ class GroupLassoOverlap(properties.NesterovFunction,
 
         alpha_sqsum = 0.0
         for a in alpha:
-            alpha_sqsum += np.sum(a ** 2.0)
+            alpha_sqsum += np.sum(a ** 2.0, axis=0)
 
         mu = self.get_mu()
 
-        return self.l * ((np.dot(beta_.T, Aa)[0, 0]
+        return self.l * ((np.dot(beta_.T, Aa)
                           - (mu / 2.0) * alpha_sqsum) - self.c)
 
     def feasible(self, beta):
@@ -136,23 +141,30 @@ class GroupLassoOverlap(properties.NesterovFunction,
             beta_ = beta
 
         A = self.A()
-        normsum = 0.0
-        for Ag in A:
-            normsum += maths.norm(Ag.dot(beta_))
 
-        return normsum <= self.c
+        normsum = maths.norm(A[0].dot(beta_), axis=0)
+        for k in range(1, len(A)):
+            normsum += maths.norm(A[k].dot(beta_), axis=0)
+
+        # normsum = 0.0
+        # for Ag in A:
+        #     normsum += maths.norm(Ag.dot(beta_))
+
+        return normsum <= self.c  # TODO: FIX This for vectrorization
 
     def L(self):
         """ Lipschitz constant of the gradient.
 
         From the interface "LipschitzContinuousGradient".
         """
-        if self.l < consts.TOLERANCE:
-            return 0.0
+        # if self.l < consts.TOLERANCE:
+        #    return 0.0
 
         lmaxA = self.lambda_max()
+        L = np.asarray(self.l * lmaxA / self.mu)
+        L[self.l < consts.TOLERANCE] = 0
 
-        return self.l * lmaxA / self.mu
+        return L
 
     def lambda_max(self):
         """ Largest eigenvalue of the corresponding covariance matrix.
@@ -185,9 +197,11 @@ class GroupLassoOverlap(properties.NesterovFunction,
         """
         for i in range(len(a)):
             astar = a[i]
-            normas = np.sqrt(np.sum(astar ** 2.0))
-            if normas > 1.0:
-                astar *= 1.0 / normas
+            normas = np.sqrt(np.sum(astar ** 2.0, axis=0))
+            astar[:, normas > 1.0] *= 1.0 / normas[normas > 1.0]
+            #normas = np.sqrt(np.sum(astar ** 2.0))
+            #if normas > 1.0:
+            #    astar *= 1.0 / normas
             a[i] = astar
 
         return a
@@ -220,7 +234,7 @@ class GroupLassoOverlap(properties.NesterovFunction,
         SS = 0.0
         A = self.A()
         for i in range(len(A)):
-            SS = max(SS, maths.norm(A[i].dot(beta_)))
+            SS = np.maximum(SS, maths.norm(A[i].dot(beta_)))
 
         return SS
 

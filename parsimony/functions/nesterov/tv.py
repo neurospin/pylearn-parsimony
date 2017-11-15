@@ -78,12 +78,14 @@ class TotalVariation(properties.NesterovFunction,
     def f(self, beta):
         """ Function value.
         """
-        if self.l < consts.TOLERANCE:
-            return 0.0
+        # if self.l < consts.TOLERANCE:
+        #    return 0.0
 
+        # TODO: This should be removed beta should not allowed to be transposed
         if (len(beta.shape) == 2) \
                 and (beta.shape[0] == 1) and (beta.shape[1] > 1):
             beta = beta.T
+            raise ValueError("Beta is transposed: not allowed")
 
         if self.penalty_start > 0:
             beta_ = beta[self.penalty_start:, :]
@@ -95,7 +97,12 @@ class TotalVariation(properties.NesterovFunction,
         for k in range(1, len(A)):
             abeta2 += A[k].dot(beta_) ** 2
 
-        return self.l * (np.sum(np.sqrt(abeta2)) - self.c)
+        f = self.l * (np.sum(np.sqrt(abeta2), axis=0) - self.c)
+        f = np.asarray(f)
+        f[self.l < consts.TOLERANCE] = 0
+
+        return f
+#        return self.l * (np.sum(np.sqrt(abeta2), axis=0) - self.c)
 #
 #        return self.l * (np.sum(np.sqrt(A[0].dot(beta_) ** 2.0 +
 #                                        A[1].dot(beta_) ** 2.0 +
@@ -106,8 +113,8 @@ class TotalVariation(properties.NesterovFunction,
 
         From the interface "NesterovFunction".
         """
-        if self.l < consts.TOLERANCE:
-            return 0.0
+#        if self.l < consts.TOLERANCE:
+#            return 0.0
 
         if self.penalty_start > 0:
             beta_ = beta[self.penalty_start:, :]
@@ -118,12 +125,18 @@ class TotalVariation(properties.NesterovFunction,
 
         alpha_sqsum = 0.0
         for a in alpha:
-            alpha_sqsum += np.sum(a ** 2.0)
+            alpha_sqsum += np.sum(a ** 2.0, axis=0)
 
         mu = self.get_mu()
 
-        return self.l * ((np.dot(beta_.T, Aa)[0, 0]
+        phi = self.l * ((np.dot(beta_.T, Aa)
                           - (mu / 2.0) * alpha_sqsum) - self.c)
+        phi = np.asarray(phi)
+        phi[self.l < consts.TOLERANCE] = 0
+
+        return phi
+#        return self.l * ((np.dot(beta_.T, Aa)
+#                          - (mu / 2.0) * alpha_sqsum) - self.c)
 
     def feasible(self, beta):
         """Feasibility of the constraint.
@@ -139,35 +152,37 @@ class TotalVariation(properties.NesterovFunction,
         abeta2 = A[0].dot(beta_) ** 2.0
         for k in range(1, len(A)):
             abeta2 += A[k].dot(beta_) ** 2
-        val = np.sum(np.sqrt(abeta2))
-#        val = np.sum(np.sqrt(A[0].dot(beta_) ** 2.0 +
-#                             A[1].dot(beta_) ** 2.0 +
-#                             A[2].dot(beta_) ** 2.0))
-        return val <= self.c
+        val = np.sum(np.sqrt(abeta2), axis=0)
+
+        return val <= self.c  # TODO: FIX This for vectrorization
 
     def L(self):
         """ Lipschitz constant of the gradient.
 
         From the interface "LipschitzContinuousGradient".
         """
-        if self.l < consts.TOLERANCE:
-            return 0.0
+#        if self.l < consts.TOLERANCE:
+#            return 0.0
 
         lmaxA = self.lambda_max()
+        L = self.l * lmaxA / self.mu
+        L[self.l < consts.TOLERANCE] = 0
 
-        return self.l * lmaxA / self.mu
+        return L
+#        return self.l * lmaxA / self.mu
 
     def lambda_max(self):
         """ Largest eigenvalue of the corresponding covariance matrix.
 
         From the interface "Eigenvalues".
         """
-        if self._lambda_max is None:        
+        if self._lambda_max is None:
             try:
-                self._lambda_max = self.A().get_singular_values(0)
+                lambda_max = self.A().get_singular_values(0)
+                self._lambda_max = np.repeat(lambda_max, np.size(self.l))
             except:
                 pass
- 
+
         if self._lambda_max is None:
             # Note that we can save the state here since lmax(A) does not change.
             # TODO: This only work if the elements of self._A are scipy.sparse. We
@@ -176,19 +191,21 @@ class TotalVariation(properties.NesterovFunction,
                     and self._A[1].nnz == 0 and self._A[2].nnz == 0:
                 # TODO: Instead of p, this should really be the number of non-zero
                 # rows of A.
-                self._lambda_max = 2.0 * (1.0 - math.cos(float(self._p - 1)
+                lambda_max = 2.0 * (1.0 - math.cos(float(self._p - 1)
                                                          * math.pi
                                                          / float(self._p)))
-    
+                self._lambda_max = np.repeat(lambda_max, np.size(self.l))
+
             else:
-    
+
                 from parsimony.algorithms.nipals import RankOneSparseSVD
-    
+
                 A = sparse.vstack(self.A())
                 # TODO: Add max_iter here!
                 v = RankOneSparseSVD().run(A)  # , max_iter=max_iter)
                 us = A.dot(v)
-                self._lambda_max = np.sum(us ** 2.0)
+                lambda_max = np.sum(us ** 2.0)
+                self._lambda_max = np.repeat(lambda_max, np.size(self.l))
 
         return self._lambda_max
 
@@ -292,7 +309,7 @@ class TotalVariation(properties.NesterovFunction,
         for Ai in A:
             normAg += Ai.dot(beta_) ** 2.0
         normAg = np.sqrt(normAg)
-        mu = np.max(normAg)
+        mu = np.max(normAg, axis=0)
 
         return mu
 

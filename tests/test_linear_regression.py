@@ -456,6 +456,7 @@ class TestLinearRegression(TestCase):
     def test_l1(self):
 
         import numpy as np
+        import scipy.sparse
         from parsimony.functions.losses import LinearRegression
         from parsimony.functions.penalties import L1
         from parsimony.functions import CombinedFunction
@@ -485,7 +486,8 @@ class TestLinearRegression(TestCase):
         k = 0.0
         g = 0.0
 
-        A = np.eye(p)
+        A = scipy.sparse.eye(p)
+#        A = np.eye(p)
         A = [A, A, A]
         snr = 100.0
         X, y, beta_star = l1_l2_gl.load(l, k, g, beta, M, e, A, snr=snr)
@@ -588,6 +590,7 @@ class TestLinearRegression(TestCase):
 
     def test_l1_intercept(self):
 
+        import scipy.sparse
         from parsimony.functions.losses import LinearRegression
         from parsimony.functions.penalties import L1
         from parsimony.functions import CombinedFunction
@@ -618,7 +621,8 @@ class TestLinearRegression(TestCase):
         k = 0.0
         g = 0.0
 
-        A = np.eye(p - 1)
+        A = scipy.sparse.eye(p - 1)
+        # A = np.eye(p - 1)
         A = [A, A, A]
         snr = 100.0
         X, y, beta_star = l1_l2_gl.load(l, k, g, beta, M, e, A, snr=snr,
@@ -723,6 +727,7 @@ class TestLinearRegression(TestCase):
 
     def test_l2(self):
 
+        import scipy.sparse
         from parsimony.functions.losses import LinearRegression
         from parsimony.functions.losses import RidgeRegression
         from parsimony.functions.penalties import L2Squared
@@ -752,7 +757,8 @@ class TestLinearRegression(TestCase):
         k = 0.618
         g = 0.0
 
-        A = np.eye(p)
+        A = scipy.sparse.eye(p)
+        #A = np.eye(p)
         A = [A, A, A]
         snr = 100.0
         X, y, beta_star = l1_l2_gl.load(l, k, g, beta, M, e, A, snr=snr)
@@ -815,6 +821,7 @@ class TestLinearRegression(TestCase):
 
     def test_l2_intercept(self):
 
+        import scipy.sparse
         from parsimony.functions.losses import LinearRegression
         from parsimony.functions.losses import RidgeRegression
         from parsimony.functions.penalties import L2Squared
@@ -846,7 +853,8 @@ class TestLinearRegression(TestCase):
         k = 0.618
         g = 0.0
 
-        A = np.eye(p - 1)
+        A = scipy.sparse.eye(p - 1)
+        # A = np.eye(p - 1)
         A = [A, A, A]
         snr = 100.0
         X, y, beta_star = l1_l2_gl.load(l, k, g, beta, M, e, A, snr=snr,
@@ -1431,6 +1439,7 @@ class TestLinearRegression(TestCase):
 
     def test_l1_l2(self):
 
+        import scipy.sparse
         from parsimony.functions.losses import LinearRegression
         from parsimony.functions.losses import RidgeRegression
         from parsimony.functions.penalties import L1
@@ -1461,7 +1470,8 @@ class TestLinearRegression(TestCase):
         k = 1.0 - l
         g = 0.0
 
-        A = np.eye(p)
+        A = scipy.sparse.eye(p)
+        # A = np.eye(p)
         A = [A, A, A]
         snr = 100.0
         X, y, beta_star = l1_l2_gl.load(l, k, g, beta, M, e, A, snr=snr)
@@ -2503,7 +2513,7 @@ class TestLinearRegression(TestCase):
         assert_almost_equal(score, 0.969725,
                             msg="The found regression vector does not give "
                                 "a low enough score value.",
-                            places=5)
+                            places=4)
 
         n, p = 100, np.prod(shape)
 

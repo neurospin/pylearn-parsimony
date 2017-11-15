@@ -37,6 +37,7 @@ import parsimony.algorithms.deflation as deflation
 import parsimony.algorithms.utils as alg_utils
 from parsimony.utils import check_arrays, check_array_in
 from parsimony.utils import class_weight_to_sample_weight, check_labels
+from parsimony.utils import check_arrays
 
 __all__ = ["BaseEstimator",
            "RegressionEstimator", "LogisticRegressionEstimator",
@@ -369,7 +370,8 @@ class RidgeRegression(RegressionEstimator):
         super(RidgeRegression, self).__init__(algorithm=algorithm,
                                               start_vector=start_vector)
 
-        self.l = float(l)
+        self.l = check_arrays(l, flatten=True)
+        #self.l = np.asarray(l, dtype=float)
 
         self.penalty_start = int(penalty_start)
         self.mean = bool(mean)
@@ -484,7 +486,8 @@ class Lasso(RegressionEstimator):
         super(Lasso, self).__init__(algorithm=algorithm,
                                     start_vector=start_vector)
 
-        self.l = float(l)
+        self.l = check_arrays(l, flatten=True)
+        #self.l = np.asarray(l, dtype=float)
 
         self.penalty_start = int(penalty_start)
         self.mean = bool(mean)
@@ -602,8 +605,9 @@ class ElasticNet(RegressionEstimator):
         super(ElasticNet, self).__init__(algorithm=algorithm,
                                          start_vector=start_vector)
 
-        self.l = float(l)
-        self.alpha = float(alpha)
+        l, alpha = check_arrays(l, alpha, flatten=True)
+        self.l = np.maximum(0,  np.minimum(1, l))
+        self.alpha = np.maximum(0, alpha)
 
         self.penalty_start = int(penalty_start)
         self.mean = bool(mean)
@@ -764,9 +768,10 @@ class LinearRegressionL1L2TV(RegressionEstimator):
                  start_vector=weights.RandomUniformWeights(normalise=True),
                  rho=1.0):
 
-        self.l1 = max(consts.TOLERANCE, float(l1))
-        self.l2 = max(consts.TOLERANCE, float(l2))
-        self.tv = max(consts.FLOAT_EPSILON, float(tv))
+        l1, l2, tv = check_arrays(l1, l2, tv, flatten=True)
+        self.l1 = np.maximum(consts.TOLERANCE, l1)
+        self.l2 = np.maximum(consts.TOLERANCE, l2)
+        self.tv = np.maximum(consts.FLOAT_EPSILON, tv)
 
         if algorithm is None:
             algorithm = proximal.CONESTA(**algorithm_params)
@@ -784,7 +789,7 @@ class LinearRegressionL1L2TV(RegressionEstimator):
         self.A = A
 
         try:
-            self.mu = float(mu)
+            self.mu = float([mu] * len(self.l1), dtype=float)
         except (ValueError, TypeError):
             self.mu = None
 
@@ -964,9 +969,10 @@ class LinearRegressionL1L2GraphNet(LinearRegression):
         super(LinearRegressionL1L2GraphNet, self).__init__(algorithm=algorithm,
                                               start_vector=start_vector)
 
-        self.l1 = l1
-        self.l2 = l2
-        self.gn = gn
+        l1, l2, gn = check_arrays(l1, l2, gn, flatten=True)
+        self.l1 = np.maximum(consts.TOLERANCE, l1)
+        self.l2 = np.maximum(0, l2)
+        self.gn = np.maximum(0, gn)
 
         self.A = A
         self.penalty_start = int(penalty_start)
@@ -1108,9 +1114,10 @@ class LinearRegressionL1L2GL(RegressionEstimator):
                  mean=True,
                  start_vector=weights.RandomUniformWeights(normalise=True)):
 
-        self.l1 = max(consts.TOLERANCE, float(l1))
-        self.l2 = max(consts.TOLERANCE, float(l2))
-        self.gl = max(consts.FLOAT_EPSILON, float(gl))
+        l1, l2, gl = check_arrays(l1, l2, gl, flatten=True)
+        self.l1 = np.maximum(consts.TOLERANCE, l1)
+        self.l2 = np.maximum(consts.TOLERANCE, l2)
+        self.gl = np.maximum(consts.FLOAT_EPSILON, gl)
 
         if algorithm is None:
             algorithm = proximal.FISTA(**algorithm_params)
@@ -1128,7 +1135,7 @@ class LinearRegressionL1L2GL(RegressionEstimator):
         self.A = A
 
         try:
-            self.mu = float(mu)
+            self.mu = np.asarray(mu)
         except (ValueError, TypeError):
             self.mu = None
 
@@ -1632,7 +1639,7 @@ class RidgeLogisticRegression(LogisticRegressionEstimator):
                  penalty_start=0,
                  mean=True):
 
-        self.l = max(0.0, float(l))
+        self.l = np.maximum(0.0, check_arrays(l, flatten=True))
 
         if algorithm is None:
             algorithm = gradient.AcceleratedGradientDescent(**algorithm_params)
@@ -1756,7 +1763,7 @@ class LassoLogisticRegression(LogisticRegressionEstimator):
                  penalty_start=0,
                  mean=True):
 
-        self.l = max(0.0, float(l))
+        self.l = np.maximum(0.0, check_arrays(l, flatten=True))
 
         if algorithm is None:
             algorithm = proximal.FISTA(**algorithm_params)
@@ -1877,8 +1884,9 @@ class ElasticNetLogisticRegression(LogisticRegressionEstimator):
                  penalty_start=0,
                  mean=True):
 
-        self.l = max(0.0, min(float(l), 1.0))
-        self.alpha = max(0.0, float(alpha))
+        l, alpha = check_arrays(l, alpha, flatten=True)
+        self.l = np.maximum(0,  np.minimum(1, l))
+        self.alpha = np.maximum(0, alpha)
 
         if algorithm is None:
             algorithm = proximal.FISTA(**algorithm_params)
@@ -1888,7 +1896,7 @@ class ElasticNetLogisticRegression(LogisticRegressionEstimator):
         super(ElasticNetLogisticRegression, self).__init__(algorithm=algorithm,
                                                            class_weight=class_weight)
 
-        self.penalty_start = max(0, int(penalty_start))
+        self.penalty_start = np.maximum(0, int(penalty_start))
         self.mean = bool(mean)
 
     def get_params(self):
@@ -1923,7 +1931,7 @@ class ElasticNetLogisticRegression(LogisticRegressionEstimator):
 
         # TODO: Should we use a seed here so that we get deterministic results?
         if beta is None:
-            beta = self.start_vector.get_weights(X.shape[1])
+            beta = self.start_vector.get_weights((X.shape[1], np.size(self.l)))
 
         self.beta = self.algorithm.run(function, beta)
 
@@ -2039,10 +2047,10 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
                  mean=True,
                  start_vector=weights.RandomUniformWeights(normalise=True)):
 
-        self.l1 = max(consts.TOLERANCE, float(l1))
-        # self.l2 = max(consts.TOLERANCE, float(l2))
-        self.l2 = max(0.0, float(l2))
-        self.tv = max(consts.FLOAT_EPSILON, float(tv))
+        l1, l2, tv = check_arrays(l1, l2, tv, flatten=True)
+        self.l1 = np.maximum(consts.TOLERANCE, l1)
+        self.l2 = np.maximum(consts.TOLERANCE, l2)
+        self.tv = np.maximum(consts.FLOAT_EPSILON, tv)
 
         if algorithm is None:
             algorithm = proximal.CONESTA(**algorithm_params)
@@ -2050,7 +2058,7 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
             algorithm.set_params(**algorithm_params)
 
         if isinstance(algorithm, proximal.CONESTA) \
-                and self.tv < consts.TOLERANCE:
+                and np.all(self.tv < consts.TOLERANCE):
             algorithm = proximal.FISTA(**algorithm_params)
 
         super(LogisticRegressionL1L2TV, self).__init__(algorithm=algorithm,
@@ -2061,7 +2069,7 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
         self.A = A
 
         try:
-            self.mu = float(mu)
+            self.mu = np.array([mu] * len(self.l1), dtype=float)
         except (ValueError, TypeError):
             self.mu = None
 
@@ -2097,12 +2105,11 @@ class LogisticRegressionL1L2TV(LogisticRegressionEstimator):
 
         # TODO: Should we use a seed here so that we get deterministic results?
         if beta is None:
-            beta = self.start_vector.get_weights(X.shape[1])
-
+            beta = self.start_vector.get_weights((X.shape[1], np.size(self.l1)))
         if self.mu is None:
             self.mu = function.estimate_mu(beta)
         else:
-            self.mu = float(self.mu)
+            self.mu = np.asarray(self.mu)
 
         function.set_params(mu=self.mu)
         self.beta = self.algorithm.run(function, beta)
@@ -2278,9 +2285,10 @@ class LogisticRegressionL1L2GraphNet(LogisticRegressionEstimator):
                  mean=True,
                  start_vector=weights.RandomUniformWeights(normalise=True)):
 
-        self.l1 = max(consts.TOLERANCE, float(l1))
-        self.l2 = max(0.0, float(l2))
-        self.gn = float(gn)
+        l1, l2, gn = check_arrays(l1, l2, gn, flatten=True)
+        self.l1 = np.maximum(consts.TOLERANCE, l1)
+        self.l2 = np.maximum(0, l2)
+        self.gn = np.maximum(0, gn)
 
         if algorithm is None:
             algorithm = proximal.FISTA(**algorithm_params)
@@ -2449,9 +2457,10 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
                  mean=True,
                  start_vector=weights.RandomUniformWeights(normalise=True)):
 
-        self.l1 = max(consts.TOLERANCE, float(l1))
-        self.l2 = max(consts.TOLERANCE, float(l2))
-        self.gl = max(consts.FLOAT_EPSILON, float(gl))
+        l1, l2, gl = check_arrays(l1, l2, gl, flatten=True)
+        self.l1 = np.maximum(consts.TOLERANCE, l1)
+        self.l2 = np.maximum(consts.TOLERANCE, l2)
+        self.gl = np.maximum(consts.FLOAT_EPSILON, gl)
 
         if algorithm is None:
             algorithm = proximal.FISTA(**algorithm_params)
@@ -2474,7 +2483,7 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
         self.A = A
 
         try:
-            self.mu = float(mu)
+            self.mu = np.asarray(mu)
         except (ValueError, TypeError):
             self.mu = None
 
@@ -2512,7 +2521,7 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
         if self.mu is None:
             self.mu = function.estimate_mu(beta)
         else:
-            self.mu = float(self.mu)
+            self.mu = np.asarray(self.mu)
 
         function.set_params(mu=self.mu)
         self.beta = self.algorithm.run(function, beta)
@@ -2605,12 +2614,13 @@ class LinearRegressionL2SmoothedL1TV(RegressionEstimator):
         super(LinearRegressionL2SmoothedL1TV, self).__init__(
                                                      algorithm=algorithm)
 
-        self.l2 = max(0.0, float(l2))
-        self.l1 = max(0.0, float(l1))
-        self.tv = max(0.0, float(tv))
+        l1, l2, tv = check_arrays(l1, l2, tv, flatten=True)
+        self.l1 = np.maximum(0.0, l1)
+        self.l2 = np.maximum(consts.TOLERANCE, l2)
+        self.tv = np.maximum(0.0, tv)
 
-        if self.l2 < consts.TOLERANCE:
-            warnings.warn("The ridge parameter should be non-zero.")
+        # if self.l2 < consts.TOLERANCE:
+        #     warnings.warn("The ridge parameter should be non-zero.")
 
         if A is None:
             raise TypeError("The A matrix may not be None.")
@@ -2829,7 +2839,7 @@ class SupportVectorMachine(SVMEstimator):
                  algorithm=None, algorithm_params=dict(),
                  start_vector=weights.RandomUniformWeights(normalise=True)):
 
-        self.C = max(consts.FLOAT_EPSILON, float(C))
+        self.C = np.maximum(consts.FLOAT_EPSILON, np.asarray(C, dtype=float))
 
         # Make sure we have a kernel:
         if kernel is None:
@@ -3195,9 +3205,9 @@ class SparsePLSRegression(RegressionEstimator):
                  start_vector=weights.RandomUniformWeights(normalise=True),
                  unbiased=True, mean=True):
 
-        self.l = [max(0.0, float(l[0])),
-                  max(0.0, float(l[1]))]
-        self.K = max(1, int(K))
+        self.l = [np.maximum(0.0, np.asarray(l[0], dtype=float)),
+                  np.maximum(0.0, np.asarray(l[1], dtype=float))]
+        self.K = np.maximum(1, int(K))
 
         if algorithm is None:
             algorithm = nipals.SparsePLSR(**algorithm_params)

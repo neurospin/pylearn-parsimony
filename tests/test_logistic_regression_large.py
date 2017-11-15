@@ -57,6 +57,8 @@ np.random.seed(42)
 ###############################################################################
 def fit_model(model_key):
     global MODELS
+    # To Debug a specific model:
+    # Run all file then; model_key = "2d_l1l2tv_inter_conesta"
     mod = MODELS[model_key]
     # Parsimony deal with intercept with a unpenalized column of 1
     if (hasattr(mod, "penalty_start") and mod.penalty_start > 0):
@@ -427,9 +429,11 @@ if __name__ == "__main__":
     options = parser.parse_args()
 
     if options.models:
-        import string
-        models = string.split(options.models, ",")
-        for model_key in MODELS:
+        # import string
+        # models = string.split(options.models, ",")
+        models = options.models.split(",")
+        models_str = list(MODELS.keys())
+        for model_key in models_str:
             if model_key not in models:
                 MODELS.pop(model_key)
 

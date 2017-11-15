@@ -519,9 +519,11 @@ class CombinedFunction(properties.CompositeFunction,
             for N in self._N:
                 L += N.L()
 
-        if all_lipschitz and L > consts.TOLERANCE:
+        if all_lipschitz and np.all(L > consts.TOLERANCE):
             step = 1.0 / L
         else:
+            if x.shape[1] != 1:
+                raise ValueError("Not vectorized yet: vector's shape should be [p, 1]")
             # If not all functions have Lipschitz continuous gradients, try
             # to find the step size through backtracking line search.
             from parsimony.algorithms.utils import BacktrackingLineSearch
@@ -878,7 +880,7 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
 
         Ata_tv = self.tv.l * self.tv.Aa(alphak)
         if self.penalty_start > 0:
-            Ata_tv = np.vstack((np.zeros((self.penalty_start, 1)),
+            Ata_tv = np.vstack((np.zeros((self.penalty_start, Ata_tv.shape[1])),
                                 Ata_tv))
 
 #        Ata_l1 = self.l1.l * SmoothedL1.project([betak / mu_min])[0]
@@ -970,41 +972,41 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
 #            alpha[j][i] = 0.0
 
         alpha = self.tv.alpha(beta)
-        g = self.fmu(beta)
+        fmu = self.fmu(beta)
 
         n = float(self.X.shape[0])
 
         if self.mean:
-            a = (np.dot(self.X, beta) - self.y) * (1.0 / n)
-            f_ = (n / 2.0) * maths.norm(a) ** 2.0 + np.dot(self.y.T, a)[0, 0]
+            sigma = (np.dot(self.X, beta) - self.y) * (1.0 / n)
+            l_star = (n / 2.0) * maths.norm(sigma, axis=0) ** 2.0 + np.dot(self.y.T, sigma)
         else:
-            a = np.dot(self.X, beta) - self.y
-            f_ = (1.0 / 2.0) * maths.norm(a) ** 2.0 + np.dot(self.y.T, a)[0, 0]
+            sigma = np.dot(self.X, beta) - self.y
+            l_star = (1.0 / 2.0) * maths.norm(sigma, axis=0) ** 2.0 + np.dot(self.y.T, sigma)
 
         lAta = self.tv.l * self.tv.Aa(alpha)
         if self.penalty_start > 0:
-            lAta = np.vstack((np.zeros((self.penalty_start, 1)),
+            lAta = np.vstack((np.zeros((self.penalty_start, beta.shape[1])),
                               lAta))
 
         alpha_sqsum = 0.0
         for a_ in alpha:
-            alpha_sqsum += np.sum(a_ ** 2.0)
+            alpha_sqsum += np.sum(a_ ** 2.0, axis=0)
 
-        z = -np.dot(self.X.T, a)
-        h_ = (1.0 / (2 * self.rr.k)) \
-           * np.sum(maths.positive(np.abs(z - lAta) - self.l1.l) ** 2.0) \
+        z = -np.dot(self.X.T, sigma)
+        psi_star = (1.0 / (2 * self.rr.k)) \
+           * np.sum(maths.positive(np.abs(z - lAta) - self.l1.l) ** 2.0, axis=0) \
            + (0.5 * self.tv.l * self.tv.get_mu() * alpha_sqsum)
 
 #        print "g :", g
 #        print "f_:", f_
 #        print "h_:", h_
-        gap = g + f_ + h_
+        gap = fmu + l_star + psi_star
 
 #        print "Fenchel duality gap:", gap
 
         return gap
-        
-        
+
+
 
     def A(self):
         """Linear operator of the Nesterov function.
@@ -1288,7 +1290,7 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
 
         Ata_gl = self.gl.l * self.gl.Aa(alphak)
         if self.penalty_start > 0:
-            Ata_gl = np.vstack((np.zeros((self.penalty_start, 1)),
+            Ata_gl = np.vstack((np.zeros((self.penalty_start, Ata_gl.shape[1])),
                                 Ata_gl))
 
 ##        Al1 = nesterov.l1.linear_operator_from_variables(self.X.shape[1],
@@ -1401,7 +1403,7 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
 
         lAta = self.gl.l * self.gl.Aa(alpha)
         if self.penalty_start > 0:
-            lAta = np.vstack((np.zeros((self.penalty_start, 1)),
+            lAta = np.vstack((np.zeros((self.penalty_start, lAta.shape[1])),
                               lAta))
 
         alpha_sqsum = 0.0
@@ -1563,7 +1565,7 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
         Bach in spam see:
         http://spams-devel.gforge.inria.fr/doc/html/doc_spams009.html
 
-        The artificial penalty is lambda_0 = 2 * eps / len(beta_with_null_l2). 
+        The artificial penalty is lambda_0 = 2 * eps / len(beta_with_null_l2).
 
         If l2 == 0.
         - f_tilde = f + lambda_0 ||beta||^2_2
@@ -1571,7 +1573,7 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
         - psi_star:  psi_star + Eq 33 paper OLS avec kappa = gamma = 0
 
         If penalty_start > 0 some variable are unpenalized.
-        Define beta = [beta_0, beta_1] with beta_0 
+        Define beta = [beta_0, beta_1] with beta_0
         coeficients of unpenalized variables.
         - f_tilde = f + lambda_0 ||beta_0||^2_2
         - l_star remain the same
@@ -1580,14 +1582,28 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
         n = float(self.X.shape[0])
         alpha = self.tv.alpha(beta)
         # gap = f + l_star + psi_star Eq 29 of OLS paper
- 
+
         # f
         f = self.fmu(beta)
-        if self.rr.k == 0:
-            f += (2 * eps / len(beta)) * np.sum(beta ** 2)
-        elif self.penalty_start > 0: # f -> f_tilde = f + lambda_0 |beta_0|^2_2
-            f += (2 * eps / self.penalty_start) * \
-                np.sum(beta[:self.penalty_start, :] ** 2)
+
+        l2_is_null = self.rr.k == 0
+        # Eq. 29 of OLS paper: l2_penalty => 2 * eps / len(beta_with_null_l2)
+        if  np.any(l2_is_null):
+            l2_penalty = np.copy(self.rr.k)
+            l2_penalty[l2_is_null] = (2 * eps / beta.shape[0])
+            # f -> f_tilde = f + lambda_0 |beta_0|^2_2
+            f[l2_is_null] +=  l2_penalty[l2_is_null] \
+             * np.sum(beta[:, l2_is_null] ** 2, axis=0)
+        # if self.rr.k == 0:
+        #     f += (2 * eps / beta.shape[0]) * np.sum(beta ** 2)
+        else:
+            l2_penalty = self.rr.k
+
+        # print(f, f[~l2_is_null], eps)
+        if self.penalty_start > 0: # f -> f_tilde = f + lambda_0 |beta_0|^2_2
+            f[~l2_is_null] += (2 * eps / self.penalty_start) * \
+                np.sum(beta[:self.penalty_start, ~l2_is_null] ** 2, axis=0)
+
         Xbeta = np.dot(self.X, beta)
         pi = np.reciprocal(1.0 + np.exp(-Xbeta))
         #if weights is None:
@@ -1600,31 +1616,32 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
         sigma = (pi - self.y) * (self.weights * scale)
         b = ((1. / (self.weights * scale)) * sigma) + self.y
         l_star = np.sum((b * np.log(b) + (1 - b)
-                * np.log(1 - b)) * (self.weights * scale))
+                * np.log(1 - b)) * (self.weights * scale), axis=0)
         # TODO: It appears we sometimes get log(x) for x <= 0 here. np.clip?
 
         lAta = self.tv.l * self.tv.Aa(alpha)
         if self.penalty_start > 0:
-            lAta = np.vstack((np.zeros((self.penalty_start, 1)),
+            lAta = np.vstack((np.zeros((self.penalty_start, lAta.shape[1])),
                               lAta))
 
         alpha_sqsum = 0.0
         for a_ in alpha:
-            alpha_sqsum += np.sum(a_ ** 2.0)
+            alpha_sqsum += np.sum(a_ ** 2.0, axis=0)
 
         # psi_star
-        v = -np.dot(self.X.T, sigma)  
-        # Eq. 29 of OLS paper
-        if self.rr.k == 0:
-            l2_penalty = (2 * eps / len(beta))
-        else:
-            l2_penalty = self.rr.k
+        v = -np.dot(self.X.T, sigma)
         psi_star = (1.0 / (2 * l2_penalty)) \
-           * np.sum(maths.positive(np.abs(v - lAta) - self.l1.l) ** 2.0) \
+           * np.sum(maths.positive(np.abs(v - lAta) - self.l1.l) ** 2.0,
+                    axis=0)\
            + (0.5 * self.tv.l * self.tv.get_mu() * alpha_sqsum)
-        if self.penalty_start > 0 and self.rr.k > 0:
-            psi_star += (0.5 / (2 * eps / self.penalty_start)) * \
-                np.sum(v[:self.penalty_start, :] ** 2)
+
+
+        if self.penalty_start > 0:
+            psi_star[~l2_is_null] += (0.5 / (2 * eps / self.penalty_start)) * \
+                np.sum(v[:self.penalty_start, ~l2_is_null] ** 2, axis=0)
+#        if self.penalty_start > 0 and self.rr.k > 0:
+#            psi_star += (0.5 / (2 * eps / self.penalty_start)) * \
+#                np.sum(v[:self.penalty_start, :] ** 2, axis=0)
 
         gap = f + l_star + psi_star
 
@@ -1860,7 +1877,7 @@ class LinearRegressionL2SmoothedL1TV(properties.CompositeFunction,
         lAta += A[3].T.dot(alpha[3])  # TV Z
 
         if self.penalty_start > 0:
-            lAta = np.vstack((np.zeros((self.penalty_start, 1)),
+            lAta = np.vstack((np.zeros((self.penalty_start, lAta.shape[1])),
                               lAta))
 
 #        XXkI = np.dot(X.T, X) + self.g.k * np.eye(X.shape[1])

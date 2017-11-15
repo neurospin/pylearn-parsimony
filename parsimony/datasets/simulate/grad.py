@@ -446,6 +446,7 @@ def _Nesterov_grad(beta, A, rng=RandomUniform(-1, 1), grad_norm=grad_l2):
     grad_Ab = 0
     for i in range(len(A)):
         Ai = A[i]
+        print("grad.py, _Nesterov_grad", Ai.shape, beta.shape)
         Ab = Ai.dot(beta)
         grad_Ab += Ai.T.dot(grad_norm(Ab, rng))
 
