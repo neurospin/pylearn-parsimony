@@ -510,7 +510,7 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
             if self.info_requested(Info.time):
                 _t.append(utils.time() - tm)
             if self.info_requested(Info.func_val):
-                _f.append(g.f(xnew))
+                _f.append(self.function.f(xnew))
             if self.info_requested(Info.other):
                 nfo = self.algorithm.info_get()
                 for key in nfo.keys():

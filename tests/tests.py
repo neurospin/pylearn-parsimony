@@ -135,6 +135,8 @@ def test_all():
     if is_windows():
         extras += ' --ignore-files="start_vectors.py"'
 
+    extras += ' --ignore-files="_playhouse.py"'
+
     # Find parsimony directory.
     testdir = os.path.dirname(os.path.abspath(__file__))
     # TODO: Is there a better way to do this?

@@ -3,7 +3,7 @@
 The :mod:`parsimony.functions.losses` module contains multiblock loss
 functions.
 
-Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 Created on Tue Feb  4 08:51:43 2014
 
@@ -78,8 +78,6 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
     def __init__(self, X, functions=[], penalties=[], smoothed=[], prox=[],
                  constraints=[]):
 
-#        super(CombinedMultiblockFunction, self).__setattr__("_method_map",
-#                                                            dict())
         self._param_map = dict()
         self._method_map = dict()
 
@@ -201,13 +199,9 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
 #                         self).__getattribute__(name)
 
     def __getattr__(self, name):
-#        mmap = super(CombinedMultiblockFunction,
-#                     self).__getattribute__("_method_map")
 
         if name == "_method_map":
             if name not in self.__dict__:
-                # super(CombinedMultiblockFunction,
-                #       self).__setattr__("_method_map", dict())
                 self.__dict__["_method_map"] = dict()
             else:
                 return self.__dict__["_method_map"]  # Never run ...
