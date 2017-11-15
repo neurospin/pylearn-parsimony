@@ -32,6 +32,9 @@ import abc
 import os
 # import re
 
+from parsimony.utils import is_windows
+
+
 __all__ = ["TestCase", "test_all"]
 
 
@@ -127,6 +130,10 @@ def test_all():
         extras += " --with-coverage"
     if has_timer:
         extras += " --with-timer"
+
+    # TODO: Remove when start_vectors is removed.
+    if is_windows():
+        extras += ' --ignore-files="start_vectors.py"'
 
     # Find parsimony directory.
     testdir = os.path.dirname(os.path.abspath(__file__))

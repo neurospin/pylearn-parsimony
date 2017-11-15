@@ -20,14 +20,13 @@ import numpy as np
 
 try:
     from . import bases  # When imported as a package.
-except (ValueError, SystemError):
+except ImportError:
     import parsimony.algorithms.bases as bases  # When run as a program.
-from parsimony.utils import time, consts, check_arrays, check_array_in, list_op
-try:
-    from . import utils as utils
-except (ValueError, SystemError):
-    import parsimony.algorithms.utils as utils
 
+import parsimony.utils as utils
+from parsimony.utils import check_arrays, check_array_in
+import parsimony.utils.consts as consts
+from parsimony.algorithms.utils import Info, LinearKernel
 import parsimony.functions.properties as properties
 
 __all__ = ["SequentialMinimalOptimization", "MajorizationMinimization"]
@@ -83,7 +82,7 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
     --------
     >>> import numpy as np
     >>> import parsimony.algorithms.algorithms as alg
-    >>> import parsimony.algorithms.utils as utils
+    >>> from parsimony.algorithms.utils import LinearKernel
     >>> np.random.seed(42)
     >>>
     >>> n = 30
@@ -92,7 +91,7 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
     >>> y = np.vstack([1 * np.ones((int(n / 2), 1)),
     ...                3 * np.ones((int(n / 2), 1))]) - 2
     >>>
-    >>> K = utils.LinearKernel(X=X)
+    >>> K = LinearKernel(X=X)
     >>> smo = alg.SequentialMinimalOptimization(1.0, kernel=K, max_iter=100)
     >>> w = smo.run(X, y)
     >>> yhat = np.zeros(y.shape)
@@ -106,12 +105,12 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
     >>> np.mean(yhat == y)  # doctest: +ELLIPSIS
     0.86666666...
     """
-    INFO_PROVIDED = [utils.Info.ok,
-                     utils.Info.time,
-                     utils.Info.func_val,
-                     utils.Info.converged]
+    INFO_PROVIDED = [Info.ok,
+                     Info.time,
+                     Info.func_val,
+                     Info.converged]
 
-    def __init__(self, C, kernel=utils.LinearKernel(), eps=1e-4,
+    def __init__(self, C, kernel=LinearKernel(), eps=1e-4,
                  max_iter=consts.MAX_ITER, min_iter=1, info=[]):
 
         super(SequentialMinimalOptimization, self).__init__(kernel=kernel,
@@ -141,13 +140,13 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
         """
         X, y = check_arrays(X, check_array_in(y, [-1, 1]))
 
-        if self.info_requested(utils.Info.ok):
-            self.info_set(utils.Info.ok, False)
+        if self.info_requested(Info.ok):
+            self.info_set(Info.ok, False)
 
-        if self.info_requested(utils.Info.time):
-            _t = time()
+        if self.info_requested(Info.time):
+            _t = utils.time()
 
-        if self.info_requested(utils.Info.func_val):
+        if self.info_requested(Info.func_val):
             self._f = []
 
         n, p = X.shape
@@ -181,13 +180,13 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
             elif numChanged == 0:
                 examineAll = True
 
-        if self.info_requested(utils.Info.time):
-            self.info_set(utils.Info.time, time() - _t)
-        if self.info_requested(utils.Info.func_val):
-            self.info_set(utils.Info.func_val, self._f)
+        if self.info_requested(Info.time):
+            self.info_set(Info.time, utils.time() - _t)
+        if self.info_requested(Info.func_val):
+            self.info_set(Info.func_val, self._f)
             del self._f  # Remove for future runs
-        if self.info_requested(utils.Info.ok):
-            self.info_set(utils.Info.ok, True)
+        if self.info_requested(Info.ok):
+            self.info_set(Info.ok, True)
 
         return self._compute_w(X, y)
 
@@ -270,8 +269,10 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
         a1 = alpha1 + s * (alpha2 - a2)
 
         # Update threshold to reflect change in Lagrange multipliers
-        b1 = E1 + y1 * (a1 - alpha1) * k11 + y2 * (a2 - alpha2) * k12 + self.bias
-        b2 = E2 + y1 * (a1 - alpha1) * k12 + y2 * (a2 - alpha2) * k22 + self.bias
+        b1 = E1 + y1 * (a1 - alpha1) * k11 + y2 * (a2 - alpha2) * k12 \
+            + self.bias
+        b2 = E2 + y1 * (a1 - alpha1) * k12 + y2 * (a2 - alpha2) * k22 \
+            + self.bias
         # Use self.eps here?
         if 0.0 < alpha1 and alpha1 < self.C:
             self.bias = b1
@@ -295,7 +296,7 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
         # Update global iteration counter:
         self.num_iter += 1
         # Save function value if requested:
-        if self.info_requested(utils.Info.func_val):
+        if self.info_requested(Info.func_val):
             self._f.append(self._func_val(X, y))
 
         return 1
@@ -401,7 +402,6 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
     >>> import numpy as np
     >>> import parsimony.algorithms as algs
     >>> import parsimony.algorithms.algorithms as alg
-    >>> import parsimony.algorithms.utils as utils
     >>> import parsimony.functions.losses as losses
     >>> import parsimony.functions.taylor as taylor
     >>> np.random.seed(42)
@@ -433,10 +433,11 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
     >>> np.linalg.norm(function.grad(opt1) - function.grad(opt2)) < 5e-13
     True
     """
-    INFO_PROVIDED = [utils.Info.ok,
-                     utils.Info.time,
-                     utils.Info.func_val,
-                     utils.Info.converged]
+    INFO_PROVIDED = [Info.ok,
+                     Info.time,
+                     Info.func_val,
+                     Info.converged,
+                     Info.other]
 
     def __init__(self, algorithm, function, eps=5e-8, max_mm_iter=1,
                  max_iter=consts.MAX_ITER, min_iter=1, info=[], callback=None):
@@ -444,6 +445,10 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
         super(MajorizationMinimization, self).__init__(info=info,
                                                        max_iter=max_iter,
                                                        min_iter=min_iter)
+
+        # if isinstance(algorithm, bases.InformationAlgorithm):
+        #     self.INFO_PROVIDED.extend(algorithm.INFO_PROVIDED)
+        #     self.INFO_PROVIDED = list(set(self.INFO_PROVIDED))
 
         self.algorithm = algorithm
         self.function = function
@@ -477,19 +482,21 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
         """
         # x = check_arrays(x)
 
-        if self.info_requested(utils.Info.ok):
-            self.info_set(utils.Info.ok, False)
-        if self.info_requested(utils.Info.time):
+        if self.info_requested(Info.ok):
+            self.info_set(Info.ok, False)
+        if self.info_requested(Info.time):
             _t = []
-        if self.info_requested(utils.Info.func_val):
+        if self.info_requested(Info.func_val):
             _f = []
-        if self.info_requested(utils.Info.converged):
-            self.info_set(utils.Info.converged, False)
+        if self.info_requested(Info.other):
+            _other = dict()
+        if self.info_requested(Info.converged):
+            self.info_set(Info.converged, False)
 
         xnew = xold = x
         for i in range(1, self.max_iter + 1):
 
-            if self.info_requested(utils.Info.time):
+            if self.info_requested(Info.time):
                 tm = utils.time()
 
             xold = xnew
@@ -500,38 +507,49 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
                 maj_f = g
             xnew = self.algorithm.run(maj_f, xold)
 
-            if self.info_requested(utils.Info.time):
+            if self.info_requested(Info.time):
                 _t.append(utils.time() - tm)
-            if self.info_requested(utils.Info.func_val):
+            if self.info_requested(Info.func_val):
                 _f.append(g.f(xnew))
+            if self.info_requested(Info.other):
+                nfo = self.algorithm.info_get()
+                for key in nfo.keys():
+
+                    if key not in _other:
+                        _other[key] = list()
+
+                    value = nfo[key]
+                    _other[key].append(value)
 
             if self.callback is not None:
                 self.callback(locals())
 
             if isinstance(xnew, list):
-                val = list_op((xnew, xold),
-                              lambda new, old: np.linalg.norm(new - old),
-                              aggregator=np.max)
+                val = utils.list_op((xnew, xold),
+                                    lambda new, old: np.linalg.norm(new - old),
+                                    aggregator=np.max)
             else:
                 val = np.linalg.norm(xnew - xold)
 
             if i >= self.min_iter and val < self.eps:
 
-                if self.info_requested(utils.Info.converged):
-                    self.info_set(utils.Info.converged, True)
+                if self.info_requested(Info.converged):
+                    self.info_set(Info.converged, True)
 
                 break
 
         self.num_iter = i
 
-        if self.info_requested(utils.Info.num_iter):
-            self.info_set(utils.Info.num_iter, self.num_iter)
-        if self.info_requested(utils.Info.time):
-            self.info_set(utils.Info.time, _t)
-        if self.info_requested(utils.Info.func_val):
-            self.info_set(utils.Info.func_val, _f)
-        if self.info_requested(utils.Info.ok):
-            self.info_set(utils.Info.ok, True)
+        if self.info_requested(Info.num_iter):
+            self.info_set(Info.num_iter, self.num_iter)
+        if self.info_requested(Info.time):
+            self.info_set(Info.time, _t)
+        if self.info_requested(Info.func_val):
+            self.info_set(Info.func_val, _f)
+        if self.info_requested(Info.other):
+            self.info_set(Info.other, _other)
+        if self.info_requested(Info.ok):
+            self.info_set(Info.ok, True)
 
         return xnew
 
