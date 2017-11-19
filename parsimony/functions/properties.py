@@ -399,13 +399,17 @@ class Continuation(with_metaclass(abc.ABCMeta, object)):
 class Gradient(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
-    def grad(self, x):
+    def grad(self, x, index=0):
         """Gradient of the function.
 
         Parameters
         ----------
         x : numpy.ndarray, shape (p, 1)
             The point at which to evaluate the gradient.
+
+        index : int
+            Non-negative integer. For multiblock functions, to know which
+            variable the gradient is for.
         """
         raise NotImplementedError('Abstract method "grad" must be '
                                   'specialised!')

@@ -16,6 +16,8 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
+import types
+
 try:
     from . import bases  # Only works when imported as a package.
 except ValueError:
@@ -59,7 +61,8 @@ class BlockRelaxationWrapper(bases.ExplicitAlgorithm,
                      Info.num_iter,
                      Info.time,
                      Info.func_val,
-                     Info.converged]
+                     Info.converged,
+                     Info.other]
 
     def __init__(self, algorithm, info=[], eps=consts.TOLERANCE,
                  max_iter=consts.MAX_ITER, min_iter=1):
@@ -107,6 +110,8 @@ class BlockRelaxationWrapper(bases.ExplicitAlgorithm,
             _t = []
         if self.info_requested(Info.func_val):
             _f = []
+        if self.info_requested(Info.other):
+            _other = dict()
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
 
@@ -116,28 +121,55 @@ class BlockRelaxationWrapper(bases.ExplicitAlgorithm,
 
             for i in range(len(w)):
 
+                if self.info_requested(Info.time):
+                    tm = utils.time()
+
                 # Wrap a function around the ith block:
                 func = mb_losses.MultiblockFunctionWrapper(function, w, i)
                 if hasattr(function, "at_point"):
                     def new_at_point(self, w):
-                        return function.at_point(self.w[:self.index] +
-                                                 [w] +
-                                                 self.w[self.index + 1:])
+                        return self.function.at_point(self.w[:self.index] +
+                                                      [w] +
+                                                      self.w[self.index + 1:])
 
-                    import types
                     func.at_point = types.MethodType(new_at_point, func)
 
                 w_old[i] = w[i]
                 self.algorithm.reset()
+                func.at_point(w_old[i])
                 w[i] = self.algorithm.run(func, w_old[i])
 
                 # Store info from algorithm:
                 if self.info_requested(Info.time):
-                    time = self.algorithm.info_get(Info.time)
-                    _t.extend(time)
+                    # time = self.algorithm.info_get(Info.time)
+                    time = utils.time() - tm
+                    _t.append(time)
                 if self.info_requested(Info.func_val):
-                    func_val = self.algorithm.info_get(Info.func_val)
-                    _f.extend(func_val)
+                    # func_val = self.algorithm.info_get(Info.func_val)
+                    func.at_point(w[i])
+#                    func_val = func.f(w[i])
+                    func_val = function.f(w)
+                    _f.append(func_val)
+
+                    if len(_f) > 2 and _f[-2] < _f[-1]:
+                        print("w00t!! "
+                              + str(function.f(w_old))
+                              + " "
+                              + str(function.f(w)))
+
+                if self.info_requested(Info.other):
+                    nfo = self.algorithm.info_get()
+                    for key in nfo.keys():
+#                        if key == Info.time:
+#                            continue
+#                        if key == Info.func_val:
+#                            continue
+
+                        if key not in _other:
+                            _other[key] = list()
+
+                        value = nfo[key]
+                        _other[key].append(value)
 
                 # Update iteration counts.
                 self.num_iter += self.algorithm.num_iter
@@ -174,6 +206,8 @@ class BlockRelaxationWrapper(bases.ExplicitAlgorithm,
             self.info_set(Info.time, _t)
         if self.info_requested(Info.func_val):
             self.info_set(Info.func_val, _f)
+        if self.info_requested(Info.other):
+            self.info_set(Info.other, _other)
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, True)
 
@@ -251,6 +285,17 @@ class MultiblockISTA(bases.ExplicitAlgorithm,
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
 
+        for i in range(len(w)):  # For each block.
+            # Store info variables.
+            if self.info_requested(Info.time):
+                time = utils.time_wall()
+            if self.info_requested(Info.func_val):
+                _f.append(function.f(w))
+            if self.info_requested(Info.smooth_func_val):
+                _fmu.append(function.fmu(w))
+            if self.info_requested(Info.time):
+                _t.append(utils.time_wall() - time)
+
         exp = 2.0 + consts.FLOAT_EPSILON
         block_iter = [1] * len(w)
 
@@ -259,11 +304,10 @@ class MultiblockISTA(bases.ExplicitAlgorithm,
 
             for i in range(len(w)):  # Loop over the blocks
 
-                 # Wrap a function around the ith block.
+                # Wrap a function around the ith block.
                 func = mb_losses.MultiblockFunctionWrapper(function, w, i)
 
                 # Run ISTA.
-                w_old = w[i]
                 for k in range(1, max(self.min_iter + 1,
                                       self.max_iter - self.num_iter + 1)):
 
@@ -415,6 +459,17 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
             _fmu = []
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
+
+        for i in range(len(w)):  # For each block.
+            # Store info variables.
+            if self.info_requested(Info.time):
+                time = utils.time_wall()
+            if self.info_requested(Info.func_val):
+                _f.append(function.f(w))
+            if self.info_requested(Info.smooth_func_val):
+                _fmu.append(function.fmu(w))
+            if self.info_requested(Info.time):
+                _t.append(utils.time_wall() - time)
 
         FISTA = True
         if FISTA:

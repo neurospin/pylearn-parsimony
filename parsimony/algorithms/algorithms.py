@@ -16,6 +16,7 @@ Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
+import copy
 import numpy as np
 
 try:
@@ -24,10 +25,11 @@ except ImportError:
     import parsimony.algorithms.bases as bases  # When run as a program.
 
 import parsimony.utils as utils
-from parsimony.utils import check_arrays, check_array_in
+from parsimony.utils import check_arrays, check_array_in, multiblock_array
 import parsimony.utils.consts as consts
 from parsimony.algorithms.utils import Info, LinearKernel
 import parsimony.functions.properties as properties
+import parsimony.functions.multiblock.losses as mb_losses
 
 __all__ = ["SequentialMinimalOptimization", "MajorizationMinimization"]
 
@@ -436,6 +438,7 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
     INFO_PROVIDED = [Info.ok,
                      Info.time,
                      Info.func_val,
+                     Info.smooth_func_val,
                      Info.converged,
                      Info.other]
 
@@ -468,19 +471,20 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
         super(MajorizationMinimization, self).set_params(**kwargs)
 
     @bases.force_reset
-    def run(self, g, x):
+    def run(self, majoriser, x):
         """Run the optimiser using the majoriser function starting at the given
         point.
 
         Parameters
         ----------
-        g : MajoriserFunction
+        majoriser : MajoriserFunction
             The function that majorises self.function.
 
         x : array_like
             The point at which to start the minimisation process.
         """
         # x = check_arrays(x)
+        # x = multiblock_array(x)
 
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, False)
@@ -488,29 +492,60 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
             _t = []
         if self.info_requested(Info.func_val):
             _f = []
+        if self.info_requested(Info.smooth_func_val):
+            _fmu = []
         if self.info_requested(Info.other):
             _other = dict()
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
 
-        xnew = xold = x
-        for i in range(1, self.max_iter + 1):
+        for it in range(1, self.max_iter + 1):
 
             if self.info_requested(Info.time):
                 tm = utils.time()
 
-            xold = xnew
-            if isinstance(g, properties.MajoriserFunction):
-                maj_f = g(self.function, xold)
+#            if isinstance(x, list):
+#                for i in range(len(x)):
+#
+#                    xold = x
+#                    if isinstance(majoriser, properties.MajoriserFunction):
+#                        maj_f = majoriser(self.function, xold)
+#                    else:
+#                        majoriser.at_point(xold)
+#                        maj_f = majoriser
+#
+#                    func = mb_losses.MultiblockFunctionWrapper(maj_f, xold, i)
+#
+#                    x[i] = self.algorithm.run(func, xold[i])
+#            else:
+            xold = x
+            if isinstance(majoriser, properties.MajoriserFunction):
+                maj_f = majoriser(self.function, xold)
             else:
-                g.at_point(xold)
-                maj_f = g
-            xnew = self.algorithm.run(maj_f, xold)
+                majoriser.at_point(xold)
+                maj_f = majoriser
+
+            x = self.algorithm.run(maj_f, xold)
 
             if self.info_requested(Info.time):
                 _t.append(utils.time() - tm)
-            if self.info_requested(Info.func_val):
-                _f.append(self.function.f(xnew))
+
+            if self.info_requested(Info.func_val) \
+                    or self.info_requested(Info.smooth_func_val):
+
+                if isinstance(majoriser, properties.MajoriserFunction):
+                    maj_f = majoriser(self.function, xold)
+                else:
+                    majoriser.at_point(xold)
+                    maj_f = majoriser
+
+                if self.info_requested(Info.func_val):
+                    _f.append(maj_f.f(x))
+
+                if self.info_requested(Info.smooth_func_val):
+                    if hasattr(maj_f, "fmu"):
+                        _fmu.append(maj_f.fmu(x))
+
             if self.info_requested(Info.other):
                 nfo = self.algorithm.info_get()
                 for key in nfo.keys():
@@ -524,21 +559,21 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
             if self.callback is not None:
                 self.callback(locals())
 
-            if isinstance(xnew, list):
-                val = utils.list_op((xnew, xold),
+            if isinstance(x, list):
+                val = utils.list_op((x, xold),
                                     lambda new, old: np.linalg.norm(new - old),
                                     aggregator=np.max)
             else:
-                val = np.linalg.norm(xnew - xold)
+                val = np.linalg.norm(x - xold)
 
-            if i >= self.min_iter and val < self.eps:
+            if it >= self.min_iter and val < self.eps:
 
                 if self.info_requested(Info.converged):
                     self.info_set(Info.converged, True)
 
                 break
 
-        self.num_iter = i
+        self.num_iter = it
 
         if self.info_requested(Info.num_iter):
             self.info_set(Info.num_iter, self.num_iter)
@@ -546,12 +581,14 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
             self.info_set(Info.time, _t)
         if self.info_requested(Info.func_val):
             self.info_set(Info.func_val, _f)
+        if self.info_requested(Info.smooth_func_val):
+            self.info_set(Info.smooth_func_val, _fmu)
         if self.info_requested(Info.other):
             self.info_set(Info.other, _other)
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, True)
 
-        return xnew
+        return x
 
 
 if __name__ == "__main__":

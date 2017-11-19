@@ -772,7 +772,7 @@ class MultiblockFunctionWrapper(properties.CompositeFunction,
         return self.function.grad(self.w[:self.index] +
                                   [w] +
                                   self.w[self.index + 1:],
-                                  self.index)
+                                  index=self.index)
 
     def prox(self, w, factor=1.0, eps=consts.TOLERANCE, max_iter=100):
         """The proximal operator corresponding to the function.
@@ -791,7 +791,7 @@ class MultiblockFunctionWrapper(properties.CompositeFunction,
                                   self.index, factor=factor,
                                   eps=eps, max_iter=max_iter)
 
-    def step(self, w, index=0):
+    def step(self, w, index=0, **kwargs):
         """The step size to use in descent methods.
 
         Parameters
@@ -801,7 +801,8 @@ class MultiblockFunctionWrapper(properties.CompositeFunction,
         return self.function.step(self.w[:self.index] +
                                   [w] +
                                   self.w[self.index + 1:],
-                                  self.index)
+                                  index=self.index,
+                                  **kwargs)
 
 
 class MultiblockNesterovFunctionWrapper(MultiblockFunctionWrapper,

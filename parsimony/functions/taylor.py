@@ -54,7 +54,7 @@ class BaseTaylor(with_metaclass(abc.ABCMeta,
                                 properties.Function)):
     """This is the base class for all Taylor approximation functions.
     """
-    def __init__(self, function, point):
+    def __init__(self, function, point=None):
 
         self.function = function
         self.at_point(point)
@@ -97,7 +97,7 @@ class MultiblockBaseTaylor(with_metaclass(abc.ABCMeta,
     """This is the base class for all Taylor approximation functions of the
     multiblock flavour.
     """
-    def __init__(self, function, point, indices):
+    def __init__(self, function, indices, point=None):
 
         self.function = function
         self.indices = [int(ind) for ind in indices]
@@ -143,7 +143,7 @@ class FirstOrderTaylorWrapper(properties.MajoriserFunction):
     def __init__(self):
         pass
 
-    def __call__(self, function, point):
+    def __call__(self, function, point=None):
 
         fun = copy.deepcopy(function)
 
@@ -191,11 +191,11 @@ class FirstOrderTaylorWrapper(properties.MajoriserFunction):
                         if hasattr(fijk, "_taylor_wrap"):
                             if fijk._taylor_wrap:
                                 f_wrap = MultiblockFirstOrderTaylorApproximation(
-                                        fijk, point, [i, j])
+                                        fijk, [i, j], point=point)
                                 fun._f[i][j][k] = f_wrap
                         else:
                             f_wrap = MultiblockFirstOrderTaylorApproximation(
-                                    fijk, point, [i, j])
+                                    fijk, [i, j], point=point)
                             fun._f[i][j][k] = f_wrap
 
 #                            if fijk._taylor_wrap:
@@ -216,8 +216,9 @@ class FirstOrderTaylorWrapper(properties.MajoriserFunction):
 
                     if hasattr(dik, "_taylor_wrap"):
                         if dik._taylor_wrap:
-                            f_wrap = FirstOrderTaylorApproximation(dik,
-                                                                   point[i])
+                            f_wrap = FirstOrderTaylorApproximation(
+                                                               dik,
+                                                               point=point[i])
                             fun._d[i][k] = f_wrap
                     else:
                         f_wrap = FirstOrderTaylorApproximation(dik, point[i])
@@ -230,11 +231,13 @@ class FirstOrderTaylorWrapper(properties.MajoriserFunction):
 
                     if hasattr(Nik, "_taylor_wrap"):
                         if Nik._taylor_wrap:
-                            f_wrap = FirstOrderTaylorApproximation(Nik,
-                                                                   point[i])
+                            f_wrap = FirstOrderTaylorApproximation(
+                                                               Nik,
+                                                               point=point[i])
                             fun._N[i][k] = f_wrap
                     else:
-                        f_wrap = FirstOrderTaylorApproximation(Nik, point[i])
+                        f_wrap = FirstOrderTaylorApproximation(Nik,
+                                                               point=point[i])
                         fun._N[i][k] = f_wrap
 
             def new_at_point(self, x):
@@ -263,9 +266,10 @@ class FirstOrderTaylorWrapper(properties.MajoriserFunction):
 
 #        elif isinstance(fun, multiblockprops.MultiblockFunction):
 #            fun = self._mb_wrap(fun, point)
-#
-#        else:
-#            fun = self._wrap(fun, point)
+
+        else:
+            # fun = self._wrap(fun, point)
+            fun = FirstOrderTaylorApproximation(fun, point=point)
 
         return fun
 
@@ -426,14 +430,16 @@ class FirstOrderTaylorWrapper(properties.MajoriserFunction):
 
 class FirstOrderTaylorApproximation(BaseTaylor,
                                     properties.Gradient,
-                                    properties.LipschitzContinuousGradient):
+                                    properties.LipschitzContinuousGradient,
+                                    properties.StepSize):
     """A first order Taylor approximation of a function around a point, a, i.e.
 
         T(x) = f(a) + <grad(f(a)) | x - a>.
     """
-    def __init__(self, function, point):
+    def __init__(self, function, point=None):
 
-        super(FirstOrderTaylorApproximation, self).__init__(function, point)
+        super(FirstOrderTaylorApproximation, self).__init__(function,
+                                                            point=point)
 
         self.reset()
 
@@ -457,25 +463,25 @@ class FirstOrderTaylorApproximation(BaseTaylor,
         if self.grad_at_point is None:
             self.grad_at_point = self.function.grad(self.point)
 
-    def f(self, w):
+    def f(self, x):
         """Function value.
 
         From the interface "CompositeFunction".
         """
         self._precompute()
 
-        f = self.f_at_point + np.dot(self.grad_at_point, w - self.point)
+        f = self.f_at_point + np.dot(self.grad_at_point.T, x - self.point)
 
         return f
 
-    def grad(self, w):
+    def grad(self, x, index=0):
         """Gradient of the function.
 
         From the interface "Gradient".
 
         Parameters
         ----------
-        w : numpy array (p-by-1)
+        x : numpy array (p-by-1)
             The point at which to evaluate the gradient.
         """
         self._precompute()
@@ -484,19 +490,30 @@ class FirstOrderTaylorApproximation(BaseTaylor,
 
         return grad
 
-    def L(self, w=None):
+    def L(self, x=None):
         """Lipschitz constant of the gradient.
 
         From the interface "LipschitzContinuousGradient".
 
         Parameters
         ----------
-        w : numpy array (p-by-1), optional
+        x : numpy array (p-by-1), optional
             The point at which to evaluate the Lipschitz constant.
         """
         # Any positive real number suffices, but a small one will give a larger
         # step in e.g. proximal gradient descent.
         return np.sqrt(consts.TOLERANCE)
+
+    def step(self, x, **kwargs):
+        """The step size to use in descent methods.
+
+        Parameters
+        ----------
+        x : numpy array
+            The point at which to determine the step size.
+        """
+        return min(1.0 / self.L(x),
+                   self.function.step(x, **kwargs))
 
 
 class MultiblockFirstOrderTaylorApproximation(MultiblockBaseTaylor,
@@ -506,11 +523,12 @@ class MultiblockFirstOrderTaylorApproximation(MultiblockBaseTaylor,
 
         T(x) = f(a) + <grad(f(a)) | x - a>.
     """
-    def __init__(self, function, point, indices):
+    def __init__(self, function, indices, point=None):
 
-        super(MultiblockFirstOrderTaylorApproximation, self).__init__(function,
-                                                                      point,
-                                                                      indices)
+        super(MultiblockFirstOrderTaylorApproximation, self).__init__(
+                                                                function,
+                                                                indices,
+                                                                point=point)
 
         self.reset()
 
@@ -534,9 +552,10 @@ class MultiblockFirstOrderTaylorApproximation(MultiblockBaseTaylor,
         if self.grad_at_point is None:
             self.grad_at_point = [0] * len(self.indices)
             for i in range(len(self.indices)):
-                self.grad_at_point[i] = self.function.grad([self.point[self.indices[0]],
-                                                            self.point[self.indices[1]]],
-                                                           i)
+                self.grad_at_point[i] = self.function.grad(
+                                                [self.point[self.indices[0]],
+                                                 self.point[self.indices[1]]],
+                                                i)
 
     def f(self, w):
         """Function value.
@@ -586,3 +605,14 @@ class MultiblockFirstOrderTaylorApproximation(MultiblockBaseTaylor,
         # Any positive real number suffices, but a small one will give a larger
         # step in e.g. proximal gradient descent.
         return np.sqrt(consts.TOLERANCE)
+
+    def step(self, x, index, **kwargs):
+        """The step size to use in descent methods.
+
+        Parameters
+        ----------
+        x : numpy array
+            The point at which to determine the step size.
+        """
+        return min(1.0 / self.L(x, index),
+                   self.function.step(x, index, **kwargs))

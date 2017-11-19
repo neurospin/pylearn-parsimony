@@ -11,7 +11,7 @@ Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 from .utils import time_cpu, time_wall, time, deprecated, corr, project
 from .utils import optimal_shrinkage, AnonymousClass
 from .utils import is_windows, version, list_op
-from .check_arrays import check_arrays, check_array_in
+from .check_arrays import check_arrays, check_array_in, multiblock_array
 from .plots import map2d
 from .classif_label import class_weight_to_sample_weight, check_labels
 from . import consts
@@ -27,7 +27,7 @@ from . import mesh
 
 
 __all__ = ["time_cpu", "time_wall", "time", "deprecated", "corr", "project",
-           "check_arrays", "check_array_in",
+           "check_arrays", "check_array_in", "multiblock_array",
            "optimal_shrinkage", "AnonymousClass",
            "is_windows", "version", "list_op",
            "map2d",

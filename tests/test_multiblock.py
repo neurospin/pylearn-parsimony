@@ -65,12 +65,18 @@ class TestMultiblock(TestCase):
                                                                 X[2]])
 
         objfun02 = taylor.MultiblockFirstOrderTaylorApproximation(
-                        mb_losses.LatentVariableCovariance([X[0], X[2]]), w, [0, 2])
+                            mb_losses.LatentVariableCovariance([X[0], X[2]]),
+                            [0, 2],
+                            point=w)
         objfun12 = taylor.MultiblockFirstOrderTaylorApproximation(
-                        mb_losses.LatentVariableCovariance([X[1], X[2]]), w, [1, 2])
+                            mb_losses.LatentVariableCovariance([X[1], X[2]]),
+                            [1, 2],
+                            point=w)
 #        objfun12 = mb_losses.LatentVariableCovariance([X[1], X[2]])
-        taylor_function.add_loss(objfun02, 0, 2, accepts_methods=("at_point", "at_point"))
-        taylor_function.add_loss(objfun12, 1, 2)#, accepts_methods=("at_point", "at_point"))
+        taylor_function.add_loss(objfun02, 0, 2,
+                                 accepts_methods=("at_point", "at_point"))
+        taylor_function.add_loss(objfun12, 1, 2)
+        #                        accepts_methods=("at_point", "at_point"))
 
         constraint0 = penalties.RGCCAConstraint(c=1.0, tau=1.0, X=X[0])
         constraint1 = penalties.RGCCAConstraint(c=1.0, tau=1.0, X=X[1])
@@ -79,10 +85,11 @@ class TestMultiblock(TestCase):
         taylor_function.add_constraint(constraint1, 1)
         taylor_function.add_constraint(constraint2, 2)
 
-        mbfista = mb_algorithms.MultiblockFISTA(info=[algorithms.utils.Info.func_val],
-                                                eps=5e-8,
-                                                max_iter=1000,
-                                                min_iter=1)
+        mbfista = mb_algorithms.MultiblockFISTA(
+                                        info=[algorithms.utils.Info.func_val],
+                                        eps=5e-8,
+                                        max_iter=1000,
+                                        min_iter=1)
         w_mbfista = mbfista.run(function, w)
         mbfista_f = function.f(w_mbfista)
 #        print mbfista.info_get(algorithms.utils.Info.func_val)
@@ -98,7 +105,8 @@ class TestMultiblock(TestCase):
 #        print brfista.info_get(algorithms.utils.Info.func_val)
 
         mm_algorithm = alg.MajorizationMinimization(
-                        algorithms.proximal.FISTA(eps=5e-8, max_iter=100), function)
+                            algorithms.proximal.FISTA(eps=5e-8, max_iter=100),
+                            function)
 
         brmm = mb_algorithms.BlockRelaxationWrapper(mm_algorithm,
                                                     info=[algorithms.utils.Info.func_val],

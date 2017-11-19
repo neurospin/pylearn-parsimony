@@ -112,10 +112,15 @@ class ISTA(bases.ExplicitAlgorithm,
                      Info.time,
                      Info.fvalue,  # <-- To be deprecated!
                      Info.func_val,
+                     Info.smooth_func_val,
                      Info.converged]
 
-    def __init__(self, eps=consts.TOLERANCE, info=[],
-                 max_iter=20000, min_iter=1, callback=None):
+    def __init__(self,
+                 eps=consts.TOLERANCE,
+                 info=[],
+                 max_iter=20000,
+                 min_iter=1,
+                 callback=None):
 
         super(ISTA, self).__init__(info=info,
                                    max_iter=max_iter,
@@ -131,22 +136,26 @@ class ISTA(bases.ExplicitAlgorithm,
 
         Parameters
         ----------
-        function : Function. The function to minimise.
+        function : Function
+            The function to minimise.
 
-        beta : Numpy array. The start vector.
+        beta : numpy.ndarray
+            The start vector.
         """
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, False)
 
-        step = function.step(beta)
+        # step = function.step(beta)
 
         betanew = betaold = beta
 
         if self.info_requested(Info.time):
-            t = []
+            _t = []
         if self.info_requested(Info.fvalue) \
                 or self.info_requested(Info.func_val):
-            f = []
+            _f = []
+        if self.info_requested(Info.smooth_func_val):
+            _fmu = []
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
 
@@ -158,16 +167,20 @@ class ISTA(bases.ExplicitAlgorithm,
             step = function.step(betanew)
 
             betaold = betanew
+            inexact_eps = 1.0 / (float(i) ** (2.0 + consts.FLOAT_EPSILON))
             betanew = function.prox(betaold - step * function.grad(betaold),
                                     step,
-                                    eps=1.0 / (float(i) ** (2.0 + consts.FLOAT_EPSILON)),
+                                    eps=inexact_eps,
                                     max_iter=self.max_iter)
 
             if self.info_requested(Info.time):
-                t.append(utils.time_cpu() - tm)
+                _t.append(utils.time_cpu() - tm)
             if self.info_requested(Info.fvalue) \
                     or self.info_requested(Info.func_val):
-                f.append(function.f(betanew))
+                _f.append(function.f(betanew))
+            if self.info_requested(Info.smooth_func_val):
+                if hasattr(function, "fmu"):
+                    _fmu.append(function.fmu(betanew))
 
             if self.callback is not None:
                 self.callback(locals())
@@ -185,11 +198,13 @@ class ISTA(bases.ExplicitAlgorithm,
         if self.info_requested(Info.num_iter):
             self.info_set(Info.num_iter, i)
         if self.info_requested(Info.time):
-            self.info_set(Info.time, t)
+            self.info_set(Info.time, _t)
         if self.info_requested(Info.fvalue):
-            self.info_set(Info.fvalue, f)
+            self.info_set(Info.fvalue, _f)
         if self.info_requested(Info.func_val):
-            self.info_set(Info.func_val, f)
+            self.info_set(Info.func_val, _f)
+        if self.info_requested(Info.smooth_func_val):
+            self.info_set(Info.smooth_func_val, _fmu)
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, True)
 
