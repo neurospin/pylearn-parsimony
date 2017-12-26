@@ -139,7 +139,7 @@ class TestLogisticRegression(TestCase):
         else:
             err = abs(f_parsimony - f_spams)
 #        print "err:", err
-        assert_almost_equal(err, 0.265056,
+        assert_almost_equal(err[0], 0.265056,
                             msg="The found regression vector does not give " \
                                 "the correct function value.",
                             places=5)
@@ -150,10 +150,10 @@ class TestLogisticRegression(TestCase):
         else:
             err = abs(f_logreg - f_spams)
 #        print "err:", err
-        assert_almost_equal(err, 0.265555,
+        assert_almost_equal(err[0], 0.265555,
                             msg="The found regression vector does not give " \
                                 "the correct function value.",
-                            places=5)
+                            places=3)
 
     def test_l1(self):
         # Spams: http://spams-devel.gforge.inria.fr/doc-python/html/doc_spams006.html#toc23
