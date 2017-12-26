@@ -138,7 +138,7 @@ def test_all():
     else:
         parsimonydir = testdir + "/../parsimony"
 
-    exec_string = "nosetests --with-doctest --doctest-tests" + \
+    exec_string = "nosetests --nologcapture --with-doctest --doctest-tests" + \
                   "%s --verbosity=3 -w %s" \
                   % (extras, parsimonydir)
 
@@ -146,7 +146,7 @@ def test_all():
     print("Running: " + exec_string)
     os.system(exec_string)
 
-    exec_string = "nosetests --with-doctest --doctest-tests " + \
+    exec_string = "nosetests --nologcapture --with-doctest --doctest-tests " +\
                   "%s --verbosity=3 -w %s" \
                   % (extras, testdir)
     # Then run unit tests in test directory.

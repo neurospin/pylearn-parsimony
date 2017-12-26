@@ -12,7 +12,7 @@ import numpy as np
 
 import parsimony.config as config
 
-__all__ = ["TOLERANCE", "MAX_ITER", "FLOAT_EPSILON", "FLOAT_INF"]
+__all__ = ["TOLERANCE", "MAX_ITER", "FLOAT_EPSILON", "FLOAT_INF", "DATA_TYPE"]
 
 # Settings
 TOLERANCE = config.get_float("utils.consts", "tolerance", 5e-8)
@@ -26,6 +26,9 @@ MAX_ITER = config.get_int("utils.consts", "max_iter", 10000)
 FLOAT_EPSILON = np.finfo(float).eps
 
 FLOAT_INF = np.inf
+
+# Default data type for generated matrices.
+DATA_TYPE = config.get_option("utils.consts", "dtype", "float64")
 
 
 ## TODO: This class should be replaced with Enum.

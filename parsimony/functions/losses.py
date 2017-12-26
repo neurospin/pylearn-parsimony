@@ -39,6 +39,10 @@ class LinearRegression(properties.CompositeFunction,
                        properties.LipschitzContinuousGradient,
                        properties.StepSize):
     """The Linear regression loss function.
+
+    Corresponds to the function
+
+        f(beta) = (1 / 2n) * ||y - X.beta||²_2.
     """
     def __init__(self, X, y, mean=True):
         """

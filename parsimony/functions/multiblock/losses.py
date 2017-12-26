@@ -78,9 +78,10 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
     def __init__(self, X, functions=[], penalties=[], smoothed=[], prox=[],
                  constraints=[]):
 
-        super(CombinedMultiblockFunction, self).__setattr__("_method_map",
-                                                            dict())
+#        super(CombinedMultiblockFunction, self).__setattr__("_method_map",
+#                                                            dict())
         self._param_map = dict()
+        self._method_map = dict()
 
         self.K = len(X)
         self.X = X
@@ -202,6 +203,15 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
     def __getattr__(self, name):
 #        mmap = super(CombinedMultiblockFunction,
 #                     self).__getattribute__("_method_map")
+
+        if name == "_method_map":
+            if name not in self.__dict__:
+                # super(CombinedMultiblockFunction,
+                #       self).__setattr__("_method_map", dict())
+                self.__dict__["_method_map"] = dict()
+            else:
+                return self.__dict__["_method_map"]  # Never run ...
+
         mmap = self._method_map
         if name in mmap:
             mms = mmap[name]  # A list of function-name pairs
@@ -434,7 +444,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
         w : list of numpy arrays
             The parameter vectors at which to evaluate the function.
         """
-        val = self._f(w)
+        val = self._only_f(w)
 
         for i in range(len(self._d)):
             di = self._d[i]
