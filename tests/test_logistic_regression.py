@@ -130,7 +130,7 @@ class TestLogisticRegression(TestCase):
 #        print "re:", re
         assert_almost_equal(re, 0.090917,
                             msg="The found regression vector is not correct.",
-                            places=5)
+                            places=4)
 
         f_spams = lr.f(beta_spams)
         f_parsimony = lr.f(beta)

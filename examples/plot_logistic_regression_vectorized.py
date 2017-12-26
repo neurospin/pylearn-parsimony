@@ -6,12 +6,14 @@ Vectorizer solver for linear problem
 Parsimony authorizes parallel problem solving leading to important (~5) acceleration
 factor.
 """
-
+import numpy as np
+import matplotlib.pyplot as plt
+import time
 import parsimony.datasets as datasets
 import parsimony.estimators as estimators
 import parsimony.functions.nesterov.tv as nesterov_tv
 from parsimony.utils.penalties import l1_max_logistic_loss
-import time
+import parsimony.utils as utils
 
 ###############################################################################
 # Fetch dice5 dataset
@@ -86,7 +88,7 @@ print(params.shape)
 step_size = 2
 sizes = np.arange(1, min(100, params.shape[0]+1), step_size)
 max_iter = 1000
-elapsed_ = list()
+elapsed = list()
 
 for s in sizes:
     enettv = estimators.LogisticRegressionL1L2TV(
