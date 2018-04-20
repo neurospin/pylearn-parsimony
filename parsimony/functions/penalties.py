@@ -256,7 +256,7 @@ class L1(properties.AtomicFunction,
         if norm1 <= self.c:  # Feasible?
             return beta
 
-        from parsimony.algorithms.explicit import Bisection
+        from parsimony.algorithms.utils import Bisection
         bisection = Bisection(force_negative=True,
                               parameter_positive=True,
                               parameter_negative=False,
