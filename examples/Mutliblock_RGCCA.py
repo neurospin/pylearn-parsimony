@@ -49,9 +49,9 @@ penalty_start=0
 nb_block = 2
 c = np.array([[0,1],[1,0]])
 
-l = [7.7,1]
+l = [1000,1]
 s = [1,1]
-tau=[.6,.6]
+tau=[0.6,0.6]
 
 algorithm = algorithms.MultiblockFISTA(**algorithm_params)
 
@@ -60,13 +60,14 @@ function = mb_losses.CombinedMultiblockFunction(D)
 for i in range(nb_block):
     for j in range(i,nb_block):
         if c[i,j] != 0 :
+            print i,j
             cov1 = mb_losses.LatentVariableCovariance([D[i],D[j]], unbiased=unbiased)
             cov2 = mb_losses.LatentVariableCovariance([D[j],D[i]], unbiased=unbiased)
             
             function.add_loss(cov1, i, j)
             function.add_loss(cov2, j, i)
             
-            l21 = penalties.L2(c=l[i])
+            l2 = penalties.L2(c=l[i])
             l1 = penalties.L1(l=l[i])
             l1l2 = penalties.L1L2Squared(l[j], 7.7)
             
@@ -84,7 +85,18 @@ algorithm.check_compatibility(function, algorithm.INTERFACES)
 w = [start_vector.get_weights(D[i].shape[1]) for i in range(len(D))]
 w_hat_ = algorithm.run(function,w)
 
+wX = np.dot(w_hat_[0].T,D[0].T)
+err = np.dot(wX, np.dot(D[1],w_hat_[1]))
+
+print err[0][0]
+
 plt.figure()
 plt.plot(w1, label='w_truth')
 plt.plot(w_hat_[0],label='w_hat')
 plt.show()
+
+plt.figure()
+plt.plot(w2, label='w_truth')
+plt.plot(w_hat_[1],label='w_hat')
+plt.show()
+
