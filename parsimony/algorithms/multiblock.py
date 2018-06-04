@@ -27,6 +27,7 @@ import parsimony.utils.maths as maths
 import parsimony.functions.properties as properties
 import parsimony.functions.multiblock.properties as multiblock_properties
 import parsimony.functions.multiblock.losses as mb_losses
+from parsimony.functions import penalties
 
 __all__ = ["BlockRelaxationWrapper", "MultiblockISTA", "MultiblockFISTA"]
 
@@ -385,13 +386,14 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
 
     def __init__(self, info=[],
                  eps=consts.TOLERANCE,
-                 max_iter=consts.MAX_ITER, min_iter=1):
+                 max_iter=consts.MAX_ITER, min_iter=1,max_outer=10):
 
         super(MultiblockFISTA, self).__init__(info=info,
                                               max_iter=max_iter,
                                               min_iter=min_iter)
 
         self.eps = max(consts.FLOAT_EPSILON, float(eps))
+        self.max_outer = max_outer
 
     def reset(self):
 
@@ -421,9 +423,11 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
             exp = 4.0 + consts.FLOAT_EPSILON
         else:
             exp = 2.0 + consts.FLOAT_EPSILON
-        block_iter = [1] * len(w)
+        self.block_iter = [1] * len(w)
+        self.check = {'RGCCA_0':[],'RGCCA_1':[],'RGCCA_2':[],
+                      'L1_0':[],'L1_1':[]}
 
-        it = 0
+        self.number_block_rel = 0
         while True:
 
             for i in range(len(w)):
@@ -437,8 +441,7 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
 
                 # Run FISTA.
                 w_old = w[i]
-                for k in range(1, max(self.min_iter + 1,
-                                       self.max_iter - self.num_iter + 1)):
+                for k in range(1, max(self.min_iter + 1, self.max_iter)):
 
                     if self.info_requested(Info.time):
                         time = utils.time_wall()
@@ -453,14 +456,14 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                     step = func.step(z)
                     # Compute inexact precision.
                     eps = max(consts.FLOAT_EPSILON,
-                              1.0 / (block_iter[i] ** exp))
+                              1.0 / (self.block_iter[i] ** exp))
 #                    eps = consts.TOLERANCE
 
                     w_old = w[i]
                     # Take a FISTA step.
                     w[i] = func.prox(z - step * func.grad(z),
                                      factor=step, eps=eps)
-
+                    
                     # Store info variables.
                     if self.info_requested(Info.time):
                         _t.append(utils.time_wall() - time)
@@ -471,7 +474,8 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
 
                     # Update iteration counts.
                     self.num_iter += 1
-                    block_iter[i] += 1
+                    self.block_iter[i] += 1
+
 
 #                    print i, function.fmu(w), step, \
 #                           (1.0 / step) * maths.norm(w[i] - z), self.eps, \
@@ -480,6 +484,12 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                     if maths.norm(w[i] - z) < step * self.eps \
                             and k >= self.min_iter:
                         break
+                    
+                for constraint in function._c[i]:
+                    if isinstance(constraint, penalties.RGCCAConstraint):
+                        self.check['RGCCA_{}'.format(i)].append(bool(constraint.feasible(w[i])))
+                    if isinstance(constraint, penalties.L1):
+                        self.check['L1_{}'.format(i)].append(bool(constraint.feasible(w[i])))
 
             # Test global stopping criterion.
             all_converged = True
@@ -492,7 +502,7 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                 step = func.step(w[i])
                 # Compute inexact precision.
                 eps = max(consts.FLOAT_EPSILON,
-                          1.0 / (block_iter[i] ** exp))
+                          1.0 / (self.block_iter[i] ** exp))
 #                eps = consts.TOLERANCE
                # Take one ISTA step for use in the stopping criterion.
                 w_tilde = func.prox(w[i] - step * func.grad(w[i]),
@@ -511,14 +521,14 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                 break
 
             # Stop after maximum number of iterations.
-            if self.num_iter >= self.max_iter:
+            if self.number_block_rel >= self.max_outer:
                 break
 
-            it += 1
+            self.number_block_rel += 1
 
         # Store information.
         if self.info_requested(Info.num_iter):
-            self.info_set(Info.num_iter, self.num_iter)
+            self.info_set(Info.num_iter, self.block_iter)
         if self.info_requested(Info.time):
             self.info_set(Info.time, _t)
         if self.info_requested(Info.func_val):
@@ -561,8 +571,9 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
     INFO_PROVIDED = [Info.ok,
                      Info.num_iter,
                      Info.time,
-                     Info.func_val,
-                     Info.converged]
+                     Info.fvalue,
+                     Info.converged,
+                     Info.weights]
 
     def __init__(self, mu_start=None, mu_min=consts.TOLERANCE,
                  tau=0.5, outer_iter=20,
@@ -611,8 +622,13 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
             t = []
         if self.info_requested(Info.fvalue):
             f = []
+        if self.info_requested(Info.weights):
+            info_w = [[] for k in range(len(w))]
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
+        
+        self.check = {'RGCCA_0':[],'RGCCA_1':[],'RGCCA_2':[],
+                      'L1_0':[],'L1_1':[]}
 
 #        print "len(w):", len(w)
 #        print "max_iter:", self.max_iter
@@ -648,11 +664,20 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
                     tval = algorithm.info_get(Info.time)
                 if algorithm.info_requested(Info.fvalue):
                     fval = algorithm.info_get(Info.fvalue)
+                if self.info_requested(Info.weights):
+                    info_w[i].append(w[i])
 
                 if self.info_requested(Info.time):
                     t = t + tval
                 if self.info_requested(Info.fvalue):
                     f = f + fval
+                
+                for constraint in function._c[i]:
+                    if isinstance(constraint, penalties.RGCCAConstraint):
+                        self.check['RGCCA_{}'.format(i)].append(bool(constraint.feasible(w[i])))
+                    if isinstance(constraint, penalties.L1):
+                        self.check['L1_{}'.format(i)].append(bool(constraint.feasible(w[i])))
+
 
 #                print "l0 :", maths.norm0(w[i]), \
 #                    ", l1 :", maths.norm1(w[i]), \
@@ -701,6 +726,9 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
             self.info_set(Info.fvalue, f)
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, True)
+        if self.info_requested(Info.weights):
+            self.info_set(Info.weights, info_w)
+        self.num_block_relaxation = it
 
         return w
 
