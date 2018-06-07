@@ -4,6 +4,8 @@ Created on Mon May 28 15:10:59 2018
 
 @author: ng255707
 """
+import sys
+sys.path.append('/Users/nicolasguigui/gits/pylearn-parsimony')
 
 import numpy as np
 import pandas as pd
@@ -91,8 +93,8 @@ class RGCCA(BaseEstimator):
         
         cov_X1_y = mb_losses.LatentVariableCovariance([X1, y], unbiased=True)
         cov_X2_y = mb_losses.LatentVariableCovariance([X2, y], unbiased=True)
-        cov_y_X1 = mb_losses.LatentVariableCovariance([y, X1], unbiased=True)
-        cov_y_X2 = mb_losses.LatentVariableCovariance([y, X2], unbiased=True)
+#        cov_y_X1 = mb_losses.LatentVariableCovariance([y, X1], unbiased=True)
+#        cov_y_X2 = mb_losses.LatentVariableCovariance([y, X2], unbiased=True)
         
         if self.link == 'complete':
             cov_X1_X2 = mb_losses.LatentVariableCovariance([X1, X2], unbiased=True)
@@ -102,8 +104,8 @@ class RGCCA(BaseEstimator):
             
         function.add_loss(cov_X1_y, 0, 2)
         function.add_loss(cov_X2_y, 1, 2)
-        function.add_loss(cov_y_X1, 2, 0)
-        function.add_loss(cov_y_X2, 2, 1)
+        #function.add_loss(cov_y_X1, 2, 0)
+        #function.add_loss(cov_y_X2, 2, 1)
 
         if self.penalty == 'GraphTV':
             Atv = linear_operator_from_graph(self.adj)
@@ -130,8 +132,9 @@ class RGCCA(BaseEstimator):
         constraint3 = penalties.RGCCAConstraint(c=1.0, tau=self.tau[2], X=y,
                                                     unbiased=True)
         function.add_constraint(constraint3, 2)
+        self.function = function
         
-        return function
+        return self.function
         
     def fit(self, X, y):
         
@@ -144,22 +147,30 @@ class RGCCA(BaseEstimator):
         y_ -= np.mean(y_, axis=0)
         y_ /= np.std(y_, axis=0)
         
-        w = [self.random_vector.get_weights(self.p),
-             self.random_vector.get_weights(self.q),
-             self.random_vector.get_weights(y.shape[1])]
+        V_1,S_1,U_1 = np.linalg.svd(X1.T,full_matrices=0)
+        V_2,S_2,U_2 = np.linalg.svd(X2.T,full_matrices=0)
+        V_3,S_3,U_3 = np.linalg.svd(y.T,full_matrices=0)
+        
+        
+#        w = [self.random_vector.get_weights(self.p),
+#             self.random_vector.get_weights(self.q),
+#             self.random_vector.get_weights(y.shape[1])]
+        
+        w = [V_1.T[0,:].reshape((self.p,1)),V_2.T[0,:].reshape((self.q,1)),
+             np.array([-1/np.sqrt(2),0,1/np.sqrt(2)]).reshape((3,1))]
         
         info = [Info.num_iter,Info.converged,Info.func_val]
         
         function = self.estimator(X1,X2,y_)
-        self.algorithm = algorithms.MultiblockFISTA(eps=1e-4, info=info,
-                                                    max_iter=2000,max_outer=10)
+        self.algorithm = algorithms.MultiblockISTA(eps=1e-6, info=info,
+                                                    max_iter=2000)
                                                       
         self.algorithm.check_compatibility(function, self.algorithm.INTERFACES)
         self.w = self.algorithm.run(function,w)
         self.info = self.algorithm.info_get()
         
         if not self.info['converged']:
-            print 'Convergence Warning'
+            print('Convergence Warning')
 
         self.t1 = np.dot(X1,self.w[0])
         self.t2 = np.dot(X2,self.w[1])
@@ -177,13 +188,7 @@ class RGCCA(BaseEstimator):
         self.t1 = np.dot(X1,self.w[0])
         self.t2 = np.dot(X2,self.w[1])
         predictors = np.concatenate([self.t1,self.t2],axis=1)
-        
-        # Standardise the dummy matrix.
-        y_ = np.copy(y)
-        _, self.labels = np.where(y == 1)
-        y_ -= np.mean(y_, axis=0)
-        y_ /= np.std(y_, axis=0)
-        
+
         self.accuracy = self.lda.score(predictors,self.labels)
         
         return self.accuracy
@@ -204,48 +209,44 @@ if __name__ == '__main__':
     adj = mmread(data_dir + 'Kegg_Graph.txt').tocsr()
         
     param_dist = {'rgcca__l1': uniform(loc=100,scale=700),
-                  'rgcca__l2': uniform(loc=50,scale=200),
-                  'rgcca__g1': randint(-10,0)}
+                  'rgcca__l2': uniform(loc=50,scale=200)}
     
     tau = [1.0,1.0,1.0] #optimal_shrinkage([X1.values,X2.values]) long to run
     
     pipeline = make_pipeline(StandardScaler(),
                              RGCCA(p=X1.shape[1],q=X2.shape[1],l1=300,l2=120,
-                                   tau=tau,penalty='GraphTV',adj=adj,
+                                   tau=tau,penalty=None,
                                    config='2_2_2'))
     
-    n_iter_search = 96*3
+    n_iter_search = 12
     random_search = RandomizedSearchCV(pipeline, param_distributions=param_dist,
                                    n_iter=n_iter_search, verbose=2,cv=5,
-                                   n_jobs=48, return_train_score=True)
+                                   n_jobs=2, return_train_score=True)
     
 #    random_search.fit(X,y)
 #
 #    results = pd.DataFrame(random_search.cv_results_)
-#    results.to_csv(data_dir + 'config_GraphTV_Conesta.csv')
+#    results.to_csv(data_dir + 'config_L1L1.csv')
 #    
-#    np.save(data_dir+ 'best_estimator_config_GraphTV_Conesta',
+#    np.save(data_dir+ 'best_estimator_config_L1L1',
 #            random_search.best_estimator_)
     
-    param_dist = {'rgcca__l1': uniform(loc=100,scale=700),
-                  'rgcca__l2': uniform(loc=50,scale=200),
-                  'rgcca__g1': randint(-10,0)}
-    
        
-    param = [300,120,0.1,1]
+    param = [0.2 * np.sqrt(X1.shape[1]), 0.2 * np.sqrt(X2.shape[1]),0,0]
     mod = RGCCA(p=X1.shape[1],q=X2.shape[1],l1 = param[0], l2=param[1],
-        g1=param[3], tau=tau, penalty=None)
+        g1=param[3], tau=tau)
     
     pipeline = make_pipeline(StandardScaler(),mod)
     
-    #    score = cross_val_score(pipeline,X,y,cv=2,verbose=2)
-    #    print score.mean()
+    #score = cross_val_score(pipeline,X,y,cv=2,verbose=2)
+    #print(score.mean())
     
     pipeline.fit(X,y)
+    pipeline.score(X,y)
     
     w = mod.w
-    print 'number of genes selected (GE): {}'.format(np.where(w[0] != 0)[0].shape[0])
-    print 'number of genes selected (CGH): {}'.format(np.where(w[1] != 0)[0].shape[0])    
+    print('number of genes selected (GE): {}'.format(np.where(w[0] != 0)[0].shape[0]))
+    print('number of genes selected (CGH): {}'.format(np.where(w[1] != 0)[0].shape[0])) 
     
     plt.figure()
     plt.plot(w[0]);
@@ -258,3 +259,12 @@ if __name__ == '__main__':
     plt.figure()
     plt.plot(mod.info['func_val'])
 
+    constraint1_L1 = mod.function._c[0][0]
+    constraint1_L2 = mod.function._c[0][1]
+    
+#    loading = mod.info['weights'][0]
+#    for i,iteration in enumerate(loading[:30]):
+#        print('iteration',i+1)
+#        print(constraint1_L1.feasible(iteration),constraint1_L1.f(iteration) + constraint1_L1.c)
+#        print(constraint1_L2.feasible(iteration),constraint1_L2.f(iteration) + constraint1_L2.c)
+#        print('---------------')
