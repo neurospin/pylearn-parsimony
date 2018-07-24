@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri May 11 11:31:25 2018
-
 @author: ng255707
 """
 
@@ -247,4 +246,3 @@ plt.figure()
 plt.plot(w2)
 plt.plot(w[1]);
 plt.title('Loadings for CGH block');
-

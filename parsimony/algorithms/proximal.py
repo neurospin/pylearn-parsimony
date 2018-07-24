@@ -1239,6 +1239,9 @@ class DykstrasProjectionAlgorithm(bases.ExplicitAlgorithm):
                     and i >= self.min_iter:
                 break
 
+        if i == self.max_iter:
+            print('Max_iter Reached in Dykstra Projection')
+
         return x_new
 
 

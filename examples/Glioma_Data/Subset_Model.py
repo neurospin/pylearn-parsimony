@@ -17,6 +17,7 @@ from scipy import sparse
 from scipy.io import mmread
 from scipy.stats import uniform,randint
 from time import time
+from parsimony.utils.utils import optimal_shrinkage
 
 from sklearn.model_selection import GridSearchCV,RandomizedSearchCV
 from sklearn.model_selection import cross_val_score
@@ -63,11 +64,6 @@ def linear_operator_from_graph(A):
     
     return B
 
-def converged(estimator,y_true,y_pred):
-    if estimator.steps[1][1].info['converged']:
-        return 1.0
-    else: return 0.0
-  
 class RGCCA(BaseEstimator):
     
     def __init__(self, p, q, l1=1,l2=1,g1=0,g2=0,
@@ -104,8 +100,8 @@ class RGCCA(BaseEstimator):
             
         function.add_loss(cov_X1_y, 0, 2)
         function.add_loss(cov_X2_y, 1, 2)
-        #function.add_loss(cov_y_X1, 2, 0)
-        #function.add_loss(cov_y_X2, 2, 1)
+#        function.add_loss(cov_y_X1, 2, 0)
+#        function.add_loss(cov_y_X2, 2, 1)
 
         if self.penalty == 'GraphTV':
             Atv = linear_operator_from_graph(self.adj)
@@ -118,25 +114,24 @@ class RGCCA(BaseEstimator):
             function.add_penalty(penalty_GN,0)
         
         constraint1_L1 = penalties.L1(c=self.l1)
-        constraint1_L2 = penalties.RGCCAConstraint(c=1.0, tau=self.tau[0], X=X1,
-                                                       unbiased=True)
+        constraint1_L2 = penalties.L2(c=1.0)
+        
         function.add_constraint(constraint1_L1, 0)
         function.add_constraint(constraint1_L2, 0)
         
         constraint2_L1 = penalties.L1(c=self.l2)
-        constraint2_L2 = penalties.RGCCAConstraint(c=1.0, tau=self.tau[1], X=X2,
-                                                       unbiased=True)
+        constraint2_L2 = penalties.L2(c=1.0)
+        
         function.add_constraint(constraint2_L1, 1)
         function.add_constraint(constraint2_L2, 1)
         
-        constraint3 = penalties.RGCCAConstraint(c=1.0, tau=self.tau[2], X=y,
-                                                    unbiased=True)
+        constraint3 = penalties.L2(c=1.0)
         function.add_constraint(constraint3, 2)
         self.function = function
         
         return self.function
         
-    def fit(self, X, y):
+    def fit(self, X, y, steps='svd'):
         
         X1 = X[:,:self.p]
         X2 = X[:,self.p:self.p + self.q]
@@ -151,22 +146,28 @@ class RGCCA(BaseEstimator):
         V_2,S_2,U_2 = np.linalg.svd(X2.T,full_matrices=0)
         V_3,S_3,U_3 = np.linalg.svd(y.T,full_matrices=0)
         
+        if steps=='svd':
+            steps = [1 / S_1[0], 1 / S_2[0], 1 / S_3[0]]
+        if steps=='Parsimony':
+            steps = []
+        else:
+            steps = [0.005] * 3
         
 #        w = [self.random_vector.get_weights(self.p),
 #             self.random_vector.get_weights(self.q),
 #             self.random_vector.get_weights(y.shape[1])]
         
-        w = [V_1.T[0,:].reshape((self.p,1)),V_2.T[0,:].reshape((self.q,1)),
-             np.array([-1/np.sqrt(2),0,1/np.sqrt(2)]).reshape((3,1))]
+        w = [np.vstack(V_1.T[0,:]),np.vstack(V_2.T[0,:]),
+             np.array([[-1/np.sqrt(2)], [1/np.sqrt(2)], [0]])]
         
         info = [Info.num_iter,Info.converged,Info.func_val]
         
         function = self.estimator(X1,X2,y_)
-        self.algorithm = algorithms.MultiblockISTA(eps=1e-6, info=info,
+        self.algorithm = algorithms.MultiblockISTA(eps=5e-14, info=info,
                                                     max_iter=2000)
                                                       
         self.algorithm.check_compatibility(function, self.algorithm.INTERFACES)
-        self.w = self.algorithm.run(function,w)
+        self.w = self.algorithm.run(function,w,steps)
         self.info = self.algorithm.info_get()
         
         if not self.info['converged']:
@@ -231,8 +232,19 @@ if __name__ == '__main__':
 #    np.save(data_dir+ 'best_estimator_config_L1L1',
 #            random_search.best_estimator_)
     
-       
+    ### Params as in Debuggage, not monotonous
+    
     param = [0.2 * np.sqrt(X1.shape[1]), 0.2 * np.sqrt(X2.shape[1]),0,0]
+    
+    mod = RGCCA(p=X1.shape[1],q=X2.shape[1],l1 = param[0], l2=param[1],
+        g1=param[3], tau=tau)
+    
+    pipeline = make_pipeline(StandardScaler(),mod)
+    
+    ### Params as in best score in Notebook, not monotonous
+    
+    param = [782, 144,0,0]
+    
     mod = RGCCA(p=X1.shape[1],q=X2.shape[1],l1 = param[0], l2=param[1],
         g1=param[3], tau=tau)
     
@@ -258,13 +270,40 @@ if __name__ == '__main__':
     
     plt.figure()
     plt.plot(mod.info['func_val'])
+    plt.title('Cost function value');
+    
+    ### Params found by grid search for which optimisation behaves better
+    
+    param = [150,144,0,0]
+    
+    mod = RGCCA(p=X1.shape[1],q=X2.shape[1],l1 = param[0], l2=param[1],
+        g1=param[3], tau=tau)
+    
+    pipeline = make_pipeline(StandardScaler(),mod)
+    
+    #score = cross_val_score(pipeline,X,y,cv=2,verbose=2)
+    #print(score.mean())
+    
+    pipeline.fit(X,y)
+    pipeline.score(X,y)
+    
+    w = mod.w
+    print('number of genes selected (GE): {}'.format(np.where(w[0] != 0)[0].shape[0]))
+    print('number of genes selected (CGH): {}'.format(np.where(w[1] != 0)[0].shape[0])) 
+    
+    plt.figure()
+    plt.plot(w[0]);
+    plt.title('loading for GE block')
+    
+    plt.figure()
+    plt.plot(w[1]);
+    plt.title('loadings for CGH block')
+    
+    plt.figure()
+    plt.plot(mod.info['func_val'])
+    plt.title('Cost function value');
 
     constraint1_L1 = mod.function._c[0][0]
     constraint1_L2 = mod.function._c[0][1]
+
     
-#    loading = mod.info['weights'][0]
-#    for i,iteration in enumerate(loading[:30]):
-#        print('iteration',i+1)
-#        print(constraint1_L1.feasible(iteration),constraint1_L1.f(iteration) + constraint1_L1.c)
-#        print(constraint1_L2.feasible(iteration),constraint1_L2.f(iteration) + constraint1_L2.c)
-#        print('---------------')
