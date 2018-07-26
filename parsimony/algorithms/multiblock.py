@@ -221,7 +221,7 @@ class MultiblockISTA(bases.ExplicitAlgorithm,
     def __init__(self,
                  info=[],
                  eps=consts.TOLERANCE,
-                 max_outer_iter=10, max_iter=consts.MAX_ITER,
+                 max_outer_iter=10, max_iter=20000,
                  max_inner_iter=consts.MAX_ITER, min_iter=1, steps=[]):
 
         super(MultiblockISTA, self).__init__(info=info,
@@ -339,7 +339,7 @@ class MultiblockISTA(bases.ExplicitAlgorithm,
                 break
 
             # Stop after maximum number of iterations.
-            if self.num_iter >= self.max_inner_iter * self.max_outer_iter * len(w):
+            if self.num_iter >= self.max_inner:
                 break
 
             it += 1
@@ -395,7 +395,7 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
 
     def __init__(self, info=[],
                  eps=consts.TOLERANCE, steps=[],
-                 max_iter=consts.MAX_ITER, min_iter=1,
+                 max_iter=20000, min_iter=1,
                  max_outer_iter=10, max_inner_iter=1000):
 
         super(MultiblockFISTA, self).__init__(info=info,
@@ -440,7 +440,7 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                       'L1_0':[],'L1_1':[]}
 
         self.number_block_rel = 0
-        while True:
+        while self.number_block_rel < self.max_outer_iter:
 
             for i in range(len(w)):
 #                print "it: %d, i: %d" % (it, i)
@@ -534,7 +534,7 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                 break
 
             # Stop after maximum number of iterations.
-            if self.number_block_rel >= self.max_outer_iter:
+            if sum(self.block_iter[i]) >= self.max_iter:
                 break
 
         # Store information.
