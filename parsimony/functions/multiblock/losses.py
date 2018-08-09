@@ -687,6 +687,7 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
                 all_lipschitz = False
                 break
             else:
+                print 'added stg'
                 L += di[k].L()  # w[index])
 
         Ni = self._N[index]
@@ -1153,7 +1154,7 @@ class LatentVariableCovariance(mb_properties.MultiblockFunction,
         """
         # Any positive real number suffices, but a small one will give a larger
         # step in e.g. proximal gradient descent.
-        return np.sqrt(consts.TOLERANCE)  # 1.0
+        return 200 #np.sqrt(consts.TOLERANCE)  # 1.0
 
 
 class LatentVariableCovarianceSquared(mb_properties.MultiblockFunction,

@@ -306,6 +306,7 @@ class MultiblockISTA(bases.ExplicitAlgorithm,
                     # Test stopping criterion.
                     if maths.norm(w[i] - w_old) < step * self.eps \
                             and k >= self.min_iter:
+#                        print 'Ista {} converged at iteration {}'.format(i,k)
                         break
 
             # Test global stopping criterion.
@@ -339,7 +340,7 @@ class MultiblockISTA(bases.ExplicitAlgorithm,
                 break
 
             # Stop after maximum number of iterations.
-            if self.num_iter >= self.max_inner:
+            if self.num_iter >= self.max_iter:
                 break
 
             it += 1
@@ -395,7 +396,7 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
 
     def __init__(self, info=[],
                  eps=consts.TOLERANCE, steps=[],
-                 max_iter=20000, min_iter=1,
+                 max_iter=20000, min_iter=1, stopping_criterion='iterates',
                  max_outer_iter=10, max_inner_iter=1000):
 
         super(MultiblockFISTA, self).__init__(info=info,
@@ -406,6 +407,7 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
         self.max_inner_iter = max_inner_iter
         self.max_outer_iter = max_outer_iter
         self.steps = steps
+        self.stopping_criterion = stopping_criterion
 
     def reset(self):
 
@@ -440,6 +442,7 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                       'L1_0':[],'L1_1':[]}
 
         self.number_block_rel = 0
+        block_iter_count = 0
         while self.number_block_rel < self.max_outer_iter:
 
             for i in range(len(w)):
@@ -533,8 +536,15 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
 
                 break
 
+            if (self.stopping_criterion == 'objective'
+                        and self.info_requested(Info.func_val)):
+                if abs(_f[block_iter_count] - _f[self.num_iter]) < eps:
+                    all_converged = True
+                    break
+                block_iter_count = self.num_iter
+
             # Stop after maximum number of iterations.
-            if sum(self.block_iter[i]) >= self.max_iter:
+            if sum(self.block_iter) >= self.max_iter:
                 break
 
         # Store information.
