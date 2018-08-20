@@ -481,7 +481,7 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                     # Take a FISTA step.
                     w[i] = func.prox(z - step * func.grad(z),
                                      factor=step, eps=eps)
-    
+
                     # Store info variables.
                     if self.info_requested(Info.time):
                         _t.append(utils.time_wall() - time)
@@ -505,41 +505,43 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
 
             self.number_block_rel += 1
 
-            # Test global stopping criterion.
-            all_converged = True
-            for i in range(len(w)):
-
-                # Wrap a function around the ith block.
-                func = mb_losses.MultiblockFunctionWrapper(function, w, i)
-
-                # Compute the step.
-                step = func.step(w[i])
-                # Compute inexact precision.
-                eps = max(consts.FLOAT_EPSILON,
-                          1.0 / (self.block_iter[i] ** exp))
-#                eps = consts.TOLERANCE
-               # Take one ISTA step for use in the stopping criterion.
-                w_tilde = func.prox(w[i] - step * func.grad(w[i]),
-                                    factor=step, eps=eps)
-
-                # Test if converged for block i.
-                if maths.norm(w[i] - w_tilde) > step * self.eps:
-                    all_converged = False
-                    break
-
-            # Converged in all blocks!
-            if all_converged:
-                if self.info_requested(Info.converged):
-                    self.info_set(Info.converged, True)
-
-                break
-
             if (self.stopping_criterion == 'objective'
                         and self.info_requested(Info.func_val)):
-                if abs(_f[block_iter_count] - _f[self.num_iter]) < eps:
-                    all_converged = True
+                if abs(_f[block_iter_count] - _f[-1]) < eps:
+                    if self.info_requested(Info.converged):
+                        self.info_set(Info.converged, True)
                     break
-                block_iter_count = self.num_iter
+                block_iter_count = self.num_iter - 1
+
+            else:
+                # Test global stopping criterion.
+                all_converged = True
+                for i in range(len(w)):
+    
+                    # Wrap a function around the ith block.
+                    func = mb_losses.MultiblockFunctionWrapper(function, w, i)
+    
+                    # Compute the step.
+                    step = func.step(w[i])
+                    # Compute inexact precision.
+                    eps = max(consts.FLOAT_EPSILON,
+                              1.0 / (self.block_iter[i] ** exp))
+    #                eps = consts.TOLERANCE
+                   # Take one ISTA step for use in the stopping criterion.
+                    w_tilde = func.prox(w[i] - step * func.grad(w[i]),
+                                        factor=step, eps=eps)
+    
+                    # Test if converged for block i.
+                    if maths.norm(w[i] - w_tilde) > step * self.eps:
+                        all_converged = False
+                        break
+    
+                # Converged in all blocks!
+                if all_converged:
+                    if self.info_requested(Info.converged):
+                        self.info_set(Info.converged, True)
+    
+                    break
 
             # Stop after maximum number of iterations.
             if sum(self.block_iter) >= self.max_iter:
@@ -591,8 +593,7 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
                      Info.num_iter,
                      Info.time,
                      Info.fvalue,
-                     Info.converged,
-                     Info.weights]
+                     Info.converged]
 
     def __init__(self, mu_start=None, mu_min=consts.TOLERANCE,
                  tau=0.5, outer_iter=20,
