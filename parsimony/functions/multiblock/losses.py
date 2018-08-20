@@ -687,7 +687,6 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
                 all_lipschitz = False
                 break
             else:
-                print 'added stg'
                 L += di[k].L()  # w[index])
 
         Ni = self._N[index]

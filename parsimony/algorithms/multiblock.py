@@ -438,8 +438,6 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
         else:
             exp = 2.0 + consts.FLOAT_EPSILON
         self.block_iter = [1] * len(w)
-        self.check = {'RGCCA_0':[],'RGCCA_1':[],'RGCCA_2':[],
-                      'L1_0':[],'L1_1':[]}
 
         self.number_block_rel = 0
         block_iter_count = 0
@@ -483,7 +481,7 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                     # Take a FISTA step.
                     w[i] = func.prox(z - step * func.grad(z),
                                      factor=step, eps=eps)
-                    
+    
                     # Store info variables.
                     if self.info_requested(Info.time):
                         _t.append(utils.time_wall() - time)
@@ -647,9 +645,6 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
             info_w = [[] for k in range(len(w))]
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
-        
-        self.check = {'RGCCA_0':[],'RGCCA_1':[],'RGCCA_2':[],
-                      'L1_0':[],'L1_1':[]}
 
 #        print "len(w):", len(w)
 #        print "max_iter:", self.max_iter
@@ -692,12 +687,6 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
                     t = t + tval
                 if self.info_requested(Info.fvalue):
                     f = f + fval
-                
-                for constraint in function._c[i]:
-                    if isinstance(constraint, penalties.RGCCAConstraint):
-                        self.check['RGCCA_{}'.format(i)].append(bool(constraint.feasible(w[i])))
-                    if isinstance(constraint, penalties.L1):
-                        self.check['L1_{}'.format(i)].append(bool(constraint.feasible(w[i])))
 
 
 #                print "l0 :", maths.norm0(w[i]), \

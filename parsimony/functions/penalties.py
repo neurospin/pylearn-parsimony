@@ -1206,8 +1206,8 @@ class GraphNet(QuadraticConstraint,
     A : Numpy or (usually) scipy.sparse array. The incidence matrix, made of 
     (-1, +1) to compute the differences between connected nodes of the graph.
 
-    L : Numpy or (usually) scipy.sparse array. The Laplacian matrix of the
-    of the graph. Either A or L must be passed
+    La : Numpy or (usually) scipy.sparse array. The Laplacian matrix of the
+    graph. Either A or L must be passed
 
     penalty_start : Non-negative integer. The number of columns, variables
             etc., to be exempt from penalisation. Equivalently, the first index
@@ -1218,11 +1218,13 @@ class GraphNet(QuadraticConstraint,
         self.l = float(l)
         self.c = 0
         if A == None:
+            if La == None:
+                raise ValueError('Either A or La must be passed')
             # The penalty must be x'Lx
             self.M = La  # for QuadraticConstraint
             self.N = None  # for QuadraticConstraint
         else:
-            # The penalty msut be x'A'Ax
+            # The penalty must be x'A'Ax
             self.M = A
             self.N = A
         self.La = La
