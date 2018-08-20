@@ -27,7 +27,6 @@ import parsimony.utils.maths as maths
 import parsimony.functions.properties as properties
 import parsimony.functions.multiblock.properties as multiblock_properties
 import parsimony.functions.multiblock.losses as mb_losses
-from parsimony.functions import penalties
 
 __all__ = ["BlockRelaxationWrapper", "MultiblockISTA", "MultiblockFISTA"]
 
@@ -287,7 +286,6 @@ class MultiblockISTA(bases.ExplicitAlgorithm,
 
                     w_old = w[i]
                     # Take an ISTA step.
-
                     w[i] = func.prox(w[i] - step * func.grad(w[i]),
                                      factor=step, eps=eps, max_iter=1000)
 
@@ -642,8 +640,6 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
             t = []
         if self.info_requested(Info.fvalue):
             f = []
-        if self.info_requested(Info.weights):
-            info_w = [[] for k in range(len(w))]
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
 
@@ -681,14 +677,11 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
                     tval = algorithm.info_get(Info.time)
                 if algorithm.info_requested(Info.fvalue):
                     fval = algorithm.info_get(Info.fvalue)
-                if self.info_requested(Info.weights):
-                    info_w[i].append(w[i])
 
                 if self.info_requested(Info.time):
                     t = t + tval
                 if self.info_requested(Info.fvalue):
                     f = f + fval
-
 
 #                print "l0 :", maths.norm0(w[i]), \
 #                    ", l1 :", maths.norm1(w[i]), \
@@ -737,8 +730,6 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
             self.info_set(Info.fvalue, f)
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, True)
-        if self.info_requested(Info.weights):
-            self.info_set(Info.weights, info_w)
         self.num_block_relaxation = it
 
         return w
