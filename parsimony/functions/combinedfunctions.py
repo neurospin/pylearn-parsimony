@@ -808,7 +808,7 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
 
         Lg = self.rr.L()
 
-        return (-gM * gA2 + np.sqrt((gM * gA2) ** 2.0
+        return (-gM * gA2 + np.sqrt((gM * gA2) ** 2
              + gM * Lg * gA2 * eps)) \
              / (gM * Lg)
 
@@ -828,7 +828,7 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
         Lg = self.rr.L()
 
         return (2.0 * gM * gA2 * mu
-             + gM * Lg * mu ** 2.0) \
+             + gM * Lg * mu ** 2) \
              / gA2
 
     def eps_max(self, mu):
@@ -959,7 +959,7 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
 #        anorm = 0.0
 #        for j in xrange(len(alpha)):
 #            alpha[j] = A[j].dot(beta_)
-#            anorm += alpha[j] ** 2.0
+#            anorm += alpha[j] ** 2
 #        anorm **= 0.5
 #        i = anorm >= consts.TOLERANCE
 #        anorm_i = anorm[i]
@@ -976,10 +976,10 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
 
         if self.mean:
             a = (np.dot(self.X, beta) - self.y) * (1.0 / n)
-            f_ = (n / 2.0) * maths.norm(a) ** 2.0 + np.dot(self.y.T, a)[0, 0]
+            f_ = (n / 2.0) * maths.norm(a) ** 2 + np.dot(self.y.T, a)[0, 0]
         else:
             a = np.dot(self.X, beta) - self.y
-            f_ = (1.0 / 2.0) * maths.norm(a) ** 2.0 + np.dot(self.y.T, a)[0, 0]
+            f_ = (1.0 / 2.0) * maths.norm(a) ** 2 + np.dot(self.y.T, a)[0, 0]
 
         lAta = self.tv.l * self.tv.Aa(alpha)
         if self.penalty_start > 0:
@@ -988,11 +988,11 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
 
         alpha_sqsum = 0.0
         for a_ in alpha:
-            alpha_sqsum += np.sum(a_ ** 2.0)
+            alpha_sqsum += np.sum(a_ ** 2)
 
         z = -np.dot(self.X.T, a)
         h_ = (1.0 / (2 * self.rr.k)) \
-           * np.sum(maths.positive(np.abs(z - lAta) - self.l1.l) ** 2.0) \
+           * np.sum(maths.positive(np.abs(z - lAta) - self.l1.l) ** 2) \
            + (0.5 * self.tv.l * self.tv.get_mu() * alpha_sqsum)
 
 #        print "g :", g
@@ -1003,8 +1003,6 @@ class LinearRegressionL1L2TV(properties.CompositeFunction,
 #        print "Fenchel duality gap:", gap
 
         return gap
-        
-        
 
     def A(self):
         """Linear operator of the Nesterov function.
@@ -1213,7 +1211,7 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
 
         Lg = self.rr.L()
 
-        return (-gM * gA2 + np.sqrt((gM * gA2) ** 2.0
+        return (-gM * gA2 + np.sqrt((gM * gA2) ** 2
              + gM * Lg * gA2 * eps)) \
              / (gM * Lg)
 
@@ -1233,7 +1231,7 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
         Lg = self.rr.L()
 
         return (2.0 * gM * gA2 * mu
-             + gM * Lg * mu ** 2.0) \
+             + gM * Lg * mu ** 2) \
              / gA2
 
     def eps_max(self, mu):
@@ -1377,7 +1375,7 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
 #        for j in xrange(len(alpha)):
 #            astar = A[j].dot(beta_)
 #
-#            normas = np.sqrt(np.sum(astar ** 2.0))
+#            normas = np.sqrt(np.sum(astar ** 2))
 #            if normas > consts.TOLERANCE:
 #                astar /= normas
 #            else:
@@ -1394,10 +1392,10 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
 
         if self.mean:
             a = (np.dot(self.X, beta) - self.y) * (1.0 / n)
-            f_ = (n / 2.0) * maths.norm(a) ** 2.0 + np.dot(self.y.T, a)[0, 0]
+            f_ = (n / 2.0) * maths.norm(a) ** 2 + np.dot(self.y.T, a)[0, 0]
         else:
             a = np.dot(self.X, beta) - self.y
-            f_ = (1.0 / 2.0) * maths.norm(a) ** 2.0 + np.dot(self.y.T, a)[0, 0]
+            f_ = (1.0 / 2.0) * maths.norm(a) ** 2 + np.dot(self.y.T, a)[0, 0]
 
         lAta = self.gl.l * self.gl.Aa(alpha)
         if self.penalty_start > 0:
@@ -1406,11 +1404,11 @@ class LinearRegressionL1L2GL(LinearRegressionL1L2TV):
 
         alpha_sqsum = 0.0
         for a_ in alpha:
-            alpha_sqsum += np.sum(a_ ** 2.0)
+            alpha_sqsum += np.sum(a_ ** 2)
 
         z = -np.dot(self.X.T, a)
         h_ = (1.0 / (2 * self.rr.k)) \
-           * np.sum(maths.positive(np.abs(z - lAta) - self.l1.l) ** 2.0) \
+           * np.sum(maths.positive(np.abs(z - lAta) - self.l1.l) ** 2) \
            + (0.5 * self.gl.l * self.gl.get_mu() * alpha_sqsum)
 
 #        print "g :", g
@@ -1563,7 +1561,7 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
         Bach in spam see:
         http://spams-devel.gforge.inria.fr/doc/html/doc_spams009.html
 
-        The artificial penalty is lambda_0 = 2 * eps / len(beta_with_null_l2). 
+        The artificial penalty is lambda_0 = 2 * eps / len(beta_with_null_l2).
 
         If l2 == 0.
         - f_tilde = f + lambda_0 ||beta||^2_2
@@ -1571,7 +1569,7 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
         - psi_star:  psi_star + Eq 33 paper OLS avec kappa = gamma = 0
 
         If penalty_start > 0 some variable are unpenalized.
-        Define beta = [beta_0, beta_1] with beta_0 
+        Define beta = [beta_0, beta_1] with beta_0
         coeficients of unpenalized variables.
         - f_tilde = f + lambda_0 ||beta_0||^2_2
         - l_star remain the same
@@ -1580,7 +1578,7 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
         n = float(self.X.shape[0])
         alpha = self.tv.alpha(beta)
         # gap = f + l_star + psi_star Eq 29 of OLS paper
- 
+
         # f
         f = self.fmu(beta)
         if self.rr.k == 0:
@@ -1610,17 +1608,17 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
 
         alpha_sqsum = 0.0
         for a_ in alpha:
-            alpha_sqsum += np.sum(a_ ** 2.0)
+            alpha_sqsum += np.sum(a_ ** 2)
 
         # psi_star
-        v = -np.dot(self.X.T, sigma)  
+        v = -np.dot(self.X.T, sigma)
         # Eq. 29 of OLS paper
         if self.rr.k == 0:
             l2_penalty = (2 * eps / len(beta))
         else:
             l2_penalty = self.rr.k
         psi_star = (1.0 / (2 * l2_penalty)) \
-           * np.sum(maths.positive(np.abs(v - lAta) - self.l1.l) ** 2.0) \
+           * np.sum(maths.positive(np.abs(v - lAta) - self.l1.l) ** 2) \
            + (0.5 * self.tv.l * self.tv.get_mu() * alpha_sqsum)
         if self.penalty_start > 0 and self.rr.k > 0:
             psi_star += (0.5 / (2 * eps / self.penalty_start)) * \
@@ -1719,7 +1717,7 @@ class LinearRegressionL2SmoothedL1TV(properties.CompositeFunction,
                  penalty_start=0, mean=True):
 
         if l2 < consts.TOLERANCE:
-            raise ValueError("The L2 regularisation constant must be " + \
+            raise ValueError("The L2 regularisation constant must be "
                              "non-zero.")
 
         self.X = X
@@ -2265,7 +2263,7 @@ class PrincipalComponentAnalysisL1TV(properties.CompositeFunction,
 
         Lg = self.rr.L()
 
-        return (-gM * gA2 + np.sqrt((gM * gA2) ** 2.0
+        return (-gM * gA2 + np.sqrt((gM * gA2) ** 2
              + gM * Lg * gA2 * eps)) \
              / (gM * Lg)
 
@@ -2285,7 +2283,7 @@ class PrincipalComponentAnalysisL1TV(properties.CompositeFunction,
         Lg = self.rr.L()
 
         return (2.0 * gM * gA2 * mu
-             + gM * Lg * mu ** 2.0) \
+             + gM * Lg * mu ** 2) \
              / gA2
 
     def eps_max(self, mu):

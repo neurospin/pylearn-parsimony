@@ -941,9 +941,9 @@ class L2Squared(properties.AtomicFunction,
         >>> np.random.seed(42)
         >>> l2 = L2Squared(c=0.3183098861837907)
         >>> y1 = l2.proj(np.random.rand(100, 1) * 2.0 - 1.0)
-        >>> 0.5 * np.linalg.norm(y1) ** 2.0  # doctest: +ELLIPSIS
+        >>> 0.5 * np.linalg.norm(y1) ** 2  # doctest: +ELLIPSIS
         0.31830988...
-        >>> y2 = np.random.rand(100, 1) * 2.0 - 1.0
+        >>> y2 = np.random.rand(100, 1) * 2 - 1.0
         >>> l2.feasible(y2)
         False
         >>> l2.feasible(l2.proj(y2))
@@ -1042,7 +1042,7 @@ class L1L2Squared(properties.AtomicFunction,
         else:
             beta_ = beta
 
-        if maths.norm(beta_) ** 2.0 > self.l2:
+        if maths.norm(beta_) ** 2 > self.l2:
             return consts.FLOAT_INF
 
         return self.l1 * maths.norm1(beta_)
@@ -1134,8 +1134,8 @@ class QuadraticConstraint(properties.AtomicFunction,
             #val = self.l * (np.dot(beta_.T, np.dot(self.M, beta_)) - self.c)
             val = self.l * (np.dot(beta_.T, self.M.dot(beta_)) - self.c)
         else:
-            val = self.l * (np.dot(beta_.T, self.M.T.dot(self.N.dot(beta_))) \
-                    - self.c)
+            val = self.l * (np.dot(beta_.T, self.M.T.dot(self.N.dot(beta_)))
+                            - self.c)
             #val = self.l * (np.dot(beta_.T, np.dot(self.M.T,
             #                                       np.dot(self.N, beta_))) \
             #        - self.c)
@@ -1256,7 +1256,7 @@ class GraphNet(QuadraticConstraint,
             # TODO: Add max_iter here!
             v = RankOneSparseSVD().run(A)  # , max_iter=max_iter)
             us = A.dot(v)
-            self._lambda_max = np.sum(us ** 2.0)
+            self._lambda_max = np.sum(us ** 2)
 
         return self._lambda_max
 
@@ -1424,15 +1424,15 @@ class RGCCAConstraint(QuadraticConstraint,
                                                           full_matrices=0)
                 self._V = self._V.T
                 self._U = self._U.T
-                self._S = ((1.0 - self.tau) / n_) * (self._S ** 2.0) + self.tau
+                self._S = ((1.0 - self.tau) / n_) * (self._S ** 2) + self.tau
                 self._S = self._S.reshape((min(n, p), 1))
 
             atilde = np.dot(self._V, beta_)
-            atilde2 = atilde ** 2.0
+            atilde2 = atilde ** 2
             ssdiff = np.dot(beta_.T, beta_)[0, 0] - np.sum(atilde2)
             atilde2lambdas = atilde2 * self._S
             atilde2lambdas2 = atilde2lambdas * self._S
-            tau2 = self.tau ** 2.0
+            tau2 = self.tau ** 2
 
             from parsimony.algorithms.utils import NewtonRaphson
             newton = NewtonRaphson(force_negative=True,
@@ -1454,13 +1454,13 @@ class RGCCAConstraint(QuadraticConstraint,
                     self.precomp_mu = None
 
                 def f(self, mu):
-                    term1 = (self.tau \
-                          / ((1.0 + 2.0 * mu * self.tau) ** 2.0)) * ssdiff
+                    term1 = (self.tau / ((1.0 + 2.0 * mu * self.tau) ** 2)) \
+                            * ssdiff
 
                     self.precomp = 1.0 + (2.0 * mu) * self.S
                     self.precomp_mu = mu
 
-                    term2 = np.sum(atilde2lambdas * (self.precomp ** -2.0))
+                    term2 = np.sum(atilde2lambdas * (self.precomp ** -2))
 
                     return term1 + term2 - self.c
 
@@ -1508,8 +1508,8 @@ class RGCCAConstraint(QuadraticConstraint,
                                       np.dot(self.X, beta_)).T).T))) * (1. / a)
 
             else:  # The case when n >= p
-                l2 = ((self._S - self.tau) \
-                               * (1.0 / ((1.0 - self.tau) / n_))).reshape((p,))
+                l2 = ((self._S - self.tau)
+                      * (1.0 / ((1.0 - self.tau) / n_))).reshape((p,))
 
                 a = 1.0 + 2.0 * mu * self.tau
                 b = 2.0 * mu * (1.0 - self.tau) / n_
@@ -1614,8 +1614,8 @@ class RidgeSquaredError(properties.CompositeFunction,
         else:
             d = 2.0
 
-        f = (1.0 / d) * np.sum((Xx_ - self.y) ** 2.0) \
-                + (self.k / 2.0) * np.sum(x_ ** 2.0)
+        f = (1.0 / d) * np.sum((Xx_ - self.y) ** 2) \
+                + (self.k / 2.0) * np.sum(x_ ** 2)
 
         return self.l * f
 
@@ -1672,12 +1672,12 @@ class RidgeSquaredError(properties.CompositeFunction,
         if self._lambda_max is None:
             s = np.linalg.svd(self.X, full_matrices=False, compute_uv=False)
 
-            self._lambda_max = np.max(s) ** 2.0
+            self._lambda_max = np.max(s) ** 2
 
             if len(s) < self.X.shape[1]:
                 self._lambda_min = 0.0
             else:
-                self._lambda_min = np.min(s) ** 2.0
+                self._lambda_min = np.min(s) ** 2
 
             if self.mean:
                 self._lambda_max /= float(self.X.shape[0])
@@ -1741,13 +1741,12 @@ class RidgeSquaredError(properties.CompositeFunction,
 
                 _, self._s2, self._V = np.linalg.svd(self.X)
                 self._V = self._V.T
-                self._s2 = self._s2.reshape((p, 1)) ** 2.0
+                self._s2 = self._s2.reshape((p, 1)) ** 2
 #                _inv_XtX_klI = np.dot(V, np.reciprocal(c + s ** 2) * V.T)
 
 #            y = np.dot(self._inv_XtX_klI, v)
             y = np.dot(self._V,
                        np.reciprocal(c + self._s2) * np.dot(self._V.T, v))
-
 
         else:  # If n < p
             if self._s2 is None or self._V is None:
@@ -1759,7 +1758,7 @@ class RidgeSquaredError(properties.CompositeFunction,
 
                 _, self._s2, self._V = np.linalg.svd(self.X.T)
                 self._V = self._V.T
-                self._s2 = self._s2.reshape((n, 1)) ** 2.0
+                self._s2 = self._s2.reshape((n, 1)) ** 2
 #                _inv_XtX_klI = np.dot(V, np.reciprocal(c + s ** 2) * V.T)
 
 #            y = (v - np.dot(self.X.T, np.dot(self._inv_XtX_klI,

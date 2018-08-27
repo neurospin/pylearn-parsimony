@@ -104,7 +104,7 @@ class RankOneSVD(bases.ImplicitAlgorithm,
     >>> v = fast_svd.run(X)
     >>> us = np.linalg.norm(np.dot(X, v))
     >>> s = np.linalg.svd(X, full_matrices=False, compute_uv=False)
-    >>> abs(np.sum(us ** 2.0) - np.max(s) ** 2.0) < 5e-12
+    >>> abs(np.sum(us ** 2) - np.max(s) ** 2) < 5e-12
     True
     >>>
     >>> np.random.seed(0)
@@ -113,7 +113,7 @@ class RankOneSVD(bases.ImplicitAlgorithm,
     >>> v = fast_svd.run(X)
     >>> us = np.linalg.norm(np.dot(X, v))
     >>> s = np.linalg.svd(X, full_matrices=False, compute_uv=False)
-    >>> abs(np.sum(us ** 2.0) - np.max(s) ** 2.0) < 5e-12
+    >>> abs(np.sum(us ** 2) - np.max(s) ** 2) < 5e-12
     True
     """
     INFO_PROVIDED = [utils.Info.ok,
@@ -282,7 +282,7 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
     >>> v = fast_svd.run(X)
     >>> us = np.linalg.norm(X.dot(v))
     >>> s = np.linalg.svd(X.todense(), full_matrices=False, compute_uv=False)
-    >>> abs(np.sum(us ** 2.0) - np.max(s) ** 2.0) < 5e-12
+    >>> abs(np.sum(us ** 2) - np.max(s) ** 2) < 5e-12
     True
     >>>
     >>> np.random.seed(0)
@@ -293,7 +293,7 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
     >>> v = fast_svd.run(X)
     >>> us = np.linalg.norm(X.dot(v))
     >>> s = np.linalg.svd(X.todense(), full_matrices=False, compute_uv=False)
-    >>> abs(np.sum(us ** 2.0) - np.max(s) ** 2.0) < 5e-12
+    >>> abs(np.sum(us ** 2) - np.max(s) ** 2) < 5e-12
     True
     """
     INFO_PROVIDED = [utils.Info.ok,
@@ -606,7 +606,7 @@ class PLSR(bases.ImplicitAlgorithm,
         if wc is not None:
             w_new = wc[0]
         else:
-            maxi = np.argmax(np.sum(Y ** 2.0, axis=0))
+            maxi = np.argmax(np.sum(Y ** 2, axis=0))
             u = Y[:, [maxi]]
             w_new = np.dot(X.T, u)
             w_new *= 1.0 / maths.norm(w_new)
@@ -719,7 +719,7 @@ class SparsePLSR(bases.ImplicitAlgorithm,
         if wc is not None:
             w_new = wc[0]
         else:
-            maxi = np.argmax(np.sum(Y ** 2.0, axis=0))
+            maxi = np.argmax(np.sum(Y ** 2, axis=0))
             u = Y[:, [maxi]]
             w_new = np.dot(X.T, u)
             w_new *= 1.0 / maths.norm(w_new)

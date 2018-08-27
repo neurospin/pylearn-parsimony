@@ -118,7 +118,7 @@ class GroupLassoOverlap(properties.NesterovFunction,
 
         alpha_sqsum = 0.0
         for a in alpha:
-            alpha_sqsum += np.sum(a ** 2.0)
+            alpha_sqsum += np.sum(a ** 2)
 
         mu = self.get_mu()
 
@@ -185,7 +185,7 @@ class GroupLassoOverlap(properties.NesterovFunction,
         """
         for i in range(len(a)):
             astar = a[i]
-            normas = np.sqrt(np.sum(astar ** 2.0))
+            normas = np.sqrt(np.sum(astar ** 2))
             if normas > 1.0:
                 astar *= 1.0 / normas
             a[i] = astar

@@ -438,7 +438,7 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                 # Run FISTA.
                 w_old = w[i]
                 for k in range(1, max(self.min_iter + 1,
-                                       self.max_iter - self.num_iter + 1)):
+                                      self.max_iter - self.num_iter + 1)):
 
                     if self.info_requested(Info.time):
                         time = utils.time_wall()
@@ -656,7 +656,7 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
 
 #                print "l0 :", maths.norm0(w[i]), \
 #                    ", l1 :", maths.norm1(w[i]), \
-#                    ", l2²:", maths.norm(w[i]) ** 2.0
+#                    ", l2²:", maths.norm(w[i]) ** 2
 
 #            print "f:", fval[-1]
 

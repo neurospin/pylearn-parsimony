@@ -86,9 +86,9 @@ class GroupTotalVariation(properties.NesterovFunction,
 
         f = 0.0
         for g in range(0, len(A), 3):
-            f += np.sum(np.sqrt(A[g + 0].dot(beta_) ** 2.0 +
-                                A[g + 1].dot(beta_) ** 2.0 +
-                                A[g + 2].dot(beta_) ** 2.0))
+            f += np.sum(np.sqrt(A[g + 0].dot(beta_) ** 2 +
+                                A[g + 1].dot(beta_) ** 2 +
+                                A[g + 2].dot(beta_) ** 2))
 
         return self.l * (f - self.c)
 
@@ -109,7 +109,7 @@ class GroupTotalVariation(properties.NesterovFunction,
 
         alpha_sqsum = 0.0
         for a in alpha:
-            alpha_sqsum += np.sum(a ** 2.0)
+            alpha_sqsum += np.sum(a ** 2)
 
         mu = self.get_mu()
 
@@ -130,9 +130,9 @@ class GroupTotalVariation(properties.NesterovFunction,
 
         f = 0.0
         for g in range(0, len(A), 3):
-            f += np.sum(np.sqrt(A[g + 0].dot(beta_) ** 2.0 +
-                                A[g + 1].dot(beta_) ** 2.0 +
-                                A[g + 2].dot(beta_) ** 2.0))
+            f += np.sum(np.sqrt(A[g + 0].dot(beta_) ** 2 +
+                                A[g + 1].dot(beta_) ** 2 +
+                                A[g + 2].dot(beta_) ** 2))
 
         return f <= self.c
 
@@ -164,7 +164,7 @@ class GroupTotalVariation(properties.NesterovFunction,
             # TODO: Add max_iter here!
             v = RankOneSparseSVD().run(A)  # , max_iter=max_iter)
             us = A.dot(v)
-            self._lambda_max = np.sum(us ** 2.0)
+            self._lambda_max = np.sum(us ** 2)
 
         return self._lambda_max
 
@@ -178,7 +178,7 @@ class GroupTotalVariation(properties.NesterovFunction,
             ax = a[g + 0]
             ay = a[g + 1]
             az = a[g + 2]
-            anorm = ax ** 2.0 + ay ** 2.0 + az ** 2.0
+            anorm = ax ** 2 + ay ** 2 + az ** 2
             i = anorm > 1.0
 
             anorm_i = anorm[i] ** 0.5  # Square root is taken here. Faster.
@@ -225,7 +225,7 @@ class GroupTotalVariation(properties.NesterovFunction,
             ay = A[g + 1].dot(beta_)
             az = A[g + 2].dot(beta_)
 
-            anorm = (ax ** 2.0 + ay ** 2.0 + az ** 2.0) ** 0.5  # Compute norm.
+            anorm = (ax ** 2 + ay ** 2 + az ** 2) ** 0.5  # Square root is taken here. Faster.
 
             max_norm = max(max_norm, np.max(anorm))  # The overall maximum.
 

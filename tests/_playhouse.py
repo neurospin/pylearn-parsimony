@@ -55,7 +55,7 @@ Atv = simulate.functions.TotalVariation.A_from_shape(shape)
 #                                                   penalty_start=penalty_start)
 Al1tv = l1tv.A_from_shape(shape, p, penalty_start=penalty_start)
 mu = consts.TOLERANCE
-mean=True
+mean = True
 
 func = functions.LinearRegressionL1L2TV(X, y, l, k, g, A=Atv, mu=mu,
                                         penalty_start=0, mean=mean)
@@ -134,9 +134,6 @@ plot.xlabel(r"$\mathrm{Time}\,[s]$")
 plot.yscale('log')
 plot.legend(["Excessive gap", "EG upper bound", "FISTA small mu"])
 plot.show()
-
-
-
 
 
 #shape = (1, 4, 4)

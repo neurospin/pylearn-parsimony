@@ -68,7 +68,7 @@ class BaseNetwork(with_metaclass(abc.ABCMeta,
     weights : parsimony.utils.weights.BaseWeights
         A class to use to generate the initial weights for the output layer and
         for any other layer that does not have its own specified weight
-        generator. Default is 
+        generator. Default is
     """
     def __init__(self, X, y, output_nodes, loss,
                  step_size=step_sizes.ConstantStepSize(0.01), weights=None):
@@ -693,7 +693,7 @@ class TanhNode(ActivationNode):
     def derivative(self, x):
 
         a = self.f(x)
-        return 1.0 - (a ** 2.0)
+        return 1.0 - (a ** 2)
 
 
 class ReluNode(ActivationNode):
@@ -736,7 +736,7 @@ class SquaredSumLoss(BaseLoss):
     """
     def f(self, x):
 
-        return 0.5 * np.sum((x - self.target) ** 2.0)
+        return 0.5 * np.sum((x - self.target) ** 2)
 
     def derivative(self, x):
 
