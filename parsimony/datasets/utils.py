@@ -108,9 +108,9 @@ class Square(ObjImage):
 
     def get_mask(self):
         hs = self.size / 2.0
-        mask = (np.abs(self.x_grid - self.center[0]) <= hs) & \
-        (np.abs(self.y_grid - self.center[1]) <= hs)
-        (np.abs(self.z_grid - self.center[2]) <= hs)
+        mask = ((np.abs(self.x_grid - self.center[0]) <= hs) &
+                (np.abs(self.y_grid - self.center[1]) <= hs) &
+                (np.abs(self.z_grid - self.center[2]) <= hs))
         return mask
 
 
