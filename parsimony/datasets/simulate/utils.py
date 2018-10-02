@@ -75,7 +75,7 @@ class ConstantValue(object):
 
 def norm2(x):
 
-    return np.sqrt(np.sum(x ** 2.0))
+    return np.sqrt(np.sum(x ** 2))
 
 
 def bisection_method(f, low=0.0, high=1.0, maxiter=30, eps=TOLERANCE):
@@ -126,7 +126,7 @@ def bisection_method(f, low=0.0, high=1.0, maxiter=30, eps=TOLERANCE):
         if val > 0:
             high = mid
 
-        if np.sqrt(np.sum((high - low) ** 2.0)) <= eps:
+        if np.sqrt(np.sum((high - low) ** 2)) <= eps:
             break
 
     return (low + high) / 2.0

@@ -111,5 +111,6 @@ class TestFunctions(TestCase):
 #        err = np.linalg.norm(beta - rr.beta)
 #        self.assertTrue(err < 0.01, "Error too big : %g > 0.01" % err)
 
+
 if __name__ == "__main__":
     unittest.main()

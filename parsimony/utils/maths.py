@@ -159,8 +159,8 @@ def corr(a, b):
     a_ = a - ma
     b_ = b - mb
 
-    norma = np.sqrt(np.sum(a_ ** 2.0, axis=0))
-    normb = np.sqrt(np.sum(b_ ** 2.0, axis=0))
+    norma = np.sqrt(np.sum(a_ ** 2, axis=0))
+    normb = np.sqrt(np.sum(b_ ** 2, axis=0))
 
     norma[norma < TOLERANCE] = 1.0
     normb[normb < TOLERANCE] = 1.0

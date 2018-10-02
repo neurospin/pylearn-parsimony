@@ -90,7 +90,7 @@ class L1TV(properties.NesterovFunction,
 
         # lambda and gamma are in A.
         A = self.A()
-        abeta_tv = A[1].dot(beta_) ** 2.0
+        abeta_tv = A[1].dot(beta_) ** 2
         for k in range(2, len(A)):
             abeta_tv += A[k].dot(beta_) ** 2
 
@@ -111,7 +111,7 @@ class L1TV(properties.NesterovFunction,
         alpha = self.alpha(beta)
         alpha_sqsum = 0.0
         for a in alpha:
-            alpha_sqsum += np.sum(a ** 2.0)
+            alpha_sqsum += np.sum(a ** 2)
 
         Aa = self.Aa(alpha)
 
@@ -129,7 +129,7 @@ class L1TV(properties.NesterovFunction,
 
         alpha_sqsum = 0.0
         for a in alpha:
-            alpha_sqsum += np.sum(a ** 2.0)
+            alpha_sqsum += np.sum(a ** 2)
 
         if self.penalty_start > 0:
             beta_ = beta[self.penalty_start:, :]
@@ -152,7 +152,7 @@ class L1TV(properties.NesterovFunction,
             p = self._A[1].shape[0]
             lmaxTV = 2.0 * (1.0 - math.cos(float(p - 1) * math.pi
                                            / float(p)))
-            self._lambda_max = lmaxTV * self.g ** 2.0 + self.l ** 2.0
+            self._lambda_max = lmaxTV * self.g ** 2 + self.l ** 2
 
         elif self._lambda_max is None:
 
@@ -162,7 +162,7 @@ class L1TV(properties.NesterovFunction,
             # TODO: Add max_iter here!!
             v = RankOneSparseSVD().run(A)  # , max_iter=max_iter)
             us = A.dot(v)
-            self._lambda_max = np.sum(us ** 2.0) + self.l ** 2.0
+            self._lambda_max = np.sum(us ** 2) + self.l ** 2
 
         return self._lambda_max
 
@@ -227,7 +227,7 @@ class L1TV(properties.NesterovFunction,
         a[0][i_l1] = np.divide(al1[i_l1], anorm_l1_i)
 
         # TV
-        anorm_tv = a[1] ** 2.0
+        anorm_tv = a[1] ** 2
         for k in range(2, len(a)):
             anorm_tv += a[k] ** 2
         i_tv = anorm_tv > 1.0
@@ -256,8 +256,7 @@ class L1TV(properties.NesterovFunction,
         A = self.A()
 
         # A[0] is L1, A[1:] is TV.
-        return (A[0].shape[0] / 2.0) \
-             + (A[1].shape[0] / 2.0)
+        return (A[0].shape[0] / 2.0) + (A[1].shape[0] / 2.0)
 
 
 @utils.deprecated("linear_operator_from_mask")
@@ -323,6 +322,7 @@ def linear_operator_from_shape(shape, num_variables, penalty_start=0):
     A = LinearOperatorNesterov(Al1[0], *Atv)
     return A
 
+
 def linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0,
                               weights=None):
     """Generates the linear operator for the total variation Nesterov function
@@ -373,7 +373,7 @@ def linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0,
                                        mesh_triangles=mesh_triangles,
                                        mask=mask, offset=offset,
                                        weights=weights)
-    num_variables = mask.sum() if not mask is None else mesh_coord.shape[0]
+    num_variables = mask.sum() if mask is not None else mesh_coord.shape[0]
     Al1 = l1.linear_operator_from_variables(num_variables,
                                             penalty_start=offset)
 

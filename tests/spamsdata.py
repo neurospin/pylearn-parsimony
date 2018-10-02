@@ -47,23 +47,23 @@ class SpamsGenerator:
                                dtype=np.float64,
                                order="FORTRAN")
             param = {'numThreads': 1, 'verbose': True,
-                 'lambda1': coefficient, 'it0': 10, 'max_it': 200,
-                 'L0': 0.1, 'tol': 1e-3, 'intercept': False,
-                 'pos': False}
+                     'lambda1': coefficient, 'it0': 10, 'max_it': 200,
+                     'L0': 0.1, 'tol': 1e-3, 'intercept': False,
+                     'pos': False}
             param['compute_gram'] = True
             param['loss'] = 'square'
             param['regul'] = 'l2'
             (weight_ridge, optim_info) = spams.fistaFlat(y,
-                                                  X,
-                                                  weight0,
-                                                  True,
-                                                  **param)
+                                                         X,
+                                                         weight0,
+                                                         True,
+                                                         **param)
             param['regul'] = 'l1'
             (weight_l1, optim_info) = spams.fistaFlat(y,
-                                                 X,
-                                                 weight0,
-                                                 True,
-                                                 **param)
+                                                      X,
+                                                      weight0,
+                                                      True,
+                                                      **param)
 #            print "X = ", repr(X)
 #            print "y = ", repr(y)
 #            print "weight_ridge =", repr(weight_ridge)
@@ -169,6 +169,7 @@ class SpamsGenerator:
         ret_data['num_ft'] = num_ft
 
         return ret_data
+
 
 if __name__ == "__main__":
     spams_generator = SpamsGenerator()

@@ -305,8 +305,8 @@ def corr(a, b):
     a_ = a - ma
     b_ = b - mb
 
-    norma = np.sqrt(np.sum(a_ ** 2.0, axis=0))
-    normb = np.sqrt(np.sum(b_ ** 2.0, axis=0))
+    norma = np.sqrt(np.sum(a_ ** 2, axis=0))
+    normb = np.sqrt(np.sum(b_ ** 2, axis=0))
 
     norma[norma < consts.TOLERANCE] = 1.0
     normb[normb < consts.TOLERANCE] = 1.0
@@ -461,7 +461,7 @@ def optimal_shrinkage(X, T=None):
         Wm = Si * ((M - 1.0) / M)  # 1 / N instead of 1 / N - 1
 #        print "Here4"
 #        sys.stdout.flush()
-        sum_d = np.sum((Ti - Si) ** 2.0)
+        sum_d = np.sum((Ti - Si) ** 2)
 #        print "Here5"
 #        sys.stdout.flush()
         del Si
@@ -477,10 +477,10 @@ def optimal_shrinkage(X, T=None):
         Var_sij = Var_sij[0, 0] * (M / ((M - 1.0) ** 3.0))
 
         # diag = _np.diag(C)
-        # SS_sij = _np.sum((C - _np.diag(diag)) ** 2.0)
-        # SS_sij += _np.sum((diag - 1.0) ** 2.0)
+        # SS_sij = _np.sum((C - _np.diag(diag)) ** 2)
+        # SS_sij += _np.sum((diag - 1.0) ** 2)
 
-#        d = (Ti - Si) ** 2.0
+#        d = (Ti - Si) ** 2
 
 #        l = Var_sij / np.sum(d)
         l = Var_sij / sum_d

@@ -265,7 +265,8 @@ def load(n_samples=100, shape=(30, 30, 1),
     if r2 < 1:
         noise = np.random.normal(0, 1, Xbeta.shape[0])
         coef = corr_to_coef(v_x=np.var(Xbeta), v_e=np.var(noise),
-                     cov_xe=np.cov(Xbeta, noise)[0, 1], cor=np.sqrt(r2))
+                            cov_xe=np.cov(Xbeta, noise)[0, 1],
+                            cor=np.sqrt(r2))
         beta *= coef
         y = np.dot(X, beta) + noise
     else:
@@ -323,5 +324,5 @@ def dice_five_with_union_of_pairs(shape):
     c3 = np.floor((nx / 2., ny / 2., nz / 2.))
     d3 = Dot(center=c3, size=s_obj, shape=shape)
     union12345 = ObjImage(mask=d1.get_mask() + d2.get_mask() + d3.get_mask() +
-        d4.get_mask() + d5.get_mask())
+                          d4.get_mask() + d5.get_mask())
     return [d1, d2, d3, d4, d5, union12, union45, union12345]

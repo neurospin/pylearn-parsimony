@@ -59,7 +59,7 @@ def ConstantCorrelation(p=[100], rho=[0.05], delta=0.10, eps=0.5):
 
            and variance
 
-               (eps * (1 - max(rho))) ** 2.0 / 10.
+               (eps * (1 - max(rho))) ** 2 / 10.
 
            You can thus control the noise by this parameter, but note that you
            must have
@@ -88,7 +88,7 @@ def ConstantCorrelation(p=[100], rho=[0.05], delta=0.10, eps=0.5):
 
     u = np.random.randn(M, N)
 #    u = (np.random.rand(M, N) * 2.0) - 1.0
-    u *= 1.0 / np.sqrt(np.sum(u ** 2.0, axis=0))  # Normalise.
+    u *= 1.0 / np.sqrt(np.sum(u ** 2, axis=0))  # Normalise.
     uu = np.dot(u.T, u)  # ~N(0, 1 / M)
     uu[uu > 1.0] = 1.0
     uu[uu < -1.0] = -1.0
@@ -145,7 +145,7 @@ def ToeplitzCorrelation(p=[100], rho=[0.05], eps=0.5):
            distribution of the noise. The noise is approximately normally
            distributed with zero mean and variance
 
-               (eps * (1.0 - max(rho)) / (1.0 + max(rho))) ** 2.0 / 10.
+               (eps * (1.0 - max(rho)) / (1.0 + max(rho))) ** 2 / 10.
 
            You can thus control the noise by this parameter, but note that you
            must have
@@ -169,7 +169,7 @@ def ToeplitzCorrelation(p=[100], rho=[0.05], eps=0.5):
 
     u = np.random.randn(M, N)
 #    u = (np.random.rand(M, N) * 2.0) - 1.0
-    u *= 1.0 / np.sqrt(np.sum(u ** 2.0, axis=0))  # Normalise.
+    u *= 1.0 / np.sqrt(np.sum(u ** 2, axis=0))  # Normalise.
     uu = np.dot(u.T, u)  # ~N(0, 1 / M)
 
     S = np.zeros((N, N))

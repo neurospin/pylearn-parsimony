@@ -544,12 +544,12 @@ def fleiss_kappa(W, k):
     P = [0.0] * N
     for i in range(N):
         for j in range(k):
-            P[i] += A[i, j] ** 2.0
+            P[i] += A[i, j] ** 2
         P[i] -= n
         P[i] /= float(n * (n - 1))
 
     P_ = sum(P) / float(N)
-    Pe = sum([pj ** 2.0 for pj in p])
+    Pe = sum([pj ** 2 for pj in p])
 
     if abs(Pe - 1) < consts.TOLERANCE:
         kappa = 1.0
@@ -559,6 +559,7 @@ def fleiss_kappa(W, k):
         kappa = 1.0
 
     return kappa
+
 
 def r2_score(y_true, y_pred):
     """R squared (coefficient of determination) regression score function.

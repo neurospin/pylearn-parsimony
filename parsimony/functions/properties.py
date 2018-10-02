@@ -290,7 +290,7 @@ class ProjectionOperator(with_metaclass(abc.ABCMeta, object)):
             Positive float. This is the stopping criterion for inexact
             projection methods, where the proximal operator is approximated
             numerically. Default is consts.TOLERANCE.
-    
+
         max_iter : int, optional
             Positive integer. This is the maximum number of iterations for
             inexact projection methods, where the projection operator is
@@ -530,6 +530,7 @@ class SubGradient(with_metaclass(abc.ABCMeta, object)):
         raise NotImplementedError('Abstract method "subgrad" must be '
                                   'specialised!')
 
+
 class Hessian(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractmethod
@@ -752,7 +753,7 @@ class NesterovFunction(with_metaclass(abc.ABCMeta,
         alpha = self.alpha(beta)
         alpha_sqsum = 0.0
         for a in alpha:
-            alpha_sqsum += np.sum(a ** 2.0)
+            alpha_sqsum += np.sum(a ** 2)
 
         Aa = self.Aa(alpha)
 
@@ -935,7 +936,7 @@ class NesterovFunction(with_metaclass(abc.ABCMeta,
             # TODO: Add max_iter here!
             v = RankOneSparseSVD().run(A)  # , max_iter=max_iter)
             us = A.dot(v)
-            self._lambda_max = np.sum(us ** 2.0)
+            self._lambda_max = np.sum(us ** 2)
 
         return self._lambda_max
 
@@ -990,7 +991,7 @@ class NesterovFunction(with_metaclass(abc.ABCMeta,
 
             def f(self, a):
                 return self.t * 0.5 \
-                        * maths.norm(self.v - self.t * self.Ata(a)) ** 2.0
+                        * maths.norm(self.v - self.t * self.Ata(a)) ** 2
 
             def grad(self, a):
                 return self.Av(-self.t * (self.v - self.t * self.Ata(a)))
@@ -1007,7 +1008,7 @@ class NesterovFunction(with_metaclass(abc.ABCMeta,
                     ## TODO: Add max_iter here!
                     #v = RankOneSparseSVD().run(A)  # , max_iter=max_iter)
                     #us = A.dot(v)
-                    #l = np.sum(us ** 2.0)
+                    #l = np.sum(us ** 2)
                     #self._step = 1.0 / (self.t * self.t * l)
                     lambda_max = self.lambda_max()
                     self._step = 1.0 / (self.t * self.t * lambda_max)
@@ -1034,7 +1035,7 @@ class NesterovFunction(with_metaclass(abc.ABCMeta,
 #            ax = a[0]
 #            ay = a[1]
 #            az = a[2]
-#            anorm = ax ** 2.0 + ay ** 2.0 + az ** 2.0
+#            anorm = ax ** 2 + ay ** 2 + az ** 2
 #            i = anorm > 1.0
 #
 #            anorm_i = anorm[i] ** 0.5  # Square root is taken here. Faster.
@@ -1101,9 +1102,9 @@ class NesterovFunction(with_metaclass(abc.ABCMeta,
                 Aa = Aa + A[i].T.dot(alpha[i])
             y = beta_ - t * Aa
             y_padded[self.penalty_start:, :] = y
-            gap = 0.5 * maths.norm(y - beta_) ** 2.0 \
-                    + factor * self.f(y_padded) \
-                - 0.5 * (maths.norm(beta_) ** 2.0 - maths.norm(y) ** 2.0)
+            gap = 0.5 * maths.norm(y - beta_) ** 2 \
+                + factor * self.f(y_padded) \
+                - 0.5 * (maths.norm(beta_) ** 2 - maths.norm(y) ** 2)
 
 #            if it % 10 == 0:
 #                print "gap:", gap
