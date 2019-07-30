@@ -1825,7 +1825,10 @@ class ElasticNetLogisticRegression(LogisticRegressionEstimator):
 
     Parameters
     ----------
-    l : Non-negative float. The L2 regularisation parameter.
+    l : Float in [0, 1]. The ElasticNet mixing parameter. For l = 0 the penalty is an L2 penalty.
+    For l = 1: L1 penalty. For 0 < l1_ratio < 1, the penalty is a combination of L1 and L2.
+
+    alpha : Non-negative float. The global regularisation parameter (default 1).
 
     algorithm : ExplicitAlgorithm. The algorithm that should be applied.
             Should be one of:
