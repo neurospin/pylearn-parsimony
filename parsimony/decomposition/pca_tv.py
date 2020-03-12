@@ -449,6 +449,10 @@ class RightSingularL1L2SmoothedTV_CONESTA(properties.CompositeFunction,
 class PCAL1L2TV(BaseEstimator):
     # TODO: Add penalty_start and mean to here!
     """
+    Principal Component Analysis with l1 l2 Total Variation (TV) regularization.
+
+    Warning, Data set is not centered before processing. User must center its data prior to using this class.
+
     Parameters
     ----------
     l1 : Non-negative float. The L1 regularisation parameter.
@@ -594,7 +598,7 @@ class PCAL1L2TV(BaseEstimator):
             _converged = False
             _stopped = False
             k = 0
-            v_new = self.start_vector.get_vector(p)
+            v_new = self.start_vector.get_weights(p)
             v_new = v_new / np.linalg.norm(v_new)
             _info = []
             _crit = []
@@ -751,6 +755,24 @@ class PCAL1L2TV(BaseEstimator):
             V_norm[:, i] = self.V[:, i] / rho
         return V_norm
 
+    def explained_variance(self, X, n_components):
+        """
+        Explained variance of each component on a new dataset
+
+        :param X: new dataset
+        :param n_components: int
+        :return: the explained variance for each component
+        """
+        rsquared = np.zeros((n_components))
+
+        for j in range(1, n_components+1):
+            #model.n_components = j + 1
+            X_predict = self.predict(X, n_components=j)
+            sse = np.sum((X - X_predict) ** 2)
+            ssX = np.sum(X ** 2)
+            rsquared[j - 1] = 1 - sse / ssX
+
+        return rsquared
 
 if __name__ == '__main__':
     import numpy as np

@@ -601,7 +601,7 @@ class LinearOperatorNesterov(list):
         self.n_compacts = None
         filename = kwargs["filename"] if "filename" in kwargs else None
         if filename is not None:
-            d = np.load(filename)
+            d = np.load(filename, allow_pickle=True)
             arr_k = [k for k in list(d.keys()) if k.count("csr")]
             arr_k.sort(reverse=False)
             argv = [sparse.csr_matrix((d[k][0], d[k][1], d[k][2]),
