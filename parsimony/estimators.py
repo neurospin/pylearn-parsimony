@@ -188,6 +188,25 @@ class RegressionEstimator(with_metaclass(abc.ABCMeta, BaseEstimator)):
         """
         return np.dot(check_arrays(X), self.beta)
 
+    def decision_function(self, X):
+        """Predict confidence scores for samples.
+
+        The confidence score for a sample is the signed distance of that
+        sample to the hyperplane.
+
+        Parameters
+        ----------
+        X : array_like, shape (n_samples, n_features) Samples.
+
+        Returns
+        -------
+        array, shape=(n_samples, 1) if n_classes == 2 else (n_samples, n_classes)
+            Confidence scores per (sample, class) combination.
+        """
+        X = check_arrays(X)
+
+        return np.dot(X, self.beta)
+
     def parameters(self):
         """Returns the fitted parameters, the regression coefficients (beta).
         """
@@ -1368,6 +1387,25 @@ class LogisticRegressionEstimator(with_metaclass(abc.ABCMeta, BaseEstimator)):
         prob = np.reciprocal(1.0 + np.exp(-logit))
 
         return prob
+
+    def decision_function(self, X):
+        """Predict confidence scores for samples.
+
+        The confidence score for a sample is the signed distance of that
+        sample to the hyperplane.
+
+        Parameters
+        ----------
+        X : array_like, shape (n_samples, n_features) Samples.
+
+        Returns
+        -------
+        array, shape=(n_samples, 1) if n_classes == 2 else (n_samples, n_classes)
+            Confidence scores per (sample, class) combination.
+        """
+        X = check_arrays(X)
+
+        return np.dot(X, self.beta)
 
     def parameters(self):
         """Returns the fitted parameters, the regression coefficients (beta).
