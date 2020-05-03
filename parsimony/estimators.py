@@ -207,6 +207,14 @@ class RegressionEstimator(with_metaclass(abc.ABCMeta, BaseEstimator)):
 
         return np.dot(X, self.beta)
 
+    @property
+    def coef_(self):
+        return self.beta
+
+    @coef_.setter
+    def coef_(self, beta):
+        self.beta = beta
+
     def parameters(self):
         """Returns the fitted parameters, the regression coefficients (beta).
         """
@@ -1406,6 +1414,14 @@ class LogisticRegressionEstimator(with_metaclass(abc.ABCMeta, BaseEstimator)):
         X = check_arrays(X)
 
         return np.dot(X, self.beta)
+
+    @property
+    def coef_(self):
+        return self.beta
+
+    @coef_.setter
+    def coef_(self, beta):
+        self.beta = beta
 
     def parameters(self):
         """Returns the fitted parameters, the regression coefficients (beta).
