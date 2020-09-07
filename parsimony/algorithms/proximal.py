@@ -1350,7 +1350,7 @@ class ParallelDykstrasProjectionAlgorithm(bases.ExplicitAlgorithm):
         for i in range(num):
             z[i] = np.copy(x)
 
-        for i in range(1, self.max_iter + 1):
+        for it in range(self.max_iter):
 
             for i in range(num):
                 p[i] = functions[i].proj(z[i])
@@ -1363,10 +1363,10 @@ class ParallelDykstrasProjectionAlgorithm(bases.ExplicitAlgorithm):
                 x_new += weights[i] * p[i]
 
             for i in range(num):
-                z[i] = x + z[i] - p[i]
+                z[i] = x_new + z[i] - p[i]
 
             if maths.norm(x_new - x_old) / maths.norm(x_old) < self.eps \
-                    and i >= self.min_iter:
+                    and it + 1 >= self.min_iter:
                 break
 
         return x_new
@@ -1433,7 +1433,7 @@ class ParallelDykstrasProximalAlgorithm(bases.ExplicitAlgorithm):
         for i in range(num_prox + num_proj):
             z[i] = np.copy(x)
 
-        for i in range(1, self.max_iter + 1):
+        for it in range(self.max_iter):
 
             for i in range(num_prox):
                 p[i] = prox[i].prox(z[i], factor)
@@ -1446,7 +1446,7 @@ class ParallelDykstrasProximalAlgorithm(bases.ExplicitAlgorithm):
                 x_new += weights[i] * p[i]
 
             if maths.norm(x_new - x_old) / maths.norm(x_old) < self.eps \
-                    and i >= self.min_iter:
+                    and it + 1 >= self.min_iter:
 
                 all_feasible = True
                 for i in range(num_proj):
