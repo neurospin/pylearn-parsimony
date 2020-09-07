@@ -36,6 +36,7 @@ def read_version():
 
     return version
 
+
 params = dict(name="pylearn-parsimony",
               version=read_version(),
               author="See contributors on https://github.com/neurospin/pylearn-parsimony",
@@ -86,4 +87,3 @@ except:
     from distutils.core import setup
 
 setup(**params)
-

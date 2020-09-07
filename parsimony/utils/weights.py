@@ -1057,7 +1057,7 @@ class OrthogonalRandomInitialiser(NeuralNetworkInitialiser):
 #        if X == None:
 #            raise ValueError('A matrix X must be must be given.')
 #
-#        idx = np.argmax(np.sum(X ** 2.0, axis=axis))
+#        idx = np.argmax(np.sum(X ** 2, axis=axis))
 #        if axis == 0:
 #            w = X[:, [idx]]  # Using column with largest sum of squares
 #        else:
@@ -1148,7 +1148,7 @@ class OrthogonalRandomInitialiser(NeuralNetworkInitialiser):
 ##        for i in xrange(dims):
 ##            x = np.arange(size[i]) - mean[i]
 ##            x = np.reshape(x, [size[i]] + s)
-##            X = X + invS[i, i] * (x ** 2.0)
+##            X = X + invS[i, i] * (x ** 2)
 ##            s.append(1)
 #
 #        w = np.reshape(X, (p, 1))
@@ -1219,7 +1219,7 @@ class OrthogonalRandomInitialiser(NeuralNetworkInitialiser):
 #            p_best = 0
 #            for j in xrange(20):
 #                p = np.random.rand(1, 2)
-#                dist_curr = np.min(np.sqrt(np.sum((means - p) ** 2.0, axis=1)))
+#                dist_curr = np.min(np.sqrt(np.sum((means - p) ** 2, axis=1)))
 #                if dist_curr > dist:
 #                    p_best = p
 #                    dist = dist_curr

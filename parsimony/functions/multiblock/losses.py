@@ -1194,7 +1194,7 @@ class LatentVariableCovarianceSquared(mb_properties.MultiblockFunction,
         Yc = np.dot(self.X[1], w[1])
         wXYc = np.dot(wX, Yc)[0, 0]
 
-        return -((wXYc / self.n) ** 2.0)
+        return -((wXYc / self.n) ** 2)
 
     def grad(self, w, index):
         """Gradient of the function.
@@ -1245,7 +1245,7 @@ class LatentVariableCovarianceSquared(mb_properties.MultiblockFunction,
                       np.dot(self.X[1 - index], w[1 - index])) \
             * (1.0 / self.n)
 
-        return 2.0 * maths.norm(grad) ** 2.0
+        return 2.0 * maths.norm(grad) ** 2
 
 
 class GeneralisedMultiblock(mb_properties.MultiblockFunction,
@@ -1289,7 +1289,7 @@ class GeneralisedMultiblock(mb_properties.MultiblockFunction,
                         val += fij[k].f(w[i])
                 else:
 #                    print "f(w[%d], w[%d])" % (i, j)
-                    if not fij is None:
+                    if fij is not None:
                         val += fij.f([w[i], w[j]])
 
         # TODO: Check instead if it is a numpy array.

@@ -72,8 +72,8 @@ def check_labels(y):
     nlevels = 2
     classes = np.unique(y)
     if len(classes) > nlevels:
-        raise ValueError("Multinomial classification with more " \
-                        "than %i labels is not possible" % nlevels)
+        raise ValueError("Multinomial classification with more "
+                         "than %i labels is not possible" % nlevels)
     classes_recoded = np.arange(len(classes))
     if np.all(classes_recoded == classes):
         return y

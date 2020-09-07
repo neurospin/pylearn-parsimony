@@ -91,15 +91,15 @@ class TotalVariation(properties.NesterovFunction,
             beta_ = beta
 
         A = self.A()
-        abeta2 = A[0].dot(beta_) ** 2.0
+        abeta2 = A[0].dot(beta_) ** 2
         for k in range(1, len(A)):
             abeta2 += A[k].dot(beta_) ** 2
 
         return self.l * (np.sum(np.sqrt(abeta2)) - self.c)
 #
-#        return self.l * (np.sum(np.sqrt(A[0].dot(beta_) ** 2.0 +
-#                                        A[1].dot(beta_) ** 2.0 +
-#                                        A[2].dot(beta_) ** 2.0)) - self.c)
+#        return self.l * (np.sum(np.sqrt(A[0].dot(beta_) ** 2 +
+#                                        A[1].dot(beta_) ** 2 +
+#                                        A[2].dot(beta_) ** 2)) - self.c)
 
     def phi(self, alpha, beta):
         """Function value with known alpha.
@@ -118,7 +118,7 @@ class TotalVariation(properties.NesterovFunction,
 
         alpha_sqsum = 0.0
         for a in alpha:
-            alpha_sqsum += np.sum(a ** 2.0)
+            alpha_sqsum += np.sum(a ** 2)
 
         mu = self.get_mu()
 
@@ -136,13 +136,13 @@ class TotalVariation(properties.NesterovFunction,
             beta_ = beta
 
         A = self.A()
-        abeta2 = A[0].dot(beta_) ** 2.0
+        abeta2 = A[0].dot(beta_) ** 2
         for k in range(1, len(A)):
             abeta2 += A[k].dot(beta_) ** 2
         val = np.sum(np.sqrt(abeta2))
-#        val = np.sum(np.sqrt(A[0].dot(beta_) ** 2.0 +
-#                             A[1].dot(beta_) ** 2.0 +
-#                             A[2].dot(beta_) ** 2.0))
+#        val = np.sum(np.sqrt(A[0].dot(beta_) ** 2 +
+#                             A[1].dot(beta_) ** 2 +
+#                             A[2].dot(beta_) ** 2))
         return val <= self.c
 
     def L(self):
@@ -162,12 +162,12 @@ class TotalVariation(properties.NesterovFunction,
 
         From the interface "Eigenvalues".
         """
-        if self._lambda_max is None:        
+        if self._lambda_max is None:
             try:
                 self._lambda_max = self.A().get_singular_values(0)
             except:
                 pass
- 
+
         if self._lambda_max is None:
             # Note that we can save the state here since lmax(A) does not change.
             # TODO: This only work if the elements of self._A are scipy.sparse. We
@@ -179,16 +179,16 @@ class TotalVariation(properties.NesterovFunction,
                 self._lambda_max = 2.0 * (1.0 - math.cos(float(self._p - 1)
                                                          * math.pi
                                                          / float(self._p)))
-    
+
             else:
-    
+
                 from parsimony.algorithms.nipals import RankOneSparseSVD
-    
+
                 A = sparse.vstack(self.A())
                 # TODO: Add max_iter here!
                 v = RankOneSparseSVD().run(A)  # , max_iter=max_iter)
                 us = A.dot(v)
-                self._lambda_max = np.sum(us ** 2.0)
+                self._lambda_max = np.sum(us ** 2)
 
         return self._lambda_max
 
@@ -241,7 +241,7 @@ class TotalVariation(properties.NesterovFunction,
 #        ax = a[0]
 #        ay = a[1]
 #        az = a[2]
-#        anorm = ax ** 2.0 + ay ** 2.0 + az ** 2.0
+#        anorm = ax ** 2 + ay ** 2 + az ** 2
 #        i = anorm > 1.0
 #
 #        anorm_i = anorm[i] ** 0.5  # Square root is taken here. Faster.
@@ -256,7 +256,7 @@ class TotalVariation(properties.NesterovFunction,
 
         From the interface "NesterovFunction".
         """
-        anorm = a[0] ** 2.0
+        anorm = a[0] ** 2
         for k in range(1, len(a)):
             anorm += a[k] ** 2
         i = anorm > 1.0
@@ -290,7 +290,7 @@ class TotalVariation(properties.NesterovFunction,
         A = self.A()
         normAg = np.zeros((A[0].shape[0], 1))
         for Ai in A:
-            normAg += Ai.dot(beta_) ** 2.0
+            normAg += Ai.dot(beta_) ** 2
         normAg = np.sqrt(normAg)
         mu = np.max(normAg)
 
@@ -541,7 +541,7 @@ def linear_operator_from_shape(shape, weights=None, calc_lambda_max=False):
                  sparse.eye(p, p)
         zind = ind[:, :, -1].ravel()
         for i in zind:
-            Ax.data[Ax.indptr[i]: \
+            Ax.data[Ax.indptr[i]:
                     Ax.indptr[i + 1]] = 0
         Ax.eliminate_zeros()
     else:
@@ -558,7 +558,7 @@ def linear_operator_from_shape(shape, weights=None, calc_lambda_max=False):
 
         yind = ind[:, -1, :].ravel()
         for i in yind:
-            Ay.data[Ay.indptr[i]: \
+            Ay.data[Ay.indptr[i]:
                     Ay.indptr[i + 1]] = 0
         Ay.eliminate_zeros()
     else:
@@ -570,12 +570,12 @@ def linear_operator_from_shape(shape, weights=None, calc_lambda_max=False):
                  sparse.spdiags(weights, 0, p, p)
             Az = Az.tocsr()
         else:
-            Az = (sparse.eye(p, p, ny * nx, format='csr') - \
+            Az = (sparse.eye(p, p, ny * nx, format='csr') -
                   sparse.eye(p, p))
 
         xind = ind[-1, :, :].ravel()
         for i in xind:
-            Az.data[Az.indptr[i]: \
+            Az.data[Az.indptr[i]:
                     Az.indptr[i + 1]] = 0
         Az.eliminate_zeros()
     else:
@@ -586,6 +586,7 @@ def linear_operator_from_shape(shape, weights=None, calc_lambda_max=False):
     if calc_lambda_max:
         A.singular_values = [TotalVariation(l=0., A=A).lambda_max()]
     return A
+
 
 def linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0,
                               weights=None, calc_lambda_max=False):
@@ -652,11 +653,11 @@ def linear_operator_from_mesh(mesh_coord, mesh_triangles, mask=None, offset=0,
             # Attach edge to first node.
             if np.sum(mesh_coord[node_idx1] - mesh_coord[node_idx2]) >= 0:
                 edge = [node_idx1, node_idx2]
-                if not edge in nodes_with_edges[node_idx1]:
+                if edge not in nodes_with_edges[node_idx1]:
                     nodes_with_edges[node_idx1].append(edge)
             else:  # attach edge to second node
                 edge = [node_idx2, node_idx1]
-                if not edge in nodes_with_edges[node_idx2]:
+                if edge not in nodes_with_edges[node_idx2]:
                     nodes_with_edges[node_idx2].append(edge)
     for i in range(mesh_triangles.shape[0]):
         t = mesh_triangles[i, :]

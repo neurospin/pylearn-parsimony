@@ -24,7 +24,7 @@ __all__ = ["ProjectionDeflation",
 class Deflation(with_metaclass(abc.ABCMeta, object)):
     @abc.abstractmethod
     def deflate(self, X, w):
-        raise NotImplementedError('Abstract method "deflate" must be ' \
+        raise NotImplementedError('Abstract method "deflate" must be '
                                   'specialised!')
 
 

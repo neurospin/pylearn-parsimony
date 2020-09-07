@@ -36,7 +36,7 @@ class MultipartArray(object):
 
         for i in range(len(self.parts)):
             if len(self.parts[i].shape) != 2:
-                raise ValueError("MultipartArray is only defined for 2D " \
+                raise ValueError("MultipartArray is only defined for 2D "
                                  "arrays")
             if not self.parts[0].shape[self.common_dim] \
                     == self.parts[i].shape[self.common_dim]:
@@ -250,11 +250,11 @@ class MultipartArray(object):
         return self.transpose()
 
     def _set_T(self, value):
-        raise AttributeError("attribute 'T' of 'MultipartArray' objects " \
+        raise AttributeError("attribute 'T' of 'MultipartArray' objects "
                              "is not writable")
 
     def _del_T(self):
-        raise AttributeError("attribute 'T' of 'MultipartArray' objects " \
+        raise AttributeError("attribute 'T' of 'MultipartArray' objects "
                              "is not writable")
 
     T = property(_get_T, _set_T, _del_T, 'Transpose of the array.')
@@ -601,7 +601,7 @@ class LinearOperatorNesterov(list):
         self.n_compacts = None
         filename = kwargs["filename"] if "filename" in kwargs else None
         if filename is not None:
-            d = np.load(filename)
+            d = np.load(filename, allow_pickle=True)
             arr_k = [k for k in list(d.keys()) if k.count("csr")]
             arr_k.sort(reverse=False)
             argv = [sparse.csr_matrix((d[k][0], d[k][1], d[k][2]),
@@ -625,7 +625,6 @@ class LinearOperatorNesterov(list):
         for k in list(self.__dict__.keys()):
             arr_dict[k] = getattr(self, k)
         np.savez_compressed(filename, **arr_dict)
-
 
     def get_singular_values(self, nb=None):
         if nb is not None:

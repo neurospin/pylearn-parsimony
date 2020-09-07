@@ -226,7 +226,7 @@ class NesterovFunction(with_metaclass(abc.ABCMeta, Function)):
 
         for i in range(len(alpha)):
             astar = alpha[i]
-            normas = np.sqrt(np.sum(astar ** 2.0))
+            normas = np.sqrt(np.sum(astar ** 2))
             if normas > 1.0:
                 astar *= 1.0 / normas
             alpha[i] = astar
@@ -249,7 +249,7 @@ class TotalVariation(Function):
         """
         beta_flat = x.ravel()
         Ab = np.vstack([Ai.dot(beta_flat) for Ai in self.A]).T
-        Ab_norm2 = np.sqrt(np.sum(Ab ** 2.0, axis=1))
+        Ab_norm2 = np.sqrt(np.sum(Ab ** 2, axis=1))
 
         upper = Ab_norm2 > TOLERANCE
         grad_Ab_norm2 = Ab
@@ -261,11 +261,11 @@ class TotalVariation(Function):
         if n_lower:
             D = len(self.A)
             vec_rnd = (self.rng(n_lower, D) * 2.0) - 1.0
-            norm_vec = np.sqrt(np.sum(vec_rnd ** 2.0, axis=1))
+            norm_vec = np.sqrt(np.sum(vec_rnd ** 2, axis=1))
             a = self.rng(n_lower)
             grad_Ab_norm2[lower] = (vec_rnd.T * (a / norm_vec)).T
 
-        grad = np.vstack([self.A[i].T.dot(grad_Ab_norm2[:, i]) \
+        grad = np.vstack([self.A[i].T.dot(grad_Ab_norm2[:, i])
                           for i in range(len(self.A))])
         grad = grad.sum(axis=0)
 
@@ -275,7 +275,7 @@ class TotalVariation(Function):
 def grad_tv(beta, A, rng=RandomUniform(0, 1)):
     beta_flat = beta.ravel()
     Ab = np.vstack([Ai.dot(beta_flat) for Ai in A]).T
-    Ab_norm2 = np.sqrt(np.sum(Ab ** 2.0, axis=1))
+    Ab_norm2 = np.sqrt(np.sum(Ab ** 2, axis=1))
 
     upper = Ab_norm2 > TOLERANCE
     grad_Ab_norm2 = Ab
@@ -287,7 +287,7 @@ def grad_tv(beta, A, rng=RandomUniform(0, 1)):
     if n_lower:
         D = len(A)
         vec_rnd = (rng(n_lower, D) * 2.0) - 1.0
-        norm_vec = np.sqrt(np.sum(vec_rnd ** 2.0, axis=1))
+        norm_vec = np.sqrt(np.sum(vec_rnd ** 2, axis=1))
         a = rng(n_lower)
         grad_Ab_norm2[lower] = (vec_rnd.T * (a / norm_vec)).T
 
@@ -330,7 +330,7 @@ class SmoothedTotalVariation(NesterovFunction):
         ax = alpha[0]
         ay = alpha[1]
         az = alpha[2]
-        anorm = ax ** 2.0 + ay ** 2.0 + az ** 2.0
+        anorm = ax ** 2 + ay ** 2 + az ** 2
         i = anorm > 1.0
 
         anorm_i = anorm[i] ** 0.5  # Square root is taken here. Faster.
@@ -396,7 +396,7 @@ class SmoothedGroupTotalVariation(NesterovFunction):
             ax = a[g + 0]
             ay = a[g + 1]
             az = a[g + 2]
-            anorm = ax ** 2.0 + ay ** 2.0 + az ** 2.0
+            anorm = ax ** 2 + ay ** 2 + az ** 2
             i = anorm > 1.0
 
             anorm_i = anorm[i] ** 0.5  # Square root is taken here. Faster.
@@ -426,7 +426,7 @@ def _Nesterov_GroupTV_project(a):
         ax = a[g + 0]
         ay = a[g + 1]
         az = a[g + 2]
-        anorm = ax ** 2.0 + ay ** 2.0 + az ** 2.0
+        anorm = ax ** 2 + ay ** 2 + az ** 2
         i = anorm > 1.0
 
         anorm_i = anorm[i] ** 0.5  # Square root is taken here. Faster.
@@ -478,7 +478,7 @@ def _Nesterov_project(alpha):
 
     for i in range(len(alpha)):
         astar = alpha[i]
-        normas = np.sqrt(np.sum(astar ** 2.0))
+        normas = np.sqrt(np.sum(astar ** 2))
         if normas > 1.0:
             astar *= 1.0 / normas
         alpha[i] = astar
@@ -492,7 +492,7 @@ def _Nesterov_TV_project(alpha):
     ax = alpha[0]
     ay = alpha[1]
     az = alpha[2]
-    anorm = ax ** 2.0 + ay ** 2.0 + az ** 2.0
+    anorm = ax ** 2 + ay ** 2 + az ** 2
     i = anorm > 1.0
 
     anorm_i = anorm[i] ** 0.5  # Square root is taken here. Faster.

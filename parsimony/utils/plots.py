@@ -70,11 +70,11 @@ def map2d_of_models(models_dict, nrow, ncol, shape, title_attr=None):
     ax_i = 1
     for k in list(models_dict.keys()):
         mod = models_dict[k]
-        if  hasattr(mod, "beta"):
+        if hasattr(mod, "beta"):
             w = mod.beta
         elif hasattr(mod, "coef_"): # to work with sklean
             w = mod.coef_
-        if  (hasattr(mod, "penalty_start") and mod.penalty_start != 0):
+        if (hasattr(mod, "penalty_start") and mod.penalty_start != 0):
             w = w[mod.penalty_start:]
         if (title_attr is not None and hasattr(mod, title_attr)):
             title = getattr(mod, title_attr)
@@ -152,8 +152,8 @@ def errorbars(X, classes=None, means=None, alpha=0.05,
         plt.rc('font', family='serif')
     if means is not None:
         plt.plot(x, means, '*',
-                  markerfacecolor="black", markeredgecolor="black",
-                  markersize=10)
+                 markerfacecolor="black", markeredgecolor="black",
+                 markersize=10)
 
     ci = ss.t.ppf(1.0 - alpha / 2.0, data_df) * data_sd / np.sqrt(B)
 
@@ -215,7 +215,7 @@ def voronoi_tesselation(mu, rect=None, nx=100, ny=100,
         polygon = vertices[region]
         plt.fill(*list(zip(*polygon)), alpha=alpha, color=colors[i])
         plt.plot(mu[i, 0], mu[i, 1], marker='o', color=colors[i],
-                  markersize=markersize)
+                 markersize=markersize)
 
     if rect is None:
         plt.xlim(vor.min_bound[0] * 0.9, vor.max_bound[0] * 1.1)

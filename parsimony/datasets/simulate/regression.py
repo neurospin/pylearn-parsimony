@@ -48,11 +48,11 @@ def load(size=[[100, 100]], rho=[0.05], delta=0.1, eps=None, density=0.5,
 
             and the variance is
 
-                (eps * (1 - max(rho))) ** 2.0 / 10.
+                (eps * (1 - max(rho))) ** 2 / 10.
 
             If locally_smooth=True, the mean is zero and the variance is
 
-                (eps * (1.0 - max(rho)) / (1.0 + max(rho))) ** 2.0 / 10.
+                (eps * (1.0 - max(rho)) / (1.0 + max(rho))) ** 2 / 10.
 
             You can thus control the noise by this parameter, but note that you
             must have
@@ -95,13 +95,13 @@ def load(size=[[100, 100]], rho=[0.05], delta=0.1, eps=None, density=0.5,
     p = [0] * K
     n = None
     for k in range(K):
-        if n != None and size[k][0] != n:
+        if n is not None and size[k][0] != n:
             raise ValueError("The groups must have the same number of samples")
         n = size[k][0]
         pk = size[k][1]
         p[k] = pk
 
-    if eps == None:
+    if eps is None:
         eps = np.sqrt(10.0 / float(n))  # Set variance to 1 / n.
 
     if locally_smooth:
@@ -126,7 +126,7 @@ def load(size=[[100, 100]], rho=[0.05], delta=0.1, eps=None, density=0.5,
     y = np.dot(X, beta)
 
     # Add noise from N(0, (1/snr)*||Xb||² / (n-1))
-    var = (np.sum(y ** 2.0) / float(n - 1)) / float(snr)
+    var = (np.sum(y ** 2) / float(n - 1)) / float(snr)
     e = np.random.randn(n, 1)
     e *= np.sqrt(var)
     y += e
@@ -138,7 +138,7 @@ if __name__ == "__main__":
 
     n = 100
     p = 100
-    # Var(S) ~= (eps * (1 - max(rho))) ** 2.0 / 10
+    # Var(S) ~= (eps * (1 - max(rho))) ** 2 / 10
     # Var(uu) = 1 / n => eps = np.sqrt(10.0 / n)
 #    X, S = load(size=[10, 10], rho=0.0, delta=0.0, eps=np.sqrt(10.0 / n))
 #    XX = np.dot(X.T, X) / (float(n) - 1.0)

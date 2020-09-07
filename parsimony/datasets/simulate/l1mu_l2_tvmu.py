@@ -67,10 +67,10 @@ def load(l, k, g, beta, M, e, mu, snr=None, shape=None):
     k = float(k)
     g = float(g)
 
-    if shape == None:
+    if shape is None:
         shape = (beta.shape[0],)
 
-    if snr != None:
+    if snr is not None:
         def f(x):
             X, y = _generate(l, k, g, x * beta, M, e, mu, shape)
 
@@ -78,13 +78,13 @@ def load(l, k, g, beta, M, e, mu, snr=None, shape=None):
 #            print "norm(Xbeta) = ", np.linalg.norm(np.dot(X, beta))
 #            print "norm(e) = ", np.linalg.norm(e)
 
-            print("snr = %.5f = %.5f = |X.b| / |e| = %.5f / %.5f" \
-                   % (snr, np.linalg.norm(np.dot(X, x * beta)) \
-                                           / np.linalg.norm(e),
-                      np.linalg.norm(np.dot(X, x * beta)), np.linalg.norm(e)))
+            print("snr = %.5f = %.5f = |X.b| / |e| = %.5f / %.5f"
+                  % (snr, np.linalg.norm(np.dot(X, x * beta))
+                          / np.linalg.norm(e),
+                     np.linalg.norm(np.dot(X, x * beta)), np.linalg.norm(e)))
 
             return (np.linalg.norm(np.dot(X, x * beta)) / np.linalg.norm(e)) \
-                        - snr
+                   - snr
 
         snr = bisection_method(f, low=0.0, high=np.sqrt(snr), maxiter=30)
 

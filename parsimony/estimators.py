@@ -188,6 +188,33 @@ class RegressionEstimator(with_metaclass(abc.ABCMeta, BaseEstimator)):
         """
         return np.dot(check_arrays(X), self.beta)
 
+    def decision_function(self, X):
+        """Predict confidence scores for samples.
+
+        The confidence score for a sample is the signed distance of that
+        sample to the hyperplane.
+
+        Parameters
+        ----------
+        X : array_like, shape (n_samples, n_features) Samples.
+
+        Returns
+        -------
+        array, shape=(n_samples, 1) if n_classes == 2 else (n_samples, n_classes)
+            Confidence scores per (sample, class) combination.
+        """
+        X = check_arrays(X)
+
+        return np.dot(X, self.beta)
+
+    @property
+    def coef_(self):
+        return self.beta
+
+    @coef_.setter
+    def coef_(self, beta):
+        self.beta = beta
+
     def parameters(self):
         """Returns the fitted parameters, the regression coefficients (beta).
         """
@@ -295,7 +322,7 @@ class LinearRegression(RegressionEstimator):
         X, y = check_arrays(X, y)
         n, p = X.shape
         y_hat = np.dot(X, self.beta)
-        err = np.sum((y_hat - y) ** 2.0)
+        err = np.sum((y_hat - y) ** 2)
         if self.mean:
             err /= float(n)
 
@@ -408,7 +435,7 @@ class RidgeRegression(RegressionEstimator):
         X, y = check_arrays(X, y)
         n, p = X.shape
         y_hat = np.dot(X, self.beta)
-        err = np.sum((y_hat - y) ** 2.0)
+        err = np.sum((y_hat - y) ** 2)
         if self.mean:
             err /= float(n)
 
@@ -523,7 +550,7 @@ class Lasso(RegressionEstimator):
         X, y = check_arrays(X, y)
         n, p = X.shape
         y_hat = np.dot(X, self.beta)
-        err = np.sum((y_hat - y) ** 2.0)
+        err = np.sum((y_hat - y) ** 2)
         if self.mean:
             err /= float(n)
 
@@ -643,7 +670,7 @@ class ElasticNet(RegressionEstimator):
         X, y = check_arrays(X, y)
         n, p = X.shape
         y_hat = np.dot(X, self.beta)
-        err = np.sum((y_hat - y) ** 2.0)
+        err = np.sum((y_hat - y) ** 2)
         if self.mean:
             err /= float(n)
 
@@ -872,7 +899,7 @@ class LinearRegressionL1L2TV(RegressionEstimator):
         n, p = X.shape
         y_hat = np.dot(X, self.beta)
 
-        return np.sum((y_hat - y) ** 2.0) / float(n)
+        return np.sum((y_hat - y) ** 2) / float(n)
 
 
 class LinearRegressionL1L2GraphNet(LinearRegression):
@@ -1174,7 +1201,7 @@ class LinearRegressionL1L2GL(RegressionEstimator):
         X, y = check_arrays(X, y)
         n, p = X.shape
         y_hat = np.dot(X, self.beta)
-        err = np.sum((y_hat - y) ** 2.0)
+        err = np.sum((y_hat - y) ** 2)
         if self.mean:
             err /= float(n)
 
@@ -1304,7 +1331,7 @@ class LinearRegressionL1L2GL(RegressionEstimator):
 #        X, y = check_arrays(X, y)
 #        n, p = X.shape
 #        y_hat = np.dot(X, self.beta)
-#        return np.sum((y_hat - y) ** 2.0) / float(n)
+#        return np.sum((y_hat - y) ** 2) / float(n)
 
 
 class LogisticRegressionEstimator(with_metaclass(abc.ABCMeta, BaseEstimator)):
@@ -1368,6 +1395,33 @@ class LogisticRegressionEstimator(with_metaclass(abc.ABCMeta, BaseEstimator)):
         prob = np.reciprocal(1.0 + np.exp(-logit))
 
         return prob
+
+    def decision_function(self, X):
+        """Predict confidence scores for samples.
+
+        The confidence score for a sample is the signed distance of that
+        sample to the hyperplane.
+
+        Parameters
+        ----------
+        X : array_like, shape (n_samples, n_features) Samples.
+
+        Returns
+        -------
+        array, shape=(n_samples, 1) if n_classes == 2 else (n_samples, n_classes)
+            Confidence scores per (sample, class) combination.
+        """
+        X = check_arrays(X)
+
+        return np.dot(X, self.beta)
+
+    @property
+    def coef_(self):
+        return self.beta
+
+    @coef_.setter
+    def coef_(self, beta):
+        self.beta = beta
 
     def parameters(self):
         """Returns the fitted parameters, the regression coefficients (beta).
@@ -1825,7 +1879,10 @@ class ElasticNetLogisticRegression(LogisticRegressionEstimator):
 
     Parameters
     ----------
-    l : Non-negative float. The L2 regularisation parameter.
+    l : Float in [0, 1]. The ElasticNet mixing parameter. For l = 0 the penalty is an L2 penalty.
+    For l = 1: L1 penalty. For 0 < l1_ratio < 1, the penalty is a combination of L1 and L2.
+
+    alpha : Non-negative float. The global regularisation parameter (default 1).
 
     algorithm : ExplicitAlgorithm. The algorithm that should be applied.
             Should be one of:
@@ -2648,7 +2705,7 @@ class LinearRegressionL2SmoothedL1TV(RegressionEstimator):
         n, p = X.shape
         y_hat = np.dot(X, self.beta)
 
-        return np.sum((y_hat - y) ** 2.0) / float(n)
+        return np.sum((y_hat - y) ** 2) / float(n)
 
 
 class SVMEstimator(RegressionEstimator):
@@ -3094,7 +3151,7 @@ class PLSRegression(RegressionEstimator):
         X, Y = check_arrays(X, Y)
 
         Yhat = np.dot(X, self.beta)
-        err = maths.normFro(Yhat - Y) ** 2.0
+        err = maths.normFro(Yhat - Y) ** 2
 
         if self.mean:
             n, p = X.shape
@@ -3313,7 +3370,7 @@ class SparsePLSRegression(RegressionEstimator):
         X, Y = check_arrays(X, Y)
 
         Yhat = np.dot(X, self.beta)
-        err = maths.normFro(Yhat - Y) ** 2.0
+        err = maths.normFro(Yhat - Y) ** 2
 
         if self.mean:
             n, p = X.shape
@@ -3413,7 +3470,7 @@ class Clustering(BaseEstimator):
         dists = np.zeros((X.shape[0], self.K))
         i = 0
         for mu in self._means:
-            dist = np.sum((X - mu) ** 2.0, axis=1)
+            dist = np.sum((X - mu) ** 2, axis=1)
             dists[:, i] = dist
             i += 1
 
@@ -3435,7 +3492,7 @@ class Clustering(BaseEstimator):
         wcss = 0.0
         for i in range(self.K):
             idx = closest == i
-            wcss += np.sum((X[idx, :] - self._means[i, :]) ** 2.0)
+            wcss += np.sum((X[idx, :] - self._means[i, :]) ** 2)
 
         return wcss
 

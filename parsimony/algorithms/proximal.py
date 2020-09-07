@@ -594,9 +594,9 @@ class CONESTA(bases.ExplicitAlgorithm,
         if gap < self.eps:  # "- mu * gM" has been removed since mu == 0
             warnings.warn(
                 "Stopping criterion satisfied before the first iteration."
-                " Either beta_start a the solution (given eps)."
-                " If beta_start is null the problem might be over-penalized. "
-                " Then try smaller penalization.")
+                " Either beta is the solution (given eps),"
+                " or if beta is null the problem might be over-penalized "
+                " - then try smaller penalization.")
             loop = False
 
         # Special case 2: gap infinite or NaN => eps is not finite or NaN
