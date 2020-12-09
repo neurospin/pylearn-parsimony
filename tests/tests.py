@@ -32,6 +32,7 @@ import abc
 import os
 # import re
 
+import parsimony
 from parsimony.utils import is_windows
 
 

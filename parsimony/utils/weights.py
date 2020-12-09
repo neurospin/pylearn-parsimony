@@ -130,16 +130,17 @@ class IdentityWeights(BaseWeights):
     >>> from parsimony.utils.weights import IdentityWeights
     >>>
     >>> start_vector = IdentityWeights(np.array([[0.5], [2.0], [0.3], [1.0]]))
-    >>> start_vector.get_weights()
-    array([[ 0.5],
-           [ 2. ],
-           [ 0.3],
-           [ 1. ]])
+    >>> np.linalg.norm(start_vector.get_weights() - np.asarray([[ 0.5],
+    ...                                                         [ 2. ],
+    ...                                                         [ 0.3],
+    ...                                                         [ 1. ]])) < 5e-16
+    True
     >>> start_vector = IdentityWeights(np.eye(3, 4))
-    >>> start_vector.get_weights()
-    array([[ 1.,  0.,  0.,  0.],
-           [ 0.,  1.,  0.,  0.],
-           [ 0.,  0.,  1.,  0.]])
+    >>> np.linalg.norm(start_vector.get_weights()
+    ...     - np.asarray([[ 1.,  0.,  0.,  0.],
+    ...                   [ 0.,  1.,  0.,  0.],
+    ...                   [ 0.,  0.,  1.,  0.]])) < 5e-16
+    True
     """
     def __init__(self, weights, **kwargs):
 
@@ -519,19 +520,19 @@ class OnesWeights(BaseWeights):
     >>> # Without normalization
     >>> start_vector = OnesWeights()
     >>> ones = start_vector.get_weights(3)
-    >>> print(ones)
-    [[ 1.]
-     [ 1.]
-     [ 1.]]
-    >>> print(maths.norm(ones))
-    1.73205080757
+    >>> np.linalg.norm(ones - np.asarray([[ 1.],
+    ...                                   [ 1.],
+    ...                                   [ 1.]])) < 5e-16
+    True
+    >>> np.abs(maths.norm(ones) - 1.73205080757) < 5e-12
+    True
     >>> # With normalization
     >>> start_vector_normalized = OnesWeights(normalise=True)
     >>> ones_normalized = start_vector_normalized.get_weights(3)
-    >>> print(ones_normalized)
-    [[ 0.57735027]
-     [ 0.57735027]
-     [ 0.57735027]]
+    >>> np.linalg.norm(ones_normalized - np.asarray([[0.57735027],
+    ...                                              [0.57735027],
+    ...                                              [0.57735027]])) < 5e-9
+    True
     >>> print(maths.norm(ones_normalized))
     1.0
     """
@@ -595,10 +596,8 @@ class ZerosWeights(BaseWeights):
     >>>
     >>> start_vector = ZerosWeights()
     >>> zeros = start_vector.get_weights(3)
-    >>> print(zeros)
-    [[ 0.]
-     [ 0.]
-     [ 0.]]
+    >>> np.linalg.norm(zeros) < 5e-16
+    True
     """
     def __init__(self, dtype=None, **kwargs):
 
@@ -997,9 +996,10 @@ class OrthogonalRandomInitialiser(NeuralNetworkInitialiser):
     >>>
     >>> start_vector = OrthogonalRandomInitialiser(seed=42)
     >>> W = start_vector.get_weights((2, 3))
-    >>> print(W)
-    [[ -9.86455841e-01   1.63488317e-01   1.32832502e-02]
-     [  6.81405840e-04   8.50658731e-02  -9.96375096e-01]]
+    >>> np.linalg.norm(W
+    ...     - np.asarray([[9.86455841e-01, -1.63488317e-01, -1.32832502e-02],
+    ...                   [6.81405840e-04, 8.50658731e-02, -9.96375096e-01]])) < 5e-9
+    True
     >>> np.allclose(np.dot(W, W.T), np.eye(W.shape[0]))
     True
     >>> W = start_vector.get_weights((3, 2))

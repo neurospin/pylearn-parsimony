@@ -15,8 +15,13 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @license: BSD 3-clause.
 """
 import warnings
-from functools import wraps
-from time import time, clock
+# from functools import wraps
+from time import time
+try:
+    from time import clock
+except ImportError:
+    from time import process_time as clock
+
 # import collections
 import functools
 import inspect
@@ -108,10 +113,10 @@ def numpy_datatype(dtype):  # TODO: Keep up-to-date!
 
 
 class deprecated(object):
-    """A decorator for marking classes, functions and class functions as
-    deprecated.
+    """Decorator for marking classes, functions and class functions deprecated.
 
-    Adapted from: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
+    Adapted from:
+        https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
 
     Parameters
     ----------
@@ -170,6 +175,7 @@ class deprecated(object):
     ...         print(warning)  # doctest: +ELLIPSIS
     Class "..." is deprecated (use "..." instead).
     """
+
     def __init__(self, replaced_by=None, filter_off=True):
 
         if inspect.isclass(replaced_by) or inspect.isfunction(replaced_by):
@@ -227,6 +233,7 @@ class deprecated(object):
             return cls_or_func(*args, **kwargs)
 
         return new_func
+
 
 #def deprecated(*replaced_by):
 #    """This decorator can be used to mark functions as deprecated.
@@ -297,6 +304,7 @@ class deprecated(object):
 ##        a = [default for i in xrange(n)]
 #        a = [default] * n
 #    return a
+
 
 def corr(a, b):
     ma = np.mean(a)
@@ -518,6 +526,7 @@ class AnonymousClass(object):
 
     Usage: anonymous_class = AnonymousClass(field=value, method=function)
     """
+
     def __init__(self, **entries):
         self.__dict__.update(entries)
 

@@ -384,17 +384,17 @@ class L0(properties.AtomicFunction,
         >>> l0 = L0(l=0.5)
         >>> maths.norm0(x)
         10
-        >>> l0.prox(x)
-        array([[ 0.        ],
-               [ 0.95071431],
-               [ 0.73199394],
-               [ 0.59865848],
-               [ 0.        ],
-               [ 0.        ],
-               [ 0.        ],
-               [ 0.86617615],
-               [ 0.60111501],
-               [ 0.70807258]])
+        >>> np.linalg.norm(l0.prox(x) - np.array([[0.        ],
+        ...                                       [0.95071431],
+        ...                                       [0.73199394],
+        ...                                       [0.59865848],
+        ...                                       [0.        ],
+        ...                                       [0.        ],
+        ...                                       [0.        ],
+        ...                                       [0.86617615],
+        ...                                       [0.60111501],
+        ...                                       [0.70807258]])) < 5e-8
+        True
         >>> l0.f(l0.prox(x))
         3.0
         >>> 0.5 * maths.norm0(l0.prox(x))
@@ -563,31 +563,31 @@ class LInf(properties.AtomicFunction,
         >>> x = np.random.rand(10, 1)
         >>> linf = LInf(l=1.45673045, c=0.5)
         >>> linf_prox = linf.prox(x)
-        >>> linf_prox
-        array([[ 0.37454012],
-               [ 0.5       ],
-               [ 0.5       ],
-               [ 0.5       ],
-               [ 0.15601864],
-               [ 0.15599452],
-               [ 0.05808361],
-               [ 0.5       ],
-               [ 0.5       ],
-               [ 0.5       ]])
+        >>> np.linalg.norm(linf_prox - np.asarray([[0.37454012],
+        ...                                        [0.5       ],
+        ...                                        [0.5       ],
+        ...                                        [0.5       ],
+        ...                                        [0.15601864],
+        ...                                        [0.15599452],
+        ...                                        [0.05808361],
+        ...                                        [0.5       ],
+        ...                                        [0.5       ],
+        ...                                        [0.5       ]])) < 5e-8
+        True
         >>> linf_proj = linf.proj(x)
-        >>> linf_proj
-        array([[ 0.37454012],
-               [ 0.5       ],
-               [ 0.5       ],
-               [ 0.5       ],
-               [ 0.15601864],
-               [ 0.15599452],
-               [ 0.05808361],
-               [ 0.5       ],
-               [ 0.5       ],
-               [ 0.5       ]])
-        >>> np.linalg.norm(linf_prox - linf_proj)
-        7.2392821740411278e-09
+        >>> np.linalg.norm(linf_proj - np.asarray([[0.37454012],
+        ...                                        [0.5       ],
+        ...                                        [0.5       ],
+        ...                                        [0.5       ],
+        ...                                        [0.15601864],
+        ...                                        [0.15599452],
+        ...                                        [0.05808361],
+        ...                                        [0.5       ],
+        ...                                        [0.5       ],
+        ...                                        [0.5       ]])) < 5e-8
+        True
+        >>> np.linalg.norm(linf_prox - linf_proj) < 5e-8
+        True
         """
         if self.penalty_start > 0:
             x_ = x[self.penalty_start:, :]
@@ -1385,13 +1385,13 @@ class RGCCAConstraint(QuadraticConstraint,
         >>> X = np.random.randn(10, 10)
         >>> x = np.random.randn(10, 1)
         >>> L2 = penalties.RGCCAConstraint(c=1.0, tau=1.0, X=X, unbiased=True)
-        >>> L2.f(x)
-        5.7906381220390024
+        >>> np.abs(L2.f(x) - 5.7906381220390024) < 5e-16
+        True
         >>> y = L2.proj(x)
         >>> abs(L2.f(y)) <= 2.0 * consts.FLOAT_EPSILON
         True
-        >>> np.linalg.norm(y)
-        0.99999999999999989
+        >>> np.abs(np.linalg.norm(y) - 0.99999999999999989) < 5e-16
+        True
         """
         if self.penalty_start > 0:
             beta_ = beta[self.penalty_start:, :]

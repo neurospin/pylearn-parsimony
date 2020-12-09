@@ -81,8 +81,8 @@ def norm1(x):
     >>> norm1(matrix)
     2.5
     >>> vector = np.array([[0.2], [1.0], [0.4]])
-    >>> norm1(vector)
-    1.6000000000000001
+    >>> np.abs(norm1(vector) - 1.6000000000000001) < 5e-16
+    True
     """
     n, p = x.shape
     if p == 1 or n == 1:
@@ -126,8 +126,8 @@ def normInf(x):
     --------
     >>> from parsimony.utils.maths import normInf
     >>> matrix = np.array([[0.2, 1.0, 0.4], [2.0, 1.5, 0.1]])
-    >>> normInf(matrix)
-    3.6000000000000001
+    >>> np.abs(normInf(matrix) - 3.6000000000000001) < 5e-16
+    True
     >>> vector = np.array([[0.2], [1.0], [0.4]])
     >>> normInf(vector)
     1.0

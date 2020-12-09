@@ -15,10 +15,14 @@ except:
     from parsimony.datasets.regression import dice5 as dice5regression
 
 
-def load(n_samples=100, shape=(30, 30, 1),
-         snr=2., sigma_logit=5., random_seed=None,
+def load(n_samples=100,
+         shape=(30, 30, 1),
+         snr=2.0,
+         sigma_logit=5.0,
+         random_seed=None,
          **kwargs):
     """Generate classification samples (images + target variable) and beta.
+
     Call make_regression_struct then apply the logistic function:
     proba = 1. / (1 + exp(-(X * beta + noise)), then
     y = 1 if proba >= 0.5 else 0
@@ -39,7 +43,7 @@ def load(n_samples=100, shape=(30, 30, 1),
     proba : Numpy array of shape [n_sample, 1]. Samples posterior
             probabilities.
 
-    See also
+    See Also
     --------
     regression.dice5.load()
 
@@ -64,6 +68,7 @@ def load(n_samples=100, shape=(30, 30, 1),
     y[proba < 0.5] = 0
 
     return X3d, y, beta3d, proba
+
 
 if __name__ == "__main__":
     import doctest

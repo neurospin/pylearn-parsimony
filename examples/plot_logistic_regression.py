@@ -25,7 +25,9 @@ n_samples = 500
 shape = (50, 50, 1)
 
 X3d, y, beta3d, proba = datasets.classification.dice5.load(n_samples=n_samples,
-                                                           shape=shape, snr=10, random_seed=1)
+                                                           shape=shape,
+                                                           snr=10,
+                                                           random_seed=1)
 X = X3d.reshape((n_samples, np.prod(beta3d.shape)))
 
 n_train = 300
@@ -86,26 +88,35 @@ _, recall_enettv, _, _ = \
 ###############################################################################
 # Plot
 plot = plt.subplot(231)
-utils.plots.map2d(beta3d.reshape(shape), plot, title="beta star")
+utils.plots.map2d(beta3d.reshape(shape),
+                  plot,
+                  title="beta star")
 
 plot = plt.subplot(232)
-utils.plots.map2d(ridge_sklrn.coef_.reshape(shape), plot,
-           title="Ridge (sklrn) (%.2f, %.2f)" % tuple(recall_ridge_sklrn))
+utils.plots.map2d(ridge_sklrn.coef_.reshape(shape),
+                  plot,
+                  title="Ridge (sklrn) (%.2f, %.2f)"
+                        % tuple(recall_ridge_sklrn))
 
 plot = plt.subplot(233)
-utils.plots.map2d(ridge_prsmy.beta.reshape(shape), plot,
-           title="Ridge (Parsimony) (%.2f, %.2f)" % tuple(recall_ridge_prsmy))
+utils.plots.map2d(ridge_prsmy.beta.reshape(shape),
+                  plot,
+                  title="Ridge (Parsimony) (%.2f, %.2f)"
+                        % tuple(recall_ridge_prsmy))
 
 plot = plt.subplot(234)
-utils.plots.map2d(enet.beta.reshape(shape), plot,
-           title="Enet (%.2f, %.2f)" % tuple(recall_enet))
+utils.plots.map2d(enet.beta.reshape(shape),
+                  plot,
+                  title="Enet (%.2f, %.2f)" % tuple(recall_enet))
 
 plot = plt.subplot(235)
-utils.plots.map2d(enettv.beta.reshape(shape), plot,
-           title="Enet+TV (%.2f, %.2f)" % tuple(recall_enettv))
+utils.plots.map2d(enettv.beta.reshape(shape),
+                  plot,
+                  title="Enet+TV (%.2f, %.2f)" % tuple(recall_enettv))
 
 plot = plt.subplot(236)
-utils.plots.map2d(enetgn.beta.reshape(shape), plot,
-           title="Enet+GraphNet (%.2f, %.2f)" % tuple(recall_enetgn))
+utils.plots.map2d(enetgn.beta.reshape(shape),
+                  plot,
+                  title="Enet+GraphNet (%.2f, %.2f)" % tuple(recall_enetgn))
 
 plt.show()

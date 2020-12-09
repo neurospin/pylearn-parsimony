@@ -21,7 +21,7 @@ import numpy as np
 
 try:
     from . import bases  # When imported as a package.
-except ImportError:
+except (ImportError, ValueError):
     import parsimony.algorithms.bases as bases  # When run as a program.
 
 import parsimony.utils as utils
@@ -420,16 +420,16 @@ class MajorizationMinimization(bases.ExplicitAlgorithm,
     >>> opt1 = gd.run(function, x)
     >>> function.f(opt1)  # doctest: +ELLIPSIS
     0.39101414...
-    >>> np.round(function.grad(opt1), 13)
-    array([[ -1.91855000e-08],
-           [  1.85334000e-08]])
+    >>> np.linalg.norm(function.grad(opt1)
+    ...     - np.array([[-1.91855e-08], [1.85334e-08]])) < 5e-14
+    True
     >>> mm = alg.MajorizationMinimization(gd, function)
     >>> opt2 = mm.run(taylor_wrapper, x)
     >>> function.f(opt2)  # doctest: +ELLIPSIS
     0.39101414...
-    >>> np.round(function.grad(opt2), 13)
-    array([[ -1.91855000e-08],
-           [  1.85334000e-08]])
+    >>> np.linalg.norm(function.grad(opt2)
+    ...     - np.array([[-1.91855e-08],[1.85334e-08]])) < 5e-14
+    True
     >>> function.f(opt1) - function.f(opt2) < 5e-13
     True
     >>> np.linalg.norm(function.grad(opt1) - function.grad(opt2)) < 5e-13

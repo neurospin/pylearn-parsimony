@@ -29,11 +29,18 @@ def check_arrays(*arrays):
     Examples
     --------
     >>> import numpy as np
-    >>> check_arrays([1, 2], np.array([3, 4]), np.array([[1., 2.], [3., 4.]]))
-    [array([[ 1.],
-           [ 2.]]), array([[ 3.],
-           [ 4.]]), array([[ 1.,  2.],
-           [ 3.,  4.]])]
+    >>> A, B, C = check_arrays([1, 2],
+    ...                        np.array([3, 4]),
+    ...                        np.array([[1., 2.], [3., 4.]]))
+    >>> np.linalg.norm(A - np.asarray([[1.],
+    ...                                [2.]])) < 5e-16
+    True
+    >>> np.linalg.norm(B - np.asarray([[3.],
+    ...                                [4.]])) < 5e-16
+    True
+    >>> np.linalg.norm(C - np.asarray([[1., 2.],
+    ...                                [3., 4.]])) < 5e-16
+    True
     """
     if len(arrays) == 0:
         return None
@@ -145,43 +152,52 @@ def multiblock_array(x, dim=2):
     >>> import numpy as np
     >>> np.random.seed(42)
     >>> X = np.random.rand(2, 2, 3)
-    >>> multiblock_array(X.tolist())  # doctest: +NORMALIZE_WHITESPACE
-    [array([[ 0.37454012,  0.95071431,  0.73199394],
-            [ 0.59865848,  0.15601864,  0.15599452]]),
-     array([[ 0.05808361,  0.86617615,  0.60111501],
-            [ 0.70807258,  0.02058449,  0.96990985]])]
-    >>> multiblock_array(X)  # doctest: +NORMALIZE_WHITESPACE
-    [array([[ 0.37454012,  0.95071431,  0.73199394],
-            [ 0.59865848,  0.15601864,  0.15599452]]),
-     array([[ 0.05808361,  0.86617615,  0.60111501],
-            [ 0.70807258,  0.02058449,  0.96990985]])]
-    >>> multiblock_array([np.asarray(x) for x in X.tolist()])  # doctest: +NORMALIZE_WHITESPACE
-    [array([[ 0.37454012,  0.95071431,  0.73199394],
-            [ 0.59865848,  0.15601864,  0.15599452]]),
-     array([[ 0.05808361,  0.86617615,  0.60111501],
-            [ 0.70807258,  0.02058449,  0.96990985]])]
+    >>> A, B = multiblock_array(X.tolist())
+    >>> np.linalg.norm(A - np.array([[0.37454012, 0.95071431, 0.73199394],
+    ...                              [0.59865848, 0.15601864, 0.15599452]])) < 5e-8
+    True
+    >>> np.linalg.norm(B - np.array([[0.05808361, 0.86617615, 0.60111501],
+    ...                              [0.70807258, 0.02058449, 0.96990985]])) < 5e-8
+    True
+    >>> A, B = multiblock_array(X)
+    >>> np.linalg.norm(A - np.array([[0.37454012, 0.95071431, 0.73199394],
+    ...                              [0.59865848, 0.15601864, 0.15599452]])) < 5e-8
+    True
+    >>> np.linalg.norm(B - np.array([[0.05808361, 0.86617615, 0.60111501],
+    ...                              [0.70807258, 0.02058449, 0.96990985]])) < 5e-8
+    True
+    >>> A, B = multiblock_array([np.asarray(x) for x in X.tolist()])
+    >>> np.linalg.norm(A - np.array([[0.37454012, 0.95071431, 0.73199394],
+    ...                              [0.59865848, 0.15601864, 0.15599452]])) < 5e-8
+    True
+    >>> np.linalg.norm(B - np.array([[0.05808361, 0.86617615, 0.60111501],
+    ...                              [0.70807258, 0.02058449, 0.96990985]])) < 5e-8
+    True
     >>> multiblock_array(X[..., np.newaxis])
     Traceback (most recent call last):
         ...
     ValueError: Input has the wrong dimension in order to be cast to a list of numpy arrays of dimension 2.
-    >>> multiblock_array(X[..., np.newaxis], dim=3)  # doctest: +NORMALIZE_WHITESPACE
-    [array([[[ 0.37454012],
-             [ 0.95071431],
-             [ 0.73199394]],
-            [[ 0.59865848],
-             [ 0.15601864],
-             [ 0.15599452]]]),
-     array([[[ 0.05808361],
-             [ 0.86617615],
-             [ 0.60111501]],
-            [[ 0.70807258],
-             [ 0.02058449],
-             [ 0.96990985]]])]
+    >>> A, B = multiblock_array(X[..., np.newaxis], dim=3)
+    >>> np.linalg.norm(A - np.array([[[ 0.37454012],
+    ...                               [ 0.95071431],
+    ...                               [ 0.73199394]],
+    ...                              [[ 0.59865848],
+    ...                               [ 0.15601864],
+    ...                               [ 0.15599452]]])) < 5e-8
+    True
+    >>> np.linalg.norm(B - np.array([[[ 0.05808361],
+    ...                               [ 0.86617615],
+    ...                               [ 0.60111501]],
+    ...                              [[ 0.70807258],
+    ...                               [ 0.02058449],
+    ...                               [ 0.96990985]]])) < 5e-8
+    True
     >>> np.random.seed(42)
     >>> X = np.random.rand(2, 3)
-    >>> multiblock_array(X)  # doctest: +NORMALIZE_WHITESPACE
-    [array([[ 0.37454012,  0.95071431,  0.73199394],
-            [ 0.59865848,  0.15601864,  0.15599452]])]
+    >>> A, = multiblock_array(X)  # doctest: +NORMALIZE_WHITESPACE
+    >>> np.linalg.norm(A - np.array([[ 0.37454012,  0.95071431,  0.73199394],
+    ...                              [ 0.59865848,  0.15601864,  0.15599452]])) < 5e-8
+    True
     """
     if type(x).__module__ == np.__name__:  # A numpy array
         if len(x.shape) == dim:

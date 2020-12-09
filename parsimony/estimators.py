@@ -3208,19 +3208,19 @@ class SparsePLSRegression(RegressionEstimator):
     ...                                    algorithm=nipals.SparsePLSR(),
     ...                                    algorithm_params=dict(max_iter=100))
     >>> error = plsr.fit(X, y).score(X, y)
-    >>> print(plsr.W)
-    [[ 0.37053417]
-     [ 0.54969643]
-     [ 0.29593809]
-     [ 0.2937247 ]
-     [ 0.49989677]
-     [ 0.0895912 ]
-     [ 0.        ]
-     [ 0.35883331]
-     [ 0.        ]
-     [ 0.        ]]
-    >>> print(plsr.C)
-    [[ 0.32949094]]
+    >>> np.linalg.norm(plsr.W - np.asarray([[0.37053417],
+    ...                                     [0.54969643],
+    ...                                     [0.29593809],
+    ...                                     [0.2937247 ],
+    ...                                     [0.49989677],
+    ...                                     [0.0895912 ],
+    ...                                     [0.        ],
+    ...                                     [0.35883331],
+    ...                                     [0.        ],
+    ...                                     [0.        ]])) < 5e-8
+    True
+    >>> np.linalg.norm(plsr.C - np.asarray([[0.32949094]])) < 5e-10
+    True
     >>> print("error = %.12f" % (error,))
     error = 0.054751307730
     """
@@ -3421,9 +3421,8 @@ class Clustering(BaseEstimator):
     >>> lloyds = cluster.KMeans(K, max_iter=100, repeat=10)
     >>> KMeans = estimators.Clustering(K, algorithm=lloyds)
     >>> error = KMeans.fit(X).score(X)
-    >>> print(error)
-    27.6675491884
-    >>>
+    >>> np.abs(error - 27.6675491884) < 5e-11
+    True
     >>> #import matplotlib.pyplot as plot
     >>> #mus = KMeans._means
     >>> #plot.plot(X[:, 0], X[:, 1], '*')

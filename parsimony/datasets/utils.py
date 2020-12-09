@@ -29,8 +29,8 @@ def corr_to_coef(v_x, v_e, cov_xe, cor):
 
     Examples
     --------
-    >>> corr_to_coef(1, 1, 0, .5)
-    0.57735026918962573
+    >>> np.abs(corr_to_coef(1, 1, 0, .5) - 0.57735026918962573) < 5e-16
+    True
     """
     b2 = v_x ** 2 * (cor ** 2 - 1)
     b1 = 2 * cov_xe * v_x * (cor ** 2 - 1)

@@ -49,12 +49,12 @@ class ConstantValue(object):
 
     Example
     -------
-    >>> rnd = ConstantValue(5.)
-    >>> rnd(3)
-    array([ 5.,  5.,  5.])
-    >>> rnd(2, 2)
-    array([[ 5.,  5.],
-           [ 5.,  5.]])
+    >>> import numpy as np
+    >>> rnd = ConstantValue(5.0)
+    >>> np.linalg.norm(rnd(3) - np.array([5., 5., 5.])) < 5e-16
+    True
+    >>> np.linalg.norm(rnd(2, 2) - np.array([[5., 5.], [5., 5.]])) < 5e-16
+    True
     """
     def __init__(self, val):
 
