@@ -34,7 +34,7 @@ def map2d(map2d, plot=None, title=None, limits=None, center_cmap=True):
     if len(map2d.shape) != 2:
         raise ValueError("input map is not 2D")
 
-    if np.asarray(limits).size is 2:
+    if np.asarray(limits).size == 2:
         mx = limits[0]
         mi = limits[1]
     else:
@@ -49,32 +49,33 @@ def map2d(map2d, plot=None, title=None, limits=None, center_cmap=True):
     frame = plt.gca()
     frame.get_xaxis().set_visible(False)
     frame.get_yaxis().set_visible(False)
-    #k = 1
-    #while (10 ** k * mx) < 1 and k < 10:
-    #    k += 1
-    #ticks = np.array([-mi, -mi / 4 - mi / 2, 0, mx / 2, mx / 2,
-    #                  mx]).round(k + 2)
+    # k = 1
+    # while (10 ** k * mx) < 1 and k < 10:
+    #     k += 1
+    # ticks = np.array([-mi, -mi / 4 - mi / 2, 0, mx / 2, mx / 2,
+    #                   mx]).round(k + 2)
     cbar = plt.colorbar(cax)  # , ticks=ticks)
-    cbar.set_clim(vmin=mi, vmax=mx)
+    if hasattr(cbar, "set_clim"):
+        cbar.set_clim(vmin=mi, vmax=mx)
+    else:
+        cbar.mappable.set_clim(vmin=mi, vmax=mx)
 
     if title is not None:
         plt.title(title)
 
 
 def map2d_of_models(models_dict, nrow, ncol, shape, title_attr=None):
-    """Plot 2 weight maps of models
-    """
-
+    """Plot 2 weight maps of models."""
     import matplotlib.pyplot as plt
 
     ax_i = 1
     for k in list(models_dict.keys()):
         mod = models_dict[k]
-        if  hasattr(mod, "beta"):
+        if hasattr(mod, "beta"):
             w = mod.beta
-        elif hasattr(mod, "coef_"): # to work with sklean
+        elif hasattr(mod, "coef_"):  # to work with sklean
             w = mod.coef_
-        if  (hasattr(mod, "penalty_start") and mod.penalty_start != 0):
+        if (hasattr(mod, "penalty_start") and mod.penalty_start != 0):
             w = w[mod.penalty_start:]
         if (title_attr is not None and hasattr(mod, title_attr)):
             title = getattr(mod, title_attr)
@@ -152,8 +153,8 @@ def errorbars(X, classes=None, means=None, alpha=0.05,
         plt.rc('font', family='serif')
     if means is not None:
         plt.plot(x, means, '*',
-                  markerfacecolor="black", markeredgecolor="black",
-                  markersize=10)
+                 markerfacecolor="black", markeredgecolor="black",
+                 markersize=10)
 
     ci = ss.t.ppf(1.0 - alpha / 2.0, data_df) * data_sd / np.sqrt(B)
 
@@ -215,7 +216,7 @@ def voronoi_tesselation(mu, rect=None, nx=100, ny=100,
         polygon = vertices[region]
         plt.fill(*list(zip(*polygon)), alpha=alpha, color=colors[i])
         plt.plot(mu[i, 0], mu[i, 1], marker='o', color=colors[i],
-                  markersize=markersize)
+                 markersize=markersize)
 
     if rect is None:
         plt.xlim(vor.min_bound[0] * 0.9, vor.max_bound[0] * 1.1)
@@ -229,9 +230,7 @@ def voronoi_tesselation(mu, rect=None, nx=100, ny=100,
 
 
 def _voronoi_finite_polygons_2d(vor, radius=None):
-    """
-    Reconstruct infinite voronoi regions in a 2D diagram to finite
-    regions.
+    """Reconstruct infinite voronoi regions in a 2D diagram to finite regions.
 
     This code is adapted from: https://gist.github.com/pv/8036995
 
@@ -308,6 +307,7 @@ def _voronoi_finite_polygons_2d(vor, radius=None):
         new_regions.append(new_region.tolist())
 
     return new_regions, np.asarray(new_vertices)
+
 
 if __name__ == "__main__":
     import doctest

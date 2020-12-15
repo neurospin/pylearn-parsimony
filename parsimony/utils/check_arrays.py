@@ -10,7 +10,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 import numpy as np
 
-__all__ = ["check_arrays", "check_array_in"]
+__all__ = ["check_arrays", "check_array_in", "multiblock_array"]
 
 
 def check_arrays(*arrays):
@@ -29,11 +29,18 @@ def check_arrays(*arrays):
     Examples
     --------
     >>> import numpy as np
-    >>> check_arrays([1, 2], np.array([3, 4]), np.array([[1., 2.], [3., 4.]]))
-    [array([[ 1.],
-           [ 2.]]), array([[ 3.],
-           [ 4.]]), array([[ 1.,  2.],
-           [ 3.,  4.]])]
+    >>> A, B, C = check_arrays([1, 2],
+    ...                        np.array([3, 4]),
+    ...                        np.array([[1., 2.], [3., 4.]]))
+    >>> np.linalg.norm(A - np.asarray([[1.],
+    ...                                [2.]])) < 5e-16
+    True
+    >>> np.linalg.norm(B - np.asarray([[3.],
+    ...                                [4.]])) < 5e-16
+    True
+    >>> np.linalg.norm(C - np.asarray([[1., 2.],
+    ...                                [3., 4.]])) < 5e-16
+    True
     """
     if len(arrays) == 0:
         return None
@@ -116,6 +123,110 @@ def check_array_in(array1, array2):
                          "found in array2.")
 
     return array1
+
+
+def multiblock_array(x, dim=2):
+    """Checks that a given array is a multiblock array, or make it so if not.
+
+    A multiblock array is defined as a list of numpy arrays. The numpy arrays
+    will have ``len(shape) == dim``.
+
+    Parameters
+    ----------
+    x : list of lists, numpy array or list numpy arrays
+        Either a list of ``dim`` nested lists, numpy array of dimension
+        ``dim + 1``, or list of numpy arrays of dimension ``dim``. If the input
+        already has dimension ``dim``, it will be wrapped in a list.
+
+    dim : int, optional
+        The dimension of the single blocks. Default is 2.
+
+    Returns
+    -------
+    mb_array : list of numpy arrays
+        Returns a multiblock array. I.e., a list of numpy arrays.
+
+    Examples
+    --------
+    >>> from parsimony.utils import multiblock_array
+    >>> import numpy as np
+    >>> np.random.seed(42)
+    >>> X = np.random.rand(2, 2, 3)
+    >>> A, B = multiblock_array(X.tolist())
+    >>> np.linalg.norm(A - np.array([[0.37454012, 0.95071431, 0.73199394],
+    ...                              [0.59865848, 0.15601864, 0.15599452]])) < 5e-8
+    True
+    >>> np.linalg.norm(B - np.array([[0.05808361, 0.86617615, 0.60111501],
+    ...                              [0.70807258, 0.02058449, 0.96990985]])) < 5e-8
+    True
+    >>> A, B = multiblock_array(X)
+    >>> np.linalg.norm(A - np.array([[0.37454012, 0.95071431, 0.73199394],
+    ...                              [0.59865848, 0.15601864, 0.15599452]])) < 5e-8
+    True
+    >>> np.linalg.norm(B - np.array([[0.05808361, 0.86617615, 0.60111501],
+    ...                              [0.70807258, 0.02058449, 0.96990985]])) < 5e-8
+    True
+    >>> A, B = multiblock_array([np.asarray(x) for x in X.tolist()])
+    >>> np.linalg.norm(A - np.array([[0.37454012, 0.95071431, 0.73199394],
+    ...                              [0.59865848, 0.15601864, 0.15599452]])) < 5e-8
+    True
+    >>> np.linalg.norm(B - np.array([[0.05808361, 0.86617615, 0.60111501],
+    ...                              [0.70807258, 0.02058449, 0.96990985]])) < 5e-8
+    True
+    >>> multiblock_array(X[..., np.newaxis])
+    Traceback (most recent call last):
+        ...
+    ValueError: Input has the wrong dimension in order to be cast to a list of numpy arrays of dimension 2.
+    >>> A, B = multiblock_array(X[..., np.newaxis], dim=3)
+    >>> np.linalg.norm(A - np.array([[[ 0.37454012],
+    ...                               [ 0.95071431],
+    ...                               [ 0.73199394]],
+    ...                              [[ 0.59865848],
+    ...                               [ 0.15601864],
+    ...                               [ 0.15599452]]])) < 5e-8
+    True
+    >>> np.linalg.norm(B - np.array([[[ 0.05808361],
+    ...                               [ 0.86617615],
+    ...                               [ 0.60111501]],
+    ...                              [[ 0.70807258],
+    ...                               [ 0.02058449],
+    ...                               [ 0.96990985]]])) < 5e-8
+    True
+    >>> np.random.seed(42)
+    >>> X = np.random.rand(2, 3)
+    >>> A, = multiblock_array(X)  # doctest: +NORMALIZE_WHITESPACE
+    >>> np.linalg.norm(A - np.array([[ 0.37454012,  0.95071431,  0.73199394],
+    ...                              [ 0.59865848,  0.15601864,  0.15599452]])) < 5e-8
+    True
+    """
+    if type(x).__module__ == np.__name__:  # A numpy array
+        if len(x.shape) == dim:
+            x = [x]
+
+    if isinstance(x, (tuple,)):
+        x = list(x)
+    if isinstance(x, (list,)):
+        for i in range(len(x)):
+            if type(x[i]).__module__ != np.__name__:  # Not a numpy array
+                x[i] = np.asarray(x[i])
+            if len(x[i].shape) != dim:
+                raise ValueError("Input has the wrong dimension in order to "
+                                 "be cast to a list of numpy arrays of "
+                                 "dimension %d." % (dim,))
+
+    if type(x).__module__ == np.__name__:  # A numpy array
+        x_ = [None] * x.shape[0]
+        for i in range(x.shape[0]):
+            x_i = x[i, ...]
+            if len(x_i.shape) != dim:
+                raise ValueError("Input has the wrong dimension in order to "
+                                 "be cast to a list of numpy arrays of "
+                                 "dimension %d." % (dim,))
+            x_[i] = x_i
+        x = x_
+
+    return x
+
 
 if __name__ == "__main__":
     import doctest

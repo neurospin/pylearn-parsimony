@@ -91,7 +91,7 @@ class LinearRegression(properties.CompositeFunction,
         else:
             d = 2.0
 
-        f = (1.0 / d) * np.sum((np.dot(self.X, beta) - self.y) ** 2.0)
+        f = (1.0 / d) * np.sum((np.dot(self.X, beta) - self.y) ** 2)
 
         return f
 
@@ -165,12 +165,12 @@ class LinearRegression(properties.CompositeFunction,
 
                 v = RankOneSVD(max_iter=1000).run(self.X)
                 us = np.dot(self.X, v)
-                self._L = np.sum(us ** 2.0)
+                self._L = np.sum(us ** 2)
 
             else:
                 s = np.linalg.svd(self.X,
                                   full_matrices=False, compute_uv=False)
-                self._L = np.max(s) ** 2.0
+                self._L = np.max(s) ** 2
 
             if self.mean:
                 self._L /= float(n)
@@ -254,8 +254,8 @@ class RidgeRegression(properties.CompositeFunction,
         else:
             d = 2.0
 
-        f = (1.0 / d) * np.sum((np.dot(self.X, beta) - self.y) ** 2.0) \
-            + (self.k / 2.0) * np.sum(beta_ ** 2.0)
+        f = (1.0 / d) * np.sum((np.dot(self.X, beta) - self.y) ** 2) \
+            + (self.k / 2.0) * np.sum(beta_ ** 2)
 
         return f
 
@@ -310,12 +310,12 @@ class RidgeRegression(properties.CompositeFunction,
                 s = np.linalg.svd(self.X, full_matrices=False,
                                   compute_uv=False)
 
-            self._lambda_max = np.max(s) ** 2.0
+            self._lambda_max = np.max(s) ** 2
 
             if len(s) < self.X.shape[1]:
                 self._lambda_min = 0.0
             else:
-                self._lambda_min = np.min(s) ** 2.0
+                self._lambda_min = np.min(s) ** 2
 
             if self.mean:
                 self._lambda_max /= float(self.X.shape[0])
@@ -497,7 +497,7 @@ class LogisticRegression(properties.AtomicFunction,
             PWX = 0.5 * np.sqrt(self.weights) * self.X
             # TODO: Use RankOneSVD for speedup!
             s = np.linalg.svd(PWX, full_matrices=False, compute_uv=False)
-            self._L = np.max(s) ** 2.0  # TODO: CHECK
+            self._L = np.max(s) ** 2  # TODO: CHECK
 
             if self.mean:
                 self._L /= float(self.X.shape[0])
@@ -592,7 +592,7 @@ class RidgeLogisticRegression(properties.CompositeFunction,
         else:
             beta_ = beta
 
-        return negloglike + (self.k / 2.0) * np.sum(beta_ ** 2.0)
+        return negloglike + (self.k / 2.0) * np.sum(beta_ ** 2)
 
     def grad(self, beta):
         """Gradient of the function at beta.
@@ -667,7 +667,7 @@ class RidgeLogisticRegression(properties.CompositeFunction,
             # PWX = np.dot(PW, self.X)
             # TODO: Use RankOneSVD for speedup!
             s = np.linalg.svd(PWX, full_matrices=False, compute_uv=False)
-            self._L = np.max(s) ** 2.0  # TODO: CHECK
+            self._L = np.max(s) ** 2  # TODO: CHECK
 
             if self.mean:
                 self._L /= float(self.X.shape[0])
@@ -783,7 +783,7 @@ class LatentVariableVariance(properties.Function,
             v = RankOneSVD(max_iter=1000).run(self.X)
             us = np.dot(self.X, v)
 
-            self._lambda_max = np.linalg.norm(us) ** 2.0
+            self._lambda_max = np.linalg.norm(us) ** 2
 
         return self._n * self._lambda_max / 2.0
 
@@ -981,7 +981,7 @@ class LinearSVM(properties.Function,
             w_ = w[self.penalty_start:, :]
         else:
             w_ = w
-        f += (self.l / 2.0) * np.sum(w_ ** 2.0)
+        f += (self.l / 2.0) * np.sum(w_ ** 2)
 
         return f
 

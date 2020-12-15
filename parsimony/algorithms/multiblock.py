@@ -16,6 +16,8 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
+import types
+
 try:
     from . import bases  # Only works when imported as a package.
 except ValueError:
@@ -59,7 +61,8 @@ class BlockRelaxationWrapper(bases.ExplicitAlgorithm,
                      Info.num_iter,
                      Info.time,
                      Info.func_val,
-                     Info.converged]
+                     Info.converged,
+                     Info.other]
 
     def __init__(self, algorithm, info=[], eps=consts.TOLERANCE,
                  max_iter=consts.MAX_ITER, min_iter=1):
@@ -107,6 +110,8 @@ class BlockRelaxationWrapper(bases.ExplicitAlgorithm,
             _t = []
         if self.info_requested(Info.func_val):
             _f = []
+        if self.info_requested(Info.other):
+            _other = dict()
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
 
@@ -116,28 +121,55 @@ class BlockRelaxationWrapper(bases.ExplicitAlgorithm,
 
             for i in range(len(w)):
 
+                if self.info_requested(Info.time):
+                    tm = utils.time()
+
                 # Wrap a function around the ith block:
                 func = mb_losses.MultiblockFunctionWrapper(function, w, i)
                 if hasattr(function, "at_point"):
                     def new_at_point(self, w):
-                        return function.at_point(self.w[:self.index] +
-                                                 [w] +
-                                                 self.w[self.index + 1:])
+                        return self.function.at_point(self.w[:self.index] +
+                                                      [w] +
+                                                      self.w[self.index + 1:])
 
-                    import types
                     func.at_point = types.MethodType(new_at_point, func)
 
                 w_old[i] = w[i]
                 self.algorithm.reset()
+                func.at_point(w_old[i])
                 w[i] = self.algorithm.run(func, w_old[i])
 
                 # Store info from algorithm:
                 if self.info_requested(Info.time):
-                    time = self.algorithm.info_get(Info.time)
-                    _t.extend(time)
+                    # time = self.algorithm.info_get(Info.time)
+                    time = utils.time() - tm
+                    _t.append(time)
                 if self.info_requested(Info.func_val):
-                    func_val = self.algorithm.info_get(Info.func_val)
-                    _f.extend(func_val)
+                    # func_val = self.algorithm.info_get(Info.func_val)
+                    func.at_point(w[i])
+#                    func_val = func.f(w[i])
+                    func_val = function.f(w)
+                    _f.append(func_val)
+
+                    if len(_f) > 2 and _f[-2] < _f[-1]:
+                        print("w00t!! "
+                              + str(function.f(w_old))
+                              + " "
+                              + str(function.f(w)))
+
+                if self.info_requested(Info.other):
+                    nfo = self.algorithm.info_get()
+                    for key in nfo.keys():
+#                        if key == Info.time:
+#                            continue
+#                        if key == Info.func_val:
+#                            continue
+
+                        if key not in _other:
+                            _other[key] = list()
+
+                        value = nfo[key]
+                        _other[key].append(value)
 
                 # Update iteration counts.
                 self.num_iter += self.algorithm.num_iter
@@ -174,6 +206,8 @@ class BlockRelaxationWrapper(bases.ExplicitAlgorithm,
             self.info_set(Info.time, _t)
         if self.info_requested(Info.func_val):
             self.info_set(Info.func_val, _f)
+        if self.info_requested(Info.other):
+            self.info_set(Info.other, _other)
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, True)
 
@@ -255,6 +289,17 @@ class MultiblockISTA(bases.ExplicitAlgorithm,
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
 
+        for i in range(len(w)):  # For each block.
+            # Store info variables.
+            if self.info_requested(Info.time):
+                time = utils.time_wall()
+            if self.info_requested(Info.func_val):
+                _f.append(function.f(w))
+            if self.info_requested(Info.smooth_func_val):
+                _fmu.append(function.fmu(w))
+            if self.info_requested(Info.time):
+                _t.append(utils.time_wall() - time)
+
         exp = 2.0 + consts.FLOAT_EPSILON
         block_iter = [1] * len(w)
 
@@ -263,7 +308,7 @@ class MultiblockISTA(bases.ExplicitAlgorithm,
 
             for i in range(len(w)):  # Loop over the blocks
 
-                 # Wrap a function around the ith block.
+                # Wrap a function around the ith block.
                 func = mb_losses.MultiblockFunctionWrapper(function, w, i)
 
                 # Run ISTA.
@@ -304,7 +349,6 @@ class MultiblockISTA(bases.ExplicitAlgorithm,
                     # Test stopping criterion.
                     if maths.norm(w[i] - w_old) < step * self.eps \
                             and k >= self.min_iter:
-#                        print 'Ista {} converged at iteration {}'.format(i,k)
                         break
 
             # Test global stopping criterion.
@@ -430,6 +474,17 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
 
+        for i in range(len(w)):  # For each block.
+            # Store info variables.
+            if self.info_requested(Info.time):
+                time = utils.time_wall()
+            if self.info_requested(Info.func_val):
+                _f.append(function.f(w))
+            if self.info_requested(Info.smooth_func_val):
+                _fmu.append(function.fmu(w))
+            if self.info_requested(Info.time):
+                _t.append(utils.time_wall() - time)
+
         FISTA = True
         if FISTA:
             exp = 4.0 + consts.FLOAT_EPSILON
@@ -441,13 +496,9 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
         block_iter_count = 0
         while self.number_block_rel < self.max_outer_iter:
 
-            for i in range(len(w)):
-#                print "it: %d, i: %d" % (it, i)
+            for i in range(len(w)):  # For each block.
 
-#                if True:
-#                    pass
-
-                 # Wrap a function around the ith block.
+                # Wrap a function around the ith block.
                 func = mb_losses.MultiblockFunctionWrapper(function, w, i)
 
                 # Run FISTA.
@@ -462,7 +513,7 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                         z = w[i] + ((k - 2.0) / (k + 1.0)) * (w[i] - w_old)
                     else:
                         z = w[i]
-                        
+
                     if len(self.steps) == len(w):
                        step = self.steps[i]
 
@@ -493,9 +544,6 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                     self.block_iter[i] += 1
 
 
-#                    print i, function.fmu(w), step, \
-#                           (1.0 / step) * maths.norm(w[i] - z), self.eps, \
-#                           k, self.num_iter, self.max_iter
                     # Test stopping criterion.
                     if maths.norm(w[i] - z) < step * self.eps \
                             and k >= self.min_iter:
@@ -515,10 +563,10 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                 # Test global stopping criterion.
                 all_converged = True
                 for i in range(len(w)):
-    
+
                     # Wrap a function around the ith block.
                     func = mb_losses.MultiblockFunctionWrapper(function, w, i)
-    
+
                     # Compute the step.
                     step = func.step(w[i])
                     # Compute inexact precision.
@@ -528,17 +576,17 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                    # Take one ISTA step for use in the stopping criterion.
                     w_tilde = func.prox(w[i] - step * func.grad(w[i]),
                                         factor=step, eps=eps)
-    
+
                     # Test if converged for block i.
                     if maths.norm(w[i] - w_tilde) > step * self.eps:
                         all_converged = False
                         break
-    
+
                 # Converged in all blocks!
                 if all_converged:
                     if self.info_requested(Info.converged):
                         self.info_set(Info.converged, True)
-    
+
                     break
 
             # Stop after maximum number of iterations.
@@ -590,7 +638,7 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
     INFO_PROVIDED = [Info.ok,
                      Info.num_iter,
                      Info.time,
-                     Info.fvalue,
+                     Info.func_val,
                      Info.converged]
 
     def __init__(self, mu_start=None, mu_min=consts.TOLERANCE,
@@ -638,7 +686,7 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
             self.info_set(Info.ok, False)
         if self.info_requested(Info.time):
             t = []
-        if self.info_requested(Info.fvalue):
+        if self.info_requested(Info.func_val):
             f = []
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
@@ -675,17 +723,17 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
                     num_iter[i] += algorithm.info_get(Info.num_iter)
                 if algorithm.info_requested(Info.time):
                     tval = algorithm.info_get(Info.time)
-                if algorithm.info_requested(Info.fvalue):
-                    fval = algorithm.info_get(Info.fvalue)
+                if algorithm.info_requested(Info.func_val):
+                    fval = algorithm.info_get(Info.func_val)
 
                 if self.info_requested(Info.time):
                     t = t + tval
-                if self.info_requested(Info.fvalue):
+                if self.info_requested(Info.func_val):
                     f = f + fval
 
 #                print "l0 :", maths.norm0(w[i]), \
 #                    ", l1 :", maths.norm1(w[i]), \
-#                    ", l2²:", maths.norm(w[i]) ** 2.0
+#                    ", l2²:", maths.norm(w[i]) ** 2
 
 #            print "f:", fval[-1]
 
@@ -726,8 +774,8 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
             self.info_set(Info.num_iter, num_iter)
         if self.info_requested(Info.time):
             self.info_set(Info.time, t)
-        if self.info_requested(Info.fvalue):
-            self.info_set(Info.fvalue, f)
+        if self.info_requested(Info.func_val):
+            self.info_set(Info.func_val, f)
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, True)
         self.num_block_relaxation = it

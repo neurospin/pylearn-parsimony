@@ -120,7 +120,7 @@ class LassoCoordinateDescent(bases.ImplicitAlgorithm,
         else:
             d = 2.0
 
-        f = (1.0 / d) * np.sum(Xbeta_y ** 2.0)
+        f = (1.0 / d) * np.sum(Xbeta_y ** 2)
 
         if self.penalty_start > 0:
             beta_ = beta[self.penalty_start:, :]
@@ -164,7 +164,7 @@ class LassoCoordinateDescent(bases.ImplicitAlgorithm,
         function.add_loss(functions.losses.LinearRegression(X, y, mean=False))
         function.add_prox(penalties.L1(l=self.l))
 
-        xTx = np.sum(X ** 2.0, axis=0)
+        xTx = np.sum(X ** 2, axis=0)
         if self.mean:
             xTx *= 1.0 / float(n)
 
@@ -309,7 +309,7 @@ class ShootingAlgorithm(bases.ImplicitAlgorithm,
         else:
             d = 2.0
 
-        f = (1.0 / d) * np.sum(Xbeta_y ** 2.0)
+        f = (1.0 / d) * np.sum(Xbeta_y ** 2)
 
         if self.penalty_start > 0:
             beta_ = beta[self.penalty_start:, :]
@@ -349,7 +349,7 @@ class ShootingAlgorithm(bases.ImplicitAlgorithm,
         else:
             beta = beta.copy()
 
-        xTx = np.sum(X ** 2.0, axis=0)
+        xTx = np.sum(X ** 2, axis=0)
         if self.mean:
             xTx *= 1.0 / float(n)
 
@@ -418,6 +418,7 @@ class ShootingAlgorithm(bases.ImplicitAlgorithm,
             self.info_set(Info.ok, True)
 
         return beta
+
 
 if __name__ == "__main__":
     import doctest

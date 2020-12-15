@@ -70,7 +70,7 @@ def load(l, k, g, beta, M, e, A, snr=None, intercept=False):
     if intercept:
         e = e - np.mean(e)
 
-    if snr != None:
+    if snr is not None:
         def f(x):
             X, y = _generate(l, k, g, x * beta, M, e, A, intercept)
 
@@ -80,7 +80,7 @@ def load(l, k, g, beta, M, e, A, snr=None, intercept=False):
 #                      np.linalg.norm(np.dot(X, x * beta)), np.linalg.norm(e))
 
             return (np.linalg.norm(np.dot(X, x * beta)) / np.linalg.norm(e)) \
-                        - snr
+                   - snr
 
         snr = bisection_method(f, low=0.0, high=np.sqrt(snr), maxiter=30)
 

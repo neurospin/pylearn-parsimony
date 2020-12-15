@@ -97,7 +97,7 @@ class L1(properties.NesterovFunction,
 #        alpha = self.alpha(beta)
 #        alpha_sqsum = 0.0
 #        for a in alpha:
-#            alpha_sqsum += np.sum(a ** 2.0)
+#            alpha_sqsum += np.sum(a ** 2)
 #
 #        Aa = self.Aa(alpha)
 #
@@ -118,7 +118,7 @@ class L1(properties.NesterovFunction,
             beta_ = beta
 
         return self.l * ((np.dot(alpha[0].T, beta_)[0, 0]
-                         - (self.mu / 2.0) * np.sum(alpha[0] ** 2.0)) - self.c)
+                         - (self.mu / 2.0) * np.sum(alpha[0] ** 2)) - self.c)
 
     def grad(self, beta):
         """ Gradient of the function at beta.

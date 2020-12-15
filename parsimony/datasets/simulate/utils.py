@@ -49,12 +49,12 @@ class ConstantValue(object):
 
     Example
     -------
-    >>> rnd = ConstantValue(5.)
-    >>> rnd(3)
-    array([ 5.,  5.,  5.])
-    >>> rnd(2, 2)
-    array([[ 5.,  5.],
-           [ 5.,  5.]])
+    >>> import numpy as np
+    >>> rnd = ConstantValue(5.0)
+    >>> np.linalg.norm(rnd(3) - np.array([5., 5., 5.])) < 5e-16
+    True
+    >>> np.linalg.norm(rnd(2, 2) - np.array([[5., 5.], [5., 5.]])) < 5e-16
+    True
     """
     def __init__(self, val):
 
@@ -75,7 +75,7 @@ class ConstantValue(object):
 
 def norm2(x):
 
-    return np.sqrt(np.sum(x ** 2.0))
+    return np.sqrt(np.sum(x ** 2))
 
 
 def bisection_method(f, low=0.0, high=1.0, maxiter=30, eps=TOLERANCE):
@@ -126,7 +126,7 @@ def bisection_method(f, low=0.0, high=1.0, maxiter=30, eps=TOLERANCE):
         if val > 0:
             high = mid
 
-        if np.sqrt(np.sum((high - low) ** 2.0)) <= eps:
+        if np.sqrt(np.sum((high - low) ** 2)) <= eps:
             break
 
     return (low + high) / 2.0

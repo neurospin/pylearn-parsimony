@@ -13,16 +13,18 @@ from scipy import ndimage
 
 try:
     from ..utils import Dot, ObjImage, spatial_smoothing, corr_to_coef
-except:
-    from parsimony.datasets.utils import Dot, ObjImage, spatial_smoothing, corr_to_coef
+except Exception:
+    from parsimony.datasets.utils import Dot, ObjImage, spatial_smoothing, \
+            corr_to_coef
 
 
-def load(n_samples=100, shape=(30, 30, 1),
+def load(n_samples=100,
+         shape=(30, 30, 1),
          r2=.75,
          sigma_spatial_smoothing=1,
          model="independant",
          random_seed=None):
-    """Generates regression samples (images + target variable) and beta.
+    """Generate regression samples (images + target variable) and beta.
 
     The covariance structure is controlled both at a pixel
     level (spatial smoothing) and object level. Objects are groups
@@ -173,7 +175,7 @@ def load(n_samples=100, shape=(30, 30, 1),
     nx, ny, nz = shape
 
     ##########################################################################
-    ## 1. Build images with signal => e_ij
+    # 1. Build images with signal => e_ij
     # Sample signal: X
     if random_seed is not None:  # If random seed, save current random state
         rnd_state = np.random.get_state()
@@ -181,7 +183,7 @@ def load(n_samples=100, shape=(30, 30, 1),
     X = np.random.normal(0, 1., n_samples * n_features)
     X3d = X.reshape(n_samples, nx, ny, nz)
     #########################################################################
-    ## 2. Tune points parameters latent and beta
+    # 2. Tune points parameters latent and beta
     # Default model independant points
     model_ = dict(
             # All points has an independant latent
@@ -192,7 +194,7 @@ def load(n_samples=100, shape=(30, 30, 1),
             b1=1., b2=1., b3=1., b4=-1., b5=-1.)
     if isinstance(model, dict):
         model_.update(model)
-    elif model is "redundant":
+    elif model == "redundant":
         model_ = dict(
             # Dot-level signal in dots 1 an 2 fully stem from the shared latent
             l1=0., l2=0., l12=2.,
@@ -204,7 +206,7 @@ def load(n_samples=100, shape=(30, 30, 1),
             l12345=0.,
             # Five dots contribute equally
             b1=1., b2=1., b3=1., b4=-1., b5=-1.)
-    elif model is "suppressor":
+    elif model == "suppressor":
         model_ = dict(
             # Dot-level signal in dot 2 stem only from shared latent
             l1=2., l2=0., l12=2.,
@@ -217,7 +219,7 @@ def load(n_samples=100, shape=(30, 30, 1),
             # Dot 2 suppresses shared signal with dot 1, dot 5 suppresses dot 4
             b1=1., b2=-1., b3=1., b4=1., b5=-1.)
     #########################################################################
-    ## 3. Build Objects
+    # 3. Build Objects
     objects = dice_five_with_union_of_pairs(shape)
     d1, d2, d3, d4, d5, union12, union45, union12345 = objects
     d1.std = model_["l1"]
@@ -237,10 +239,10 @@ def load(n_samples=100, shape=(30, 30, 1),
     union12345.std = model_["l12345"]
     union12345.beta = 0.
     #########################################################################
-    ## 3. Object-level signal: sample object's latent and add it to images
+    # 3. Object-level signal: sample object's latent and add it to images
     X3d, support = ObjImage.object_model(objects, X3d)
     #########################################################################
-    ## 4. Pixel-level signal structure: spatial smoothing
+    # 4. Pixel-level signal structure: spatial smoothing
     if sigma_spatial_smoothing != 0:
         X3d = spatial_smoothing(X3d, sigma_spatial_smoothing)
     X = X3d.reshape((X3d.shape[0], np.prod(X3d.shape[1:])))
@@ -248,7 +250,7 @@ def load(n_samples=100, shape=(30, 30, 1),
     X /= X.std(axis=0)
 
     #########################################################################
-    ## 5. Model: y = X beta + noise
+    # 5. Model: y = X beta + noise
     beta3d = np.zeros(X3d.shape[1:])
 
     for k in range(len(objects)):
@@ -265,7 +267,8 @@ def load(n_samples=100, shape=(30, 30, 1),
     if r2 < 1:
         noise = np.random.normal(0, 1, Xbeta.shape[0])
         coef = corr_to_coef(v_x=np.var(Xbeta), v_e=np.var(noise),
-                     cov_xe=np.cov(Xbeta, noise)[0, 1], cor=np.sqrt(r2))
+                            cov_xe=np.cov(Xbeta, noise)[0, 1],
+                            cor=np.sqrt(r2))
         beta *= coef
         y = np.dot(X, beta) + noise
     else:
@@ -288,9 +291,9 @@ def load(n_samples=100, shape=(30, 30, 1),
 
 
 ############################################################################
-## Objects builder
+# Objects builder
 def dice_five_with_union_of_pairs(shape):
-    """Seven objects, five dot + union1 = dots 1 + 2 and union2 = dots 4 + 5
+    """Seven objects, five dot + union1 = dots 1 + 2 and union2 = dots 4 + 5.
 
     Examples
     --------
@@ -319,9 +322,9 @@ def dice_five_with_union_of_pairs(shape):
     c5 = np.floor((k * nx / 4., ny - (ny / 4.), nz / 2.))
     d5 = Dot(center=c5, size=s_obj, shape=shape)
     union45 = ObjImage(mask=d4.get_mask() + d5.get_mask())
-    ## dot in the middle
+    # dot in the middle
     c3 = np.floor((nx / 2., ny / 2., nz / 2.))
     d3 = Dot(center=c3, size=s_obj, shape=shape)
     union12345 = ObjImage(mask=d1.get_mask() + d2.get_mask() + d3.get_mask() +
-        d4.get_mask() + d5.get_mask())
+                          d4.get_mask() + d5.get_mask())
     return [d1, d2, d3, d4, d5, union12, union45, union12345]

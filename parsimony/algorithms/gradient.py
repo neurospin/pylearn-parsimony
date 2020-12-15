@@ -112,8 +112,6 @@ class GradientDescent(bases.ExplicitAlgorithm,
         if isinstance(beta, list):
             is_list = True
 
-#        step = function.step(beta, iteration=0)
-
         betanew = betaold = beta
 
         if self.info_requested(Info.time):

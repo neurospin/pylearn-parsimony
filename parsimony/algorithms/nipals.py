@@ -86,25 +86,24 @@ class RankOneSVD(bases.ImplicitAlgorithm,
     >>> np.random.seed(0)
     >>> X = np.random.random((10, 10))
     >>> fast_svd = RankOneSVD()
-    >>> fast_svd.run(X)
-    array([[ 0.3522974 ],
-           [ 0.35647707],
-           [ 0.35190104],
-           [ 0.34715338],
-           [ 0.19594198],
-           [ 0.24103104],
-           [ 0.25578904],
-           [ 0.29501092],
-           [ 0.42311297],
-           [ 0.27656382]])
-    >>>
+    >>> np.linalg.norm(fast_svd.run(X) - np.array([[0.3522974],
+    ...                                            [0.35647707],
+    ...                                            [0.35190104],
+    ...                                            [0.34715338],
+    ...                                            [0.19594198],
+    ...                                            [0.24103104],
+    ...                                            [0.25578904],
+    ...                                            [0.29501092],
+    ...                                            [0.42311297],
+    ...                                            [0.27656382]])) < 5e-8
+    True
     >>> np.random.seed(0)
     >>> X = np.random.random((100, 150))
     >>> fast_svd = RankOneSVD()
     >>> v = fast_svd.run(X)
     >>> us = np.linalg.norm(np.dot(X, v))
     >>> s = np.linalg.svd(X, full_matrices=False, compute_uv=False)
-    >>> abs(np.sum(us ** 2.0) - np.max(s) ** 2.0) < 5e-12
+    >>> abs(np.sum(us ** 2) - np.max(s) ** 2) < 5e-12
     True
     >>>
     >>> np.random.seed(0)
@@ -113,7 +112,7 @@ class RankOneSVD(bases.ImplicitAlgorithm,
     >>> v = fast_svd.run(X)
     >>> us = np.linalg.norm(np.dot(X, v))
     >>> s = np.linalg.svd(X, full_matrices=False, compute_uv=False)
-    >>> abs(np.sum(us ** 2.0) - np.max(s) ** 2.0) < 5e-12
+    >>> abs(np.sum(us ** 2) - np.max(s) ** 2) < 5e-12
     True
     """
     INFO_PROVIDED = [utils.Info.ok,
@@ -262,18 +261,17 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
     >>> X[X < 0.1] = 0.0
     >>> X = sparse.csr_matrix(X)
     >>> fast_sparse_svd = RankOneSparseSVD(max_iter=1000)
-    >>> fast_sparse_svd.run(X)
-    array([[ 0.35668503],
-           [ 0.36118301],
-           [ 0.35219541],
-           [ 0.34784089],
-           [ 0.19048907],
-           [ 0.23453575],
-           [ 0.25620994],
-           [ 0.28843988],
-           [ 0.42695407],
-           [ 0.27361241]])
-    >>>
+    >>> np.linalg.norm(fast_sparse_svd.run(X) - np.array([[0.35668503],
+    ...                                                   [0.36118301],
+    ...                                                   [0.35219541],
+    ...                                                   [0.34784089],
+    ...                                                   [0.19048907],
+    ...                                                   [0.23453575],
+    ...                                                   [0.25620994],
+    ...                                                   [0.28843988],
+    ...                                                   [0.42695407],
+    ...                                                   [0.27361241]])) < 5e-8
+    True
     >>> np.random.seed(0)
     >>> X = np.random.rand(100, 150)
     >>> X[X < 0.5] = 0.0
@@ -282,7 +280,7 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
     >>> v = fast_svd.run(X)
     >>> us = np.linalg.norm(X.dot(v))
     >>> s = np.linalg.svd(X.todense(), full_matrices=False, compute_uv=False)
-    >>> abs(np.sum(us ** 2.0) - np.max(s) ** 2.0) < 5e-12
+    >>> abs(np.sum(us ** 2) - np.max(s) ** 2) < 5e-12
     True
     >>>
     >>> np.random.seed(0)
@@ -293,7 +291,7 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
     >>> v = fast_svd.run(X)
     >>> us = np.linalg.norm(X.dot(v))
     >>> s = np.linalg.svd(X.todense(), full_matrices=False, compute_uv=False)
-    >>> abs(np.sum(us ** 2.0) - np.max(s) ** 2.0) < 5e-12
+    >>> abs(np.sum(us ** 2) - np.max(s) ** 2) < 5e-12
     True
     """
     INFO_PROVIDED = [utils.Info.ok,
@@ -450,12 +448,12 @@ class RankOneSVDProduct(bases.ImplicitAlgorithm,
     >>> X = np.random.random((15,10))
     >>> Y = np.random.random((10,5))
     >>> fast_svd = RankOneSVDProduct()
-    >>> fast_svd.run(X, Y)
-    array([[ 0.47169804],
-           [ 0.38956366],
-           [ 0.41397845],
-           [ 0.52493576],
-           [ 0.42285389]])
+    >>> np.linalg.norm(fast_svd.run(X, Y) - np.array([[0.47169804],
+    ...                                               [0.38956366],
+    ...                                               [0.41397845],
+    ...                                               [0.52493576],
+    ...                                               [0.42285389]])) < 5e-8
+    True
     """
     INFO_PROVIDED = [utils.Info.ok,
                      utils.Info.time,
@@ -549,23 +547,23 @@ class PLSR(bases.ImplicitAlgorithm,
     >>> c = np.random.rand(5, 1)
     >>> plsr = PLSR()
     >>> w, c = plsr.run([X, Y], [w, c])
-    >>> w
-    array([[ 0.34682103],
-           [ 0.32576718],
-           [ 0.28909788],
-           [ 0.40036279],
-           [ 0.32321038],
-           [ 0.39060766],
-           [ 0.22351433],
-           [ 0.28643062],
-           [ 0.29060872],
-           [ 0.23712672]])
-    >>> c
-    array([[ 0.29443832],
-           [ 0.35886751],
-           [ 0.33847141],
-           [ 0.23526002],
-           [ 0.35910191]])
+    >>> np.linalg.norm(w - np.array([[0.34682103],
+    ...                              [0.32576718],
+    ...                              [0.28909788],
+    ...                              [0.40036279],
+    ...                              [0.32321038],
+    ...                              [0.39060766],
+    ...                              [0.22351433],
+    ...                              [0.28643062],
+    ...                              [0.29060872],
+    ...                              [0.23712672]])) < 5e-8
+    True
+    >>> np.linalg.norm(c - np.array([[0.29443832],
+    ...                              [0.35886751],
+    ...                              [0.33847141],
+    ...                              [0.23526002],
+    ...                              [0.35910191]])) < 5e-8
+    True
     >>> C, S, W = np.linalg.svd(np.dot(Y.T, X))
     >>> w_ = W[0, :].reshape(10, 1)
     >>> w_ = -w_ if w_[0, 0] < 0.0 else w_
@@ -606,7 +604,7 @@ class PLSR(bases.ImplicitAlgorithm,
         if wc is not None:
             w_new = wc[0]
         else:
-            maxi = np.argmax(np.sum(Y ** 2.0, axis=0))
+            maxi = np.argmax(np.sum(Y ** 2, axis=0))
             u = Y[:, [maxi]]
             w_new = np.dot(X.T, u)
             w_new *= 1.0 / maths.norm(w_new)
@@ -662,23 +660,23 @@ class SparsePLSR(bases.ImplicitAlgorithm,
     >>> c = np.random.rand(5, 1)
     >>> plsr = SparsePLSR(l=[4.0, 5.0])
     >>> w, c = plsr.run([X, Y], [w, c])
-    >>> w
-    array([[ 0.32012726],
-           [ 0.31873833],
-           [ 0.15539258],
-           [ 0.64271827],
-           [ 0.23337738],
-           [ 0.54819589],
-           [ 0.        ],
-           [ 0.06088551],
-           [ 0.        ],
-           [ 0.        ]])
-    >>> c
-    array([[ 0.1463623 ],
-           [ 0.66483154],
-           [ 0.4666803 ],
-           [ 0.        ],
-           [ 0.5646119 ]])
+    >>> np.linalg.norm(w - np.array([[ 0.32012726],
+    ...                              [ 0.31873833],
+    ...                              [ 0.15539258],
+    ...                              [ 0.64271827],
+    ...                              [ 0.23337738],
+    ...                              [ 0.54819589],
+    ...                              [ 0.        ],
+    ...                              [ 0.06088551],
+    ...                              [ 0.        ],
+    ...                              [ 0.        ]])) < 5e-8
+    True
+    >>> np.linalg.norm(c - np.array([[0.1463623 ],
+    ...                              [0.66483154],
+    ...                              [0.4666803 ],
+    ...                              [0.        ],
+    ...                              [0.5646119 ]])) < 5e-8
+    True
     """
     def __init__(self, l=[0.0, 0.0], penalise_y=True, max_iter=200,
                  eps=consts.TOLERANCE, **kwargs):
@@ -719,7 +717,7 @@ class SparsePLSR(bases.ImplicitAlgorithm,
         if wc is not None:
             w_new = wc[0]
         else:
-            maxi = np.argmax(np.sum(Y ** 2.0, axis=0))
+            maxi = np.argmax(np.sum(Y ** 2, axis=0))
             u = Y[:, [maxi]]
             w_new = np.dot(X.T, u)
             w_new *= 1.0 / maths.norm(w_new)
