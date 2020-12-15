@@ -68,15 +68,16 @@ class TestLogisticRegression(TestCase):
         try:
             import spams
 
-            params = {"loss": "logistic",
-                      "regul": "l2",
-                      "lambda1": 0.0,
-                      "max_it": max_iter,
-                      "tol": eps,
-                      "ista": True,
-                      "numThreads": -1,
-                      "intercept": False,
-                     }
+            params = {
+                "loss": "logistic",
+                "regul": "l2",
+                "lambda1": 0.0,
+                "max_it": max_iter,
+                "tol": eps,
+                "ista": True,
+                "numThreads": -1,
+                "intercept": False,
+            }
 
             y_ = y.copy()
             y_[y_ == 0.0] = -1.0

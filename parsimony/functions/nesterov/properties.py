@@ -75,7 +75,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 #        alpha = self.alpha(beta)
 #        alpha_sqsum = 0.0
 #        for a in alpha:
-#            alpha_sqsum += np.sum(a ** 2.0)
+#            alpha_sqsum += np.sum(a ** 2)
 #
 #        Aa = self.Aa(alpha)
 #

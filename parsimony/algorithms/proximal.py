@@ -63,6 +63,25 @@ class ISTA(bases.ExplicitAlgorithm,
         Non-negative integer less than or equal to max_iter. Minimum number of
         iterations that must be performed. Default is 1.
 
+    inexact_start_iteration : int, optional
+        When ISTA is used repeatedly in some outer iteration procedure, it is
+        useful to be able to set the actual iteration count from outside. This
+        count is used when deriving ``inexact_eps``. Default is None, which
+        means to use ``inexact_eps``, if given, or default inexact behaviour
+        otherwise.
+
+    inexact_eps : float, optional
+        The precision used in the approximation of the proximal operator. This
+        is only used/relevant if your penalties require the approximation of
+        a projection or proximal operator. Default is None, which means to
+        derive ``inexact_eps`` from ``inexact_start_iteration``, if given, or
+        to use ``eps`` otherwise.
+
+    inexact_max_iter : int, optional
+        The number of iterations to allow in the inexact approximation of the
+        projection or proximal operator. Default is None, which means to use
+        ``max_iter``.
+
     callback: Callable
         A callable object that will be called at the end of each iteration with
         locals() as arguments.
@@ -112,15 +131,38 @@ class ISTA(bases.ExplicitAlgorithm,
                      Info.time,
                      Info.fvalue,  # <-- To be deprecated!
                      Info.func_val,
+                     Info.smooth_func_val,
                      Info.converged]
 
-    def __init__(self, eps=consts.TOLERANCE, info=[],
-                 max_iter=20000, min_iter=1, callback=None):
+    def __init__(self,
+                 eps=consts.TOLERANCE,
+                 info=[],
+                 max_iter=20000,
+                 min_iter=1,
+                 inexact_start_iteration=None,
+                 inexact_eps=None,
+                 inexact_max_iter=None,
+                 callback=None):
 
         super(ISTA, self).__init__(info=info,
                                    max_iter=max_iter,
                                    min_iter=min_iter)
-        self.eps = eps
+        self.eps = max(consts.FLOAT_EPSILON, float(eps))
+
+        if inexact_eps is None:
+            self.inexact_eps = inexact_eps
+        else:
+            self.inexact_eps = max(consts.FLOAT_EPSILON, float(inexact_eps))
+
+        if inexact_start_iteration is None:
+            self.inexact_start_iteration = inexact_start_iteration
+        else:
+            self.inexact_start_iteration = max(0, int(inexact_start_iteration))
+
+        if inexact_max_iter is None:
+            self.inexact_max_iter = self.max_iter
+        else:
+            self.inexact_max_iter = max(1, int(inexact_max_iter))
 
         self.callback = callback
 
@@ -131,22 +173,26 @@ class ISTA(bases.ExplicitAlgorithm,
 
         Parameters
         ----------
-        function : Function. The function to minimise.
+        function : Function
+            The function to minimise.
 
-        beta : Numpy array. The start vector.
+        beta : numpy.ndarray
+            The start vector.
         """
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, False)
 
-        step = function.step(beta)
+        # step = function.step(beta)
 
         betanew = betaold = beta
 
         if self.info_requested(Info.time):
-            t = []
+            _t = []
         if self.info_requested(Info.fvalue) \
                 or self.info_requested(Info.func_val):
-            f = []
+            _f = []
+        if self.info_requested(Info.smooth_func_val):
+            _fmu = []
         if self.info_requested(Info.converged):
             self.info_set(Info.converged, False)
 
@@ -158,16 +204,31 @@ class ISTA(bases.ExplicitAlgorithm,
             step = function.step(betanew)
 
             betaold = betanew
+
+            if self.inexact_eps is not None:
+                inexact_eps = self.inexact_eps
+            else:
+                if self.inexact_start_iteration is None:
+                    inexact_eps = \
+                        1.0 / (float(i) ** (2.0 + consts.FLOAT_EPSILON))
+                else:
+                    ii = self.inexact_start_iteration
+                    inexact_eps = \
+                        1.0 / (float(i + ii) ** (2.0 + consts.FLOAT_EPSILON))
+
             betanew = function.prox(betaold - step * function.grad(betaold),
                                     step,
-                                    eps=1.0 / (float(i) ** (2.0 + consts.FLOAT_EPSILON)),
-                                    max_iter=self.max_iter)
+                                    eps=inexact_eps,
+                                    max_iter=self.inexact_max_iter)
 
             if self.info_requested(Info.time):
-                t.append(utils.time_cpu() - tm)
+                _t.append(utils.time_cpu() - tm)
             if self.info_requested(Info.fvalue) \
                     or self.info_requested(Info.func_val):
-                f.append(function.f(betanew))
+                _f.append(function.f(betanew))
+            if self.info_requested(Info.smooth_func_val):
+                if hasattr(function, "fmu"):
+                    _fmu.append(function.fmu(betanew))
 
             if self.callback is not None:
                 self.callback(locals())
@@ -185,11 +246,13 @@ class ISTA(bases.ExplicitAlgorithm,
         if self.info_requested(Info.num_iter):
             self.info_set(Info.num_iter, i)
         if self.info_requested(Info.time):
-            self.info_set(Info.time, t)
+            self.info_set(Info.time, _t)
         if self.info_requested(Info.fvalue):
-            self.info_set(Info.fvalue, f)
+            self.info_set(Info.fvalue, _f)
         if self.info_requested(Info.func_val):
-            self.info_set(Info.func_val, f)
+            self.info_set(Info.func_val, _f)
+        if self.info_requested(Info.smooth_func_val):
+            self.info_set(Info.smooth_func_val, _fmu)
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, True)
 
@@ -531,9 +594,9 @@ class CONESTA(bases.ExplicitAlgorithm,
         if gap < self.eps:  # "- mu * gM" has been removed since mu == 0
             warnings.warn(
                 "Stopping criterion satisfied before the first iteration."
-                " Either beta_start a the solution (given eps)."
-                " If beta_start is null the problem might be over-penalized. "
-                " Then try smaller penalization.")
+                " Either beta is the solution (given eps),"
+                " or if beta is null the problem might be over-penalized "
+                " - then try smaller penalization.")
             loop = False
 
         # Special case 2: gap infinite or NaN => eps is not finite or NaN
@@ -1287,7 +1350,7 @@ class ParallelDykstrasProjectionAlgorithm(bases.ExplicitAlgorithm):
         for i in range(num):
             z[i] = np.copy(x)
 
-        for i in range(1, self.max_iter + 1):
+        for it in range(self.max_iter):
 
             for i in range(num):
                 p[i] = functions[i].proj(z[i])
@@ -1300,10 +1363,10 @@ class ParallelDykstrasProjectionAlgorithm(bases.ExplicitAlgorithm):
                 x_new += weights[i] * p[i]
 
             for i in range(num):
-                z[i] = x + z[i] - p[i]
+                z[i] = x_new + z[i] - p[i]
 
             if maths.norm(x_new - x_old) / maths.norm(x_old) < self.eps \
-                    and i >= self.min_iter:
+                    and it + 1 >= self.min_iter:
                 break
 
         return x_new
@@ -1370,7 +1433,7 @@ class ParallelDykstrasProximalAlgorithm(bases.ExplicitAlgorithm):
         for i in range(num_prox + num_proj):
             z[i] = np.copy(x)
 
-        for i in range(1, self.max_iter + 1):
+        for it in range(self.max_iter):
 
             for i in range(num_prox):
                 p[i] = prox[i].prox(z[i], factor)
@@ -1383,7 +1446,7 @@ class ParallelDykstrasProximalAlgorithm(bases.ExplicitAlgorithm):
                 x_new += weights[i] * p[i]
 
             if maths.norm(x_new - x_old) / maths.norm(x_old) < self.eps \
-                    and i >= self.min_iter:
+                    and it + 1 >= self.min_iter:
 
                 all_feasible = True
                 for i in range(num_proj):

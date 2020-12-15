@@ -29,8 +29,8 @@ def corr_to_coef(v_x, v_e, cov_xe, cor):
 
     Examples
     --------
-    >>> corr_to_coef(1, 1, 0, .5)
-    0.57735026918962573
+    >>> np.abs(corr_to_coef(1, 1, 0, .5) - 0.57735026918962573) < 5e-16
+    True
     """
     b2 = v_x ** 2 * (cor ** 2 - 1)
     b1 = 2 * cov_xe * v_x * (cor ** 2 - 1)
@@ -108,9 +108,9 @@ class Square(ObjImage):
 
     def get_mask(self):
         hs = self.size / 2.0
-        mask = (np.abs(self.x_grid - self.center[0]) <= hs) & \
-        (np.abs(self.y_grid - self.center[1]) <= hs)
-        (np.abs(self.z_grid - self.center[2]) <= hs)
+        mask = ((np.abs(self.x_grid - self.center[0]) <= hs) &
+                (np.abs(self.y_grid - self.center[1]) <= hs) &
+                (np.abs(self.z_grid - self.center[2]) <= hs))
         return mask
 
 
@@ -124,8 +124,8 @@ class Dot(ObjImage):
                                                          0:shape[2]]
 
     def get_mask(self):
-        mask = np.sqrt((self.x_grid - self.center[0]) ** 2 + \
-                       (self.y_grid - self.center[1]) ** 2 + \
+        mask = np.sqrt((self.x_grid - self.center[0]) ** 2 +
+                       (self.y_grid - self.center[1]) ** 2 +
                        (self.z_grid - self.center[2]) ** 2) <= self.size / 2
         return mask
 
@@ -140,9 +140,9 @@ class Dimaond(ObjImage):
                                                          0:shape[2]]
 
     def get_mask(self):
-        mask = np.abs(self.x_grid - self.center[0]) + \
-               np.abs(self.y_grid - self.center[1]) + \
-               np.abs(self.z_grid - self.center[2]) <= self.size / 2
+        mask = (np.abs(self.x_grid - self.center[0]) +
+                np.abs(self.y_grid - self.center[1]) +
+                np.abs(self.z_grid - self.center[2])) <= self.size / 2
         return mask
 
 

@@ -63,4 +63,3 @@ with open(OUTPUT, "w+") as out:
                             match_next_comment = False
 #            if not first_in_file:
 #                write(out, "")
-

@@ -322,7 +322,7 @@ class MetropolisHastings(bases.ExplicitAlgorithm,
     ...         beta = beta[1:, :]
     ...         diff = np.dot(self.X, beta) - self.y
     ...         val = np.sum(np.log(np.sqrt(2 * np.pi * s2))
-    ...                      + ((diff ** 2.0) / (2 * s2)))
+    ...                      + ((diff ** 2) / (2 * s2)))
     ...         return val
     >>>
     >>> s2 = 0.1
@@ -558,7 +558,7 @@ class GibbsSampler(bases.ExplicitAlgorithm,
     ...         beta = beta[1:, :]
     ...         diff = np.dot(self.X, beta) - self.y
     ...         val = np.sum(np.log(np.sqrt(2 * np.pi * s2))
-    ...                      + ((diff ** 2.0) / (2 * s2)))
+    ...                      + ((diff ** 2) / (2 * s2)))
     ...         return val
     >>>
     >>> s2 = 0.1
@@ -793,7 +793,7 @@ class GoodmanWeare(bases.ExplicitAlgorithm,
     ...         beta = beta[1:, :]
     ...         diff = np.dot(self.X, beta) - self.y
     ...         val = np.sum(np.log(np.sqrt(2 * np.pi * s2))
-    ...                      + ((diff ** 2.0) / (2 * s2)))
+    ...                      + ((diff ** 2) / (2 * s2)))
     ...         return val
     >>>
     >>> s2 = 0.1

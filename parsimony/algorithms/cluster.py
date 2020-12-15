@@ -128,7 +128,7 @@ class KMeans(bases.ImplicitAlgorithm):
         dists = np.zeros((X.shape[0], K))
         i = 0
         for mu in mus:
-            dist = np.sum((X - mu) ** 2.0, axis=1)
+            dist = np.sum((X - mu) ** 2, axis=1)
             dists[:, i] = dist
             i += 1
 
@@ -163,7 +163,7 @@ class KMeans(bases.ImplicitAlgorithm):
         wcss = 0.0
         for i in range(K):
             idx = closest == i
-            wcss += np.sum((X[idx, :] - mus[i, :]) ** 2.0)
+            wcss += np.sum((X[idx, :] - mus[i, :]) ** 2)
 
         return wcss
 

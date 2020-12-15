@@ -3,7 +3,7 @@
 The :mod:`parsimony.functions.losses` module contains multiblock loss
 functions.
 
-Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
+Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 
 Created on Tue Feb  4 08:51:43 2014
 
@@ -78,8 +78,6 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
     def __init__(self, X, functions=[], penalties=[], smoothed=[], prox=[],
                  constraints=[]):
 
-#        super(CombinedMultiblockFunction, self).__setattr__("_method_map",
-#                                                            dict())
         self._param_map = dict()
         self._method_map = dict()
 
@@ -201,13 +199,9 @@ class CombinedMultiblockFunction(mb_properties.MultiblockFunction,
 #                         self).__getattribute__(name)
 
     def __getattr__(self, name):
-#        mmap = super(CombinedMultiblockFunction,
-#                     self).__getattribute__("_method_map")
 
         if name == "_method_map":
             if name not in self.__dict__:
-                # super(CombinedMultiblockFunction,
-                #       self).__setattr__("_method_map", dict())
                 self.__dict__["_method_map"] = dict()
             else:
                 return self.__dict__["_method_map"]  # Never run ...
@@ -778,7 +772,7 @@ class MultiblockFunctionWrapper(properties.CompositeFunction,
         return self.function.grad(self.w[:self.index] +
                                   [w] +
                                   self.w[self.index + 1:],
-                                  self.index)
+                                  index=self.index)
 
     def prox(self, w, factor=1.0, eps=consts.TOLERANCE, max_iter=100):
         """The proximal operator corresponding to the function.
@@ -797,7 +791,7 @@ class MultiblockFunctionWrapper(properties.CompositeFunction,
                                   self.index, factor=factor,
                                   eps=eps, max_iter=max_iter)
 
-    def step(self, w, index=0):
+    def step(self, w, index=0, **kwargs):
         """The step size to use in descent methods.
 
         Parameters
@@ -807,7 +801,8 @@ class MultiblockFunctionWrapper(properties.CompositeFunction,
         return self.function.step(self.w[:self.index] +
                                   [w] +
                                   self.w[self.index + 1:],
-                                  self.index)
+                                  index=self.index,
+                                  **kwargs)
 
 
 class MultiblockNesterovFunctionWrapper(MultiblockFunctionWrapper,
@@ -1199,7 +1194,7 @@ class LatentVariableCovarianceSquared(mb_properties.MultiblockFunction,
         Yc = np.dot(self.X[1], w[1])
         wXYc = np.dot(wX, Yc)[0, 0]
 
-        return -((wXYc / self.n) ** 2.0)
+        return -((wXYc / self.n) ** 2)
 
     def grad(self, w, index):
         """Gradient of the function.
@@ -1250,7 +1245,7 @@ class LatentVariableCovarianceSquared(mb_properties.MultiblockFunction,
                       np.dot(self.X[1 - index], w[1 - index])) \
             * (1.0 / self.n)
 
-        return 2.0 * maths.norm(grad) ** 2.0
+        return 2.0 * maths.norm(grad) ** 2
 
 
 class GeneralisedMultiblock(mb_properties.MultiblockFunction,
@@ -1294,7 +1289,7 @@ class GeneralisedMultiblock(mb_properties.MultiblockFunction,
                         val += fij[k].f(w[i])
                 else:
 #                    print "f(w[%d], w[%d])" % (i, j)
-                    if not fij is None:
+                    if fij is not None:
                         val += fij.f([w[i], w[j]])
 
         # TODO: Check instead if it is a numpy array.

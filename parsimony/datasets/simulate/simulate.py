@@ -83,7 +83,7 @@ class LinearRegressionData(SimulatedData):
         beta : Numpy array (p-by-1). The regression vector to generate data
                 from.
         """
-        if self.snr != None:
+        if self.snr is not None:
             old_snr = self.snr
             self.snr = None
             try:
@@ -96,7 +96,7 @@ class LinearRegressionData(SimulatedData):
 #                          np.linalg.norm(np.dot(X, x * beta)),
 #                          np.linalg.norm(self.e))
 
-                    return (np.linalg.norm(np.dot(X, x * beta)) \
+                    return (np.linalg.norm(np.dot(X, x * beta))
                             / np.linalg.norm(self.e)) - old_snr
 
                 snr = utils.bisection_method(f,

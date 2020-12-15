@@ -93,6 +93,7 @@ def fit_model(model_key):
 
 def fit_all(MODELS):
     for model_key in MODELS:
+        # print(model_key)
         fit_model(model_key)
 
 
@@ -212,7 +213,8 @@ if has_sklearn:
         sklearn.linear_model.LogisticRegression(C=1. / alpha, penalty="l1",
                                                 fit_intercept=False,
                                                 class_weight=None,
-                                                dual=False)
+                                                dual=False,
+                                                solver="liblinear")
 MODELS["2d_l1_fista"] = \
     estimators.ElasticNetLogisticRegression(alpha=alpha, l=1.,
                                             class_weight=None,
@@ -224,7 +226,8 @@ if has_sklearn:
         sklearn.linear_model.LogisticRegression(C=1. / alpha, penalty="l1",
                                                 fit_intercept=True,
                                                 class_weight=None,
-                                                dual=False)
+                                                dual=False,
+                                                solver="liblinear")
 
 MODELS["2d_l1_inter_fista"] = \
     estimators.ElasticNetLogisticRegression(alpha=alpha, l=1.,

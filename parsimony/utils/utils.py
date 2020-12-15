@@ -15,8 +15,13 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @license: BSD 3-clause.
 """
 import warnings
-from functools import wraps
-from time import time, clock
+# from functools import wraps
+from time import time
+try:
+    from time import clock
+except ImportError:
+    from time import process_time as clock
+
 # import collections
 import functools
 import inspect
@@ -108,10 +113,10 @@ def numpy_datatype(dtype):  # TODO: Keep up-to-date!
 
 
 class deprecated(object):
-    """A decorator for marking classes, functions and class functions as
-    deprecated.
+    """Decorator for marking classes, functions and class functions deprecated.
 
-    Adapted from: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
+    Adapted from:
+        https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
 
     Parameters
     ----------
@@ -170,6 +175,7 @@ class deprecated(object):
     ...         print(warning)  # doctest: +ELLIPSIS
     Class "..." is deprecated (use "..." instead).
     """
+
     def __init__(self, replaced_by=None, filter_off=True):
 
         if inspect.isclass(replaced_by) or inspect.isfunction(replaced_by):
@@ -227,6 +233,7 @@ class deprecated(object):
             return cls_or_func(*args, **kwargs)
 
         return new_func
+
 
 #def deprecated(*replaced_by):
 #    """This decorator can be used to mark functions as deprecated.
@@ -298,6 +305,7 @@ class deprecated(object):
 #        a = [default] * n
 #    return a
 
+
 def corr(a, b):
     ma = np.mean(a)
     mb = np.mean(b)
@@ -305,8 +313,8 @@ def corr(a, b):
     a_ = a - ma
     b_ = b - mb
 
-    norma = np.sqrt(np.sum(a_ ** 2.0, axis=0))
-    normb = np.sqrt(np.sum(b_ ** 2.0, axis=0))
+    norma = np.sqrt(np.sum(a_ ** 2, axis=0))
+    normb = np.sqrt(np.sum(b_ ** 2, axis=0))
 
     norma[norma < consts.TOLERANCE] = 1.0
     normb[normb < consts.TOLERANCE] = 1.0
@@ -461,7 +469,7 @@ def optimal_shrinkage(X, T=None):
         Wm = Si * ((M - 1.0) / M)  # 1 / N instead of 1 / N - 1
 #        print "Here4"
 #        sys.stdout.flush()
-        sum_d = np.sum((Ti - Si) ** 2.0)
+        sum_d = np.sum((Ti - Si) ** 2)
 #        print "Here5"
 #        sys.stdout.flush()
         del Si
@@ -477,10 +485,10 @@ def optimal_shrinkage(X, T=None):
         Var_sij = Var_sij[0, 0] * (M / ((M - 1.0) ** 3.0))
 
         # diag = _np.diag(C)
-        # SS_sij = _np.sum((C - _np.diag(diag)) ** 2.0)
-        # SS_sij += _np.sum((diag - 1.0) ** 2.0)
+        # SS_sij = _np.sum((C - _np.diag(diag)) ** 2)
+        # SS_sij += _np.sum((diag - 1.0) ** 2)
 
-#        d = (Ti - Si) ** 2.0
+#        d = (Ti - Si) ** 2
 
 #        l = Var_sij / np.sum(d)
         l = Var_sij / sum_d
@@ -518,6 +526,7 @@ class AnonymousClass(object):
 
     Usage: anonymous_class = AnonymousClass(field=value, method=function)
     """
+
     def __init__(self, **entries):
         self.__dict__.update(entries)
 
