@@ -312,14 +312,13 @@ class MultiblockISTA(bases.ExplicitAlgorithm,
                 func = mb_losses.MultiblockFunctionWrapper(function, w, i)
 
                 # Run ISTA.
-                w_old = w[i]
                 for k in range(1, max(self.min_iter + 1, self.max_inner_iter)):
 
                     if self.info_requested(Info.time):
                         time = utils.time_wall()
 
                     if len(self.steps) == len(w):
-                       step = self.steps[i]
+                        step = self.steps[i]
 
                     else:
                         # Compute the step.
@@ -450,6 +449,8 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
         self.max_outer_iter = max_outer_iter
         self.steps = steps
         self.stopping_criterion = stopping_criterion
+        self.block_iter = None
+        self.number_block_rel = 0
 
     def reset(self):
 
@@ -543,7 +544,6 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                     self.num_iter += 1
                     self.block_iter[i] += 1
 
-
                     # Test stopping criterion.
                     if maths.norm(w[i] - z) < step * self.eps \
                             and k >= self.min_iter:
@@ -573,7 +573,8 @@ class MultiblockFISTA(bases.ExplicitAlgorithm,
                     eps = max(consts.FLOAT_EPSILON,
                               1.0 / (self.block_iter[i] ** exp))
     #                eps = consts.TOLERANCE
-                   # Take one ISTA step for use in the stopping criterion.
+
+                    # Take one ISTA step for use in the stopping criterion.
                     w_tilde = func.prox(w[i] - step * func.grad(w[i]),
                                         factor=step, eps=eps)
 
@@ -652,6 +653,7 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
 
         self.outer_iter = outer_iter
         self.eps = eps
+        self.num_block_relaxation = 0
 
         # Copy the allowed info keys for FISTA.
         from parsimony.algorithms.proximal import FISTA
@@ -679,8 +681,6 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
     @bases.force_reset
     @bases.check_compatibility
     def run(self, function, w):
-
-#        self.info.clear()
 
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, False)
@@ -757,8 +757,6 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
                     break
 
             if all_converged:
-#                print "All converged!"
-
                 if self.info_requested(Info.converged):
                     self.info_set(Info.converged, True)
 
@@ -781,6 +779,7 @@ class MultiblockCONESTA(bases.ExplicitAlgorithm,
         self.num_block_relaxation = it
 
         return w
+
 
 if __name__ == "__main__":
     import doctest

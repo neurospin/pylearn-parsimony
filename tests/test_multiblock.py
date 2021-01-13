@@ -100,30 +100,30 @@ class TestMultiblock(TestCase):
                                                        eps=5e-8,
                                                        max_iter=1000,
                                                        min_iter=1)
-# TODO: Removed 2020-12-09: Unclear why at_point was removed. Deleting this test
-#       until investigated properly.
+        # TODO: Removed 2020-12-09: Unclear why at_point was removed. Deleting this test
+        #       until investigated properly.
 
-#        w_brfista = brfista.run(function, w)
-#        brfista_f = function.f(w_brfista)
+        w_brfista = brfista.run(function, w)
+        brfista_f = function.f(w_brfista)
 ##        print brfista.info_get(algorithms.utils.Info.func_val)
 #
-#        mm_algorithm = alg.MajorizationMinimization(
-#                            algorithms.proximal.FISTA(eps=5e-8, max_iter=100),
-#                            function)
-#
-#        brmm = mb_algorithms.BlockRelaxationWrapper(mm_algorithm,
-#                                                    info=[algorithms.utils.Info.func_val],
-#                                                    eps=5e-8,
-#                                                    max_iter=1000,
-#                                                    min_iter=1)
-#
-#        w_brmm = brmm.run(taylor_function, w)
-#        brmm_f = taylor_function.f(w_brmm)
+        # mm_algorithm = alg.MajorizationMinimization(
+        #                    algorithms.proximal.FISTA(eps=5e-8, max_iter=100),
+        #                    function)
+        #
+        # brmm = mb_algorithms.BlockRelaxationWrapper(mm_algorithm,
+        #                                            info=[algorithms.utils.Info.func_val],
+        #                                            eps=5e-8,
+        #                                            max_iter=1000,
+        #                                            min_iter=1)
+        #
+        # w_brmm = brmm.run(taylor_function, w)
+        # brmm_f = taylor_function.f(w_brmm)
 ##        print brmm.info_get(algorithms.utils.Info.func_val)
 #
-#        assert(np.abs(mbfista_f - brfista_f) < 5e-13)
-#        assert(np.abs(mbfista_f - brmm_f) < 5e-13)
-#        assert(np.abs(brfista_f - brmm_f) < 5e-13)
+        assert(np.abs(mbfista_f - brfista_f) < 5e-13)
+        # assert(np.abs(mbfista_f - brmm_f) < 5e-13)
+        # assert(np.abs(brfista_f - brmm_f) < 5e-13)
 
 
 if __name__ == "__main__":

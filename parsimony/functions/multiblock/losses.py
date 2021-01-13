@@ -1148,7 +1148,7 @@ class LatentVariableCovariance(mb_properties.MultiblockFunction,
         """
         # Any positive real number suffices, but a small one will give a larger
         # step in e.g. proximal gradient descent.
-        return 200 #np.sqrt(consts.TOLERANCE)  # 1.0
+        return 200  # 1.0
 
 
 class LatentVariableCovarianceSquared(mb_properties.MultiblockFunction,
