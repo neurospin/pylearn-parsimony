@@ -133,6 +133,16 @@ class TestSVD(TestCase):
                         "Error too big : %g > %g tolerance" %
                         (err, utils.consts.TOLERANCE))
 
+    def test_svd_adjacency_laplacian_coincide(self):
+        from parsimony.functions.penalties import GraphNet
+
+        a = np.array([[1., 0., 0., 1.], [1., 0., 1., 1.], [1., 1., 0., 1.]])
+        gn = GraphNet(A=a)
+        result_adjacency = (gn.lambda_max() ** 2)
+        gn = GraphNet(La=np.matmul(a.transpose(), a))
+        result_laplacian = (gn.lambda_max())
+        self.assertEqual(result_laplacian, result_adjacency)
+
 
 if __name__ == '__main__':
     import doctest

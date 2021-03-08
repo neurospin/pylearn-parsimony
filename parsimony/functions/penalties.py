@@ -1216,8 +1216,8 @@ class GraphNet(QuadraticConstraint,
 
         self.l = float(l)
         self.c = 0
-        if A == None:
-            if La == None:
+        if A is None:
+            if La is None:
                 raise ValueError('Either A or La must be passed')
             # The penalty must be x'Lx
             self.M = La  # for QuadraticConstraint
@@ -1248,7 +1248,7 @@ class GraphNet(QuadraticConstraint,
         # norm of 2A'A or 2L, which thus is the square of the largest singular value
         # of 2A'A or largest eigenvalue of 2L.
 
-        return self.l * (2 * lmaxA) # I think the eigen value was squared twice
+        return self.l * (2 * lmaxA)
 
     def lambda_max(self):
         """ Largest eigenvalue of the corresponding covariance matrix.
@@ -1261,7 +1261,7 @@ class GraphNet(QuadraticConstraint,
         # should allow dense matrices as well.
         if self._lambda_max is None:
 
-            if self.A != None:
+            if not (self.A is None):
                 from parsimony.algorithms.nipals import RankOneSparseSVD
                 A = self.A
                 # TODO: Add max_iter here!
@@ -1269,11 +1269,13 @@ class GraphNet(QuadraticConstraint,
                 us = A.dot(v)
                 self._lambda_max = np.sum(us ** 2.0)
             else:
+                from scipy.sparse import csr_matrix
                 from scipy.sparse.linalg import svds
-                L = self.La.asfptype()
+                L = csr_matrix(self.La) if not isinstance(self.La, csr_matrix) else self.La
+                L = L.asfptype()
                 # TODO: is using RankOneSparseSVD more efficient here?
                 u,s,v = svds(L, k=1)
-                self._lambda_max = s[0]
+                self._lambda_max = s[0] ** 2.0
 
         return self._lambda_max
 
