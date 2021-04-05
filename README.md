@@ -29,9 +29,7 @@ ParsimonY contains the following features:
 
 Installation
 ------------
-The reference environment for pylearn-parsimony is Ubuntu 14.04 LTS with
-Python 2.7.6, Numpy 1.8.2 and Scipy 0.13.3. More recent versions likely work,
-but have not been tested thoroughly.
+The reference environment for pylearn-parsimony was Ubuntu 14.04 LTS with Python 2.7.6, Numpy 1.8.2 and Scipy 0.13.3. We have converted the package to Python 3, but have not finished this transition yet. It appears to work well in Python 3, but please report any bugs that you find!
 
 Unless you already have Numpy and Scipy installed, you need to install them:
 ```
