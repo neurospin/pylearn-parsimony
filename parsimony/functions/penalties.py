@@ -1202,20 +1202,31 @@ class GraphNet(QuadraticConstraint,
     l : Non-negative float. The Lagrange multiplier, or regularisation
             constant, of the function.
 
-    A : Numpy or (usually) scipy.sparse array. The a matrix, made of (-1, +1),
-    that computes all the differences between connected nodes of the graph.
+    A : Numpy or (usually) scipy.sparse array. The incidence matrix, made of
+    (-1, +1) to compute the differences between connected nodes of the graph.
 
+    La : Numpy or (usually) scipy.sparse array. The Laplacian matrix of the
+    graph. Either A or L must be passed
 
     penalty_start : Non-negative integer. The number of columns, variables
             etc., to be exempt from penalisation. Equivalently, the first index
             to be penalised. Default is 0, all columns are included.
     """
-    def __init__(self, l=1.0, A=None, penalty_start=0):
+    def __init__(self, l=1.0, A=None, La=None, penalty_start=0):
 
         self.l = float(l)
         self.c = 0
-        self.M = A  # for QuadraticConstraint
-        self.N = A  # for QuadraticConstraint
+        if A is None:
+            if La is None:
+                raise ValueError('Either A or La must be passed')
+            # The penalty must be x'Lx
+            self.M = La  # for QuadraticConstraint
+            self.N = None  # for QuadraticConstraint
+        else:
+            # The penalty must be x'A'Ax
+            self.M = A
+            self.N = A
+        self.La = La
         self.A = A
         self.penalty_start = penalty_start
         self._lambda_max = None
@@ -1234,10 +1245,10 @@ class GraphNet(QuadraticConstraint,
 
         lmaxA = self.lambda_max()
         # The (largest) Lipschitz constant of the gradient would be the operator
-        # norm of 2A'A, which thus is the square of the largest singular value
-        # of 2A'A.
+        # norm of 2A'A or 2L, which thus is the square of the largest singular value
+        # of 2A'A or largest eigenvalue of 2L.
 
-        return self.l * (2 * lmaxA) ** 2
+        return self.l * (2 * lmaxA)
 
     def lambda_max(self):
         """ Largest eigenvalue of the corresponding covariance matrix.
@@ -1250,13 +1261,21 @@ class GraphNet(QuadraticConstraint,
         # should allow dense matrices as well.
         if self._lambda_max is None:
 
-            from parsimony.algorithms.nipals import RankOneSparseSVD
-
-            A = self.A
-            # TODO: Add max_iter here!
-            v = RankOneSparseSVD().run(A)  # , max_iter=max_iter)
-            us = A.dot(v)
-            self._lambda_max = np.sum(us ** 2)
+            if not (self.A is None):
+                from parsimony.algorithms.nipals import RankOneSparseSVD
+                A = self.A
+                # TODO: Add max_iter here!
+                v = RankOneSparseSVD().run(A)  # , max_iter=max_iter)
+                us = A.dot(v)
+                self._lambda_max = np.sum(us ** 2.0)
+            else:
+                from scipy.sparse import csr_matrix
+                from scipy.sparse.linalg import svds
+                L = csr_matrix(self.La) if not isinstance(self.La, csr_matrix) else self.La
+                L = L.asfptype()
+                # TODO: is using RankOneSparseSVD more efficient here?
+                u,s,v = svds(L, k=1)
+                self._lambda_max = s[0] ** 2.0
 
         return self._lambda_max
 

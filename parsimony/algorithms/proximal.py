@@ -1269,6 +1269,7 @@ class DykstrasProjectionAlgorithm(bases.ExplicitAlgorithm):
         self.eps = eps
         self.max_iter = max_iter
         self.min_iter = min_iter
+        self.converged = False
 
     def run(self, function, x):
         """Finds the projection onto the intersection of two sets.
@@ -1300,6 +1301,7 @@ class DykstrasProjectionAlgorithm(bases.ExplicitAlgorithm):
 
             if maths.norm(x_new - x_old) / maths.norm(x_old) < self.eps \
                     and i >= self.min_iter:
+                self.converged = True
                 break
 
         return x_new
@@ -1460,6 +1462,7 @@ class ParallelDykstrasProximalAlgorithm(bases.ExplicitAlgorithm):
                 z[i] = x_new + z[i] - p[i]
 
         return x_new
+
 
 if __name__ == "__main__":
     import doctest

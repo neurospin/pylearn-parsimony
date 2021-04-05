@@ -303,7 +303,12 @@ class RidgeRegression(properties.CompositeFunction,
         From the interface "LipschitzContinuousGradient".
         """
         if self._lambda_max is None:
-            s = np.linalg.svd(self.X, full_matrices=False, compute_uv=False)
+            # test wether X is diagonal
+            if np.all(self.X == np.diag(np.diagonal(self.X))):
+                s = np.diagonal(self.X)
+            else:
+                s = np.linalg.svd(self.X, full_matrices=False,
+                                  compute_uv=False)
 
             self._lambda_max = np.max(s) ** 2
 
