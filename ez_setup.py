@@ -103,7 +103,7 @@ def use_setuptools(
     try:
         import pkg_resources
     except ImportError:
-        return do_download()       
+        return do_download()
     try:
         pkg_resources.require("setuptools>="+version); return
     except pkg_resources.VersionConflict as e:
@@ -279,9 +279,3 @@ if __name__=='__main__':
         update_md5(sys.argv[2:])
     else:
         main(sys.argv[1:])
-
-
-
-
-
-

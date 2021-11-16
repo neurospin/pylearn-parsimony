@@ -1,4 +1,4 @@
-.. _index: 
+.. _index:
 
 ==========================================
 Welcome to the documentation of Parsimony!
@@ -40,7 +40,7 @@ API
 ===
 
 API_
-   
+
 .. _API: ./epydoc_api/index.html
 
 

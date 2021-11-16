@@ -50,15 +50,15 @@ Use PEP 257 convention. Here is a useful example using the same style as numpy:
     -------
     out1 : Datatype. A descriptive text for the output parameters. Then a blank
             line.
-    
+
     out2 : Datatype. Note that the same rules regarding lines that wrap are used
             here as well.
-    
+
     See Also
     --------
     other_function : Short description of what the other function does.
     or_other_class : Or of what the other class does.
-    
+
     Examples
     --------
     >>> s = "Give doctest examples here."
