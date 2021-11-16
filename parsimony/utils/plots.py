@@ -201,7 +201,7 @@ def voronoi_tesselation(mu, rect=None, nx=100, ny=100,
 
     from scipy.spatial import Voronoi
 
-    vor = Voronoi(mu)  # Compute Voronoi tesselation.
+    vor = Voronoi(mu)  # Compute Voronoi tessellation.
     regions, vertices = _voronoi_finite_polygons_2d(vor)
 
     if colors is None:

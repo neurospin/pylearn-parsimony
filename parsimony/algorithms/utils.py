@@ -112,7 +112,7 @@ class AlgorithmSnapshot:
         self.output_prefix = output_prefix
         self.saving_period = saving_period
         self.cpt = 0
-        self.continuation_ite_nb = list()  # ite nb where continuation occured
+        self.continuation_ite_nb = list()  # ite nb where continuation occurred
 
     def save_conesta(self, algo_locals):
         self.cpt += 1
@@ -246,7 +246,7 @@ class Bisection(bases.ExplicitAlgorithm,
 
         x : A vector or tuple with two elements. The first element is the lower
                 end of the interval for which |f(x[0])|_2 < -eps. The second
-                element is the upper end of the interfal for which
+                element is the upper end of the interval for which
                 |f(x[1])|_2 > eps. If x is None, these values are found
                 automatically. Finding them may be slow, though, if the
                 function is expensive to evaluate.

@@ -672,7 +672,7 @@ class PCAL1L2TV(BaseEstimator):
                     if crit < self.eps:
                         _converged = True
 
-            # Store informations for this component
+            # Store information for this component
             self.info.append(_info)
             self.subfunc.append(_subfunc)
             self.func.append(_func)
@@ -693,7 +693,7 @@ class PCAL1L2TV(BaseEstimator):
         """ Return the approximated matrix for a given matrix.
         We have to recompute U and d because the argument may not have the same
         number of lines.
-        The argument must have the same number of columns than the datset used
+        The argument must have the same number of columns than the dataset used
         to fit the estimator.
         """
         if n_components is None:
@@ -702,7 +702,7 @@ class PCAL1L2TV(BaseEstimator):
         n, p = Xk.shape
         if p != self.V.shape[0]:
             raise ValueError("The argument must have the same number of "
-                             "columns than the datset used to fit the "
+                             "columns than the dataset used to fit the "
                              "estimator.")
         Ut, dt = self.transform(Xk, n_components=n_components)
         Xt = np.zeros(Xk.shape)
@@ -720,7 +720,7 @@ class PCAL1L2TV(BaseEstimator):
         Return the projected data and the associated d.
         We have to recompute U and d because the argument may not have the same
         number of lines.
-        The argument must have the same number of columns than the datset used
+        The argument must have the same number of columns than the dataset used
         to fit the estimator.
         """
         if n_components is None:
@@ -732,7 +732,7 @@ class PCAL1L2TV(BaseEstimator):
         n, p = Xk.shape
         if p != self.V.shape[0]:
             raise ValueError("The argument must have the same number of "
-                             "columns than the datset used to fit the "
+                             "columns than the dataset used to fit the "
                              "estimator.")
         U = np.zeros((n, n_components))
         d = np.zeros((n_components, ))

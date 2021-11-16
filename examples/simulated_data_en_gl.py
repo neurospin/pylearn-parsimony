@@ -4,7 +4,7 @@ This example shows the use of simulated data. The data are fit to a function
 that represents linear regression + elastic net (L1 + L2²) + group lasso.
 
 The output has the "best" solution (in terms of f(beta_k), f(mu, beta_k) and
-|beta* - beta_k|) at the inputed beta*.
+|beta* - beta_k|) at the inputted beta*.
 
 The code can be used equivalently for total variation. The necessary code has
 been commented out.

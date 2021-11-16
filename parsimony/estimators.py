@@ -2499,7 +2499,7 @@ class LogisticRegressionL1L2GL(LogisticRegressionEstimator):
     """
     def __init__(self, l1, l2, gl,
                  A=None, mu=consts.TOLERANCE,
-                 weigths=None,
+                 weights=None,
                  algorithm=None, algorithm_params=dict(),
                  class_weight=None,
                  penalty_start=0,

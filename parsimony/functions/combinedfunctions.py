@@ -339,7 +339,7 @@ class CombinedFunction(properties.CompositeFunction,
 
         clever : bool
             Whether or not to try to be "clever" when computing the
-            subgradient. If True, be "clever" in the sence that values of the
+            subgradient. If True, be "clever" in the sense that values of the
             subgradient are chosen that are assumed to improve the estimations;
             if False, use random uniform values. Default is True.
 
@@ -1554,7 +1554,7 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
         -------
 
         If penalty_start > 0 or l2 == 0, the gap may be infinite.
-        We use f_tilde instead of f with an artificial l2 penatly which is
+        We use f_tilde instead of f with an artificial l2 penalty which is
         sufficiently small to converge toward the same eps while maintaining
         a finite gap.
         This avoid to scale the dual variable sigma as done by Mairal &
@@ -1570,7 +1570,7 @@ class LogisticRegressionL1L2TV(LinearRegressionL1L2TV):
 
         If penalty_start > 0 some variable are unpenalized.
         Define beta = [beta_0, beta_1] with beta_0
-        coeficients of unpenalized variables.
+        coefficients of unpenalized variables.
         - f_tilde = f + lambda_0 ||beta_0||^2_2
         - l_star remain the same
         - psi_star:  psi_star + Eq 33 paper OLS avec kappa = gamma = 0
@@ -2084,7 +2084,7 @@ class AugmentedLinearRegressionL1L2TV(properties.SplittableFunction,
     def prox(self, x, **kwargs):
 
         raise NotImplementedError("Use the prox of the parts of the " \
-                                  "splitted function, g.prox() and h.prox().")
+                                  "split function, g.prox() and h.prox().")
 
     def set_rho(self, rho):
         """Update the penalty parameter.

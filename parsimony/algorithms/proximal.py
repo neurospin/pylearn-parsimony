@@ -578,7 +578,7 @@ class CONESTA(bases.ExplicitAlgorithm,
         if self.info_requested(Info.ok):
             self.info_set(Info.ok, False)
 
-        # Time the init computation (essentialy Lipchitz constant in mu_opt).
+        # Time the init computation (essentially Lipchitz constant in mu_opt).
         if self.info_requested(Info.time):
             init_time = utils.time_cpu()
 

@@ -1,6 +1,6 @@
-Required Softwares
-------------------
-Make sure the below softwares have been installed on your machine:
+Required Software
+-----------------
+Make sure the following software has been installed on your machine:
 
 * http://sphinx-doc.org/latest/install.html
 * https://pypi.python.org/pypi/sphinxtogithub

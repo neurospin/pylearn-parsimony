@@ -85,7 +85,7 @@ def bisection_method(f, low=0.0, high=1.0, maxiter=30, eps=TOLERANCE):
     Parameters
     ----------
     f : The function for which a root is found. The function must be increasing
-            for increasing x, and decresing for decreasing x.
+            for increasing x, and decreasing for decreasing x.
 
     low : A value for which f(low) < 0. If f(low) >= 0, a lower value, low',
             will be found such that f(low') < 0 and used instead of low.

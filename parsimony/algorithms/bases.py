@@ -201,7 +201,7 @@ class InformationAlgorithm(object):
     """Algorithms that produce information about their run.
 
     Implementing classes should update the INFO_PROVIDED class variable with
-    the information provided by the algorithm. Defauls to an empty list.
+    the information provided by the algorithm. Defaults to an empty list.
 
     ALL algorithms that inherit from InformationAlgorithm MUST add force_reset
     as a decorator to the run method.

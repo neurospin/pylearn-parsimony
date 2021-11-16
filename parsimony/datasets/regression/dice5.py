@@ -22,7 +22,7 @@ def load(n_samples=100,
          shape=(30, 30, 1),
          r2=.75,
          sigma_spatial_smoothing=1,
-         model="independant",
+         model="independent",
          random_seed=None):
     """Generate regression samples (images + target variable) and beta.
 
@@ -31,7 +31,7 @@ def load(n_samples=100,
     of pixels sharing a covariance that stem from a latent variable. Here
     objects are the dice's dots.
     Beta is non null within objects (default is five dots).
-    Then y is obtained with y = X * beta + noise, where beta is scalled such
+    Then y is obtained with y = X * beta + noise, where beta is scaled such
     that r_square(y, X * beta) = r2 and noise is sampled according to N(0, 1).
 
     Parameters
@@ -44,17 +44,17 @@ def load(n_samples=100,
             r_square(y, X * beta) = r2 (Default is .75)
 
     sigma_spatial_smoothing: Float. Standard deviation for Gaussian kernel
-            (default is 1). High value promotes spatial correlation bewteen
+            (default is 1). High value promotes spatial correlation between
             pixels.
 
-    model:  string or a dict (default "independant")
+    model:  string or a dict (default "independent")
         The dictionary contains the std-dev of each latent variables. It can be
         used to control the signal that stem from dot's latent over the noise.
         Since noise std-dev=1, model=dict(l1=2, l2=2) will create 2 latents
         associated to dot 1 and 2 with std-dev=2, ie.: dot/noise signal=2.
 
-        If model is "independant":
-            # Each dice dot has an independant latent variable:
+        If model is "independent":
+            # Each dice dot has an independent latent variable:
             l1=2., l2=2., l3=2., l4=2., l5=2.,
             # with no shared variance:
             l12=0., l45=0., l12345=0.,
@@ -62,14 +62,14 @@ def load(n_samples=100,
             b1=1., b2=1., b3=1., b4=-1., b5=-1.
 
         if model is a dictionary:
-            Update (overwrite) independant model by dictionnary parameter
+            Update (overwrite) independent model by dictionary parameter
             Example set betas of points 4 and 5 to 1
             dict(b4=1., b5=1.)
 
         If model is "redundant":
             # Dot-level signal in dots 1 an 2 fully stem from a shared latent:
             l1=0., l2=0., l12 =2.,
-            # l3 is independant
+            # l3 is independent
             l3=2.,
             # Dot-level signal in dots 4 an 5 fully stem from a shared latent:
             l4=0., l5=0., l45=2.,
@@ -81,7 +81,7 @@ def load(n_samples=100,
         If model is "suppressor":
             # Dot-level signal in dot 2 fully stem from shared latent:
             l1=1, l2=0., l12=2.,
-            # l3 is independant
+            # l3 is independent
             l3 = 2.,
             # Dot-level signal in dot 5 fully stem from shared latent:
             l4=2., l5=0., l45=2.,
@@ -95,11 +95,11 @@ def load(n_samples=100,
             y = l1 + l3 + l4 + noise.
             So pixels of X2 and X5 are not correlated with the target y so they
             will not be detected by univariate analysis. However, they
-            are usefull since they are suppressing unwilling variance that stem
+            are useful since they are suppressing unwilling variance that stem
             from latents l12 and l45.
 
     random_seed: None or integer. See numpy.random.seed(). If not None, it can
-            be used to obtain reproducable samples.
+            be used to obtain reproducible samples.
 
     Returns
     -------
@@ -114,7 +114,7 @@ def load(n_samples=100,
     -------
     The general procedure is:
 
-        1) For each pixel i, Generate independant variables Xi ~ N(0, 1)
+        1) For each pixel i, Generate independent variables Xi ~ N(0, 1)
 
         2) Add object level structure corresponding to the five dots:
            - Sample five latent variables ~ N(0, 1): l1, l3, l4, l12, l45,
@@ -166,7 +166,7 @@ def load(n_samples=100,
     ...     pass
     """
     if shape[0] < 5 or shape[1] < 5:
-        raise ValueError("Shape too small. The minimun is (5, 5, 0)")
+        raise ValueError("Shape too small. The minimum is (5, 5, 0)")
 
     if len(shape) == 2:
         shape = tuple(list(shape) + [1])
@@ -184,9 +184,9 @@ def load(n_samples=100,
     X3d = X.reshape(n_samples, nx, ny, nz)
     #########################################################################
     # 2. Tune points parameters latent and beta
-    # Default model independant points
+    # Default model independent points
     model_ = dict(
-            # All points has an independant latent
+            # All points has an independent latent
             l1=2., l2=2., l3=2., l4=2., l5=2.,
             # No shared variance
             l12=0., l45=0., l12345=0.,
@@ -198,7 +198,7 @@ def load(n_samples=100,
         model_ = dict(
             # Dot-level signal in dots 1 an 2 fully stem from the shared latent
             l1=0., l2=0., l12=2.,
-            # l3 is independant
+            # l3 is independent
             l3=2.,
             # Dot-level signal in dots 4 an 5 fully stem from the shared latent
             l4=0., l5=0., l45=2.,
@@ -210,7 +210,7 @@ def load(n_samples=100,
         model_ = dict(
             # Dot-level signal in dot 2 stem only from shared latent
             l1=2., l2=0., l12=2.,
-            # l3 is independant
+            # l3 is independent
             l3=2.,
             # Dot-level signal in dot 5 stem from shared latent
             l4=2., l5=0., l45=2.,
@@ -308,7 +308,7 @@ def dice_five_with_union_of_pairs(shape):
     """
     nx, ny, nz = shape
     if nx < 5 or ny < 5:
-        raise ValueError("Shape too small minimun is (5, 5, 0)")
+        raise ValueError("Shape too small minimum is (5, 5, 0)")
     s_obj = np.max([1, np.floor(np.max(shape) / 7)])
     k = 1
     c1 = np.floor((k * nx / 4., ny / 4., nz / 2.))

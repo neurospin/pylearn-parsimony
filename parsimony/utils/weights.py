@@ -1073,7 +1073,7 @@ class OrthogonalRandomInitialiser(NeuralNetworkInitialiser):
 #    """A start vector with the shape of a Gaussian curve.
 #
 #    The gaussian is computed with respect to the numbers of dimension in a
-#    supposed image. The output is thus a reshaped vector corresponsing to a 1-,
+#    supposed image. The output is thus a reshaped vector corresponding to a 1-,
 #    2-, 3- or higher-dimensional Gaussian curve.
 #    """
 #
@@ -1163,7 +1163,7 @@ class OrthogonalRandomInitialiser(NeuralNetworkInitialiser):
 #    """A start vector with multibple Gaussian curve shapes.
 #
 #    The gaussians are in an imagined 1D or 2D image. The output is a reshaped
-#    vector corresponsing to a 1- or 2-dimensional image.
+#    vector corresponding to a 1- or 2-dimensional image.
 #    """
 #
 #    def __init__(self, num_points=3, normalise=True, **kwargs):

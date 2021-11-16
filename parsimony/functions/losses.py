@@ -303,7 +303,7 @@ class RidgeRegression(properties.CompositeFunction,
         From the interface "LipschitzContinuousGradient".
         """
         if self._lambda_max is None:
-            # test wether X is diagonal
+            # test whether X is diagonal
             if np.all(self.X == np.diag(np.diagonal(self.X))):
                 s = np.diagonal(self.X)
             else:
@@ -1069,7 +1069,7 @@ class NonlinearSVM(properties.KernelFunction,
 
         penalty_start : int
             Must be non-negative. The number of columns, variables etc., to
-            excempt from penalisation. Equivalently, the first index to be
+            exempt from penalisation. Equivalently, the first index to be
             penalised. Default is 0, all columns are included.
 
         mean : bool

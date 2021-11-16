@@ -50,7 +50,7 @@ class GroupTotalVariation(properties.NesterovFunction,
 
         A : Numpy array (usually sparse). The linear operator for the Nesterov
                 formulation. Will have length 3 * number of groups, and the
-                group A matrices are assumed to be next to eachother in the
+                group A matrices are assumed to be next to each other in the
                 list. A may not be None!
 
         mu : Non-negative float. The regularisation constant for the smoothing.
@@ -289,7 +289,7 @@ def A_from_rects(*args, **kwargs):
 
 def linear_operator_from_rects(rects, shape, weights=None):
     """Generates the linear operator for the group total variation Nesterov
-    function from the rectange of a 3D image.
+    function from the rectangle of a 3D image.
 
     Parameters
     ----------

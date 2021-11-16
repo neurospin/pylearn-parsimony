@@ -18,11 +18,11 @@ Python code format
 - Pep 8. As far as possible.
 - Never go beyond 80 characters per line. If you cannot break the line before 80 characters, well then you or someone else have done something wrong.
 - Keep modules short and purposeful.
-- All the fields of an instance should be explictly declared in the function "__init__" or in methods that have the prefix "_init_". Avoid adding fields run-time.
+- All the fields of an instance should be explicitly declared in the function "__init__" or in methods that have the prefix "_init_". Avoid adding fields run-time.
 - Never "import *".
 - Do not use relative imports. When we move to Python 3, this will be relevant.
 - First import standard python modules, add one empty line and then import other non-standard python modules, add another empty line and then import library modules.
-- Use coherent names when importing modules, and use the same thoughout. E.g. "import numpy as np", "import very.long.imported.module.path as path".
+- Use consistent names when importing modules, and use the same throughout. E.g. "import numpy as np", "import very.long.imported.module.path as path".
 - Private fields, classes, functions, etc. use an underscore prefix. Such as "_private_field = 3.141592653589".
 - Lists, tuples, modules or datatypes with multiples members should be names in plural.
 
