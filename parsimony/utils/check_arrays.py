@@ -49,7 +49,7 @@ def check_arrays(*arrays):
     checked_arrays = []
     for array in arrays:
         # Recast input as float array
-        array = np.asarray(array, dtype=np.float)
+        array = np.asarray(array, dtype=float)
 
         if n_samples is None:
             n_samples = array.shape[0]
@@ -115,8 +115,8 @@ def check_array_in(array1, array2):
     ...                      np.arange(0, 1000))  # doctest: +ELLIPSIS
     array([971, 552,  14, ..., 525, 650, 332])
     """
-    _array1 = np.asarray(array1, dtype=np.float).ravel()
-    _array2 = np.asarray(array2, dtype=np.float).ravel()
+    _array1 = np.asarray(array1, dtype=float).ravel()
+    _array2 = np.asarray(array2, dtype=float).ravel()
 
     if not np.all(np.in1d(_array1, _array2)):
         raise ValueError("At least one elements of array1 could not be "

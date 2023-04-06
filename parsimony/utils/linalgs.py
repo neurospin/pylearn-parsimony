@@ -522,10 +522,10 @@ class TridiagonalSolver(Solver):
         b = abc[1, :]
         c = abc[2, :]
 
-        if abc.dtype != np.float:
-            a = np.asarray(a, np.float)
-            b = np.asarray(b, np.float)
-            c = np.asarray(c, np.float)
+        if abc.dtype != float:
+            a = np.asarray(a, float)
+            b = np.asarray(b, float)
+            c = np.asarray(c, float)
 
         n = len(a)
         x = np.zeros(n)
