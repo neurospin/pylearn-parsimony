@@ -10,6 +10,7 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 """
 from six import with_metaclass
 import abc
+import math
 
 import numpy as np
 
@@ -333,7 +334,7 @@ class SmoothedTotalVariation(NesterovFunction):
         anorm = ax ** 2 + ay ** 2 + az ** 2
         i = anorm > 1.0
 
-        anorm_i = anorm[i] ** 0.5  # Square root is taken here. Faster.
+        anorm_i = math.sqrt(anorm[i])
         ax[i] = np.divide(ax[i], anorm_i)
         ay[i] = np.divide(ay[i], anorm_i)
         az[i] = np.divide(az[i], anorm_i)
@@ -399,7 +400,7 @@ class SmoothedGroupTotalVariation(NesterovFunction):
             anorm = ax ** 2 + ay ** 2 + az ** 2
             i = anorm > 1.0
 
-            anorm_i = anorm[i] ** 0.5  # Square root is taken here. Faster.
+            anorm_i = math.sqrt(anorm[i])
             ax[i] = np.divide(ax[i], anorm_i)
             ay[i] = np.divide(ay[i], anorm_i)
             az[i] = np.divide(az[i], anorm_i)
@@ -429,7 +430,7 @@ def _Nesterov_GroupTV_project(a):
         anorm = ax ** 2 + ay ** 2 + az ** 2
         i = anorm > 1.0
 
-        anorm_i = anorm[i] ** 0.5  # Square root is taken here. Faster.
+        anorm_i = math.sqrt(anorm[i])
         ax[i] = np.divide(ax[i], anorm_i)
         ay[i] = np.divide(ay[i], anorm_i)
         az[i] = np.divide(az[i], anorm_i)
@@ -495,7 +496,7 @@ def _Nesterov_TV_project(alpha):
     anorm = ax ** 2 + ay ** 2 + az ** 2
     i = anorm > 1.0
 
-    anorm_i = anorm[i] ** 0.5  # Square root is taken here. Faster.
+    anorm_i = math.sqrt(anorm[i])
     ax[i] = np.divide(ax[i], anorm_i)
     ay[i] = np.divide(ay[i], anorm_i)
     az[i] = np.divide(az[i], anorm_i)

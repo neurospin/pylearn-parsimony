@@ -15,6 +15,7 @@ Copyright (c) 2013-2017, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @license: BSD 3-clause.
 """
 import abc
+import math
 from six import with_metaclass
 
 import numpy as np
@@ -1042,7 +1043,7 @@ class NesterovFunction(with_metaclass(abc.ABCMeta,
 #            anorm = ax ** 2 + ay ** 2 + az ** 2
 #            i = anorm > 1.0
 #
-#            anorm_i = anorm[i] ** 0.5  # Square root is taken here. Faster.
+#            anorm_i = math.sqrt(anorm[i])
 #            ax[i] = np.divide(ax[i], anorm_i)
 #            ay[i] = np.divide(ay[i], anorm_i)
 #            az[i] = np.divide(az[i], anorm_i)

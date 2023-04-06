@@ -12,6 +12,8 @@ Copyright (c) 2013-2014, CEA/DSV/I2BM/Neurospin. All rights reserved.
 @email:   lofstedt.tommy@gmail.com
 @license: BSD 3-clause.
 """
+import math
+
 import scipy.sparse as sparse
 import numpy as np
 
@@ -181,7 +183,7 @@ class GroupTotalVariation(properties.NesterovFunction,
             anorm = ax ** 2 + ay ** 2 + az ** 2
             i = anorm > 1.0
 
-            anorm_i = anorm[i] ** 0.5  # Square root is taken here. Faster.
+            anorm_i = math.sqrt(anorm[i])
             ax[i] = np.divide(ax[i], anorm_i)
             ay[i] = np.divide(ay[i], anorm_i)
             az[i] = np.divide(az[i], anorm_i)
@@ -225,7 +227,7 @@ class GroupTotalVariation(properties.NesterovFunction,
             ay = A[g + 1].dot(beta_)
             az = A[g + 2].dot(beta_)
 
-            anorm = (ax ** 2 + ay ** 2 + az ** 2) ** 0.5  # Square root is taken here. Faster.
+            anorm = math.sqrt(ax ** 2 + ay ** 2 + az ** 2)
 
             max_norm = max(max_norm, np.max(anorm))  # The overall maximum.
 
