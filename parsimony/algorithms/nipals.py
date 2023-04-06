@@ -526,7 +526,7 @@ FastSVDProduct = RankOneSVDProduct
 
 class PLSR(bases.ImplicitAlgorithm,
            bases.IterativeAlgorithm):
-    """A NIPALS implementation for PLS regresison.
+    """A NIPALS implementation for PLS regression.
 
     Parameters
     ----------
@@ -581,7 +581,7 @@ class PLSR(bases.ImplicitAlgorithm,
         self.eps = max(consts.TOLERANCE, float(eps))
 
     def run(self, XY, wc=None):
-        """A NIPALS implementation for PLS regresison.
+        """A NIPALS implementation for PLS regression.
 
         Parameters
         ----------
@@ -634,7 +634,7 @@ class PLSR(bases.ImplicitAlgorithm,
 
 class SparsePLSR(bases.ImplicitAlgorithm,
                  bases.IterativeAlgorithm):
-    """A NIPALS implementation for Sparse PLS regresison.
+    """A NIPALS implementation for Sparse PLS regression.
 
     Parameters
     ----------
@@ -691,7 +691,7 @@ class SparsePLSR(bases.ImplicitAlgorithm,
         self.penalise_y = bool(penalise_y)
 
     def run(self, XY, wc=None):
-        """A NIPALS implementation for sparse PLS regresison.
+        """A NIPALS implementation for sparse PLS regression.
 
         Parameters
         ----------

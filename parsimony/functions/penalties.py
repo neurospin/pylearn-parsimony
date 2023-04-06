@@ -305,7 +305,7 @@ class L0(properties.AtomicFunction,
 
         f(x) = l * (||x||_0 - c),
 
-    where ||x||_0 is the L0 loss function. The constrainted version has the
+    where ||x||_0 is the L0 loss function. The constrained version has the
     form
 
         ||x||_0 <= c.
@@ -496,7 +496,7 @@ class LInf(properties.AtomicFunction,
 
         f(x) = l * (||x||_inf - c),
 
-    where ||x||_inf is the L-infinity loss function. The constrainted version
+    where ||x||_inf is the L-infinity loss function. The constrained version
     has the form
 
         ||x||_inf <= c.
