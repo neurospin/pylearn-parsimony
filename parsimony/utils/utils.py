@@ -61,7 +61,7 @@ def numpy_datatype(dtype):  # TODO: Keep up-to-date!
         dtype = _.dtype
 
     # For special numpy types, let numpy handle it!
-    if isinstance(dtype, (np.bool_, np.int_, np.intc, np.intp, np.float_,
+    if isinstance(dtype, (bool_, np.int_, np.intc, np.intp, np.float_,
                           np.complex_)):
         _ = np.zeros((1,), dtype=dtype)
         dtype = _.dtype
@@ -94,8 +94,8 @@ def numpy_datatype(dtype):  # TODO: Keep up-to-date!
         dtype = np.uint16
     elif (dtype == "string"):
         dtype = np.string
-    elif (dtype == "bool") or (dtype == np.bool):
-        dtype = np.bool
+    elif (dtype == "bool") or (dtype == bool):
+        dtype = bool
     elif (dtype == "complex64") or (dtype == np.complex64):
         dtype = np.complex64
     elif (dtype == "complex128") or (dtype == np.complex128):
@@ -225,7 +225,8 @@ class deprecated(object):
 
 #            warnings.warn_explicit(msg, category=DeprecationWarning,
 #                                   filename=filename, lineno=lineno)
-            warnings.warn(msg, category=DeprecationWarning, stacklevel=2)  # Prints function call site instead of function definition site.
+            # Prints function call site instead of function definition site.
+            warnings.warn(msg, category=DeprecationWarning, stacklevel=2)
 
             if self.filter_off:
                 warnings.simplefilter("default", DeprecationWarning)  # Reset filter
@@ -235,7 +236,7 @@ class deprecated(object):
         return new_func
 
 
-#def deprecated(*replaced_by):
+# def deprecated(*replaced_by):
 #    """This decorator can be used to mark functions as deprecated.
 #
 #    Useful when phasing out old API functions.
@@ -277,8 +278,8 @@ class deprecated(object):
 #        return outer
 
 
-#@deprecated("functions.properties.Gradient.approx_grad")
-#def approx_grad(f, x, eps=1e-4):
+# @deprecated("functions.properties.Gradient.approx_grad")
+# def approx_grad(f, x, eps=1e-4):
 #    p = x.shape[0]
 #    grad = np.zeros(x.shape)
 #    for i in xrange(p):
@@ -291,7 +292,7 @@ class deprecated(object):
 #
 #    return grad
 
-#def make_list(a, n, default=None):
+# def make_list(a, n, default=None):
 #    # If a list, but empty
 #    if isinstance(a, (tuple, list)) and len(a) == 0:
 #        a = None
@@ -349,7 +350,7 @@ def project(v, u):
     return (np.dot(v.T, u) / np.dot(u.T, u)) * u
 
 
-#def cov(a, b):
+# def cov(a, b):
 #    ma = np.mean(a)
 #    mb = np.mean(b)
 #
@@ -364,17 +365,17 @@ def project(v, u):
 #        return ip
 #
 #
-#def sstot(a):
+# def sstot(a):
 #    a = np.asarray(a)
 #    return np.sum(a ** 2)
 #
 #
-#def ssvar(a):
+# def ssvar(a):
 #    a = np.asarray(a)
 #    return np.sum(a ** 2, axis=0)
 #
 #
-#def direct(W, T=None, P=None, compare=False):
+# def direct(W, T=None, P=None, compare=False):
 #    if compare and T == None:
 #        raise ValueError("In order to compare you need to supply two arrays")
 #
@@ -421,7 +422,7 @@ def project(v, u):
 #        return W
 #
 #
-#def debug(*args):
+# def debug(*args):
 #    if _DEBUG:
 #        s = ""
 #        for a in args:
@@ -429,12 +430,12 @@ def project(v, u):
 #        print s
 #
 #
-#def warning(*args):
+# def warning(*args):
 #    if _DEBUG:
 #        s = ""
 #        for a in args:
 #            s = s + str(a)
-##        traceback.print_stack()
+# traceback.print_stack()
 #        print "WARNING:", s
 
 
@@ -500,7 +501,7 @@ def optimal_shrinkage(X, T=None):
     return tau
 
 
-#def delete_sparse_csr_row(mat, i):
+# def delete_sparse_csr_row(mat, i):
 #    """Delete row i in-place from sparse matrix mat (CSR format).
 #
 #    Implementation from:

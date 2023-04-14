@@ -214,6 +214,7 @@ class RankOneSVD(bases.ImplicitAlgorithm,
 
         return utils.direct_vector(v)
 
+
 FastSVD = RankOneSVD
 
 
@@ -406,6 +407,7 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
 
         return utils.direct_vector(v)
 
+
 FastSparseSVD = RankOneSparseSVD
 
 
@@ -521,6 +523,7 @@ class RankOneSVDProduct(bases.ImplicitAlgorithm,
 
         return utils.direct_vector(v)
 
+
 FastSVDProduct = RankOneSVDProduct
 
 
@@ -574,6 +577,7 @@ class PLSR(bases.ImplicitAlgorithm,
     ...            np.dot(Y, c / np.linalg.norm(c)))[0, 0] - S[0]) < 5e-15
     True
     """
+
     def __init__(self, max_iter=200, eps=consts.TOLERANCE, **kwargs):
 
         super(PLSR, self).__init__(max_iter=max_iter, **kwargs)
@@ -678,6 +682,7 @@ class SparsePLSR(bases.ImplicitAlgorithm,
     ...                              [0.5646119 ]])) < 5e-8
     True
     """
+
     def __init__(self, l=[0.0, 0.0], penalise_y=True, max_iter=200,
                  eps=consts.TOLERANCE, **kwargs):
 

@@ -155,7 +155,7 @@ class SequentialMinimalOptimization(bases.ExplicitAlgorithm,
 
         # Set up error cache
         self._E = np.zeros(n)
-        self._Evalid = np.zeros(n, dtype=np.bool)
+        self._Evalid = np.zeros(n, dtype=bool)
 
         # Bias (intercept/threshold)
         self.bias = 0.0

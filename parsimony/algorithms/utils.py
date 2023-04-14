@@ -108,6 +108,7 @@ class AlgorithmSnapshot:
     >>> print("Nb snapshots = %d" % (len(glob.glob(prefix + "*")),))
     Nb snapshots = 5
     """
+
     def __init__(self, output_prefix, saving_period=100):
         self.output_prefix = output_prefix
         self.saving_period = saving_period
@@ -630,6 +631,7 @@ class SqSumNotSumStepSize(StepSize):
         Non-negative value. Addend in the denominator. Large values give
         smaller steps. Default is 0.
     """
+
     def __init__(self, a=0.1, b=0.0):
 
         self.a = max(consts.TOLERANCE, float(a))
@@ -653,6 +655,7 @@ class NonSumDimStepSize(StepSize):
         Positive value. Factor in the numerator. Large values give longer
         steps. Default is 0.1.
     """
+
     def __init__(self, a=0.1):
 
         self.a = max(consts.TOLERANCE, float(a))
@@ -683,7 +686,7 @@ class Kernel(object):
             self._vector_cache = dict()
 
             self._K = np.zeros(self.shape)
-            self._K_computed = np.zeros(self.shape, dtype=np.bool)
+            self._K_computed = np.zeros(self.shape, dtype=bool)
             self._K_num = 0
 
     def __call__(self, x1, x2=None):
@@ -769,8 +772,8 @@ class LinearKernel(ExplicitKernel):
         i2 = int(i2)
 
         if self._use_cache:
-#            if (i1, i2) in self._cache:
-#                return self._cache[(i1, i2)]
+            #            if (i1, i2) in self._cache:
+            #                return self._cache[(i1, i2)]
             if self._K_computed[i1, i2]:
                 return self._K[i1, i2]
             else:
