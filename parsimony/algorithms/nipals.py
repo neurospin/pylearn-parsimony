@@ -148,7 +148,7 @@ class RankOneSVD(bases.ImplicitAlgorithm,
         if start_vector is None:
             start_vector = weights.RandomUniformWeights(normalise=True)
 
-        v0 = start_vector.get_weights(np.min(X.shape))
+        v0 = start_vector.get_weights(np.min(X.shape)).squeeze()
 
         arpack_failed = False
         try:
@@ -213,6 +213,7 @@ class RankOneSVD(bases.ImplicitAlgorithm,
             self.info_set(utils.Info.ok, True)
 
         return utils.direct_vector(v)
+
 
 FastSVD = RankOneSVD
 
@@ -330,7 +331,7 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
         if start_vector is None:
             start_vector = weights.RandomUniformWeights(normalise=True)
 
-        v0 = start_vector.get_weights(np.min(X.shape))
+        v0 = start_vector.get_weights(np.min(X.shape)).squeeze()
 
         # determine when to use power method or scipy_sparse
         use_power = True if X.shape[1] >= 10 ** 3 else False
@@ -405,6 +406,7 @@ class RankOneSparseSVD(bases.ImplicitAlgorithm,
             self.info_set(utils.Info.ok, True)
 
         return utils.direct_vector(v)
+
 
 FastSparseSVD = RankOneSparseSVD
 
@@ -521,6 +523,7 @@ class RankOneSVDProduct(bases.ImplicitAlgorithm,
 
         return utils.direct_vector(v)
 
+
 FastSVDProduct = RankOneSVDProduct
 
 
@@ -574,6 +577,7 @@ class PLSR(bases.ImplicitAlgorithm,
     ...            np.dot(Y, c / np.linalg.norm(c)))[0, 0] - S[0]) < 5e-15
     True
     """
+
     def __init__(self, max_iter=200, eps=consts.TOLERANCE, **kwargs):
 
         super(PLSR, self).__init__(max_iter=max_iter, **kwargs)
@@ -678,6 +682,7 @@ class SparsePLSR(bases.ImplicitAlgorithm,
     ...                              [0.5646119 ]])) < 5e-8
     True
     """
+
     def __init__(self, l=[0.0, 0.0], penalise_y=True, max_iter=200,
                  eps=consts.TOLERANCE, **kwargs):
 
