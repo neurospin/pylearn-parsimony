@@ -742,7 +742,7 @@ def nemenyi_test(X, p_value=0.05, return_ranks=False, return_critval=False):
     crit_val = _critical_nemenyi_value(p_value, num_models)
     CD = crit_val * np.sqrt(num_models * (num_models + 1) / (6.0 * num_datasets))
 
-    sign = np.zeros((num_models, num_models), dtype=np.bool)
+    sign = np.zeros((num_models, num_models), dtype=bool)
     for j1 in range(num_models):
         for j2 in range(num_models):
             sign[j1, j2] = np.abs(np.mean(R[:, j1] - R[:, j2])) > CD

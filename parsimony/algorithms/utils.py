@@ -683,7 +683,7 @@ class Kernel(object):
             self._vector_cache = dict()
 
             self._K = np.zeros(self.shape)
-            self._K_computed = np.zeros(self.shape, dtype=np.bool)
+            self._K_computed = np.zeros(self.shape, dtype=bool)
             self._K_num = 0
 
     def __call__(self, x1, x2=None):
