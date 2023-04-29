@@ -232,7 +232,7 @@ class L1TV(properties.NesterovFunction,
             anorm_tv += a[k] ** 2
         i_tv = anorm_tv > 1.0
 
-        anorm_tv_i = anorm_tv[i_tv] ** 0.5  # Square root is taken here. Faster.
+        anorm_tv_i = math.sqrt(anorm_tv[i_tv])
         for k in range(1, len(a)):
             a[k][i_tv] = np.divide(a[k][i_tv], anorm_tv_i)
 
