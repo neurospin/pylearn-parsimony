@@ -70,7 +70,7 @@ params = dict(name="pylearn-parsimony",
                            "License :: OSI Approved :: BSD 3-Clause License",
                            "Topic :: Scientific/Engineering",
                            "Topic :: Machine learning"
-                           "Programming Language :: Python :: 2.7",
+                           "Programming Language :: Python",
                            ],
               )
 
